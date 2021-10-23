@@ -1,0 +1,14 @@
+#!/bin/bash
+
+fUsage()
+{
+	cat <<EOF
+git proj	(git-proj)
+git proj init [-l] [-r]
+    	      (git-proj-init, proj-init-local, proj-init-remote, proj-init-raw )
+git proj get	(git-proj-get, proj-get-local)
+git proj set	(git-proj-set, proj-set-origin)
+git proj push 	(git-proj-push, proj-push-raw)
+git proj pull 	(git-proj-pull, proj-pull-raw)
+EOF
+}
