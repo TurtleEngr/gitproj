@@ -84,7 +84,7 @@ git proj pull [-b]
 
 git proj set [-l pExternalPath] [-e pRawPath]
 
-    Define or redefine the options.
+    Define or redefine the gitproj options.
     
     -l pExternalPath
     
@@ -94,10 +94,10 @@ git proj set [-l pExternalPath] [-e pRawPath]
 
     -e pRawPath
 
-       Redefine the location of the raw file dir. The "raw" symlink
-       will be updated.
+       Redefine the location of the local raw file dir. The "raw"
+       symlink will be updated.
 
-    -c
+    -c on/off
     
        Set a commit hook to not allow commits for "large" binary files.
 
@@ -105,14 +105,13 @@ git proj set [-l pExternalPath] [-e pRawPath]
     
        Set the max size for commits of binary files.
 
-git proj status
+git proj status [-v]
 
     Verify origin is set to a path that exists.
     Verify the raw symlink points a directory.
     Verify the origin raw dir exists (assumes at least one push)
-
-git proj diff
-
     Give a "diff" of the raw files, local vs external.
+    if -v, show all the config settings.
+
 EOF
 }
