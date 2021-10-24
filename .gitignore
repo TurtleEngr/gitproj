@@ -1,0 +1,10 @@
+*.tmp
+*~
+.cache/
+.cvsignore
+CVS/
+core
+nohup.out
+proxy/
+thumbs/
+tmp/

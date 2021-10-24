@@ -1,5 +1,26 @@
 # gitproj
 
+## Notes
+
+https://coderwall.com/p/bt93ia/extend-git-with-custom-commands
+
+https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html
+
+    source "$(git --exec-path)/git-sh-setup"
+       require_work_tree_exists
+       cd_to_toplevel
+       require_clean_work_tree rebase "Please commit or stash them."
+
+https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html
+
+https://github.com/nvie/gitflow
+
+https://github.com/nvie/gitflow/blob/develop/git-flow-init
+
+https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks
+https://git-scm.com/docs/githooks
+
+
 ## Design
 
 ### Move existing files to PROJ.raw/DIRS and make symlinks
