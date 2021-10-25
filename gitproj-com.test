@@ -1,0 +1,683 @@
+#!/bin/bash
+# Test suite to gitproj functions and scripts.
+
+# -------------------
+# Set current directory location in PWD and cCurDir
+if [ -z "$PWD" ]; then
+        PWD=$(pwd)
+fi
+cCurDir=$PWD
+
+# -------------------
+# Define the location of this script
+cBin=${0%/*}
+if [ "$cBin" = "." ]; then
+        cBin=$PWD
+fi
+cd $cBin
+cBin=$PWD
+cd $cCurDir
+
+# --------------------------------
+fGitProjTestUsage()
+{
+        # This is just a place for the start of the testing internal
+        #  documentation. See: fGitProjComInternalDoc()
+        return
+        cat <<\EOF >/dev/null
+=internal-pod
+
+=internal-head1 gitproj-com.test
+
+=internal-head2 gitproj-com.test Usage
+
+=internal-cut
+
+=pod
+
+=head1 NAME
+
+gitproj-com.test - test the gitproj-com.inc functions
+
+=head1 SYNOPSIS
+
+        gitproj-com.test [testName,testName,...]
+
+=head1 DESCRIPTION
+
+shunit2.1 is used to run the unit tests. If no test function names are
+listed, then all of the test functions will be run.
+
+=head1 RETURN VALUE
+
+0 - if OK
+
+=head1 ERRORS
+
+Look for the assert errors.
+
+=head1 EXAMPLES
+
+=head1 ENVIRONMENT
+
+=head1 FILES
+
+=head1 SEE ALSO
+
+shunit2.1
+
+=head1 NOTES
+
+=head1 CAVEATS
+
+=head1 DIAGNOSTICS
+
+=head1 BUGS
+
+=head1 RESTRICTIONS
+
+=head1 AUTHOR
+
+=head1 HISTORY
+
+$Revision: 1.2 $ $Date: 2021/09/08 01:39:35 $ GMT 
+
+=cut
+EOF
+}
+
+# --------------------------------
+fCleanUp()
+{
+        fComCleanUp
+} # fCleanUp
+
+# --------------------------------
+fComUDebug()
+{
+        if [ ${gpUnitDebug:-0} -ne 0 ]; then
+                echo "fComUDebug: $*"
+        fi
+        return
+        cat <<EOF
+
+=internal-head2 Com Unit Test Functions
+
+EOF
+} # fComUDebug
+
+# --------------------------------
+oneTimeSetUp()
+{
+	assertTrue "$LINENO" "[ -x $cBin/gitproj-com.inc ]"
+        . $cBin/gitproj-com.inc
+
+        fComSetGlobals
+
+        # Save global values
+        export tDefault_Tmp=$Tmp
+        export tDefault_cBin=$cBin
+        export tDefault_cCurDir=$cCurDir
+        export tDefault_cName=$cName
+        export tDefault_cPID=$cPID
+        export tDefault_cTmp1=$cTmp1
+        export tDefault_cTmpF=$cTmpF
+        export tDefault_cVer=$cVer
+        export tDefault_gErr=0
+        export tDefault_gpDebug=0
+        export tDefault_gpFacility=user
+        export tDefault_gpLog=0
+        export tDefault_gpVerbose=0
+
+	assertTrue "$LINENO" "[ -r ~/.gitconfig ]"
+	assertTrue "$LINENO" "[ -r .git/config ]"
+
+	assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head2 Test gitproj-com.inc
+
+=internal-head3 oneTimeSetuUp
+
+Currently this records all of the script's expected initial global
+variable settings, defined in fComSetGlobals. If different, adjust the
+tests as needed.
+
+Calls:
+
+ $cBin/gitproj-com.inc
+ fComSetGlobals
+
+=internal-cut
+EOF
+} # oneTimeSetUp
+
+# --------------------------------
+setUp()
+{
+        # Restore global values, before each test
+        Tmp=$tDefault_Tmp
+        cBin=$tDefault_cBin
+        cCurDir=$tDefault_cCurDir
+        cName=$tDefault_cName
+        cPID=$tDefault_cPID
+        cTmp1=$tDefault_cTmp1
+        cTmpF=$tDefault_cTmpF
+        cVer=$tDefault_cVer
+        gErr=$tDefault_gErr
+        gpDebug=$tDefault_gpDebug
+        gpFacility=$tDefault_gpFacility
+        gpLog=$tDefault_gpLog
+        gpVerbose=$tDefault_gpVerbose
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 setUp
+
+Before each test runs, this restores all of the script's initial
+global variable settings,
+
+=internal-cut
+EOF
+} # setUp
+
+tearDown()
+{
+	git config --local --remove-section gitproj.test &>/dev/null
+	git config --global --remove-section gitproj.test &>/dev/null
+	return 0
+}
+
+# --------------------------------
+testComInitialConfig()
+{
+        local tProg
+        local tResult
+
+        assertEquals "$LINENO tcic-1" "$PWD" "$cCurDir"
+        assertTrue "$LINENO tcic-2" "[ -d $cCurDir ]"
+
+        assertNotNull "$LINENO tcic-3" "$cBin"
+        assertTrue "$LINENO tcic-4" "[ -d $cBin ]"
+        assertTrue "$LINENO tcic-5" "[ -f $cBin/$cName ]"
+        assertTrue "$LINENO tcic-6" "[ -x $cBin/$cName ]"
+        assertTrue "$LINENO tcic-7" "[ -x $cBin/gitproj-com.inc ]"
+        assertTrue "$LINENO tcic-8" "[ -x $cBin/gitproj-com.test ]"
+
+        assertEquals "$LINENO tcic-10" "0" "$gpDebug"
+        assertEquals "$LINENO tcic-11" "0" "$gpVerbose"
+        assertEquals "$LINENO tcic-12" "0" "$gpLog"
+        assertEquals "$LINENO tcic-13" "user" "$gpFacility"
+        assertEquals "$LINENO tcic-14" "0" "$gErr"
+        assertNull "$LINENO tcic-15" "$(echo $cVer | tr -d '.[:digit:]')"
+        assertEquals "$LINENO tcic-16" "/tmp/$USER/$cName" "$Tmp"
+        #assertEquals "$LINENO tcic-17" "$Tmp/file-$cPID" "$cTmpF"
+        assertEquals "$LINENO tcic-18" "${cTmpF}-1.tmp" "$cTmp1"
+
+        # ADJUST
+        assertEquals "$LINENO tcic-19" "/tmp/$USER/$cName" "$Tmp"
+
+        for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr; do
+                which $tProg &>/dev/null
+                assertTrue "$LINENO tcic-20 missing: $tProg" "[ $? -eq 0 ]"
+        done
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 testInitialConfig
+
+Verify all of the global variables are correctly defined. Look for
+"ADJUST" comment for tests that might need to be changed for your
+script.
+
+=internal-cut
+EOF
+} # testInitialConfig
+
+# --------------------------------
+testComLog_MultiplePermutations()
+{
+        local tMsg
+        local tLevel
+        local tLine
+        local tErr
+        local tResult
+        local tTestMsg
+
+        # Check the format, for a number of settings
+        gpLog=0
+        gpVerbose=0
+        gpDebug=0
+        tMsg="Testing 123"
+        tLine="458"
+        tErr="42"
+
+        gpUnitDebug=0
+        for gpLog in 0 1; do
+          for gpVerbose in 0 1 2; do
+            for gpDebug in 0 1 2; do
+              for tLevel in alert crit err warning notice info debug debug-1 debug-3; do
+                echo -n '.' 1>&2
+                tTestMsg="l-$gpLog.v-$gpVerbose.d-$gpDebug.$tLevel.fLog"
+                if [ "fLog" = "fLog" ]; then
+                  fComUDebug " "
+                  fComUDebug "Call: fLog $tLevel \"$tMsg\" $tLine $tErr"
+                  tResult=$(fLog $tLevel "$tMsg" $tLine $tErr 2>&1)
+                fi
+                if [ "fLog" = "fLog" ]; then
+                  fComUDebug " "
+                  fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\" -l $tLine -e $tErr"
+                  tResult=$(fLog -p $tLevel -m "$tMsg" -l $tLine -e $tErr 2>&1)
+                fi
+                fComUDebug "tResult=$tResult"
+
+                if [ $gpVerbose -eq 0 ] && echo $tLevel | grep -Eq 'notice|info'; then
+                    assertNull "$LINENO tcl1-$tTestMsg not notice,info" "$tResult"
+                    continue
+                fi
+                if [ $gpVerbose -eq 1 ] && echo $tLevel | grep -Eq 'info'; then
+                    assertNull "$LINENO tcl1-$tTestMsg not info" "$tResult"
+                    continue
+                fi              
+                if [ $gpDebug -eq 0 ] && [ "${tLevel%%-*}" = "debug" ]; then
+                    assertNull "$LINENO tcl2-$tTestMsg not debug" "$tResult"
+                    continue
+                fi
+                if [ $gpDebug -lt 2 ] && [ "$tLevel" = "debug-2" ]; then
+                    assertNull "$LINENO tcl3-$tTestMsg not debug-2" "$tResult"
+                    continue
+                fi
+                if [ $gpDebug -lt 3 ] && [ "$tLevel" = "debug-3" ]; then
+                    assertNull "$LINENO tcl4-$tTestMsg not debug-3" "$tResult"
+                    continue
+                fi
+                assertContains "$LINENO tcl5-$tTestMsg.name" "$tResult" "$cName"
+                assertContains "$LINENO tcl6-$tTestMsg.level" "$tResult" "$tLevel:"
+                assertContains "$LINENO tcl7-$tTestMsg.msg" "$tResult" "$tMsg"
+                assertContains "$LINENO tcl8-$tTestMsg.line" "$tResult" '['$tLine']'
+                assertContains "$LINENO tcl9-$tTestMsg.$tLevel.err" "$tResult" '('$tErr')'
+              done # tLevel
+            done # gpDebug
+          done # gpVerbose
+        done # gpLog
+	
+        echo 1>&2
+        gpUnitDebug=0
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 testLog
+
+Test fLog and fLog.
+
+=internal-cut
+EOF
+} # testLog
+
+# --------------------------------
+testComSysLog()
+{
+        local tErr
+        local tLevel
+        local tLine
+        local tMsg
+        local tResult
+        local tTestMsg
+
+        # ADJUST? This is dependent on your syslog configuration.
+        export tSyslog=/var/log/user.log
+        #export tSyslog=/var/log/messages.log
+        #export tSyslog=/var/log/syslog
+
+        # Check syslog
+        gpUnitDebug=0
+        gpLog=1
+        gpVerbose=0
+        tMsg="Testing 123"
+        #for tLevel in emerg alert crit err warning; do
+        for tLevel in alert crit err warning; do
+            echo -n '.' 1>&2
+            tTestMsg="$tLevel.fLog"
+            fComUDebug " "
+            if [ "fLog" = "fLog" ]; then
+                fComUDebug "Call: fLog $tLevel $tMsg"
+                tResult=$(fLog $tLevel "$tMsg" 2>&1)
+            fi
+            if [ "fLog" = "fLog" ]; then
+                fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\""
+                tResult=$(fLog -p $tLevel -m "$tMsg" 2>&1)
+            fi
+            fComUDebug "tResult=$tResult"
+            assertContains "$LINENO tcl11-$tTestMsg" "$tResult" "$tLevel:"
+            tResult=$(tail -n1 $tSyslog)
+            fComUDebug "syslog tResult=$tResult"
+            assertContains "$LINENO tcl12-$tTestMsg" "$tResult" "$tLevel:"
+            assertContains "$LINENO tcl13-$tTestMsg" "$tResult" "$tMsg"
+        done
+        echo 1>&2
+        gpUnitDebug=0
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 testSysLog
+
+Test fLog and fLog, and verify messages are in a syslog file.
+
+=internal-cut
+EOF
+} # testSysLog
+
+# --------------------------------
+testComErrorLog()
+{
+        local tMsg
+        local tLevel
+        local tLine
+        local tErr
+        local tResult
+        local tTestMsg
+
+        gpUnitDebug=0
+        gpLog=0
+        gpVerbose=0
+        local tMsg="Testing 123"
+        local tLine="458"
+        for gpLog in 0 1; do
+            echo -n '.' 1>&2
+            tTestMsg="l-$gpLog.fError"
+            fComUDebug " "
+            if [ "fError" = "fError" ]; then
+                fComUDebug "Call: fError \"$tMsg\" $tLine"
+                tResult=$(fError "$tMsg" $tLine 2>&1)
+            fi
+            if [ "fError" = "fError" ]; then
+                fComUDebug "Call: fError -m \"$tMsg\" -l $tLine"
+                tResult=$(fError -m "$tMsg" -l $tLine 2>&1)
+            fi
+            fComUDebug "tResult=$tResult"
+            assertContains "$LINENO tcel-$tTestMsg.name" "$tResult" "$cName"
+            assertContains "$LINENO tcel-$tTestMsg.crit" "$tResult" "crit:"
+            assertContains "$LINENO tcel-$tTestMsg.msg" "$tResult" "$tMsg"
+            assertContains "$LINENO tcel-$tTestMsg.line" "$tResult" '['$tLine']'
+            # shellcheck disable=SC2026
+            assertContains "$LINENO tcel-$tTestMsg.err" "$tResult" '('1')'
+            assertContains "$LINENO tcel-$tTestMsg.usage" "$tResult" "Usage:"
+        done
+        echo 1>&2
+        gpUnitDebug=0
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 testErrorLog
+
+Test fError and fError.
+
+=internal-cut
+EOF
+} # testErrorLog
+
+# --------------------------------
+testComUsage()
+{
+        local tResult
+        
+        gpUnitDebug=0
+
+        #-----
+        tResult=$(fComUsage -s short -f $cBin/$cName 2>&1)
+        fComUDebug "tResult=$tResult"
+        assertContains "$LINENO tcu-short" "$tResult" "Usage:"
+        
+        #-----
+        tResult=$(fComUsage -s foo -f $cBin/$cName 2>&1)
+        fComUDebug "tResult=$tResult"
+        assertContains "$LINENO tcu-s-foo.1" "$tResult" "DESCRIPTION"
+        assertContains "$LINENO tcu-s-foo.2" "$tResult" "HISTORY"
+
+        #-----
+        tResult=$(fComUsage -f $cBin/$cName -s 2>&1)
+        fComUDebug "tResult=$tResult"
+        assertContains "$LINENO tcu-s-null.1" "$tResult" "crit: Internal: fComUsage: Value required"
+
+        #-----
+        tResult=$(fComUsage -s long -f $cBin/$cName 2>&1)
+        assertContains "$LINENO tcu-long.1" "$tResult" "DESCRIPTION"
+        assertContains "$LINENO tcu-long.2" "$tResult" "HISTORY"
+
+        #-----
+        tResult=$(fComUsage -s man -f $cBin/$cName 2>&1)
+        assertContains "$LINENO tcu-man.1" "$tResult" '.IX Header "DESCRIPTION"'
+        assertContains "$LINENO tcu-man.2" "$tResult" '.IX Header "HISTORY"'
+
+        #-----
+        tResult=$(fComUsage -s html -f $cBin/$cName -t "$cName Usage" 2>&1)
+        assertContains "$LINENO tcu-html.1" "$tResult" '<li><a href="#DESCRIPTION">DESCRIPTION</a></li>'
+        assertContains "$LINENO tcu-html.2" "$tResult" '<h1 id="HISTORY">HISTORY</h1>'
+        assertContains "$LINENO tcu-html.3" "$tResult" "<title>$cName Usage</title>"
+
+        #-----
+        tResult=$(fComUsage -s md -f $cBin/$cName 2>&1)
+        assertContains "$LINENO tcu-md.1" "$tResult" '# DESCRIPTION'
+        assertContains "$LINENO tcu-md.2" "$tResult" '# HISTORY'
+
+        #-----
+        tResult=$(fComUsage -i -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)
+        fComUDebug "tResult=$tResult"
+        assertContains "$LINENO tcu-internal.1" "$tResult" 'Template Use'
+        assertContains "$LINENO tcu-internal.2" "$tResult" 'fComSetGlobals'
+
+        #-----
+        tResult=$(fComUsage -i -s html -t "Internal Doc" -f $cBin/$cName -f $cBin/gitproj-com.inc -f $cBin/gitproj-com.test 2>&1)
+        fComUDebug "tResult=$tResult"
+        assertContains "$LINENO tcu-int-html.1" "$tResult" '<a href="#Template-Use">Template Use</a>'
+        assertContains "$LINENO tcu-int-html.2" "$tResult" '<h3 id="fComSetGlobals">fComSetGlobals</h3>'
+        assertContains "$LINENO tcu-int-html.3" "$tResult" '<title>Internal Doc</title>'
+        assertContains "$LINENO tcu-int-html.4" "$tResult" '<h3 id="testComUsage">testComUsage</h3>'
+
+        #-----
+        tResult=$(fComUsage -i -s md -f $cBin/$cName -f $cBin/gitproj-com.inc -f $cBin/gitproj-com.test 2>&1)
+        assertContains "$LINENO tcu-int-md.1" "$tResult" '## Template Use'
+        assertContains "$LINENO tcu-int-md.2" "$tResult" '### fComSetGlobals'
+        assertContains "$LINENO tcu-int-md.3" "$tResult" '### testComUsage'
+        
+        #-----
+        tResult=$(fComUsage -a -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)   
+        #-----
+        gpUnitDebug=0
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 testComUsage
+
+Test fComUsage. Verify the different output styles work.
+
+=internal-cut
+EOF
+} # testComUsage
+
+# --------------------------------
+testComFunctions()
+{
+        local tResult
+
+        tResult=$(fComCheckDeps 2>&1)
+        assertTrue "$LINENO tcf-fComCheckDep tResult=$tResult" "[ $? -eq 0 ]"
+
+        tResult=$(fComSetGlobals 2>&1)
+        assertTrue "$LINENO tcf-fComSetGlobals tResult=$tResult" "[ $? -eq 0 ]"
+        return
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 testComFunctions
+
+Just verify these functions exist and run.
+
+Calls:
+
+ fComCheckDeps
+ fComSetGlobals
+
+=internal-cut
+EOF
+} # testComFunctions
+
+# --------------------------------
+testSetConfig()
+{
+        local tResult
+	local tGlobal=~/.gitconfig
+	local tLocal=.git/config
+	local tScope
+	local tScopeFile
+
+	for tScopeFile in $tGlobal $tLocal; do
+		if [ "$tScopeFile" = "$tGlobal" ]; then
+	    		tScope="-g"
+		fi
+		if [ "$tScopeFile" = "$tLocal" ]; then
+			tScope="-l"
+		fi
+        	assertTrue "$LINENO $tScope" "[ -r $tScopeFile ]"
+        	assertTrue "$LINENO $tScope" "[ -r $tLocal ]"
+	
+		grep -q '\[gitproj "test"\]' $tScopeFile
+        	assertFalse "$LINENO $tScope tearDown ran" "[ $? -eq 0 ]"
+	
+		fComSetConfig $tScope -k gitproj.test.test-str -v "test a string"
+		grep -q '\[gitproj "test"\]' $tScopeFile
+        	assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
+		grep -q 'test-str = test a string' $tScopeFile
+        	assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
+
+		fComSetConfig $tScope -i -k gitproj.test.test-int -v "2K"
+		grep -q 'test-int = 2048' $tScopeFile
+        	assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
+
+		fComSetConfig $tScope -b -k gitproj.test.test-bool -v "yes"
+		grep -q 'test-bool = true' $tScopeFile
+        	assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
+	done
+} # testSetConfig
+
+# --------------------------------
+testGetConfig()
+{
+        local tResult
+	local tGlobal=~/.gitconfig
+	local tLocal=.git/config
+	local tScope
+	local tScopeFile
+
+	for tScopeFile in $tGlobal $tLocal; do
+		if [ "$tScopeFile" = "$tGlobal" ]; then
+	    		tScope="-g"
+		fi
+		if [ "$tScopeFile" = "$tLocal" ]; then
+			tScope="-l"
+		fi
+		fComSetConfig $tScope -k gitproj.test.test-str-get -v "test a string"
+		fComSetConfig $tScope -k gitproj.test.test-int-get -v "2K"
+		fComSetConfig $tScope -k gitproj.test.test-bool-get -v "yes"
+
+		tResult=$(fComGetConfig $tScope -k gitproj.test.test-str-get)
+		assertEquals "$LINENO $tScope" "test a string" "$tResult"
+		
+		tResult=$(fComGetConfig $tScope -i -k gitproj.test.test-int-get)
+		assertEquals "$LINENO $tScope" "2048" "$tResult"
+		
+		tResult=$(fComGetConfig $tScope -b -k gitproj.test.test-bool-get)
+		assertEquals "$LINENO $tScope" "true" "$tResult"
+	done
+
+	fComSetConfig -g -k gitproj.test.test-str-default -v "in global"
+	fComSetConfig -l -k gitproj.test.test-str-default -v "in local"
+	tResult=$(fComGetConfig -k gitproj.test.test-str-default)
+	assertEquals "$LINENO $tResult" "in local" "$tResult"
+
+} # testGetGlobalConfig
+
+# --------------------------------
+testUnsetConfig()
+{
+        local tResult
+	local tGlobal=~/.gitconfig
+	local tLocal=.git/config
+	local tScope
+	local tScopeFile
+
+	for tScopeFile in $tGlobal $tLocal; do
+		if [ "$tScopeFile" = "$tGlobal" ]; then
+	    		tScope="-g"
+		fi
+		if [ "$tScopeFile" = "$tLocal" ]; then
+			tScope="-l"
+		fi
+		fComSetConfig $tScope -k gitproj.test.test-str-unset -v "test unset"
+		tResult=$(fComGetConfig $tScope -k gitproj.test.test-str-unset)
+		assertEquals "$LINENO $tResult" "test unset" "$tResult"
+		grep -q "test unset" $tScopeFile
+		assertTrue "$LINENO" "[ $? -eq 0 ]"
+
+		fComUnsetConfig $tScope -k gitproj.test.test-str-unset
+		assertTrue "$LINENO" "[ $? -eq 0 ]"
+		grep -q "test unset" $tScopeFile
+		assertFalse "$LINENO" "[ $? -eq 0 ]"
+	done
+} # testUnsetConfig
+
+# -------------------
+# This should be the last defined function
+fComRunTests()
+{
+        export gpUnitDebug=${gpUnitDebug:-0}
+        if [ "${gpTest:-all}" = "all" ]; then
+                # shellcheck disable=SC1091
+                . /usr/local/bin/shunit2.1
+                exit $?
+        fi
+        # shellcheck disable=SC1091
+        . /usr/local/bin/shunit2.1 -- $gpTest
+        exit $?
+        
+        cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head3 fComRunTests
+
+Run unit tests for the common functions.
+
+=internal-cut
+EOF
+} # fComRunTests
+
+# ====================
+# Main
+export PWD Tmp cBin cCurDir cName cPID cTmp1 cTmp2 cTmpF cVer
+export gErr gpDebug gpFacility gpLog gpVerbose
+
+# Test globals
+export gpTest
+export gpUnitDebug
+export SHUNIT_COLOR
+
+# -----
+# Optional input: a comma separated list of test function names
+export gpTest="$*"
+fComRunTests $gpTest

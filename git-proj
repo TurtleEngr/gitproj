@@ -5,10 +5,10 @@ fUsage()
 	cat <<EOF
 git proj This help
 
-The proj git subcommand supports using git repo for versioning files to
+The "proj" git subcommand supports using git repo for versioning files to
 locally mounted external drives.
 
-gitproj also supports the issue with large
+git-proj also supports the issue with large
 binary files causing git repo "bloat". Large files are not versioned,
 they are only copied. So if a version important, just rename the file.
 (symlinks are used and versioned to point to the large binary files.)
@@ -113,5 +113,9 @@ git proj status [-v]
     Give a "diff" of the raw files, local vs external.
     if -v, show all the config settings.
 
+common flags
+       -h - long usage help
+       -v - verbose
+       -x - increment debug level
 EOF
 }
