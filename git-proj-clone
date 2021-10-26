@@ -6,23 +6,31 @@ fUsage()
     exit 1
 
     cat <<EOF >/dev/null
-git proj clone pExternalPath
+=pod
+
+=for text ========================================
+
+=for html <hr/>
+
+ git proj clone pExternalPath
 
     Clone a local git repo from the external pDirPath.
 
 
-Usage:
+ Usage:
 	proj-get-local pPath
 	
-Description
+ Description
 	Use this script get a local copy of the remote git repo on a
 	mounted drive.
 
-Example
+ Example
 	The drive is mounted at: /mnt/usb-video and the the repo is
 	at: video-2019-04-01/trip.git So use this to get a local copy.
 
 	    proj-get-local /mnt/usb-video/video-2019-04-01/trip.git
+
+=cut
 EOF
     exit 1
 }

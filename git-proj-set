@@ -5,7 +5,13 @@ fUsage()
 {
     exit 1
     cat <<\EOF >/dev/null
-git proj set [-l pExternalPath] [-e pRawPath]
+=pod
+
+=for text ========================================
+
+=for html <hr/>
+
+ git proj set [-l pExternalPath] [-e pRawPath]
 
     Define or redefine the gitproj options.
     
@@ -44,6 +50,9 @@ Example
 
 	will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
 	if trip.git is found at the specified path.
+
+=cut
+
 EOF
     exit 1
 }

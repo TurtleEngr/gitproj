@@ -6,8 +6,13 @@ fUsage()
     exit 1
 
     cat <<\EOF >/dev/null
+=pod
 
-git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
+=for text ========================================
+
+=for html <hr/>
+
+ git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
 
     -l intialize a local git repo in pDirPath. If pDirPath is not
        specified then $PWD will be used. The git repo will be named
@@ -28,16 +33,19 @@ git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
 
     (git-proj-init, proj-init-local, proj-init-remote, proj-init-raw)
 	
-Usage:
+ Usage:
 	proj-new-local -n
 
-Description
+ Description
 	Create a new git repo in this directory. After adding and
 	committing files, use "proj-new-remote" to push the repo to a
 	mounted drive.
 	
-Dependencies
+ Dependencies
 	packages: git, git-flow 
+
+=cut
+
 EOF
     exit 1
 }

@@ -18,6 +18,10 @@ fGitProjTestUsage()
 
 =pod
 
+=for text ========================================
+
+=for html <hr/>
+
 =head1 NAME
 
 gitproj-com.test - test the gitproj-com.inc functions

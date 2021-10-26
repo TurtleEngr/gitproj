@@ -6,10 +6,19 @@ fUsage()
     exit 1
 
     cat <<EOF >/dev/null
-git proj pull [-b]
+=pod
+
+=for text ========================================
+
+=for html <hr/>
+
+ git proj pull [-b]
 
     Use this command to pull (or copy), the "raw" files from
     ../"origin"/[git_dir_name].raw to [top_git_dir]/../[git_dir_name].raw
     If the -b option is given then run: "git pull origin [current-branch]"
+
+=cut
+
 EOF
 }

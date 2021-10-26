@@ -10,6 +10,10 @@ fGitProjComInternalDoc()
     cat <<\EOF >/dev/null
 =internal-pod
 
+=internal-for text ========================================
+
+=internal-for html <hr/>
+
 =internal-head1 gitproj-com.inc Internal Documentation
 
 =internal-head2 Template Use
@@ -111,6 +115,7 @@ because the tests are also embedded in the script.
 =internal-head2 Common Script Functions
 
 =internal-cut
+
 EOF
 } # fGitProjComInternalDoc
 
@@ -177,6 +182,7 @@ that begin with "gp" can usually be overridden by setting them before
 the script is run.
 
 =internal-cut
+
 EOF
 } # fComSetGlobals
 
