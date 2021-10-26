@@ -612,7 +612,7 @@ testComUnsetConfig()
 testGitProj()
 {
     local tResult
-    
+
     tResult=$($cBin/git-proj 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'

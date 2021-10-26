@@ -349,30 +349,30 @@ fComUsage()
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             for tFile in $pFileList; do
-	    	cat $tFile
-		echo '<hr/>'
-		echo '<hr/>'
-	    done | $tProg --title="$pTitle" | $tTidy
+                cat $tFile
+                echo '<hr/>'
+                echo '<hr/>'
+            done | $tProg --title="$pTitle" | $tTidy
         else
             for tFile in $pFileList; do
-	    	cat $tFile
-		echo '----'
-	    done | $tProg
+                cat $tFile
+                echo '----'
+            done | $tProg
         fi
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
             for tFile in $pFileList; do
-	    	cat $tFile
-		echo '<hr/>'
-		echo '<hr/>'
-	    done | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
+                cat $tFile
+                echo '<hr/>'
+                echo '<hr/>'
+            done | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
         else
             # shellcheck disable=SC2002
             for tFile in $pFileList; do
-	    	cat $tFile
-		echo '----'
-	    done | fComInternalDoc $pAll | $tProg
+                cat $tFile
+                echo '----'
+            done | fComInternalDoc $pAll | $tProg
         fi
     fi
 

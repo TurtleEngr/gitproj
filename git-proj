@@ -23,7 +23,7 @@ fUsage()
 	-f $cBin/gitproj-com.inc \
 	-f $cBin/gitproj-com.test \
     "
-    
+
     case $pStyle in
         short | usage | man)
             fComUsage -s $pStyle -f $cCurDir/$cName
@@ -353,22 +353,22 @@ fi
 # -------------------
 # Get Args Section
 if [ $# -eq 0 ]; then
-	fError2 -m "Missing options." -l $LINENO
+    fError2 -m "Missing options." -l $LINENO
 fi
 while getopts :hH:lvx tArg; do
-	case $tArg in
-		# Common arguments
-		h)	fUsage long;;
-		H)	fUsage "$OPTARG";;
-		l)	gpLog=1;;
-		v)	let gpVerbose=gpVerbose+1;;
-		x)	let gpDebug=gpDebug+1;;
-		# Problem arguments
-		:)	fError "Value required for option: -$OPTARG" $LINENO;;
-		\?)	fError "Unknown option: $OPTARG" $LINENO;;
-	esac
+    case $tArg in
+        # Common arguments
+        h) fUsage long ;;
+        H) fUsage "$OPTARG" ;;
+        l) gpLog=1 ;;
+        v) let gpVerbose=gpVerbose+1 ;;
+        x) let gpDebug=gpDebug+1 ;;
+        # Problem arguments
+        :) fError "Value required for option: -$OPTARG" $LINENO ;;
+        \?) fError "Unknown option: $OPTARG" $LINENO ;;
+    esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError "Unexpected option: $*" $LINENO
 fi
