@@ -620,6 +620,14 @@ testGitProj()
     tResult=$($cBin/git-proj -h 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
+
+    tResult=$($cBin/git-proj -H html 2>&1)
+    assertFalse "$LINENO" "[ $? -eq 0 ]"
+    assertContains "$LINENO $tResult" "$tResult" '<title>git-proj Usage</title>'
+
+    tResult=$($cBin/git-proj -H int 2>&1)
+    assertFalse "$LINENO" "[ $? -eq 0 ]"
+
 }
 
 # ====================

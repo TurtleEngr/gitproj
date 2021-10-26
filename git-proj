@@ -7,27 +7,44 @@ fUsage()
 
     local pStyle="${1:-short}"
 
+    local tFileList="\
+	-f $cBin/git-proj \
+	-f $cBin/git-proj-init \
+	-f $cBin/git-proj-clone \
+	-f $cBin/git-proj-add \
+	-f $cBin/git-proj-push \
+	-f $cBin/git-proj-pull \
+	-f $cBin/git-proj-set \
+	-f $cBin/git-proj-status \
+    "
+
+    local tIntFileList="\
+        $tFileList \
+	-f $cBin/gitproj-com.inc \
+	-f $cBin/gitproj-com.test \
+    "
+    
     case $pStyle in
         short | usage | man)
-            fComUsage -f $cCurDir/$cName -s $pStyle
+            fComUsage -s $pStyle -f $cCurDir/$cName
             ;;
         long | text | md)
-            fComUsage -f $cCurDir/$cName -s $pStyle
+            fComUsage -s $pStyle $tFileList
             ;;
         html)
-            fComUsage -f $cCurDir/$cName -s $pStyle -t "$cName Usage"
+            fComUsage -s $pStyle -t "$cName Usage" $tFileList
             ;;
         int)
-            fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s long
+            fComUsage -s long $tIntFileList
             ;;
         int-html)
-            fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s html -t "$cName Internal Doc"
+            fComUsage -s html -t "$cName Internal Doc" $tIntFileList
             ;;
         int-md)
-            fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s md
+            fComUsage -s md $tIntFileList
             ;;
         *)
-            fComUsage -f $cCurDir/$cName -s short
+            fComUsage -s short -f $cCurDir/$cName
             ;;
     esac
     exit 1
