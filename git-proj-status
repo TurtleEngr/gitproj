@@ -3,8 +3,8 @@
 #--------------------
 fUsage()
 {
-	exit 1
-	cat <<\EOF >/dev/null
+    exit 1
+    cat <<\EOF >/dev/null
 git proj status [-v]
 
     Verify origin is set to a path that exists.

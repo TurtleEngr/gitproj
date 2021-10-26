@@ -3,9 +3,9 @@
 #--------------------
 fUsage()
 {
-	exit 1
-	
-	cat <<EOF >/dev/null
+    exit 1
+
+    cat <<EOF >/dev/null
 git proj add pFilePath
 
     Copy pFilePath to [top_git_dir]/raw dir. The path will be

@@ -3,9 +3,9 @@
 #--------------------
 fUsage()
 {
-	exit 1
-	
-	cat <<\EOF >/dev/null
+    exit 1
+
+    cat <<\EOF >/dev/null
 
 git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
 
@@ -39,34 +39,34 @@ Description
 Dependencies
 	packages: git, git-flow 
 EOF
-	exit 1
+    exit 1
 }
 
 # --------------------
 fCheckForPkg()
 {
-	local pPkg=$1
+    local pPkg=$1
 
-	if ! (dpkg -l $pPkg 2>/dev/null | grep -q "^ii *$pPkg"); then
-		echo "Error: Missing package: $pPkg"
-		exit 1
-	fi
+    if ! (dpkg -l $pPkg 2>/dev/null | grep -q "^ii *$pPkg"); then
+        echo "Error: Missing package: $pPkg"
+        exit 1
+    fi
 }
 
 # --------------------
 fCheckForGit()
 {
-	if git $cOrigin; then
-		echo "Error: .git already exists for the directory."
-		git branch
-		exit 1
-	fi
+    if git $cOrigin; then
+        echo "Error: .git already exists for the directory."
+        git branch
+        exit 1
+    fi
 }
 
 # --------------------
 fCreateGitDir()
 {
-	cat <<EOF >.gitignore
+    cat <<EOF >.gitignore
 *.tmp
 *~
 .cache/
@@ -78,20 +78,20 @@ proxy/
 thumbs/
 tmp/
 EOF
-	set -x
-	git init
-	git flow init
-	git checkout develop
-	git add .gitignore
-	git status
-	set +x
+    set -x
+    git init
+    git flow init
+    git checkout develop
+    git add .gitignore
+    git status
+    set +x
 }
 
 # ====================
 # Main
 
 if [ $# -eq 0 ]; then
-	fUsage
+    fUsage
 fi
 
 export cOrigin='config --get remote.origin.url'
@@ -109,7 +109,7 @@ exit 0
 #--------------------
 fUsage()
 {
-	cat <<EOF
+    cat <<EOF
 Usage:
 	proj-new-remote pPath
 	
@@ -128,84 +128,84 @@ Example
 
 	proj-new-remote /mnt/usb-video/video-2019-04-01
 EOF
-	exit 1
+    exit 1
 }
 
 # --------------------
 fCheckForGit()
 {
-	if [ ! -d .git ]; then
-		cat <<EOF
+    if [ ! -d .git ]; then
+        cat <<EOF
 Error: .git not found in current directory. cd to directory with .git
 in it, or use proj-new-local to create a new local repo.
 EOF
-		exit 1
-	fi
+        exit 1
+    fi
 }
 
 # --------------------
 fCheckPath()
 {
-	local pPath=$1
+    local pPath=$1
 
-	local tName=${PWD##*/}
+    local tName=${PWD##*/}
 
-	if [ ! -d $pPath ]; then
-		echo "Error: Could not find: $pPath"
-		exit 1
-	fi
-	if [ ! -w $pPath ]; then
-		echo "Error: $pPath is not writable for you."
-		exit 1
-	fi
-	if [ -e $pPath/$tName.git ]; then
-		echo "Error: $pPath/$tName.git already exists."
-		exit 1
-	fi
+    if [ ! -d $pPath ]; then
+        echo "Error: Could not find: $pPath"
+        exit 1
+    fi
+    if [ ! -w $pPath ]; then
+        echo "Error: $pPath is not writable for you."
+        exit 1
+    fi
+    if [ -e $pPath/$tName.git ]; then
+        echo "Error: $pPath/$tName.git already exists."
+        exit 1
+    fi
 }
 
 fCheckSpace()
 {
-	local pPath=$1
+    local pPath=$1
 
-	local tAvail
-	local tGitSize
+    local tAvail
+    local tGitSize
 
-	tAvail=$(df -BM $pPath --output=avail | tail -n1)
-	tAvail=${tAvail%M}
+    tAvail=$(df -BM $pPath --output=avail | tail -n1)
+    tAvail=${tAvail%M}
 
-	tGitSize=$(du -sm .git | awk '{print $1}')
-	let tGitSize*=2
+    tGitSize=$(du -sm .git | awk '{print $1}')
+    let tGitSize*=2
 
-	if [ $tGitSize -gt $tAvail ]; then
-		echo "Error: There is not enough space at $pPath"
-		echo "$pPath has ${tAvail}MB"
-		echo ".git needs ${tGitSize}MB"
-		exit 1
-	fi
+    if [ $tGitSize -gt $tAvail ]; then
+        echo "Error: There is not enough space at $pPath"
+        echo "$pPath has ${tAvail}MB"
+        echo ".git needs ${tGitSize}MB"
+        exit 1
+    fi
 }
 
 # --------------------
 fCreateRemote()
 {
-	local pPath=$1
+    local pPath=$1
 
-	local tSrcPath=$PWD
-	local tProjName=${PWD##*/}
+    local tSrcPath=$PWD
+    local tProjName=${PWD##*/}
 
-	set -x
-	cd $pPath &>/dev/null
-	git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
-	cd - &>/dev/null
-	git remote add origin $pPath/$tProjName.git
-	set +x
+    set -x
+    cd $pPath &>/dev/null
+    git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
+    cd - &>/dev/null
+    git remote add origin $pPath/$tProjName.git
+    set +x
 }
 
 fReport()
 {
-	echo 'Remote origin is now set to:'
-	git $cOrigin
-	cat <<EOF
+    echo 'Remote origin is now set to:'
+    git $cOrigin
+    cat <<EOF
 Be sure the disk is mounted and $gpPath exists.
 Then you can use: "git push origin develop"
 If the mount path is changed, use proj-remote-location update origin.
@@ -216,7 +216,7 @@ EOF
 # Main
 
 if [ $# -ne 1 ]; then
-	fUsage
+    fUsage
 fi
 
 gpPath=$1

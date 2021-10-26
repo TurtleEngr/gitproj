@@ -2,37 +2,37 @@
 
 fUsage()
 {
-	# Quick help, run this:
-	# git-proj -h | less
+    # Quick help, run this:
+    # git-proj -h | less
 
-	local pStyle="${1:-short}"
+    local pStyle="${1:-short}"
 
-	case $pStyle in
-		short|usage|man)
-			fComUsage -f $cCurDir/$cName -s $pStyle
-		;;
-		long|text|md)
-			fComUsage -f $cCurDir/$cName -s $pStyle
-		;;
-		html)
-			fComUsage -f $cCurDir/$cName -s $pStyle -t "$cName Usage"
-		;;
-		int)
-			fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s long
-		;;
-		int-html)
-			fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s html -t "$cName Internal Doc"
-		;;
-		int-md)
-			fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s md
-		;;
-		*)
-			fComUsage -f $cCurDir/$cName -s short
-		;;
-	esac
-	exit 1
+    case $pStyle in
+        short | usage | man)
+            fComUsage -f $cCurDir/$cName -s $pStyle
+            ;;
+        long | text | md)
+            fComUsage -f $cCurDir/$cName -s $pStyle
+            ;;
+        html)
+            fComUsage -f $cCurDir/$cName -s $pStyle -t "$cName Usage"
+            ;;
+        int)
+            fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s long
+            ;;
+        int-html)
+            fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s html -t "$cName Internal Doc"
+            ;;
+        int-md)
+            fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s md
+            ;;
+        *)
+            fComUsage -f $cCurDir/$cName -s short
+            ;;
+    esac
+    exit 1
 
-	cat <<\EOF >/dev/null
+    cat <<\EOF >/dev/null
 =pod
 
 =head1 NAME
@@ -304,7 +304,7 @@ export gErr gpDebug gpFacility gpLog gpVerbose
 # -------------------
 # Set current directory location in PWD and cCurDir
 if [ -z "$PWD" ]; then
-        PWD=$(pwd)
+    PWD=$(pwd)
 fi
 cCurDir=$PWD
 
@@ -312,7 +312,7 @@ cCurDir=$PWD
 # Define the location of this script
 cBin=${0%/*}
 if [ "$cBin" = "." ]; then
-p        cBin=$PWD
+    p cBin=$PWD
 fi
 cd $cBin
 cBin=$PWD
@@ -322,5 +322,5 @@ cd $cCurDir
 fComSetGlobals
 
 if [ $# -eq 0 ]; then
-	fUsage short
+    fUsage short
 fi

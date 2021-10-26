@@ -3,9 +3,9 @@
 #--------------------
 fUsage()
 {
-	exit 1
-	
-	cat <<EOF >/dev/null
+    exit 1
+
+    cat <<EOF >/dev/null
 git proj clone pExternalPath
 
     Clone a local git repo from the external pDirPath.
@@ -24,44 +24,44 @@ Example
 
 	    proj-get-local /mnt/usb-video/video-2019-04-01/trip.git
 EOF
-	exit 1
+    exit 1
 }
 
 # --------------------
 fCheckForGit()
 {
-	if git $cOrigin; then
-		echo 'Error: The current directory is a git dir.'
-		exit 1
-	fi
+    if git $cOrigin; then
+        echo 'Error: The current directory is a git dir.'
+        exit 1
+    fi
 }
 
 # --------------------
 fCheckPath()
 {
-	local pPath=$1
+    local pPath=$1
 
-	if [ ! -r $pPath ]; then
-		echo "Error: Could not find $pPath, or it is not readable"
-		exit 1
-	fi
+    if [ ! -r $pPath ]; then
+        echo "Error: Could not find $pPath, or it is not readable"
+        exit 1
+    fi
 }
 
 fGetLocal()
 {
-	local pPath=$1
+    local pPath=$1
 
-	git clone $pPath
-	echo "Done"
-	echo -n "Origin: "
-	git $cOrigin
+    git clone $pPath
+    echo "Done"
+    echo -n "Origin: "
+    git $cOrigin
 }
 
 # ====================
 # Main
 
 if [ $# -ne 1 ]; then
-	fUsage
+    fUsage
 fi
 
 gpPath=$1

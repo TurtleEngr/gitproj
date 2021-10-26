@@ -3,9 +3,9 @@
 #--------------------
 fUsage()
 {
-	exit 1
-	
-	cat <<EOF >/dev/null
+    exit 1
+
+    cat <<EOF >/dev/null
 git proj push [-b]
 
     rsync will be used top copy the ../[git_dir_name].raw files to

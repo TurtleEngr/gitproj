@@ -3,9 +3,9 @@
 #--------------------
 fUsage()
 {
-	exit 1
-	
-	cat <<EOF >/dev/null
+    exit 1
+
+    cat <<EOF >/dev/null
 git proj pull [-b]
 
     Use this command to pull (or copy), the "raw" files from
