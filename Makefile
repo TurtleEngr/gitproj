@@ -36,7 +36,7 @@ fmt :
 	for i in $(sh-files); do \
 		echo $$i; \
 		'shfmt' -i 4 -ci -fn <$$i >$$i.tmp; \
-		if [ $? -ne 0 ]; then \
+		if [ $$? -ne 0 ]; then \
 			continue; \
 		fi; \
 		mv -f $$i.tmp $$i; \
