@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#--------------------
+fUsage()
+{
+	exit 1
+	cat <<\EOF >/dev/null
+git proj status [-v]
+
+    Verify origin is set to a path that exists.
+    Verify the raw symlink points a directory.
+    Verify the origin raw dir exists (assumes at least one push)
+    Give a "diff" of the raw files, local vs external.
+    if -v, show all the config settings.
+EOF
+}

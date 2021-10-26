@@ -293,100 +293,6 @@ TurtleEngr
 $Revision: 1.0 $
 
 =cut
-
-git proj
-
-    This help
-
-git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
-
-    -l intialize a local git repo in pDirPath. If pDirPath is not
-       specified then $PWD will be used. The git repo will be named
-       after the last directory in pDirPath.
-       
-    -e export the git repo to an external drive (or another local dir)
-       This is usually the removable drive's "top" directory.  Ideally
-       the top directory should be different across a set of drives,
-       so that the local "origin" can be used to make sure the proper
-       git repo is round on the drive. "origin" will be set to
-       $pDirPath
-       
-    -r define the "raw" file dir for files that will not be versioned.
-       If pDirPath is not specified, then
-       [top_git_dir]/../[git_dir_name].raw will be used. In
-       [top_git_dir] this symlink will be created:
-       raw->../[git_dir_name].raw
-
-    (git-proj-init, proj-init-local, proj-init-remote, proj-init-raw)
-
-git proj clone pExternalPath
-
-    Clone a local git repo from the external pDirPath.
-
-git proj add pFilePath
-
-    Copy pFilePath to [top_git_dir]/raw dir. The path will be
-    duplicated (with ln) in [top_git_dir]/raw dir and the file will
-    remove and a symlink will be made to [top_git_dir]/raw dir
-    location. Files can also be manually put in the "raw" symlink
-    directory, then used from there directly or with symlinks to that
-    directory. Do not link to, or reference files with the actual raw
-    directory location, because the raw symlink could be changed to a
-    new location.
-
-    Note: the files do not need to be binary.
-
-git proj push [-b]
-
-    rsync will be used top copy the ../[git_dir_name].raw files to
-    ../"origin". If the -b option is given then run:
-    "git push origin [current-branch]"
-
-    (git-proj-push, proj-push-raw)
-    
-git proj pull [-b]
-
-    Use this command to pull (or copy), the "raw" files from
-    ../"origin"/[git_dir_name].raw to [top_git_dir]/../[git_dir_name].raw
-    If the -b option is given then run: "git pull origin [current-branch]"
-
-    (git-proj-pull, proj-pull-raw)
-
-git proj set [-l pExternalPath] [-e pRawPath]
-
-    Define or redefine the gitproj options.
-    
-    -l pExternalPath
-    
-       If the external repo is mounted at a different path than the
-       original "origin", then use this command to set the origin to
-       the new mount point.  (git-proj-set, proj-set-origin)
-
-    -e pRawPath
-
-       Redefine the location of the local raw file dir. The "raw"
-       symlink will be updated.
-
-    -c on/off
-    
-       Set a commit hook to not allow commits for "large" binary files.
-
-    -s pMaxSize
-    
-       Set the max size for commits of binary files.
-
-git proj status [-v]
-
-    Verify origin is set to a path that exists.
-    Verify the raw symlink points a directory.
-    Verify the origin raw dir exists (assumes at least one push)
-    Give a "diff" of the raw files, local vs external.
-    if -v, show all the config settings.
-
-common flags
-       -h - long usage help
-       -v - verbose
-       -x - increment debug level
 EOF
 }
 
@@ -415,4 +321,6 @@ cd $cCurDir
 # -----
 fComSetGlobals
 
-fUsage 
+if [ $# -eq 0 ]; then
+	fUsage short
+fi

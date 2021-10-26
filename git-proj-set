@@ -3,7 +3,31 @@
 #--------------------
 fUsage()
 {
-	cat <<\EOF
+	exit 1
+	cat <<\EOF >/dev/null
+git proj set [-l pExternalPath] [-e pRawPath]
+
+    Define or redefine the gitproj options.
+    
+    -l pExternalPath
+    
+       If the external repo is mounted at a different path than the
+       original "origin", then use this command to set the origin to
+       the new mount point.  (git-proj-set, proj-set-origin)
+
+    -e pRawPath
+
+       Redefine the location of the local raw file dir. The "raw"
+       symlink will be updated.
+
+    -c on/off
+    
+       Set a commit hook to not allow commits for "large" binary files.
+
+    -s pMaxSize
+    
+       Set the max size for commits of binary files.
+
 Usage:
 	proj-set-remote pPath
 	

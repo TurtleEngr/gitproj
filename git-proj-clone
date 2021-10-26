@@ -3,7 +3,14 @@
 #--------------------
 fUsage()
 {
-	cat EOF
+	exit 1
+	
+	cat <<EOF >/dev/null
+git proj clone pExternalPath
+
+    Clone a local git repo from the external pDirPath.
+
+
 Usage:
 	proj-get-local pPath
 	

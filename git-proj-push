@@ -1,1 +1,15 @@
 #!/bin/bash
+
+#--------------------
+fUsage()
+{
+	exit 1
+	
+	cat <<EOF >/dev/null
+git proj push [-b]
+
+    rsync will be used top copy the ../[git_dir_name].raw files to
+    ../"origin". If the -b option is given then run:
+    "git push origin [current-branch]"
+EOF
+}
