@@ -79,9 +79,6 @@ For more help, see the Globals section in fUsage.
  gpVerbose - -v, -vv
  gpDebug - -x, -xx, ...
  gpTest - -t
- Tmp - personal tmp directory.  Usually set to: /tmp/$USER
- cTmpF - tmp file prefix.  Includes $$ to make it unique
- cTmp1 - a temp file with a pattern that fCleanUp will remove
  gErr - error code (0 = no error)
  cName - script's name taken from $0
  cCurDir - current directory
@@ -126,7 +123,7 @@ fComSetGlobals()
     # -------------------
     # Set name of this script
     local tName=${0##*/}
-    cName=${cName:-$tName}
+    cName=$tName
 
     # -------------------
     # Set current directory location in PWD and cCurDir, because with cron
@@ -209,8 +206,7 @@ fComCheckDeps()
     done
 
     if [ $tErr -eq 2 ]; then
-        echo "Error: Missing one or more required programs."
-        fCleanUp
+        fError "Missing one or more required programs."
     fi
     if [ $tErr -eq 1 ]; then
         fLog -p warning -m "Missing some some optional programs." -l $LINENO
@@ -369,7 +365,6 @@ fComUsage()
     fi
 
     gErr=1
-    fCleanUp
     exit 1
 
     cat <<EOF >/dev/null

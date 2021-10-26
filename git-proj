@@ -37,7 +37,7 @@ fUsage()
 
 =head1 NAME
 
-git-proj - this implemets the "git proj"
+git-proj - this implements the "git proj"
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ See -x
 If set to non-zero, then the fUDebug function calls will output
 the messages when in test functions.
 
-See -T, fUDebug
+See gitproj-com.test
 
 =back
 
@@ -264,11 +264,13 @@ shunit2.1
 In the top git cloned directory, run the unit test functions with the
 command:
 
-    ./git-proj -T pTest
+    gitproj-com.test
 
-"-T all" will run all of the functions that begin with "test".
-Otherwise "pTest" should match the test function names separated with
-commas. "-T com" will run all the tests for bash-com.inc
+will run all of the functions that begin with "test".
+
+    gitproj-com.test [testName,testName,...]
+
+This will run the listed testName functions.
 
 For more details about shunit2 (or shunit2.1), see
 shunit2/shunit2-manual.html
@@ -312,15 +314,46 @@ cCurDir=$PWD
 # Define the location of this script
 cBin=${0%/*}
 if [ "$cBin" = "." ]; then
-    p cBin=$PWD
+    cBin=$PWD
 fi
 cd $cBin
 cBin=$PWD
 cd $cCurDir
 
 # -----
+. $cBin/gitproj-com.inc
+
+# shellcheck disable=SC2016
+cVer='$Revision: 1.49 $'
+
+#fSetGlobals
 fComSetGlobals
 
 if [ $# -eq 0 ]; then
     fUsage short
 fi
+
+# -------------------
+# Get Args Section
+if [ $# -eq 0 ]; then
+	fError2 -m "Missing options." -l $LINENO
+fi
+while getopts :hH:lvx tArg; do
+	case $tArg in
+		# Common arguments
+		h)	fUsage long;;
+		H)	fUsage "$OPTARG";;
+		l)	gpLog=1;;
+		v)	let gpVerbose=gpVerbose+1;;
+		x)	let gpDebug=gpDebug+1;;
+		# Problem arguments
+		:)	fError "Value required for option: -$OPTARG" $LINENO;;
+		\?)	fError "Unknown option: $OPTARG" $LINENO;;
+	esac
+done
+shift $((OPTIND-1))
+if [ $# -ne 0 ]; then
+    fError "Unexpected option: $*" $LINENO
+fi
+
+exit 0

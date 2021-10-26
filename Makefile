@@ -17,4 +17,5 @@ fmt :
 		echo $$i; \
 		'shfmt' -i 4 -ci -fn - <$$i >$$i.tmp; \
 		mv -f $$i.tmp $$i; \
+		chmod a+rx $$i; \
 	done

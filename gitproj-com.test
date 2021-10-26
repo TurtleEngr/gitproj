@@ -1,24 +1,7 @@
 #!/bin/bash
 # Test suite to gitproj functions and scripts.
 
-# -------------------
-# Set current directory location in PWD and cCurDir
-if [ -z "$PWD" ]; then
-    PWD=$(pwd)
-fi
-cCurDir=$PWD
-
-# -------------------
-# Define the location of this script
-cBin=${0%/*}
-if [ "$cBin" = "." ]; then
-    cBin=$PWD
-fi
-cd $cBin
-cBin=$PWD
-cd $cCurDir
-
-# --------------------------------
+# ========================================
 fGitProjTestUsage()
 {
     # This is just a place for the start of the testing internal
@@ -54,8 +37,6 @@ listed, then all of the test functions will be run.
 
 =head1 ERRORS
 
-Look for the assert errors.
-
 =head1 EXAMPLES
 
 =head1 ENVIRONMENT
@@ -86,11 +67,7 @@ $Revision: 1.2 $ $Date: 2021/09/08 01:39:35 $ GMT
 EOF
 }
 
-# --------------------------------
-fCleanUp()
-{
-    fComCleanUp
-} # fCleanUp
+# ========================================
 
 # --------------------------------
 fComUDebug()
@@ -115,13 +92,10 @@ oneTimeSetUp()
     fComSetGlobals
 
     # Save global values
-    export tDefault_Tmp=$Tmp
     export tDefault_cBin=$cBin
     export tDefault_cCurDir=$cCurDir
     export tDefault_cName=$cName
     export tDefault_cPID=$cPID
-    export tDefault_cTmp1=$cTmp1
-    export tDefault_cTmpF=$cTmpF
     export tDefault_cVer=$cVer
     export tDefault_gErr=0
     export tDefault_gpDebug=0
@@ -159,13 +133,10 @@ EOF
 setUp()
 {
     # Restore global values, before each test
-    Tmp=$tDefault_Tmp
     cBin=$tDefault_cBin
     cCurDir=$tDefault_cCurDir
     cName=$tDefault_cName
     cPID=$tDefault_cPID
-    cTmp1=$tDefault_cTmp1
-    cTmpF=$tDefault_cTmpF
     cVer=$tDefault_cVer
     gErr=$tDefault_gErr
     gpDebug=$tDefault_gpDebug
@@ -193,6 +164,8 @@ tearDown()
     return 0
 }
 
+# ========================================
+
 # --------------------------------
 testComInitialConfig()
 {
@@ -215,12 +188,6 @@ testComInitialConfig()
     assertEquals "$LINENO tcic-13" "user" "$gpFacility"
     assertEquals "$LINENO tcic-14" "0" "$gErr"
     assertNull "$LINENO tcic-15" "$(echo $cVer | tr -d '.[:digit:]')"
-    assertEquals "$LINENO tcic-16" "/tmp/$USER/$cName" "$Tmp"
-    #assertEquals "$LINENO tcic-17" "$Tmp/file-$cPID" "$cTmpF"
-    assertEquals "$LINENO tcic-18" "${cTmpF}-1.tmp" "$cTmp1"
-
-    # ADJUST
-    assertEquals "$LINENO tcic-19" "/tmp/$USER/$cName" "$Tmp"
 
     for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr; do
         which $tProg &>/dev/null
@@ -539,7 +506,7 @@ EOF
 } # testComFunctions
 
 # --------------------------------
-testSetConfig()
+testComSetConfig()
 {
     local tResult
     local tGlobal=~/.gitconfig
@@ -574,10 +541,10 @@ testSetConfig()
         grep -q 'test-bool = true' $tScopeFile
         assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
     done
-} # testSetConfig
+} # testComSetConfig
 
 # --------------------------------
-testGetConfig()
+testComGetConfig()
 {
     local tResult
     local tGlobal=~/.gitconfig
@@ -611,10 +578,10 @@ testGetConfig()
     tResult=$(fComGetConfig -k gitproj.test.test-str-default)
     assertEquals "$LINENO $tResult" "in local" "$tResult"
 
-} # testGetGlobalConfig
+} # testComGetConfig
 
 # --------------------------------
-testUnsetConfig()
+testComUnsetConfig()
 {
     local tResult
     local tGlobal=~/.gitconfig
@@ -640,20 +607,36 @@ testUnsetConfig()
         grep -q "test unset" $tScopeFile
         assertFalse "$LINENO" "[ $? -eq 0 ]"
     done
-} # testUnsetConfig
+} # testComUnsetConfig
 
-# -------------------
+testGitProj()
+{
+    local tResult
+    
+    tResult=$($cBin/git-proj 2>&1)
+    assertFalse "$LINENO" "[ $? -eq 0 ]"
+    assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
+
+    tResult=$($cBin/git-proj -h 2>&1)
+    assertFalse "$LINENO" "[ $? -eq 0 ]"
+    assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
+}
+
+# ====================
 # This should be the last defined function
 fComRunTests()
 {
-    export gpUnitDebug=${gpUnitDebug:-0}
+    if [ ! -x $cBin/shunit2.1 ]; then
+        echo "Error: Missing: $cBin/shunit2.1"
+        exit 1
+    fi
     if [ "${gpTest:-all}" = "all" ]; then
         # shellcheck disable=SC1091
-        . /usr/local/bin/shunit2.1
+        . $cBin/shunit2.1
         exit $?
     fi
     # shellcheck disable=SC1091
-    . /usr/local/bin/shunit2.1 -- $gpTest
+    . $cBin/shunit2.1 -- $gpTest
     exit $?
 
     cat <<EOF >/dev/null
@@ -669,15 +652,32 @@ EOF
 
 # ====================
 # Main
-export PWD Tmp cBin cCurDir cName cPID cTmp1 cTmp2 cTmpF cVer
+export PWD cBin cCurDir cName cPID cVer
 export gErr gpDebug gpFacility gpLog gpVerbose
 
 # Test globals
-export gpTest
-export gpUnitDebug
-export SHUNIT_COLOR
+export gpTest gpUnitDebug SHUNIT_COLOR
+
+# -------------------
+# Set current directory location in PWD and cCurDir
+if [ -z "$PWD" ]; then
+    PWD=$(pwd)
+fi
+cCurDir=$PWD
+
+# -------------------
+# Define the location of this script
+cBin=${0%/*}
+if [ "$cBin" = "." ]; then
+    cBin=$PWD
+fi
+cd $cBin
+cBin=$PWD
+cd $cCurDir
 
 # -----
+gpUnitDebug=${gpUnitDebug:-0}
+
 # Optional input: a comma separated list of test function names
-export gpTest="$*"
+gpTest="$*"
 fComRunTests $gpTest
