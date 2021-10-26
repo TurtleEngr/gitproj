@@ -27,6 +27,7 @@ build :
 	mkdir -p dist/usr/lib/git-core
 	cp $(release-files) dist/usr/lib/git-core
 	mkdir -p dist/usr/share/doc/git-proj/hooks
+	cp hooks/* dist/usr/share/doc/git-proj/hooks
 
 package :
 
