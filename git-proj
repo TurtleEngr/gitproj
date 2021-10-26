@@ -2,10 +2,53 @@
 
 fUsage()
 {
-	cat <<EOF
-git proj This help
+	# Quick help, run this:
+	# git-proj -h | less
 
-The "proj" git subcommand supports using git repo for versioning files to
+	local pStyle="${1:-short}"
+
+	case $pStyle in
+		short|usage|man)
+			fComUsage -f $cCurDir/$cName -s $pStyle
+		;;
+		long|text|md)
+			fComUsage -f $cCurDir/$cName -s $pStyle
+		;;
+		html)
+			fComUsage -f $cCurDir/$cName -s $pStyle -t "$cName Usage"
+		;;
+		int)
+			fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s long
+		;;
+		int-html)
+			fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s html -t "$cName Internal Doc"
+		;;
+		int-md)
+			fComUsage -a -f $cCurDir/$cName -f $cBin/bash-com.inc -f $cBin/bash-com.test -s md
+		;;
+		*)
+			fComUsage -f $cCurDir/$cName -s short
+		;;
+	esac
+	exit 1
+
+	cat <<\EOF >/dev/null
+=pod
+
+=head1 NAME
+
+git-proj - this implemets the "git proj"
+
+=head1 SYNOPSIS
+
+ 	git proj [pSubCmd] [pSubCmdOptions] [pComOpt]
+
+ 	pSubCmd: init, clone, add, push, pull, set, status
+ 	pComOpt: [-h] -H pStyle] [-v] [-x]
+ 
+=head1 DESCRIPTION
+
+The "git proj" subcommand supports using git repo for versioning files to
 locally mounted external drives.
 
 git-proj also supports the issue with large
@@ -22,6 +65,234 @@ projects. Video files are HUGE, yet they don't change much. Since most
 video files are rendered from files that do not change, it is only
 important to version the video editor's file, if you need to recreate
 a particular video file version.
+
+=head1 OPTIONS
+
+=head2 pComOpt
+
+=over 4
+
+=item B<-h>
+
+Output this "long" usage help. See "-H long"
+
+=item B<-H pStyle>
+
+pStyle is used to select the type of help and how it is formatted.
+
+Styles:
+
+	short|usage - Output short usage help as text.
+	long|text   - Output long usage help as text. All subcommands.
+	man 	    - Output long usage help as a man page.
+	html 	    - Output long usage help as html. All subcommands.
+	md 	    - Output long usage help as markdown.
+	int 	    - Also output internal documentation as text.
+	int-html    - Also output internal documentation as html.
+	int-md 	    - Also output internal documentation as markdown.
+
+=item B<-v>
+
+Verbose output. Default is is only output (or log) messages with
+level "warning" and higher.
+
+ -v - output "notice" and higher.
+ -vv - output "info" and higher.
+
+=item B<-x>
+
+Set the gpDebug level. Add 1 for each -x.
+Or you can set gpDebug before running the script.
+
+See: fLog (Internal documentation)
+
+=back
+
+=head2 pSubCmd
+
+=over 4
+
+=item B<init - Initialize the git project repo>
+
+ git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
+
+=item B<clone - Clone a previously saved project>
+
+ git proj clone pExternalPath
+
+=item B<add - Add a large binary file to the "raw" remote>
+
+ git proj add pFilePath
+
+=item B<push - Push files to the "raw" remote>
+
+ git proj push [-b]
+
+=item B<pull - Pull files from the "raw" remote>
+
+ git proj pull [-b]
+
+=item B<set - Redefine config values>
+
+ git proj set [-l pExternalPath] [-e pRawPath]
+ 
+=item B<status - Show the staus of "raw" files, and more>
+
+ git proj status [-b] [-v]
+
+=back
+
+
+=head2 Config
+
+These are globals that may affect how the script runs. Just about all
+of these globals that begin with "gp" can be set and exported before
+the script is run. That way you can set your own defaults, by putting
+them in your ~/.bashrc or ~/.bash_profile files.
+
+The the "common" CLI flags will override the initial variable settings.
+
+=over 4
+
+=item B<gpLog>
+
+If set to 0, log messages will only be sent to stderr.
+
+If set to 1, log messages will be sent to stderr and syslog.
+
+See -l, fLog and fErr for details
+
+Default: 0
+
+=item B<gpFacility>
+
+Log messages sent to syslog will be sent to the "facility" specified
+by by gpFacility.
+
+"user" log messages will be sent to /var/log/user.log, or
+/var/log/syslog, or /var/log/messages.log
+
+See: fLog
+
+Default: user
+
+Allowed facility names:
+
+ local0 through local7 - local system facilities
+ user - misc scripts, generic user-level messages
+ auth - security/authorization messages
+ authpriv - security/authorization messages (private)
+ cron - clock daemon (cron and at)
+ daemon - system daemons without separate facility value
+ ftp - ftp daemon
+ kern - kernel  messages  (these  can't be generated from user processes)
+ lpr - line printer subsystem
+ mail - mail subsystem
+ news - USENET news subsystem
+ syslog - messages generated internally by syslogd(8)
+ uucp - UUCP subsystem
+
+These are some suggested uses for the localN facilities:
+
+ local0 - system or application configuration
+ local1 - application processes
+ local2 - web site errors
+ local3 - web site access
+ local4 - backend processes
+ local5 - publishing
+ local6 - available
+ local7 - available
+
+=item B<gpVerbose>
+
+If set to 0, only log message at "warning" level and above will be output.
+
+If set to 1, all non-debug messages will be output.
+
+See -v, fLog
+
+Default: 0
+
+=item B<gpDebug>
+
+If set to 0, all "debug" and "debug-N" level messages will be skipped.
+
+If not 0, all "debug" level messages will be output.
+
+Or if "debug-N" level is used, then if gpDebug is <= N, then the
+log message will be output, otherwise it is skipped.
+
+See -x
+
+=item B<gpUnitDebug>
+
+If set to non-zero, then the fUDebug function calls will output
+the messages when in test functions.
+
+See -T, fUDebug
+
+=back
+
+=head1 RETURN VALUE
+
+=head1 ERRORS
+
+=head1 EXAMPLES
+
+=head1 ENVIRONMENT
+
+See Globals section for details.
+
+HOME,USER, gpLog, gpFacility, gpVerbose, gpDebug, gpUnitDebug
+
+=head1 FILES
+
+=head1 SEE ALSO
+
+shunit2.1
+
+=head1 NOTES
+
+=head1 CAVEATS
+
+[Things to take special care with; sometimes called WARNINGS.]
+
+=head1 DIAGNOSTICS
+
+=head2 Testing
+
+In the top git cloned directory, run the unit test functions with the
+command:
+
+    ./git-proj -T pTest
+
+"-T all" will run all of the functions that begin with "test".
+Otherwise "pTest" should match the test function names separated with
+commas. "-T com" will run all the tests for bash-com.inc
+
+For more details about shunit2 (or shunit2.1), see
+shunit2/shunit2-manual.html
+L<Source|https://github.com/kward/shunit2>
+
+See shunit2, shunit2.1, and global: gpUnitDebug
+
+Also for more help, use the "-H int" option.
+
+=head1 BUGS
+
+=head1 RESTRICTIONS
+
+=head1 AUTHOR
+
+TurtleEngr
+
+=head1 HISTORY
+
+(c) Copyright 2021 by TurtleEngr
+
+$Revision: 1.0 $
+
+=cut
 
 git proj
 
@@ -48,10 +319,9 @@ git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
 
     (git-proj-init, proj-init-local, proj-init-remote, proj-init-raw)
 
-git proj get pExternalPath
+git proj clone pExternalPath
 
     Clone a local git repo from the external pDirPath.
-    (git-proj-get, proj-get-local)
 
 git proj add pFilePath
 
@@ -119,3 +389,30 @@ common flags
        -x - increment debug level
 EOF
 }
+
+# ====================
+# Main
+export PWD Tmp cBin cCurDir cName cPID cTmp1 cTmp2 cTmpF cVer
+export gErr gpDebug gpFacility gpLog gpVerbose
+
+# -------------------
+# Set current directory location in PWD and cCurDir
+if [ -z "$PWD" ]; then
+        PWD=$(pwd)
+fi
+cCurDir=$PWD
+
+# -------------------
+# Define the location of this script
+cBin=${0%/*}
+if [ "$cBin" = "." ]; then
+p        cBin=$PWD
+fi
+cd $cBin
+cBin=$PWD
+cd $cCurDir
+
+# -----
+fComSetGlobals
+
+fUsage 

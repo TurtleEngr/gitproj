@@ -1,0 +1,66 @@
+#!/bin/bash
+
+#--------------------
+fUsage()
+{
+	cat EOF
+Usage:
+	proj-get-local pPath
+	
+Description
+	Use this script get a local copy of the remote git repo on a
+	mounted drive.
+
+Example
+	The drive is mounted at: /mnt/usb-video and the the repo is
+	at: video-2019-04-01/trip.git So use this to get a local copy.
+
+	    proj-get-local /mnt/usb-video/video-2019-04-01/trip.git
+EOF
+	exit 1
+}
+
+# --------------------
+fCheckForGit()
+{
+	if git $cOrigin; then
+		echo 'Error: The current directory is a git dir.'
+		exit 1
+	fi
+}
+
+# --------------------
+fCheckPath()
+{
+	local pPath=$1
+
+	if [ ! -r $pPath ]; then
+		echo "Error: Could not find $pPath, or it is not readable"
+		exit 1
+	fi
+}
+
+fGetLocal()
+{
+	local pPath=$1
+
+	git clone $pPath
+	echo "Done"
+	echo -n "Origin: "
+	git $cOrigin
+}
+
+# ====================
+# Main
+
+if [ $# -ne 1 ]; then
+	fUsage
+fi
+
+gpPath=$1
+
+export cOrigin='config --get remote.origin.url'
+
+fCheckForGit
+fCheckPath $gpPath
+fGetLocal $gpPath
