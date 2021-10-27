@@ -11,17 +11,17 @@ fUsage()
 
 =for html <hr/>
 
- git proj set [-l pExternalPath] [-e pRawPath]
+ git proj config [-e pExternalPath] [-r pRawPath]
 
     Define or redefine the gitproj options.
     
-    -l pExternalPath
+    -e pExternalPath
     
        If the external repo is mounted at a different path than the
        original "origin", then use this command to set the origin to
-       the new mount point.  (git-proj-set, proj-set-origin)
+       the new mount point.
 
-    -e pRawPath
+    -r pRawPath
 
        Redefine the location of the local raw file dir. The "raw"
        symlink will be updated.

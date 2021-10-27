@@ -14,7 +14,7 @@ fUsage()
 	-f $cBin/git-proj-add \
 	-f $cBin/git-proj-push \
 	-f $cBin/git-proj-pull \
-	-f $cBin/git-proj-set \
+	-f $cBin/git-proj-config \
 	-f $cBin/git-proj-status \
     "
 
@@ -149,9 +149,9 @@ See: fLog (Internal documentation)
 
  git proj pull [-b]
 
-=item B<set - Redefine config values>
+=item B<config - Redefine config values>
 
- git proj set [-l pExternalPath] [-e pRawPath]
+ git proj config [-l pExternalPath] [-e pRawPath]
  
 =item B<status - Show the staus of "raw" files, and more>
 

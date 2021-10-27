@@ -6,17 +6,27 @@ release-files = \
 	git-proj \
 	git-proj-add \
 	git-proj-clone \
+	git-proj-config \
 	git-proj-init \
 	git-proj-pull \
 	git-proj-push \
-	git-proj-set \
 	git-proj-status \
 	gitproj-com.inc
+
+doc-files = \
+	LICENSE \
+	README.md \
+	global.gitproj.config \
+	local.getproj.config \
+	hooks/* \
+	gitproj-com.test \
+	shunit2.1
 
 sh-files = \
 	$(release-files) \
 	hooks/* \
 	gitproj-com.test
+
 
 # --------------------
 test : 
@@ -26,8 +36,8 @@ build :
 	-rm -rf dist
 	mkdir -p dist/usr/lib/git-core
 	cp $(release-files) dist/usr/lib/git-core
-	mkdir -p dist/usr/share/doc/git-proj/hooks
-	cp hooks/* dist/usr/share/doc/git-proj/hooks
+	mkdir -p dist/usr/share/doc/git-proj
+	rsync -a $(doc-files) dist/usr/share/doc/git-proj/
 
 package :
 

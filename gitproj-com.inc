@@ -354,31 +354,17 @@ fComUsage()
 
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
-            for tFile in $pFileList; do
-                cat $tFile
-                echo '<hr/>'
-                echo '<hr/>'
-            done | $tProg --title="$pTitle" | $tTidy
+            cat $tFileList | $tProg --title="$pTitle" | $tTidy
         else
-            for tFile in $pFileList; do
-                cat $tFile
-                echo '----'
-            done | $tProg
+            cat $tFileList | $tProg
         fi
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            for tFile in $pFileList; do
-                cat $tFile
-                echo '<hr/>'
-                echo '<hr/>'
-            done | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
+            cat $tFileLis | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
         else
             # shellcheck disable=SC2002
-            for tFile in $pFileList; do
-                cat $tFile
-                echo '----'
-            done | fComInternalDoc $pAll | $tProg
+            cat $tFileList | fComInternalDoc $pAll | $tProg
         fi
     fi
 
@@ -606,20 +592,40 @@ EOF
 } # fError
 
 # --------------------------------
+fComMkHostConfig()
+{
+    local cTop
+
+    cTop=$(git rev-parse --show-toplevel)
+    mkdir -p $cTop/gitproj 2>&1
+    touch $cTop/gitproj/config.$HOSTNAME
+    git config --local include.path $cTop/gitproj/config.$HOSTNAME
+    cd $cTop
+    git add gitproj/config.$HOSTNAME
+} # fComMkHostConfig
+
+# --------------------------------
 fComSetConfig()
 {
-    local pScope=""
+    local pScope="--local"
     local pType="--no-type"
     local pKey=""
     local pValue=""
 
+    local tHostConfig
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glibk:v: tArg; do
+    while getopts :glhibk:v: tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
+	    h) tHostConfig=$(git config include.path)
+	       pScope="--file $tHostConfig"
+	       if [ ! -r "$tHostConfig" ]; then
+	       	  fError -m "Internal fComSetConfig: no host config set" -l $LINENO
+	       fi
+	       ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
@@ -628,6 +634,12 @@ fComSetConfig()
             \?) fError "Internal fComSetConfig:: Unknown option: $OPTARG [$LINENO]" ;;
         esac
     done
+    if [ -z "$pKey" ]; then
+       fError -m "Internal fComSetConfig: missing key" -l $LINENO
+    fi
+    if [ -z "$pValue" ]; then
+       fError -m "Internal fComSetConfig: missing value" -l $LINENO
+    fi
 
     git config $pScope $pType $pKey "$pValue"
 } # fComSetConfig
@@ -638,30 +650,41 @@ fComGetConfig()
     local pScope=""
     local pType="--no-type"
     local pKey=""
+    local pDefault=""
+
     local tValue=""
 
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glibk: tArg; do
+    while getopts :glibk:d: tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
+	    d) pDefault="${OPTARG}"
             :) fError "Internal fComGetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComGetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
     done
+    if [ -z "$pKey" ]; then
+       fError -m "Internal fComGetConfig: missing key" -l $LINENO
+    fi
 
-    git config --get $pScope $pType $pKey
+    tValue=$(git config --get --includes $pScope $pType $pKey)
+    if [ -z "$tValue" ] && [ -n "$pDefault" ]; then
+        tValue=$pDefault
+    fi
+    echo $tValue
+    return 0
 } # fComGetConfig
 
 # --------------------------------
 fComUnsetConfig()
 {
-    local pScope=""
+    local pScope="--local"
     local pKey=""
 
     local OPTIND=1
