@@ -620,12 +620,13 @@ fComSetConfig()
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
-	    h) tHostConfig=$(git config include.path)
-	       pScope="--file $tHostConfig"
-	       if [ ! -r "$tHostConfig" ]; then
-	       	  fError -m "Internal fComSetConfig: no host config set" -l $LINENO
-	       fi
-	       ;;
+            h)
+                tHostConfig=$(git config include.path)
+                pScope="--file $tHostConfig"
+                if [ ! -r "$tHostConfig" ]; then
+                    fError -m "Internal fComSetConfig: no host config set" -l $LINENO
+                fi
+                ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
@@ -635,10 +636,10 @@ fComSetConfig()
         esac
     done
     if [ -z "$pKey" ]; then
-       fError -m "Internal fComSetConfig: missing key" -l $LINENO
+        fError -m "Internal fComSetConfig: missing key" -l $LINENO
     fi
     if [ -z "$pValue" ]; then
-       fError -m "Internal fComSetConfig: missing value" -l $LINENO
+        fError -m "Internal fComSetConfig: missing value" -l $LINENO
     fi
 
     git config $pScope $pType $pKey "$pValue"
@@ -664,13 +665,13 @@ fComGetConfig()
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
-	    d) pDefault="${OPTARG}"
+            d) pDefault="${OPTARG}" ;;
             :) fError "Internal fComGetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComGetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
     done
     if [ -z "$pKey" ]; then
-       fError -m "Internal fComGetConfig: missing key" -l $LINENO
+        fError -m "Internal fComGetConfig: missing key" -l $LINENO
     fi
 
     tValue=$(git config --get --includes $pScope $pType $pKey)

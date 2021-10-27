@@ -196,9 +196,8 @@ fCreateLocalGit()
 # --------------------
 fCreateRawDir()
 {
-	fCheckForGit
+    fCheckForGit
 } # fCreateRawDir
-
 
 # ========================================
 # -e fCreateRemoteGit Section
@@ -277,13 +276,13 @@ EOF
 # --------------------
 fCreateRemoteGit()
 {
-export cOrigin='config --get remote.origin.url'
+    export cOrigin='config --get remote.origin.url'
 
-fCheckForGit
-fCheckPath $gpPath
-fCheckSpace $gpPath
-fMkRemote $gpPath
-fReport
+    fCheckForGit
+    fCheckPath $gpPath
+    fCheckSpace $gpPath
+    fMkRemote $gpPath
+    fReport
 } # fCreateRemoteGit
 
 # ====================
@@ -319,37 +318,40 @@ fi
 gpAction=""
 gpDirPath=""
 while getopts :l:re:hH:lvx tArg; do
-	case $tArg in
-		# Script arguments
-		l)  if [ -n "$gpAction" ]; then
-		       fError -m "Only one -l, -e, or -r can be specified." -l $LINENO
-		    fi
-		    gpAction=fCreateLocalGit
-		    gpDirPath="$OPTARG"
-		    ;;
-		r)  if [ -n "$gpAction" ]; then
-		       fError -m "Only one -l, -e, or -r can be specified." -l $LINENO
-		    fi
-		    gpAction=fCreateRawDir
-		    ;;
-		e)  if [ -n "$gpAction" ]; then
-		       fError -m "Only one -l, -e, or -r can be specified." -l $LINENO
-		    fi
-		    gpAction=fCreateRemoteGit
-		    gpDirPath="$OPTARG"
-		    ;;
-		# Common arguments
-		h) fUsage long;;
-		H) fUsage "$OPTARG";;
-		l) gpLog=1;;
-		v) let ++gpVerbose;;
-		x) let ++gpDebug;;
-		# Problem arguments
-		:)  fError "Value required for option: -$OPTARG" $LINENO;;
-		\?) fError "Unknown option: $OPTARG" $LINENO;;
-	esac
+    case $tArg in
+        # Script arguments
+        l)
+            if [ -n "$gpAction" ]; then
+                fError -m "Only one -l, -e, or -r can be specified." -l $LINENO
+            fi
+            gpAction=fCreateLocalGit
+            gpDirPath="$OPTARG"
+            ;;
+        r)
+            if [ -n "$gpAction" ]; then
+                fError -m "Only one -l, -e, or -r can be specified." -l $LINENO
+            fi
+            gpAction=fCreateRawDir
+            ;;
+        e)
+            if [ -n "$gpAction" ]; then
+                fError -m "Only one -l, -e, or -r can be specified." -l $LINENO
+            fi
+            gpAction=fCreateRemoteGit
+            gpDirPath="$OPTARG"
+            ;;
+        # Common arguments
+        h) fUsage long ;;
+        H) fUsage "$OPTARG" ;;
+        l) gpLog=1 ;;
+        v) let ++gpVerbose ;;
+        x) let ++gpDebug ;;
+        # Problem arguments
+        :) fError "Value required for option: -$OPTARG" $LINENO ;;
+        \?) fError "Unknown option: $OPTARG" $LINENO ;;
+    esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $LINENO
 fi

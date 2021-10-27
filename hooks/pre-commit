@@ -32,18 +32,19 @@ fi
 if [ "$tCheckBigFiles" = "true" ]; then
     # To detect binary files, we exploit the fact that the printable
     # range starts at the space character and ends with tilde.
-tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
-LC_ALL=C
-for tFile in $(git diff --cached --name-only --diff-filter=A -z $tAgainst); do
-    if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
-        tSize=$(ls -l $tFile | awk '{print $5}')
-        if [ $tSize -gt $tMaxSize ]; then
-	    tErr=1
-	    echo "Error: tFile size $tSize > $tMaxSize"
-            git reset HEAD $tFile
+    tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
+    LC_ALL=C
+    for tFile in $(git diff --cached --name-only --diff-filter=A -z $tAgainst); do
+        if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
+            tSize=$(ls -l $tFile | awk '{print $5}')
+            if [ $tSize -gt $tMaxSize ]; then
+                tErr=1
+                echo "Error: tFile size $tSize > $tMaxSize"
+                git reset HEAD $tFile
+            fi
         fi
-    fi
-done
+    done
+fi
 if [ $tErr -ne 0 ]; then
     echo "Error: Large binary files should not be committed:"
     echo 'Use "git proj add FILE" to save the files to the "raw" remote.'
@@ -59,10 +60,10 @@ if [ "$tCheckFileNames" = "true" ]; then
 	    s/_+/_/;
 	    print
 	')
-	if [ "$tTest" != "$tFile" ]; then
-	    tErr=2
-	    echo "Error: Invalid file name: \"$tFile\""
-	fi
+        if [ "$tTest" != "$tFile" ]; then
+            tErr=2
+            echo "Error: Invalid file name: \"$tFile\""
+        fi
     done
 fi
 if [ $tErr -ne 0 ]; then
