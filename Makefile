@@ -2,31 +2,9 @@
 # --------------------
 # Config
 
-release-files = \
-	git-proj \
-	git-proj-add \
-	git-proj-clone \
-	git-proj-config \
-	git-proj-init \
-	git-proj-pull \
-	git-proj-push \
-	git-proj-status \
-	gitproj-com.inc
-
-doc-files = \
-	LICENSE \
-	README.md \
-	global.gitproj.config \
-	local.getproj.config \
-	hooks/* \
-	gitproj-com.test \
-	shunit2.1
-
 sh-files = \
-	$(release-files) \
-	hooks/* \
-	gitproj-com.test
-
+	git-core/* \
+	doc/hooks/*
 
 # --------------------
 test : 
@@ -35,21 +13,33 @@ test :
 build :
 	-rm -rf dist
 	mkdir -p dist/usr/lib/git-core
-	cp $(release-files) dist/usr/lib/git-core
+	rsync -a git-core/* dist/usr/lib/git-core
 	mkdir -p dist/usr/share/doc/git-proj
-	rsync -a $(doc-files) dist/usr/share/doc/git-proj/
+	rsync -a doc/* dist/usr/share/doc/git-proj/
 
 package :
 
 # --------------------
 fmt :
 	+which shfmt
-	for i in $(sh-files); do \
+	git commit -am "Before fmt"
+	-rm fmt-err.tmp
+	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
-		'shfmt' -i 4 -ci -fn <$$i >$$i.tmp; \
-		if [ $$? -ne 0 ]; then \
+		if ! bash -n $$i; then \
+			echo "Error in $$i" >>fmt-err.tmp; \
 			continue; \
 		fi; \
-		mv -f $$i.tmp $$i; \
+		if ! 'shfmt' -i 4 -ci -fn <$$i >t.tmp; then \
+			echo "Error in $$i" >>fmt-err.tmp; \
+			continue; \
+		fi; \
+		if [ ! -s t.tmp ]; then \
+			echo "Error in $$i" >>fmt-err.tmp; \
+			continue; \
+		fi; \
+		echo mv -f t.tmp $$i; \
 		chmod a+rx $$i; \
 	done
+	-rm t.tmp
+	-cat fmt-err.tmp
