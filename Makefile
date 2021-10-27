@@ -16,6 +16,7 @@ build :
 	rsync -a git-core/* dist/usr/lib/git-core
 	mkdir -p dist/usr/share/doc/git-proj
 	rsync -a doc/* dist/usr/share/doc/git-proj/
+	rsync -a ../test-gitproj.tgz dist/usr/share/doc/git-proj/test
 
 package :
 
