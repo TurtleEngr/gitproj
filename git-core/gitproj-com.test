@@ -613,6 +613,7 @@ testComUnsetConfig()
     done
 } # testComUnsetConfig
 
+# --------------------------------
 testGitProj()
 {
     local tResult
@@ -632,6 +633,29 @@ testGitProj()
     tResult=$($cBin/git-proj -H int 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
 
+} # testGitProj
+
+# --------------------------------
+fComSetupDev()
+{
+}
+
+# --------------------------------
+fComSetupProd()
+{
+}
+
+# --------------------------------
+fComSetup()
+{
+	if [ "$cBin" = "/usr/lib/git-core" ]; then
+	   fComSetupProd
+	fi
+	if [ -d $cBin/.git ]; then
+	   fComSetupDev
+	fi
+        echo "Error: Cannot setup tests. $LINENO"
+	exit
 }
 
 # ====================
@@ -692,4 +716,6 @@ gpUnitDebug=${gpUnitDebug:-0}
 
 # Optional input: a comma separated list of test function names
 gpTest="$*"
+
+fComSetup
 fComRunTests $gpTest
