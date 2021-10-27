@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # To enable this hook, rename this file to "pre-commit".
 
 local tAgainst
