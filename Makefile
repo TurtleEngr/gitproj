@@ -38,7 +38,7 @@ fmt :
 			echo "Error in $$i" >>fmt-err.tmp; \
 			continue; \
 		fi; \
-		echo mv -f t.tmp $$i; \
+		mv -f t.tmp $$i; \
 		chmod a+rx $$i; \
 	done
 	-rm t.tmp
