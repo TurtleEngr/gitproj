@@ -6,7 +6,8 @@ fUsage()
     # Quick help, run this:
     # git-proj-init -h | less
 
-    local pStyle="${1:-short}"
+    local pStyle="${1:-usage}"
+
     fComUsage -s $pStyle -f $cCurDir/$cName
     exit 1
 

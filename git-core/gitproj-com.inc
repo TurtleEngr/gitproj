@@ -583,7 +583,7 @@ fError()
     fi
     fLog -p crit -l $pLine -e $pErr -m "$pMsg"
     if [ $pInt -eq 0 ]; then
-        fUsage -i short
+        fUsage usage
     fi
     exit 1
     return

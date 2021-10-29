@@ -91,6 +91,84 @@ EOF
 } # fComUDebug
 
 # --------------------------------
+fComSetupDev()
+{
+	cTestFiles=test-gitproj.tgz
+
+	cTestDestDir=$cBin/../..
+	cd $cTestDestDir
+	cTestDestDir=$PWD
+	cd - >/dev/null
+
+	if [ -r $cBin/../doc/test/$cTestFiles ]; then
+		cTestSrcDir=$cBin/../doc/test
+	fi
+	if [ -r $cBin/../../$cTestFiles ]; then
+		cTestSrcDir=$cBin/../..
+	fi
+	if [ -z "$cTestSrcDir" ]; then
+           fError -m "Error: Cannot setup tests." -l $LINENO
+	fi
+	cd $cTestSrcDir
+	cTestSrcDir=$PWD
+	cd - >/dev/null
+}
+
+# --------------------------------
+fComSetupProd()
+{
+	echo TBD
+}
+
+# --------------------------------
+fComSetup()
+{
+	if [ "$cBin" = "/usr/lib/git-core" ]; then
+	   fComSetupProd
+	elif [ -d $cBin/../.git ]; then
+	   fComSetupDev
+	else
+	    fError -m "Error: Cannot setup tests." -l $LINENO
+	fi
+
+	cDatProj1=project/george
+	cDatProj2=project/paulb
+	cDatProj1Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/george.mp4"
+	cDatProj2Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/paulb.mp4"
+	cDatMount1=$cTestDestDir/test/root/mnt/disk-2
+	cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
+	cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
+
+	return
+}
+
+# --------------------------------
+fCreateTestEnv()
+{
+    if [ -d $cTestDestDir/test ]; then
+       find $cTestDestDir/test -type l -exec rm {} \;
+       rm -rf $cTestDestDir/test
+    fi
+    cd $cTestDestDir >/dev/null
+    tar -xzf $cTestSrcDir/$cTestFiles
+
+    cd test/root/home/john >/dev/null
+    cHome=$HOME
+    HOME=$PWD
+    cd $cBin >/dev/null
+    cp $cBin/../doc/config/global.gitproj.config $HOME/.gitproj.config
+    cp $cBin/../doc/config/test-dev.gitproj-test.config $HOME/.gitproj-test.config
+    fComSetConfig -g -k "include.path" -v ".gitproj.config"
+    fComSetConfig -g -k "include.path" -v ".gitproj-test.config" -a
+
+    if [ -d $cBin/../.git ]; then
+       # We are testing from the git clone, so set GIT_DIR
+       tGitTop=$(git rev-parse --show-toplevel)
+       sed -i "s;GIT_DIR;$tGitTop;g" $HOME/.gitproj-test.config
+    fi
+} # fCreateTestEnv
+
+# --------------------------------
 oneTimeSetUp()
 {
     local tGitTop
@@ -107,23 +185,7 @@ oneTimeSetUp()
     export tDefault_gpLog=0
     export tDefault_gpVerbose=0
 
-    cd $cTestDestDir >/dev/null
-    tar -xzf $cTestSrcDir/$cTestFiles
-    
-    cd test/root/home/john >/dev/null
-    cHome=$HOME
-    HOME=$PWD
-    cd $cBin >/dev/null
-    cp $cBin/../doc/config/global.gitproj.config $HOME/.gitproj.config
-    cp $cBin/../doc/config/test-dev.gitproj-test.config $HOME/.gitproj-test.config
-    fComSetConfig -g -k "include.path" -v ".gitproj.config"
-    fComSetConfig -g -k "include.path" -v ".gitproj-test.config" -a
-
-    if [ -d $cBin/../.git ]; then
-       # We are testing from the git clone, so set GIT_DIR
-       tGitTop=$(git rev-parse --show-toplevel)
-       sed -i "s;GIT_DIR;$tGitTop;g" $HOME/.gitproj-test.config
-    fi
+    fCreateTestEnv
     return
 
     cat <<EOF >/dev/null
@@ -181,7 +243,9 @@ setUp()
     gpFacility=$tDefault_gpFacility
     gpLog=$tDefault_gpLog
     gpVerbose=$tDefault_gpVerbose
-    return
+    
+    gpUnitDebug=0
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -197,8 +261,8 @@ EOF
 
 tearDown()
 {
-    git config --local --remove-section gitproj.test &>/dev/null
-    git config --global --remove-section gitproj.test &>/dev/null
+    git config --global --remove-section gitproj.testitd &>/dev/null
+    gpUnitDebug=0
     return 0
 } # tearDown
 
@@ -214,6 +278,23 @@ testSetup()
     assertTrue "$LINENO" "[ -r $HOME/.gitproj.config ]"
     assertTrue "$LINENO" "[ -r $HOME/.gitproj-test.config ]"
     assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
+
+    for i in $cDatMount1 $cDatMount2 $cDatMount3; do
+          fComUDebug "i=$i"
+    	  assertTrue "$LINENO ${i##*/}" "[ -d $i ]"
+    done
+    for i in $cDatProj1 $cDatProj2; do
+        fComUDebug "i=$i"
+     	assertTrue "$LINENO ${i}" "[ -d $HOME/$i ]"
+    done
+    for i in $cDatProj1Big; do
+        fComUDebug "i=$i"
+     	assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj1/$i ]"
+    done
+    for i in $cDatProj2Big $cDatProj2Big; do
+        fComUDebug "i=$i"
+     	assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj2/$i ]"
+    done
 }
 
 # --------------------------------
@@ -276,7 +357,6 @@ testComLog_MultiplePermutations()
     tLine="458"
     tErr="42"
 
-    gpUnitDebug=0
     for gpLog in 0 1; do
         for gpVerbose in 0 1; do
             for gpDebug in 0 1 2; do
@@ -319,7 +399,6 @@ testComLog_MultiplePermutations()
     done             # gpLog
 
     echo 1>&2
-    gpUnitDebug=0
     return
 
     cat <<EOF >/dev/null
@@ -349,7 +428,6 @@ testComSysLog()
     #export tSyslog=/var/log/syslog
 
     # Check syslog
-    gpUnitDebug=0
     gpLog=1
     gpVerbose=0
     tMsg="Testing 123"
@@ -368,7 +446,6 @@ testComSysLog()
         assertContains "$LINENO tcl13-$tTestMsg" "$tResult" "$tMsg"
     done
     echo 1>&2
-    gpUnitDebug=0
     return
 
     cat <<EOF >/dev/null
@@ -392,7 +469,6 @@ testComErrorLog()
     local tResult
     local tTestMsg
 
-    gpUnitDebug=0
     gpLog=0
     gpVerbose=0
     local tMsg="Testing 123"
@@ -408,12 +484,10 @@ testComErrorLog()
         assertContains "$LINENO tcel-$tTestMsg.crit" "$tResult" "crit:"
         assertContains "$LINENO tcel-$tTestMsg.msg" "$tResult" "$tMsg"
         assertContains "$LINENO tcel-$tTestMsg.line" "$tResult" '['$tLine']'
-        # shellcheck disable=SC2026
         assertContains "$LINENO tcel-$tTestMsg.err" "$tResult" '('1')'
-        assertContains "$LINENO tcel-$tTestMsg.usage" "$tResult" "Usage:"
+        assertContains "$LINENO tcel-$tTestMsg.usage" "$tResult" "Usage"
     done
     echo 1>&2
-    gpUnitDebug=0
     return
 
     cat <<EOF >/dev/null
@@ -432,12 +506,10 @@ testComUsage()
 {
     local tResult
 
-    gpUnitDebug=0
-
     #-----
-    tResult=$(fComUsage -s short -f $cBin/$cName 2>&1)
+    tResult=$(fComUsage -s usage -f $cBin/$cName 2>&1)
     fComUDebug "tResult=$tResult"
-    assertContains "$LINENO tcu-short" "$tResult" "Usage:"
+    assertContains "$LINENO tcu-short" "$tResult" "Usage"
 
     #-----
     tResult=$(fComUsage -s foo -f $cBin/$cName 2>&1)
@@ -494,7 +566,6 @@ testComUsage()
     #-----
     tResult=$(fComUsage -a -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)
     #-----
-    gpUnitDebug=0
     return
 
     cat <<EOF >/dev/null
@@ -537,108 +608,68 @@ EOF
 } # testComFunctions
 
 # --------------------------------
-testComSetConfig()
+testComSetConfigGlobal()
 {
     local tResult
-    local tGlobal=$cHome/.gitconfig
-    local tLocal=.git/config
-    local tScope
-    local tScopeFile
+    local tGlobal=$HOME/.gitconfig
 
-    for tScopeFile in $tGlobal $tLocal; do
-        if [ "$tScopeFile" = "$tGlobal" ]; then
-            tScope="-g"
-        fi
-        if [ "$tScopeFile" = "$tLocal" ]; then
-            tScope="-l"
-        fi
-        assertTrue "$LINENO $tScope" "[ -r $tScopeFile ]"
-        assertTrue "$LINENO $tScope" "[ -r $tLocal ]"
+        assertTrue "$LINENO -g" "[ -r $tGlobal ]"
 
-        grep -q '\[gitproj "test"\]' $tScopeFile
-        assertFalse "$LINENO $tScope tearDown ran" "[ $? -eq 0 ]"
+        grep -q '\[gitproj "testit"\]' $tGlobal
+        assertFalse "$LINENO tearDown ran" "[ $? -eq 0 ]"
 
-        fComSetConfig $tScope -k gitproj.test.test-str -v "test a string"
-        grep -q '\[gitproj "test"\]' $tScopeFile
-        assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
-        grep -q 'test-str = test a string' $tScopeFile
-        assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
+        fComSetConfig -g -k gitproj.testit.test-str -v "test a string"
+        grep -q '\[gitproj "testit"\]' $tGlobal
+        assertTrue "$LINENO" "[ $? -eq 0 ]"
+        grep -q 'test-str = test a string' $tGlobal
+        assertTrue "$LINENO" "[ $? -eq 0 ]"
 
-        fComSetConfig $tScope -i -k gitproj.test.test-int -v "2K"
-        grep -q 'test-int = 2048' $tScopeFile
-        assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
+        fComSetConfig -g -i -k gitproj.testit.test-int -v "2K"
+        grep -q 'test-int = 2048' $tGlobal
+        assertTrue "$LINENO" "[ $? -eq 0 ]"
 
-        fComSetConfig $tScope -b -k gitproj.test.test-bool -v "yes"
-        grep -q 'test-bool = true' $tScopeFile
-        assertTrue "$LINENO $tScope" "[ $? -eq 0 ]"
-    done
-} # testComSetConfig
+        fComSetConfig -g -b -k gitproj.testit.test-bool -v "yes"
+        grep -q 'test-bool = true' $tGlobal
+        assertTrue "$LINENO" "[ $? -eq 0 ]"
+} # testComSetConfigGlobal
 
 # --------------------------------
-testComGetConfig()
+testComGetConfigGlobal()
 {
     local tResult
-    local tGlobal=$cHome/.gitconfig
-    local tLocal=.git/config
-    local tScope
-    local tScopeFile
+    local tGlobal=$HOME/.gitconfig
 
-    for tScopeFile in $tGlobal $tLocal; do
-        if [ "$tScopeFile" = "$tGlobal" ]; then
-            tScope="-g"
-        fi
-        if [ "$tScopeFile" = "$tLocal" ]; then
-            tScope="-l"
-        fi
-        fComSetConfig $tScope -k gitproj.test.test-str-get -v "test a string"
-        fComSetConfig $tScope -k gitproj.test.test-int-get -v "2K"
-        fComSetConfig $tScope -k gitproj.test.test-bool-get -v "yes"
+        fComSetConfig -g -k gitproj.testit.test-str-get -v "test a string"
+        fComSetConfig -g -k gitproj.testit.test-int-get -v "2K"
+        fComSetConfig -g -k gitproj.testit.test-bool-get -v "yes"
 
-        tResult=$(fComGetConfig $tScope -k gitproj.test.test-str-get)
-        assertEquals "$LINENO $tScope" "test a string" "$tResult"
+        tResult=$(fComGetConfig -g -k gitproj.testit.test-str-get)
+        assertEquals "$LINENO -g" "test a string" "$tResult"
 
-        tResult=$(fComGetConfig $tScope -i -k gitproj.test.test-int-get)
-        assertEquals "$LINENO $tScope" "2048" "$tResult"
+        tResult=$(fComGetConfig -g -i -k gitproj.testit.test-int-get)
+        assertEquals "$LINENO -g" "2048" "$tResult"
 
-        tResult=$(fComGetConfig $tScope -b -k gitproj.test.test-bool-get)
-        assertEquals "$LINENO $tScope" "true" "$tResult"
-    done
-
-    fComSetConfig -g -k gitproj.test.test-str-default -v "in global"
-    fComSetConfig -l -k gitproj.test.test-str-default -v "in local"
-    tResult=$(fComGetConfig -k gitproj.test.test-str-default)
-    assertEquals "$LINENO $tResult" "in local" "$tResult"
-
-} # testComGetConfig
+        tResult=$(fComGetConfig -g -b -k gitproj.testit.test-bool-get)
+        assertEquals "$LINENO -g" "true" "$tResult"
+} # testComGetConfigGlobal
 
 # --------------------------------
-testComUnsetConfig()
+testComUnsetConfigGlobal()
 {
     local tResult
-    local tGlobal=$cHome/.gitconfig
-    local tLocal=.git/config
-    local tScope
-    local tScopeFile
+    local tGlobal=$HOME/.gitconfig
 
-    for tScopeFile in $tGlobal $tLocal; do
-        if [ "$tScopeFile" = "$tGlobal" ]; then
-            tScope="-g"
-        fi
-        if [ "$tScopeFile" = "$tLocal" ]; then
-            tScope="-l"
-        fi
-        fComSetConfig $tScope -k gitproj.test.test-str-unset -v "test unset"
-        tResult=$(fComGetConfig $tScope -k gitproj.test.test-str-unset)
+        fComSetConfig -g -k gitproj.testit.test-str-unset -v "test unset"
+        tResult=$(fComGetConfig -g -k gitproj.testit.test-str-unset)
         assertEquals "$LINENO $tResult" "test unset" "$tResult"
-        grep -q "test unset" $tScopeFile
+        grep -q "test unset" $tGlobal
         assertTrue "$LINENO" "[ $? -eq 0 ]"
 
-        fComUnsetConfig $tScope -k gitproj.test.test-str-unset
+        fComUnsetConfig -g -k gitproj.testit.test-str-unset
         assertTrue "$LINENO" "[ $? -eq 0 ]"
-        grep -q "test unset" $tScopeFile
+        grep -q "test unset" $tGlobal
         assertFalse "$LINENO" "[ $? -eq 0 ]"
-    done
-} # testComUnsetConfig
+} # testComUnsetConfigGlobal
 
 # --------------------------------
 testGitProj()
@@ -663,46 +694,19 @@ testGitProj()
 } # testGitProj
 
 # --------------------------------
-fComSetupDev()
+testGitProjInit()
 {
-	cTestFiles=test-gitproj.tgz
+	local tResult
 
-	cTestDestDir=$cBin/../..
-	cd $cTestDestDir
-	cTestDestDir=$PWD
-	cd - >/dev/null
+	tResult=$($cBin/git-proj-init 2>&1)
+    	assertContains "$LINENO $tResult" "$tResult" 'Usage'
+    
+	tResult=$($gBin/git-proj-init -h)
+    	assertContains "$LINENO $tResult" "$tResult" 'DESCRIPTION'
 
-	if [ -r $cBin/../doc/test/$cTestFiles ]; then
-		cTestSrcDir=$cBin/../doc/test
-	fi
-	if [ -r $cBin/../../$cTestFiles ]; then
-		cTestSrcDir=$cBin/../..
-	fi
-	if [ -z "$cTestSrcDir" ]; then
-           fError -m "Error: Cannot setup tests." -l $LINENO
-	fi
-	cd $cTestSrcDir
-	cTestSrcDir=$PWD
-	cd - >/dev/null
-}
+# git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
 
-# --------------------------------
-fComSetupProd()
-{
-	echo TBD
-}
-
-# --------------------------------
-fComSetup()
-{
-	if [ "$cBin" = "/usr/lib/git-core" ]; then
-	   fComSetupProd
-	elif [ -d $cBin/../.git ]; then
-	   fComSetupDev
-	else
-	    fError -m "Error: Cannot setup tests." -l $LINENO
-	fi
-	return
+	#tResult=$($gBin/git-proj-init -l ???)
 }
 
 # ====================
@@ -740,7 +744,18 @@ export gErr gpDebug gpFacility gpLog gpVerbose
 
 # Test globals
 export gpTest gpUnitDebug SHUNIT_COLOR
-export ctTestSrcDir cTestDestDir cTestFiles
+export cTestSrcDir cTestDestDir cTestFiles
+
+# For cDat defs see: fComSetup()
+
+# Relative to $HOME
+export cDatProj1 cDatProj2
+
+# Relative to the corresponding $cDatProjN
+export cDatProj1Big cDatProj2Big
+
+# These are simulations of local mount points. Absolute paths.
+export cDatMount1 cDatMount2 cDatMount3
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -760,8 +775,6 @@ cBin=$PWD
 cd $cCurDir
 
 # -----
-gpUnitDebug=0
-
 # Optional input: a comma separated list of test function names
 gpTest="$*"
 
