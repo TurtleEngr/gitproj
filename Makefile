@@ -27,7 +27,7 @@ package : build
 # --------------------
 fmt :
 	+which shfmt
-	git commit -am "Before fmt"
+	-git commit -am "Before fmt"
 	-rm fmt-err.tmp
 	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
