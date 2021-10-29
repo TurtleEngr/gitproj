@@ -35,13 +35,13 @@ fUsage()
             fComUsage -s $pStyle -t "$cName Usage" $tFileList
             ;;
         int)
-            fComUsage -s long $tIntFileList
+            fComUsage -i -s long $tIntFileList
             ;;
         int-html)
-            fComUsage -s html -t "$cName Internal Doc" $tIntFileList
+            fComUsage -i -s html -t "$cName Internal Doc" $tIntFileList
             ;;
         int-md)
-            fComUsage -s md $tIntFileList
+            fComUsage -i -s md $tIntFileList
             ;;
         *)
             fComUsage -s short -f $cCurDir/$cName

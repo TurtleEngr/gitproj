@@ -170,6 +170,7 @@ fComSetGlobals()
         cVer=${cVer#*' '}
         cVer=${cVer%' '*}
     fi
+
     return
 
     cat <<EOF >/dev/null
@@ -195,7 +196,7 @@ fComCheckDeps()
     local tProg
     local tErr=0
     local tComReq='logger pod2text pod2usage'
-    local tComOpt='pod2html pod2man pod2markdown tidy shunit2.1 awk tr'
+    local tComOpt='pod2html pod2man pod2markdown tidy shunit2.1 gawk sed tr fmt'
 
     for tProg in $pOptional $tComOpt; do
         if ! which $tProg &>/dev/null; then
@@ -212,7 +213,7 @@ fComCheckDeps()
     done
 
     if [ $tErr -eq 2 ]; then
-        fError "Missing one or more required programs."
+        fError -m "Missing one or more required programs." -l $LINENO
     fi
     if [ $tErr -eq 1 ]; then
         fLog -p warning -m "Missing some some optional programs." -l $LINENO
@@ -312,7 +313,9 @@ fComUsage()
         short | usage)
             tProg=pod2usage
             if [ $pInt -ne 0 ]; then
-                tProg="pod2text | head -n 24"
+	        # This fails, don't know why
+                # tProg='pod2text | head -n 24'
+                tProg=pod2text
             fi
             ;;
         man)
@@ -325,7 +328,7 @@ fComUsage()
             tProg=pod2text
             ;;
         html)
-            tProg="pod2html"
+            tProg=pod2html
             ;;
         md)
             tProg=pod2markdown
@@ -354,14 +357,21 @@ fComUsage()
 
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
+            # shellcheck disable=SC2002
             cat $tFileList | $tProg --title="$pTitle" | $tTidy
         else
-            cat $tFileList | $tProg
+	    if [ "$pStyle" = "short" ]; then
+		# shellcheck disable=SC2002
+            	cat $tFileList | pod2text | head -n 10
+	    else
+		# shellcheck disable=SC2002
+            	cat $tFileList | $tProg
+	    fi
         fi
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $tFileLis | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
+            cat $tFileList | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
         else
             # shellcheck disable=SC2002
             cat $tFileList | fComInternalDoc $pAll | $tProg
@@ -440,7 +450,7 @@ fFmtLog()
 
     # Check verbose
     if [ $gpVerbose -eq 0 ] &&
-        [ "$pLevel" = "notice" -o "$pLevel" = "info" ]; then
+        [ "$pLevel" = "notice" ] || [ "$pLevel" = "info" ]; then
         return
     fi
     if [ $gpVerbose -eq 1 ] && [ "$pLevel" = "info" ]; then
@@ -460,7 +470,7 @@ fFmtLog()
     fi
 
     if [ $tPID_Flag -eq 1 ]; then
-        tPID="[$cPID]"
+        tPID="[$tPID]"
         tPID_Opt="-i"
     fi
 
@@ -573,7 +583,7 @@ fError()
     fi
     fLog -p crit -l $pLine -e $pErr -m "$pMsg"
     if [ $pInt -eq 0 ]; then
-        fUsage short
+        fUsage -i short
     fi
     exit 1
     return
@@ -611,22 +621,23 @@ fComSetConfig()
     local pType="--no-type"
     local pKey=""
     local pValue=""
+    local pAdd=""
 
     local tHostConfig
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glhibk:v: tArg; do
+    while getopts :aglhibk:v: tArg; do
         case $tArg in
+	    a) pAdd="--add" ;;
             g) pScope=--global ;;
             l) pScope=--local ;;
-            h)
-                tHostConfig=$(git config include.path)
-                pScope="--file $tHostConfig"
-                if [ ! -r "$tHostConfig" ]; then
-                    fError -m "Internal fComSetConfig: no host config set" -l $LINENO
-                fi
-                ;;
+            h) tHostConfig=$(git config include.path)
+               pScope="--file $tHostConfig"
+               if [ ! -r "$tHostConfig" ]; then
+                   fError -m "Internal fComSetConfig: no host config set" -l $LINENO
+               fi
+               ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
@@ -642,7 +653,7 @@ fComSetConfig()
         fError -m "Internal fComSetConfig: missing value" -l $LINENO
     fi
 
-    git config $pScope $pType $pKey "$pValue"
+    git config $pScope $pAdd $pType $pKey "$pValue"
 } # fComSetConfig
 
 # --------------------------------

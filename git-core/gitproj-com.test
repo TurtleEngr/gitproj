@@ -2,11 +2,14 @@
 # Test suite to gitproj functions and scripts.
 
 # ========================================
-fGitProjTestUsage()
+fUsage()
 {
-    # This is just a place for the start of the testing internal
-    #  documentation. See: fGitProjComInternalDoc()
+    fComUsage -i -s short -f $cCurDir/$cName
+
+    # This is the start of the testing internal documentation. See:
+    # fGitProjComInternalDoc()
     return
+
     cat <<\EOF >/dev/null
 =internal-pod
 
@@ -90,10 +93,7 @@ EOF
 # --------------------------------
 oneTimeSetUp()
 {
-    assertTrue "$LINENO" "[ -x $cBin/gitproj-com.inc ]"
-    . $cBin/gitproj-com.inc
-
-    fComSetGlobals
+    local tGitTop
 
     # Save global values
     export tDefault_cBin=$cBin
@@ -107,10 +107,23 @@ oneTimeSetUp()
     export tDefault_gpLog=0
     export tDefault_gpVerbose=0
 
-    assertTrue "$LINENO" "[ -r ~/.gitconfig ]"
-    assertTrue "$LINENO" "[ -r .git/config ]"
+    cd $cTestDestDir >/dev/null
+    tar -xzf $cTestSrcDir/$cTestFiles
+    
+    cd test/root/home/john >/dev/null
+    cHome=$HOME
+    HOME=$PWD
+    cd $cBin >/dev/null
+    cp $cBin/../doc/config/global.gitproj.config $HOME/.gitproj.config
+    cp $cBin/../doc/config/test-dev.gitproj-test.config $HOME/.gitproj-test.config
+    fComSetConfig -g -k "include.path" -v ".gitproj.config"
+    fComSetConfig -g -k "include.path" -v ".gitproj-test.config" -a
 
-    assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
+    if [ -d $cBin/../.git ]; then
+       # We are testing from the git clone, so set GIT_DIR
+       tGitTop=$(git rev-parse --show-toplevel)
+       sed -i "s;GIT_DIR;$tGitTop;g" $HOME/.gitproj-test.config
+    fi
     return
 
     cat <<EOF >/dev/null
@@ -124,6 +137,11 @@ Currently this records all of the script's expected initial global
 variable settings, defined in fComSetGlobals. If different, adjust the
 tests as needed.
 
+Env Var
+
+ HOME - this is set to the test user's home dir
+ gpUnitDebug - this can be manually set to 1 in unit test functions.
+
 Calls:
 
  $cBin/gitproj-com.inc
@@ -132,6 +150,22 @@ Calls:
 =internal-cut
 EOF
 } # oneTimeSetUp
+
+oneTimeTearDown()
+{
+    gpUnitDebug=1
+
+    if [ -n "$cHome" ]; then
+       HOME=$cHome
+    fi
+
+    # Remove all test files
+    cd $cBin
+    if [ $gpUnitDebug -eq 0  ] && [ -d $cTestDestDir/test ]; then
+       find $cTestDestDir/test -type l -exec rm {} \;
+       rm -rf $cTestDestDir/test
+    fi
+} # oneTimeTearDown
 
 # --------------------------------
 setUp()
@@ -166,9 +200,21 @@ tearDown()
     git config --local --remove-section gitproj.test &>/dev/null
     git config --global --remove-section gitproj.test &>/dev/null
     return 0
-}
+} # tearDown
 
 # ========================================
+
+# --------------------------------
+testSetup()
+{
+    assertTrue "$LINENO" "[ -x $cBin/gitproj-com.inc ]"
+    assertTrue "$LINENO" "[ -r $cTestSrcDir/$cTestFiles ]"
+    assertTrue "$LINENO" "[ -d $cTestDestDir ]"
+    assertNotEquals "$LINENO" "$cHome" "$HOME"
+    assertTrue "$LINENO" "[ -r $HOME/.gitproj.config ]"
+    assertTrue "$LINENO" "[ -r $HOME/.gitproj-test.config ]"
+    assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
+}
 
 # --------------------------------
 testComInitialConfig()
@@ -232,21 +278,14 @@ testComLog_MultiplePermutations()
 
     gpUnitDebug=0
     for gpLog in 0 1; do
-        for gpVerbose in 0 1 2; do
+        for gpVerbose in 0 1; do
             for gpDebug in 0 1 2; do
                 for tLevel in alert crit err warning notice info debug debug-1 debug-3; do
                     echo -n '.' 1>&2
                     tTestMsg="l-$gpLog.v-$gpVerbose.d-$gpDebug.$tLevel.fLog"
-                    if [ "fLog" = "fLog" ]; then
-                        fComUDebug " "
-                        fComUDebug "Call: fLog $tLevel \"$tMsg\" $tLine $tErr"
-                        tResult=$(fLog $tLevel "$tMsg" $tLine $tErr 2>&1)
-                    fi
-                    if [ "fLog" = "fLog" ]; then
-                        fComUDebug " "
-                        fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\" -l $tLine -e $tErr"
-                        tResult=$(fLog -p $tLevel -m "$tMsg" -l $tLine -e $tErr 2>&1)
-                    fi
+                    fComUDebug " "
+                    fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\" -l $tLine -e $tErr"
+                    tResult=$(fLog -p $tLevel -m "$tMsg" -l $tLine -e $tErr 2>&1)
                     fComUDebug "tResult=$tResult"
 
                     if [ $gpVerbose -eq 0 ] && echo $tLevel | grep -Eq 'notice|info'; then
@@ -319,14 +358,8 @@ testComSysLog()
         echo -n '.' 1>&2
         tTestMsg="$tLevel.fLog"
         fComUDebug " "
-        if [ "fLog" = "fLog" ]; then
-            fComUDebug "Call: fLog $tLevel $tMsg"
-            tResult=$(fLog $tLevel "$tMsg" 2>&1)
-        fi
-        if [ "fLog" = "fLog" ]; then
-            fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\""
-            tResult=$(fLog -p $tLevel -m "$tMsg" 2>&1)
-        fi
+        fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\""
+        tResult=$(fLog -p $tLevel -m "$tMsg" 2>&1)
         fComUDebug "tResult=$tResult"
         assertContains "$LINENO tcl11-$tTestMsg" "$tResult" "$tLevel:"
         tResult=$(tail -n1 $tSyslog)
@@ -368,14 +401,8 @@ testComErrorLog()
         echo -n '.' 1>&2
         tTestMsg="l-$gpLog.fError"
         fComUDebug " "
-        if [ "fError" = "fError" ]; then
-            fComUDebug "Call: fError \"$tMsg\" $tLine"
-            tResult=$(fError "$tMsg" $tLine 2>&1)
-        fi
-        if [ "fError" = "fError" ]; then
-            fComUDebug "Call: fError -m \"$tMsg\" -l $tLine"
-            tResult=$(fError -m "$tMsg" -l $tLine 2>&1)
-        fi
+        fComUDebug "Call: fError -m \"$tMsg\" -l $tLine"
+        tResult=$(fError -m "$tMsg" -l $tLine 2>&1)
         fComUDebug "tResult=$tResult"
         assertContains "$LINENO tcel-$tTestMsg.name" "$tResult" "$cName"
         assertContains "$LINENO tcel-$tTestMsg.crit" "$tResult" "crit:"
@@ -513,7 +540,7 @@ EOF
 testComSetConfig()
 {
     local tResult
-    local tGlobal=~/.gitconfig
+    local tGlobal=$cHome/.gitconfig
     local tLocal=.git/config
     local tScope
     local tScopeFile
@@ -551,7 +578,7 @@ testComSetConfig()
 testComGetConfig()
 {
     local tResult
-    local tGlobal=~/.gitconfig
+    local tGlobal=$cHome/.gitconfig
     local tLocal=.git/config
     local tScope
     local tScopeFile
@@ -588,7 +615,7 @@ testComGetConfig()
 testComUnsetConfig()
 {
     local tResult
-    local tGlobal=~/.gitconfig
+    local tGlobal=$cHome/.gitconfig
     local tLocal=.git/config
     local tScope
     local tScopeFile
@@ -638,11 +665,31 @@ testGitProj()
 # --------------------------------
 fComSetupDev()
 {
+	cTestFiles=test-gitproj.tgz
+
+	cTestDestDir=$cBin/../..
+	cd $cTestDestDir
+	cTestDestDir=$PWD
+	cd - >/dev/null
+
+	if [ -r $cBin/../doc/test/$cTestFiles ]; then
+		cTestSrcDir=$cBin/../doc/test
+	fi
+	if [ -r $cBin/../../$cTestFiles ]; then
+		cTestSrcDir=$cBin/../..
+	fi
+	if [ -z "$cTestSrcDir" ]; then
+           fError -m "Error: Cannot setup tests." -l $LINENO
+	fi
+	cd $cTestSrcDir
+	cTestSrcDir=$PWD
+	cd - >/dev/null
 }
 
 # --------------------------------
 fComSetupProd()
 {
+	echo TBD
 }
 
 # --------------------------------
@@ -650,12 +697,12 @@ fComSetup()
 {
 	if [ "$cBin" = "/usr/lib/git-core" ]; then
 	   fComSetupProd
-	fi
-	if [ -d $cBin/.git ]; then
+	elif [ -d $cBin/../.git ]; then
 	   fComSetupDev
+	else
+	    fError -m "Error: Cannot setup tests." -l $LINENO
 	fi
-        echo "Error: Cannot setup tests. $LINENO"
-	exit
+	return
 }
 
 # ====================
@@ -688,11 +735,12 @@ EOF
 
 # ====================
 # Main
-export PWD cBin cCurDir cName cPID cVer
+export PWD cBin cCurDir cName cPID cVer cHome
 export gErr gpDebug gpFacility gpLog gpVerbose
 
 # Test globals
 export gpTest gpUnitDebug SHUNIT_COLOR
+export ctTestSrcDir cTestDestDir cTestFiles
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -712,10 +760,12 @@ cBin=$PWD
 cd $cCurDir
 
 # -----
-gpUnitDebug=${gpUnitDebug:-0}
+gpUnitDebug=0
 
 # Optional input: a comma separated list of test function names
 gpTest="$*"
 
+. $cBin/gitproj-com.inc
+fComSetGlobals
 fComSetup
 fComRunTests $gpTest

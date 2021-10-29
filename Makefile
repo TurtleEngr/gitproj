@@ -7,18 +7,22 @@ sh-files = \
 	doc/hooks/*
 
 # --------------------
-test : 
-	./gitproj-com.test
+clean :
+	-find . -name '*~' -exec rm {} \;
+	-find . -name '*.tmp' -exec rm {} \;
 
-build :
+test : clean
+	cd git-core; ./gitproj-com.test
+
+build : test
 	-rm -rf dist
 	mkdir -p dist/usr/lib/git-core
-	rsync -a git-core/* dist/usr/lib/git-core
+	rsync -a git-core/* dist/usr/lib/git-core/
 	mkdir -p dist/usr/share/doc/git-proj
 	rsync -a doc/* dist/usr/share/doc/git-proj/
 	rsync -a ../test-gitproj.tgz dist/usr/share/doc/git-proj/test
 
-package :
+package : build
 
 # --------------------
 fmt :

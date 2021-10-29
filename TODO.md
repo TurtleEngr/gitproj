@@ -24,6 +24,8 @@
 
 * Code git-proj-config
 
+* Refactor the test setup so it is simpler
+
 * Get travis-ci working. Run tests.
 
 * Cleanup the user docs.
