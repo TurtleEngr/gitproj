@@ -313,7 +313,7 @@ fComUsage()
         short | usage)
             tProg=pod2usage
             if [ $pInt -ne 0 ]; then
-	        # This fails, don't know why
+                # This fails, don't know why
                 # tProg='pod2text | head -n 24'
                 tProg=pod2text
             fi
@@ -360,13 +360,13 @@ fComUsage()
             # shellcheck disable=SC2002
             cat $tFileList | $tProg --title="$pTitle" | $tTidy
         else
-	    if [ "$pStyle" = "short" ]; then
-		# shellcheck disable=SC2002
-            	cat $tFileList | pod2text | head -n 10
-	    else
-		# shellcheck disable=SC2002
-            	cat $tFileList | $tProg
-	    fi
+            if [ "$pStyle" = "short" ]; then
+                # shellcheck disable=SC2002
+                cat $tFileList | pod2text | head -n 10
+            else
+                # shellcheck disable=SC2002
+                cat $tFileList | $tProg
+            fi
         fi
     else
         if [ "$pStyle" = "html" ]; then
@@ -629,15 +629,16 @@ fComSetConfig()
     local tArg
     while getopts :aglhibk:v: tArg; do
         case $tArg in
-	    a) pAdd="--add" ;;
+            a) pAdd="--add" ;;
             g) pScope=--global ;;
             l) pScope=--local ;;
-            h) tHostConfig=$(git config include.path)
-               pScope="--file $tHostConfig"
-               if [ ! -r "$tHostConfig" ]; then
-                   fError -m "Internal fComSetConfig: no host config set" -l $LINENO
-               fi
-               ;;
+            h)
+                tHostConfig=$(git config include.path)
+                pScope="--file $tHostConfig"
+                if [ ! -r "$tHostConfig" ]; then
+                    fError -m "Internal fComSetConfig: no host config set" -l $LINENO
+                fi
+                ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
