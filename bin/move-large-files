@@ -2,23 +2,58 @@
 
 fUsage()
 {
-	exit 1
+    # Quick help, run this:
+    # git-proj-init -h | less
+
+    local pStyle="${1:-usage}"
+
+    fComUsage -s $pStyle -f $cCurDir/$cName
+    exit 1
 	
-	cat <<EOF >/dev/null
-move-large-files [-h] [-n] [-b] [-s pSize] [-d pDir] [-r pSymLink ]
+    cat <<EOF >/dev/null
+=pod
+
+=for text ========================================
+
+=for html <hr/>
+
+=head1 NAME move-large-files
+
+=head1 SYNOPSIS
+
+ move-large-files [-h] [-n] [-b] [-s pSize] [-d pDir] [-r pSymLink ]
+
+ -n - no-op, just show what would be moved, use this to show the "large" files
+ -b - don't just move binary files
+ -s pSize - move files larger than pSize. Suffix with k, M, G (default: 1k)
+ -d pDir - pDir should not be in current dir or below (default: ../NAME.raw)
+ -r pSymLink - symlink in current dir to pDir (default: raw)
+ -h - this help
+
+=head1 DESCRIPTION
 
 Use this to prepare a directory for use with git-proj.
 
--n - no-op, just show what would be moved, use this to show the "large" files
--b - don't just move binary files
--s pSize - move files larger than pSize. Suffix with k, M, G (default: 1k)
--d pDir - pDir should not be in current dir or below (default: ../NAME.raw)
--r pSymLink - symlink in current dir to pDir (default: raw)
--h - this help
-
 Example Before:
 
-    project/
+=head1 OPTIONS
+
+=over 4
+
+=back
+
+=head1 RETURN VALUE
+
+ 0 - if OK
+ !0 - if errors
+
+=for comment =head1 ERRORS
+
+=head1 EXAMPLES
+
+Example directories before running move-large-files.
+
+    ~/project/
 	ocean-videos/
 	    edit/
 	    src/
@@ -30,9 +65,9 @@ Example Before:
 		    wave002.jpg
 		    wave003.png
 		    
-Example command::
+Example command:
 
-	cd project/ocean-videos
+	cd ~/project/ocean-videos
 	move-large-files -n -s 2M
 
 Example after:
@@ -59,6 +94,49 @@ Example after:
 		still/
 		    wave002.jpg -> ../../raw/src/final/wave002.jpg
 		    wave003.png -> ../../raw/src/final/wave003.png
+
+Now you can run git-proj-init...??? TBD
+
+cd ~/project/ocean-videos
+git-proj-init...
+
+=for comment=head1 ENVIRONMENT
+
+=for comment=head1 FILES
+
+=head1 SEE ALSO
+
+ git proj
+ git proj clone
+ git proj add
+ git proj push
+ git proj pull
+ git proj set
+ git proj status
+ git flow
+
+=for comment =head1 NOTES
+
+=for comment =head1 CAVEATS
+
+=for comment =head1 DIAGNOSTICS
+
+=for comment =head1 BUGS
+
+=for comment =head1 RESTRICTIONS
+
+=head1 AUTHOR
+
+TurtleEngr
+
+=head1 HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
+
+$Revision: 1.52 $
+
+=cut
+
 EOF
 }
 

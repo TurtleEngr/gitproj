@@ -18,16 +18,22 @@ fUsage()
 
 =for html <hr/>
 
-=head1 NAME git proj init
+=head1 NAME git-proj-init
 
 =head1 SYNOPSIS
 
- git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
+    git-proj-init -l pDirPath
 
- -l - run "git init" in the pDirPath
- -r - create a raw directory relative to the repo
- -e - clone the repo and raw files to a mounted drive at $pDirPath
- -h - full help
+run "git init" in the pDirPath
+
+    git proj remote
+ 
+clone the repo and raw files to a mounted drive at $pDirPath
+
+    git-proj-add (move-large-files -f -h)
+    git proj add
+
+create a raw directory relative to the repo. And move large files
 
 =head1 DESCRIPTION
 
@@ -93,7 +99,6 @@ directory video-2019-04-01, with:
 =head1 SEE ALSO
 
  git proj
- git proj init
  git proj clone
  git proj add
  git proj push
@@ -162,6 +167,7 @@ fCheckPkg()
 fCheckForBinary()
 {
     local tFound=0;
+    declare -l tAns
 
     for i in $(find * -size +10k -exec ls -l {} \;); do
         if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
@@ -170,7 +176,15 @@ fCheckForBinary()
 	fi
     done
     if [ $tFound -ne 0 ]; then
-       ffLog -l warning -m 'Some "large" binary file were found. Use ' -l $LINENO
+       fLog -l warning -m 'Some "large" binary file were found. To \
+keep your repository small, binary files should not be versioned. Use \
+move-large-files to move them. ' -l $LINENO
+       if [ $gpForce -ne 0 ]; then
+           read -p 'Continue (y/n)? ' tAns
+	   if [ "$tAns" != "y" ]; then
+	       exit 1
+	   fi
+       fi
     fi
     return $tFound
 }
@@ -190,29 +204,30 @@ proxy/
 thumbs/
 tmp/
 EOF
-    set -x &>/dev/null
+    set -x >/dev/null 2>&1
     git init
     git add .gitignore *
     git commit -am "Initial commit"
     git branch --move master main
     git branch develop
     git checkout develop
-    set +x &>/dev/null
+    set +x >/dev/null 2>&1
     if fCheckPkg git-flow; then
-        set -x &>/dev/null
+        set -x >/dev/null 2>&1
         git flow init -d
-    	set +x &>/dev/null
+    	set +x >/dev/null 2>&1
     fi
-    set -x &>/dev/null
+    set -x >/dev/null 2>&1
     git branch
     git status
-    set +x &>/dev/null
+    set +x >/dev/null 2>&1
 }
 
 # --------------------
 fCreateLocalGit()
 {
     fCheckForNoGit
+    fCheckForBinary
     fMkGitDir
 } # fCreateLocalGit
 
@@ -280,12 +295,12 @@ fMkRemote()
     local tSrcPath=$PWD
     local tProjName=${PWD##*/}
 
-    set -x &>/dev/null
-    cd $pPath &>/dev/null
+    set -x >/dev/null 2>&1
+    cd $pPath >/dev/null 2>&1
     git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
-    cd - &>/dev/null
+    cd - >/dev/null 2>&1
     git remote add origin $pPath/$tProjName.git
-    set +x &>/dev/null
+    set +x >/dev/null 2>&1
 }
 
 # --------------------
@@ -344,7 +359,8 @@ fi
 
 gpAction=""
 gpDirPath=""
-while getopts :l:re:hH:lvx tArg; do
+gpForce=0
+while getopts :l:re:fhH:lvx tArg; do
     case $tArg in
         # Script arguments
         l)
@@ -367,6 +383,7 @@ while getopts :l:re:hH:lvx tArg; do
             gpAction=fCreateRemoteGit
             gpDirPath="$OPTARG"
             ;;
+	f)  gpForce=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

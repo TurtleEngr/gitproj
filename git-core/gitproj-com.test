@@ -566,6 +566,8 @@ testComUsage()
 
     #-----
     tResult=$(fComUsage -a -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)
+    assertContains "$LINENO long" "$tResult" "DESCRIPTION"
+    
     #-----
     return
 
@@ -702,14 +704,14 @@ testGitProjInit()
     tResult=$($cBin/git-proj-init 2>&1)
     assertContains "$LINENO $tResult" "$tResult" 'Usage'
 
-    tResult=$($gBin/git-proj-init -h)
+    tResult=$($cBin/git-proj-init -h)
     assertContains "$LINENO $tResult" "$tResult" 'DESCRIPTION'
 
     # git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
 
     cd $HOME/$cDatProj1
     assertFalse "$LINENO" "[ -d .git ]"
-    tResult=$($gBin/git-proj-init -l $PWD)
+    tResult=$($cBin/git-proj-init -l $PWD)
     assertTrue "$LINENO" "[ -d .git ]"
 
     assertTrue "$LINENO" "[ -f .gitignore ]"
