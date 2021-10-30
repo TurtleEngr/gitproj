@@ -136,6 +136,16 @@ fCheckForGit()
     fi
 }
 
+# --------------------
+fCheckForNoGit()
+{
+    if git $cOrigin; then
+        git branch
+        fError -m ".git already exists for the directory." -l $LINENO
+        exit 1
+    fi
+}
+
 # ========================================
 # -l fCreateLocalGit Section
 
@@ -149,13 +159,20 @@ fCheckPkg()
 }
 
 # --------------------
-fCheckForNoGit()
+fCheckForBinary()
 {
-    if git $cOrigin; then
-        git branch
-        fError -m ".git already exists for the directory." -l $LINENO
-        exit 1
+    local tFound=0;
+
+    for i in $(find * -size +10k -exec ls -l {} \;); do
+        if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
+	    tFound=1
+	    break
+	fi
+    done
+    if [ $tFound -ne 0 ]; then
+       ffLog -l warning -m 'Some "large" binary file were found. Use ' -l $LINENO
     fi
+    return $tFound
 }
 
 # --------------------
@@ -173,15 +190,23 @@ proxy/
 thumbs/
 tmp/
 EOF
-    set -x
+    set -x &>/dev/null
     git init
-    if fCheckPkg git-flow; then
-        git flow init
-    fi
+    git add .gitignore *
+    git commit -am "Initial commit"
+    git branch --move master main
+    git branch develop
     git checkout develop
-    git add .gitignore
+    set +x &>/dev/null
+    if fCheckPkg git-flow; then
+        set -x &>/dev/null
+        git flow init -d
+    	set +x &>/dev/null
+    fi
+    set -x &>/dev/null
+    git branch
     git status
-    set +x
+    set +x &>/dev/null
 }
 
 # --------------------
@@ -198,6 +223,7 @@ fCreateLocalGit()
 fCreateRawDir()
 {
     fCheckForGit
+    # TBD
 } # fCreateRawDir
 
 # ========================================
@@ -254,12 +280,12 @@ fMkRemote()
     local tSrcPath=$PWD
     local tProjName=${PWD##*/}
 
-    set -x
+    set -x &>/dev/null
     cd $pPath &>/dev/null
     git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
     cd - &>/dev/null
     git remote add origin $pPath/$tProjName.git
-    set +x
+    set +x &>/dev/null
 }
 
 # --------------------

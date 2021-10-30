@@ -1,0 +1,93 @@
+#!/bin/bash
+
+fUsage()
+{
+	exit 1
+	
+	cat <<EOF >/dev/null
+move-large-files [-h] [-n] [-b] [-s pSize] [-d pDir] [-r pSymLink ]
+
+Use this to prepare a directory for use with git-proj.
+
+-n - no-op, just show what would be moved, use this to show the "large" files
+-b - don't just move binary files
+-s pSize - move files larger than pSize. Suffix with k, M, G (default: 1k)
+-d pDir - pDir should not be in current dir or below (default: ../NAME.raw)
+-r pSymLink - symlink in current dir to pDir (default: raw)
+-h - this help
+
+Example Before:
+
+    project/
+	ocean-videos/
+	    edit/
+	    src/
+		final/
+		    draft.mp4
+		camera/
+		    MOV001.MP4
+		still/
+		    wave002.jpg
+		    wave003.png
+		    
+Example command::
+
+	cd project/ocean-videos
+	move-large-files -n -s 2M
+
+Example after:
+
+    project/
+	ocean-videos.raw
+	    src/
+		final/
+		    draft.mp4
+		camera/
+		    MOV001.MP4
+		still/
+		    wave002.jpg
+		    wave003.png
+	ocean-videos/
+	    raw -> ../ocean-videos.raw
+	    edit/
+		ocean-draft.kdenlive
+	    src/
+		final/
+		    draft.mp4 -> ../../raw/src/final/draft.mp4
+		camera/
+		    MOV001.MP4 -> ../../raw/src/final/MOV001.MP4
+		still/
+		    wave002.jpg -> ../../raw/src/final/wave002.jpg
+		    wave003.png -> ../../raw/src/final/wave003.png
+EOF
+}
+
+fRun()
+{
+    pCmd="$*"
+    fLog -l info -m $pCmd -l $LINENO
+    if [ $gpRun -eq 1 ]; then
+       if ! $pCmd; then
+       	  fError -m "Problem running: $pCmd" -l $LINENO
+       fi
+    fi
+}
+
+fMain()
+{
+    fRun "mkdir ../raw"
+    for i in $(find * -size +$pSize \;); do
+        if [ $gpBinary -ne 0 ] && [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
+	   fRun "mv $i raw"
+	else
+	   fRun "mv $i raw"
+	fi
+    done
+}
+
+gpRun=1		# -n gpRun=0
+gpBinary=1	# -b gpBinary=0
+gpSize=1k 	# -s gpSize=OPT
+gpDestDir=..	# -d OPT
+gptSymDir=..	# -r OPT
+fMain

@@ -185,7 +185,6 @@ oneTimeSetUp()
     export tDefault_gpLog=0
     export tDefault_gpVerbose=0
 
-    fCreateTestEnv
     return
 
     cat <<EOF >/dev/null
@@ -243,6 +242,8 @@ setUp()
     gpFacility=$tDefault_gpFacility
     gpLog=$tDefault_gpLog
     gpVerbose=$tDefault_gpVerbose
+
+    fCreateTestEnv
 
     gpUnitDebug=0
     return 0
@@ -706,7 +707,17 @@ testGitProjInit()
 
     # git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
 
-    #tResult=$($gBin/git-proj-init -l ???)
+    cd $HOME/$cDatProj1
+    assertFalse "$LINENO" "[ -d .git ]"
+    tResult=$($gBin/git-proj-init -l $PWD)
+    assertTrue "$LINENO" "[ -d .git ]"
+
+    assertTrue "$LINENO" "[ -f .gitignore ]"
+
+    # check for git-flow settings
+    # git is already in project dir
+
+    # git-flow not installed
 }
 
 # ====================
