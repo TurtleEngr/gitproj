@@ -173,19 +173,7 @@ oneTimeSetUp()
 {
     local tGitTop
 
-    # Save global values
-    export tDefault_cBin=$cBin
-    export tDefault_cCurDir=$cCurDir
-    export tDefault_cName=$cName
-    export tDefault_cPID=$cPID
-    export tDefault_cVer=$cVer
-    export tDefault_gErr=0
-    export tDefault_gpDebug=0
-    export tDefault_gpFacility=user
-    export tDefault_gpLog=0
-    export tDefault_gpVerbose=0
-
-    return
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -231,20 +219,10 @@ oneTimeTearDown()
 # --------------------------------
 setUp()
 {
-    # Restore global values, before each test
-    cBin=$tDefault_cBin
-    cCurDir=$tDefault_cCurDir
-    cName=$tDefault_cName
-    cPID=$tDefault_cPID
-    cVer=$tDefault_cVer
-    gErr=$tDefault_gErr
-    gpDebug=$tDefault_gpDebug
-    gpFacility=$tDefault_gpFacility
-    gpLog=$tDefault_gpLog
-    gpVerbose=$tDefault_gpVerbose
-
+    # Restore default global values, before each test
+    unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
+    fComSetGlobals
     fCreateTestEnv
-
     gpUnitDebug=0
     return 0
 
@@ -262,7 +240,7 @@ EOF
 
 tearDown()
 {
-    git config --global --remove-section gitproj.testitd &>/dev/null
+    git config --global --remove-section gitproj.test &>/dev/null
     gpUnitDebug=0
     return 0
 } # tearDown
@@ -793,6 +771,6 @@ gpTest="$*"
 
 . $cBin/gitproj-com.inc
 . $cBin/gitproj-init.inc
-fComSetGlobals
+
 fComSetup
 fComRunTests $gpTest

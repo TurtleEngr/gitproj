@@ -22,8 +22,8 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj init local [-a] [-l pProjPath]
-                        [-r pRawPath] [-k pSymLink]
+    git proj init local [-a] [-l pLocalPath]
+                        [-r pRawLocalPath] [-k pSymLink]
                         [-s pSize] [-m] [-f] [-h]
         Defaults: [-l $PWD] [-r ../[NAME].raw] [-k raw] [-s 1K] [-m] [-f]
 
@@ -66,15 +66,15 @@ The -a option will automattically run the whole init process with
 default settings. The options can be defined to override the default
 settings.
 
-=item B<-l pProjPath>
+=item B<-l pLocalPath>
 
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 
-    Path (-l) [$PWD]? $gpProjPath
-        So the project Name will be: ${gpProjPath##*/}
+    Path (-l) [$PWD]? $gpLocalPath
+        So the project Name will be: ${gpLocalPath##*/}
 
-=item B<-r pRawPath>
+=item B<-r pRawLocalPath>
 
 Set the location for large binary files. It cannot be *in* any of the
 project directories. It will be created, if it does not existi. The
@@ -211,8 +211,8 @@ export PWD cBin cCurDir cName cPID cVer
 export gErr gpDebug gpFacility gpLog gpVerbose
 
 # Option args
-export gpAuto gpLocalPath gpRawPath gpSynLinkName gpMaxSize gpMove
-export gpGitFlow gpAction
+export gpAuto gpLocalPath gpRawLocalPath gpSymLinkName gpMaxSize gpMove
+export gpGitFlow gpAction gpProjName
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -234,33 +234,26 @@ cd $cCurDir
 # -------------------
 . $cBin/gitproj-com.inc
 . $cBin/gitproj-init.inc
-fComSetGlobals
-gpVerbose=2
-l
+fSetGlobals
+
 if [ $# -eq 0 ]; then
     fError -m "Missing options." -l $LINENO
 fi
 
-gpAuto=0
-gpLocalPath=$PWD
-gpRawPath=../${gpLocal##*/}
-gpSynLinkName=raw
-gpMaxSize=1K
-gpMove=0
-gpGitFlow=0
-gpAction=""
 while getopts :al:r:k:s:mfhH:x tArg; do
     case $tArg in
         # Script arguments
 	a)  gpAuto=1 ;;
         l)  gpLocalPath="$OPTARG"
-	    gpRawPath=../${gpLocal##*/}
+	    gpRawLocalPath=../${gpLocal##*/}
 	    ;;
-        r)  gpRawPath="$OPTARG" ;;
-	k)  gpSynLinkName="$OPTARG" ;;
+        r)  gpRawLocalPath="$OPTARG"
+	    gpRawRemotePath="$OPTARG"
+	    ;;
+	k)  gpSymLinkName="$OPTARG" ;;
 	s)  gpMaxSize=1K ;;
 	m)  gpMove=1 ;;
-	f)  gpGitFlow=1
+	f)  gpGitFlow=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
