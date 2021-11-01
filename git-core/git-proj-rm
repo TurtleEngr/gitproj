@@ -5,7 +5,6 @@ git proj rm pFile...
 git proj rm -e
 EOF
 
-
 for tFile in $*; do
     if [ -d $tFile ]; then
         echo error

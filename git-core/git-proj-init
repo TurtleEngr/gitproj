@@ -243,17 +243,19 @@ fi
 while getopts :al:r:k:s:mfhH:x tArg; do
     case $tArg in
         # Script arguments
-	a)  gpAuto=1 ;;
-        l)  gpLocalPath="$OPTARG"
-	    gpRawLocalPath=../${gpLocal##*/}
-	    ;;
-        r)  gpRawLocalPath="$OPTARG"
-	    gpRawRemotePath="$OPTARG"
-	    ;;
-	k)  gpSymLinkName="$OPTARG" ;;
-	s)  gpMaxSize=1K ;;
-	m)  gpMove=1 ;;
-	f)  gpGitFlow=1 ;;
+        a) gpAuto=1 ;;
+        l)
+            gpLocalPath="$OPTARG"
+            gpRawLocalPath=../${gpLocal##*/}
+            ;;
+        r)
+            gpRawLocalPath="$OPTARG"
+            gpRawRemotePath="$OPTARG"
+            ;;
+        k) gpSymLinkName="$OPTARG" ;;
+        s) gpMaxSize=1K ;;
+        m) gpMove=1 ;;
+        f) gpGitFlow=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -268,9 +270,9 @@ if [ $# -ne 1 ]; then
     fError -m "local or remote needs to be specified." -l $LINENO
 fi
 case $1 in
-     local)  gpAction="fCreateLocalGit" ;;
-     remote) gpAction="fCreateRemoteGit" ;;
-     *) fError -m "Invalid option: $1. Expeced 'local' or 'remote'." -l $LINENO ;;
+    local) gpAction="fCreateLocalGit" ;;
+    remote) gpAction="fCreateRemoteGit" ;;
+    *) fError -m "Invalid option: $1. Expeced 'local' or 'remote'." -l $LINENO ;;
 esac
 
 $gpAction

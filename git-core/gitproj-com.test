@@ -545,7 +545,7 @@ testComUsage()
     #-----
     tResult=$(fComUsage -a -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)
     assertContains "$LINENO long" "$tResult" "DESCRIPTION"
-    
+
     #-----
     return
 

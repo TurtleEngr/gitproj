@@ -7,4 +7,3 @@ git proj check
 EOF
 
 find * -xtype l -exec stat -c %N {} \;
-
