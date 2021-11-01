@@ -792,6 +792,7 @@ cd $cCurDir
 gpTest="$*"
 
 . $cBin/gitproj-com.inc
+. $cBin/gitproj-init.inc
 fComSetGlobals
 fComSetup
 fComRunTests $gpTest

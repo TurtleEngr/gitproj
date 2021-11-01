@@ -6,4 +6,5 @@ git proj check
     verify configs are still valid
 EOF
 
-find * -xtype l
+find * -xtype l -exec stat -c %N {} \;
+
