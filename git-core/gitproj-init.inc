@@ -3,7 +3,7 @@
 # --------------------
 fSetInitGlobals()
 {
-    fComSetGlobals
+    . fComSetGlobals
     gpVerbose=2
 
     gpAuto=0
