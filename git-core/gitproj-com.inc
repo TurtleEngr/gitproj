@@ -623,22 +623,20 @@ fComSetConfig()
     local pValue=""
     local pAdd=""
 
-    local tHostConfig
+    local tTopDir
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :aglhibk:v: tArg; do
+    while getopts :agG:lL:f:ibk:v: tArg; do
         case $tArg in
             a) pAdd="--add" ;;
-            g) pScope=--global ;;
-            l) pScope=--local ;;
-            h)
-                tHostConfig=$(git config include.path)
-                pScope="--file $tHostConfig"
-                if [ ! -r "$tHostConfig" ]; then
-                    fError -m "Internal fComSetConfig: no host config set" -l $LINENO
-                fi
-                ;;
+            g) pScope="--global" ;;
+            G) pScope="---file ~/.gitproj.config" ;;
+            l) pScope="--local" ;;
+            L) tTopDir="$($cTopDir)"
+	       pScope="--file $tTopDir/gitproj/config.$HOSTNAME"
+	       ;;
+	    f) pScope="--file ${OPTARG}" ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
@@ -661,7 +659,7 @@ fComSetConfig()
 fComGetConfig()
 {
     local pScope=""
-    local pType="--no-type"
+    local pType=""
     local pKey=""
     local pDefault=""
 
@@ -670,10 +668,11 @@ fComGetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glibk:d: tArg; do
+    while getopts :glf:ibk:d: tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
+	    f) pScope="--file ${OPTARG}" ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
@@ -703,10 +702,11 @@ fComUnsetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glk: tArg; do
+    while getopts :glf:k: tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
+	    f) pScope="--file ${OPTARG}" ;;
             k) pKey="${OPTARG}" ;;
             :) fError "Internal fComUnsetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComUnsetConfig: Unknown option: $OPTARG [$LINENO]" ;;
@@ -715,3 +715,45 @@ fComUnsetConfig()
 
     git config --unset $pScope $pKey
 } # fComUnsetConfig
+
+# --------------------
+fMustBeInGitRepo()
+{
+    if [ ! -d .git ]; then
+        fError -m "You need to be in a git repo for this to work." -l $LINENO
+    fi
+    return 0
+} # fMustBeInGitRepo
+
+# --------------------
+fMustBeNoGit()
+{
+    local tFound=0
+    local tGitDir
+
+    if git $cOrigin; then
+        git branch
+        tFound=1
+    else
+        tGitDir=$(find . -type d -name .git)
+        if [ -n "$tGitDir" ]; then
+            tFound=1
+        fi
+    fi
+    if [ $tFound -ne 0 ]; then
+        fError -m "You should NOT be in a git repo, or a directory above a git repo" -l $LINENO
+    fi
+    return 0
+} # fMustBeNoGit
+
+fAllMustBeReadable()
+{
+    local pDir=$1
+    local tFound
+
+    pDir=${pDir:-$PWD}
+    tFound=$(find $pDir \! -readable -print)
+    if [ -n "$tFound" ]; then
+        fError -m "All directories and files must be readable, under $pDir" -l $LINENO
+    fi
+} # fAllMustBeReadable

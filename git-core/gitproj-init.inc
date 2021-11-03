@@ -6,34 +6,27 @@ fSetInitGlobals()
     . fComSetGlobals
     gpVerbose=2
 
+    cExpectVer=$(fComGetConfig -k "gitproj.config.ver")
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog")
+    gpFacility=$(fComGetConfig -k "gitproj.config.facility")
+
+    cDoc=$(fComGetConfig -k "gitproj.config.doc")
+    cTest=$(fComGetConfig -k "gitproj.config.test")
+
     gpAuto=0
     gpLocalPath=$PWD
     gpProjName=${gpLocalPath##*/}"
-    gpRawLocalPath=../${gpLocalPath##*/}
-    gpSymLinkName=raw
-    gpMaxSize=1K
+    cRawDir=$(fComGetConfig -k "gitproj.config.raw-dir")
+    gpRawLocalPath=$cRawDir/${gpLocalPath##*/}
+    gpSymLinkName=$(fComGetConfig -k "gitproj.config.raw-symlink")
+    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit")
     gpMove=0
     gpGitFlow=0
     gpAction=""
+
+    cOrigin='config --get remote.origin.url'
+    cTopDir='git rev-parse --show-toplevel'
 } # fSetInitGlobals
-
-# --------------------
-fCheckForGit()
-{
-    if [ ! -d .git ]; then
-        fError -m ".git not found in current directory. cd to a directory with .git in it, or use "git proj init -l" to create a new local repo." -l $LINENO
-    fi
-} # fCheckForGit
-
-# --------------------
-fCheckForNoGit()
-{
-    if git $cOrigin; then
-        git branch
-        fError -m ".git already exists for the directory." -l $LINENO
-        exit 1
-    fi
-} # fCheckForNoGit
 
 # ========================================
 # fCreateLocalGit Section
@@ -417,8 +410,9 @@ fMkRaw()
 # --------------------
 fCreateLocalGit()
 {
-    fCheckForNoGit
-
+    fMustBeNoGit
+    fAllMustBeReadable
+    
     # Prompt/Response or if -a, just validate the options
     fGetLocalPath $gpLocalPath
     fGetRawLocalPath $gpRawLocalPath
@@ -520,13 +514,11 @@ EOF
 # --------------------
 fCreateRemoteGit()
 {
-    export cOrigin='config --get remote.origin.url'
-
     fGetMountPath $gpMountPath
     #    	fCheckPath $gpPath
     fGetRawRemotePath $gpRawRemotePath
 
-    fCheckForGit
+    fMustBeInGitRepo
     fCheckSpace $gpPath
     fMkRemote $gpPath
     fReport

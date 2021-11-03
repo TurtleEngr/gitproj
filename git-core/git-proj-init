@@ -214,6 +214,9 @@ export gErr gpDebug gpFacility gpLog gpVerbose
 export gpAuto gpLocalPath gpRawLocalPath gpSymLinkName gpMaxSize gpMove
 export gpGitFlow gpAction gpProjName
 
+# Constants
+export cOrigin cDoc cTest cRawDir cTopDir
+
 # -------------------
 # Set current directory location in PWD and cCurDir
 if [ -z "$PWD" ]; then
