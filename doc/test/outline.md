@@ -137,7 +137,7 @@
     |   |   |   |man8/
     |   |   |   |   |gitproj.1.gz - generated, internal documentation
     
-## After running git-proj-init local, or git proj-clone
+## After running git-proj-init local, or git-proj-clone
 
     /home/
     |   |USER/
@@ -172,7 +172,7 @@
 
 ## File include pattern - prod
 
-    cBin=/usr/lib/git-core
+    cBin=/usr/lib/git-core - set when a CMD is run
     cDoc=/usr/share/doc/gitproj
 
         $cBin/git-proj-CMD
@@ -181,7 +181,7 @@
 
 ## File include pattern - prod-test
 
-    cTest=/usr/share/doc/gitproj/test
+    cTest=/usr/share/doc/gitproj/test - set when a test-*.inc is run
     cDoc=$cTest/.. or /usr/share/doc/gitproj
     cBin=/usr/lib/git-core
 
@@ -197,7 +197,7 @@
 
 ## File include pattern - dev
 
-    cBin=DIR/gitproj/git-core
+    cBin=DIR/gitproj/git-core - set when a CMD is run
     cDoc=$cBin/../doc or DIR/gitproj/doc
 
         $cBin/git-proj-CMD
@@ -206,7 +206,7 @@
 
 ## File include pattern - dev-test
 
-    cTest=DIR/gitproj/doc/test
+    cTest=DIR/gitproj/doc/test - set when a test-*.inc is run
     cBin=$cTest/../../git-core or DIR/gitproj/git-core
     cDoc=$cTest/.. or DIR/gitproj/doc
 
