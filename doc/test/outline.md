@@ -224,6 +224,7 @@
 
     cTest=/usr/share/doc/gitproj/test
     cTestEnv=~/test-gitproj.tmp
+    HOME=$cTestEnv/root/home/john
 
 Create with:
 
@@ -237,6 +238,7 @@ See dev-test Environment for more details
 
     cTest=DIR/gitproj/doc/test
     cTestEnv=$cTest/../../..
+    HOME=$cTestEnv/root/home/john
 
 Create with:
 
@@ -256,7 +258,7 @@ Creates:
             |   |   |usb-video/
             |   |   |   |video-2020-04-02/
             |   |home/
-            |   |   |john/
+            |   |   |john/ - $HOME
             |   |   |   |project/
             |   |   |   |   |beach/
             |   |   |   |   |   |doc/
@@ -265,7 +267,7 @@ Creates:
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |file.txt
             |   |   |   |   |   |.git/
-            |   |   |   |   |george/ - $HOME
+            |   |   |   |   |george/
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
