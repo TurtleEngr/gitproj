@@ -2,73 +2,73 @@
 
 ## gitproj Source Repo - dev
 
- gitproj/
-    |doc/
-    |   |config/
-    |   |   |gitproj.config.system
-    |   |   |gitproj.config.global
-    |   |   |getproj.config.local
-    |   |   |gitproj-config.test-dev
-    |   |   |gitproj-config.test-prod
-    |   |hooks/
-    |   |   |pre-commit*
-    |   |html/ - generated user level docs
-    |   |   |index.html
-    |   |   |*.html
-    |   |markdown/ - generated user level docs
-    |   |   |*.md
-    |   |development/ - generated docs for developers
-    |   |   |index.html
-    |   |   |*.html
-    |   |   |*.md
-    |   |test/
-    |   |   |outline.md
-    |   |   |shunit2 -> shunit2.1*
-    |   |   |shunit2.1*
-    |   |   |test.inc
-    |   |   |test-com-inc*
-    |   |   |test-env.tgz -> ../../../test-env.tgz
-    |   |   |test-add.inc*
-    |   |   |test-check.inc*
-    |   |   |test-clone.inc*
-    |   |   |test-config.inc*
-    |   |   |test-init.inc*
-    |   |   |test-move.inc*
-    |   |   |test-pull.inc*
-    |   |   |test-push.inc*
-    |   |   |test-remote.inc*
-    |   |   |test-rm.inc*
-    |   |   |test-status.inc*
-    |   |LICENSE
-    |git-core/
-    |   |gitproj-com.inc*
-    |   |gitproj-init.inc*
-    |   |gitproj-add.inc*
-    |   |gitproj-check.inc*
-    |   |gitproj-clone.inc*
-    |   |gitproj-config.inc*
-    |   |gitproj-move.inc*
-    |   |gitproj-pull.inc*
-    |   |gitproj-push.inc*
-    |   |gitproj-remote.inc*
-    |   |gitproj-rm.inc*
-    |   |gitproj-status.inc*
-    |   |git-proj*
-    |   |git-proj-add*
-    |   |git-proj-check*
-    |   |git-proj-clone*
-    |   |git-proj-config*
-    |   |git-proj-init*
-    |   |git-proj-move*
-    |   |git-proj-pull*
-    |   |git-proj-push*
-    |   |git-proj-remote*
-    |   |git-proj-rm*
-    |   |git-proj-status*
-    |.gitignore
-    |Makefile
-    |README.md
-    |TODO.md
+    gitproj/
+    |   |doc/
+    |   |   |config/
+    |   |   |   |gitproj.config.system
+    |   |   |   |gitproj.config.global
+    |   |   |   |getproj.config.local
+    |   |   |   |gitproj-config.test-dev
+    |   |   |   |gitproj-config.test-prod
+    |   |   |hooks/
+    |   |   |   |pre-commit*
+    |   |   |html/ - generated user level docs
+    |   |   |   |index.html
+    |   |   |   |*.html
+    |   |   |markdown/ - generated user level docs
+    |   |   |   |*.md
+    |   |   |development/ - generated docs for developers
+    |   |   |   |index.html
+    |   |   |   |*.html
+    |   |   |   |*.md
+    |   |   |test/
+    |   |   |   |outline.md
+    |   |   |   |shunit2 -> shunit2.1*
+    |   |   |   |shunit2.1*
+    |   |   |   |test.inc
+    |   |   |   |test-com-inc*
+    |   |   |   |test-env.tgz -> ../../../test-env.tgz
+    |   |   |   |test-add.inc*
+    |   |   |   |test-check.inc*
+    |   |   |   |test-clone.inc*
+    |   |   |   |test-config.inc*
+    |   |   |   |test-init.inc*
+    |   |   |   |test-move.inc*
+    |   |   |   |test-pull.inc*
+    |   |   |   |test-push.inc*
+    |   |   |   |test-remote.inc*
+    |   |   |   |test-rm.inc*
+    |   |   |   |test-status.inc*
+    |   |   |LICENSE
+    |   |git-core/
+    |   |   |gitproj-com.inc*
+    |   |   |gitproj-init.inc*
+    |   |   |gitproj-add.inc*
+    |   |   |gitproj-check.inc*
+    |   |   |gitproj-clone.inc*
+    |   |   |gitproj-config.inc*
+    |   |   |gitproj-move.inc*
+    |   |   |gitproj-pull.inc*
+    |   |   |gitproj-push.inc*
+    |   |   |gitproj-remote.inc*
+    |   |   |gitproj-rm.inc*
+    |   |   |gitproj-status.inc*
+    |   |   |git-proj*
+    |   |   |git-proj-add*
+    |   |   |git-proj-check*
+    |   |   |git-proj-clone*
+    |   |   |git-proj-config*
+    |   |   |git-proj-init*
+    |   |   |git-proj-move*
+    |   |   |git-proj-pull*
+    |   |   |git-proj-push*
+    |   |   |git-proj-remote*
+    |   |   |git-proj-rm*
+    |   |   |git-proj-status*
+    |   |.gitignore
+    |   |Makefile
+    |   |README.md
+    |   |TODO.md
 
 ## gitproj Installed Files - prod
 
@@ -172,37 +172,37 @@
 
 ## File include pattern - prod
 
-   cBin=/usr/lib/git-core
-   cDoc=/usr/share/doc/gitproj
+    cBin=/usr/lib/git-core
+    cDoc=/usr/share/doc/gitproj
 
-	$cBin/git-proj-CMD
-		$cBin/gitproj-com.inc
-		$cBin/gitproj-CMD.inc
+        $cBin/git-proj-CMD
+                $cBin/gitproj-com.inc
+                $cBin/gitproj-CMD.inc
 
 ## File include pattern - prod-test
 
-   cTest=/usr/share/doc/gitproj/test
-   cDoc=$cTest/.. or /usr/share/doc/gitproj
-   cBin=/usr/lib/git-core
+    cTest=/usr/share/doc/gitproj/test
+    cDoc=$cTest/.. or /usr/share/doc/gitproj
+    cBin=/usr/lib/git-core
 
-	$cTest/test-com-inc*
-		$cBin/gitproj-com.inc
-		$cTest/shunit2.1*
+        $cTest/test-com-inc*
+                $cBin/gitproj-com.inc
+                $cTest/shunit2.1*
 
-	$cTest/test-CMD.inc
-		$cBin/gitproj-com.inc
-		$cBin/gitproj-CMD.inc
-		$cTest/test.inc
-		$cTest/shunit2.1*
+        $cTest/test-CMD.inc
+                $cBin/gitproj-com.inc
+                $cBin/gitproj-CMD.inc
+                $cTest/test.inc
+                $cTest/shunit2.1*
 
 ## File include pattern - dev
 
-   cBin=DIR/gitproj/git-core
-   cDoc=$cBin/../doc or DIR/gitproj/doc
+    cBin=DIR/gitproj/git-core
+    cDoc=$cBin/../doc or DIR/gitproj/doc
 
-	$cBin/git-proj-CMD
-		$cBin/gitproj-com.inc
-		$cBin/gitproj-CMD.inc
+        $cBin/git-proj-CMD
+                $cBin/gitproj-com.inc
+                $cBin/gitproj-CMD.inc
 
 ## File include pattern - dev-test
 
@@ -210,15 +210,15 @@
     cBin=$cTest/../../git-core or DIR/gitproj/git-core
     cDoc=$cTest/.. or DIR/gitproj/doc
 
-	$cTest/test-com-inc*
-		$cBin/gitproj-com.inc
-		$cTest/shunit2.1*
+        $cTest/test-com-inc*
+                $cBin/gitproj-com.inc
+                $cTest/shunit2.1*
 
-	$cTest/test-CMD.inc
-		$cBin/gitproj-com.inc
-		$cBin/gitproj-CMD.inc
-		$cTest/test.inc
-		$cTest/shunit2.1*
+        $cTest/test-CMD.inc
+                $cBin/gitproj-com.inc
+                $cBin/gitproj-CMD.inc
+                $cTest/test.inc
+                $cTest/shunit2.1*
 
 ## prod-test Environment
 
