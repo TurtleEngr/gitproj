@@ -38,7 +38,7 @@ EOF
 # --------------------
 fCheckForGit()
 {
-    if git $cOrigin; then
+    if $cGetOrigin; then
         echo 'Error: The current directory is a git dir.'
         exit 1
     fi
@@ -62,7 +62,7 @@ fGetLocal()
     git clone $pPath
     echo "Done"
     echo -n "Origin: "
-    git $cOrigin
+    $cGetOrigin
 }
 
 # ====================
@@ -73,8 +73,6 @@ if [ $# -ne 1 ]; then
 fi
 
 gpPath=$1
-
-export cOrigin='config --get remote.origin.url'
 
 fCheckForGit
 fCheckPath $gpPath

@@ -207,15 +207,6 @@ EOF
 
 # ====================
 # Main
-export PWD cBin cCurDir cName cPID cVer
-export gErr gpDebug gpFacility gpLog gpVerbose
-
-# Option args
-export gpAuto gpLocalPath gpRawLocalPath gpSymLinkName gpMaxSize gpMove
-export gpGitFlow gpAction gpProjName
-
-# Constants
-export cOrigin cDoc cTest cRawDir cTopDir
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -236,13 +227,12 @@ cd $cCurDir
 
 # -------------------
 . $cBin/gitproj-com.inc
-. $cBin/gitproj-init.inc
-fSetGlobals
 
 if [ $# -eq 0 ]; then
     fError -m "Missing options." -l $LINENO
 fi
 
+. $cBin/gitproj-init.inc
 while getopts :al:r:k:s:mfhH:x tArg; do
     case $tArg in
         # Script arguments

@@ -70,7 +70,7 @@ fFindRemote()
 {
     local pPath=$1
 
-    local tOrigin=$(git $cOrigin)
+    local tOrigin=$($cGetOrigin)
     local tRemoteGit=${tOrigin##*/}
     local tNewPath=$pPath/$tRemoteGit
 
@@ -89,8 +89,6 @@ if [ $# -ne 1 ]; then
 fi
 
 gpPath=$1
-
-export cOrigin='config --get remote.origin.url'
 
 fCheckForGit
 tNewPath=$(fFindRemote $gpPath)

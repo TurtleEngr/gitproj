@@ -1,17 +1,16 @@
 #!/bin/bash
 
 # --------------------
+export gpAuto gpLocalPath gpRawLocalPath gpSymLinkName gpMaxSize gpMove
+export gpGitFlow gpAction gpProjName
+. fSetInitGlobals
+
+# --------------------
 fSetInitGlobals()
 {
-    . fComSetGlobals
-    gpVerbose=2
-
     cExpectVer=$(fComGetConfig -k "gitproj.config.ver")
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility")
-
-    cDoc=$(fComGetConfig -k "gitproj.config.doc")
-    cTest=$(fComGetConfig -k "gitproj.config.test")
 
     gpAuto=0
     gpLocalPath=$PWD
@@ -24,8 +23,6 @@ fSetInitGlobals()
     gpGitFlow=0
     gpAction=""
 
-    cOrigin='config --get remote.origin.url'
-    cTopDir='git rev-parse --show-toplevel'
 } # fSetInitGlobals
 
 # ========================================
@@ -503,7 +500,7 @@ fMkRemote()
 fReport()
 {
     echo 'Remote origin is now set to:'
-    git $cOrigin
+    $cGetOrigin
     cat <<EOF
 Be sure the disk is mounted and $gpPath exists.
 Then you can use: "git push origin develop"

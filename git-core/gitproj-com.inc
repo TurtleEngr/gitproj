@@ -1,6 +1,10 @@
 #!/bin/bash
-# $Source: /repo/local.cvs/per/bruce/bin/bash-com.inc,v $
-# $Revision: 1.4 $ $Date: 2021/10/20 01:07:50 $ GMT
+
+# --------------------------------
+export PWD cBin cCurDir cName cPID cVer cHome
+export gErr gpDebug gpFacility gpLog gpVerbose
+export cDoc cTest cRawDir cGetOrigin cGetTopDir
+. fComSetGlobals
 
 # --------------------------------
 fGitProjComInternalDoc()
@@ -151,11 +155,25 @@ fComSetGlobals()
     fi
 
     # -------------------
+    # Useful constants
+    cDoc=$(fComGetConfig -k "gitproj.config.doc")
+    cTest=$(fComGetConfig -k "gitproj.config.test")
+
+    # Use:
+    #     tOrigin=$($cGetOrigin)
+    #     if $cGetOrigin >/dev/null 2>&1; then echo "In a git dir"; fi
+    cGetOrigin='git config --get remote.origin.url'
+
+    # Use:
+    #     tTop=$($cTopDir); cd $tTop
+    cGetTopDir='git rev-parse --show-toplevel'
+
+    # -------------------
     # Setup log variables
     # -x
     gpDebug=${gpDebug:-0}
     # -v
-    gpVerbose=${gpVerbose:-0}
+    gpVerbose=${gpVerbose:-2}
     # -l
     gpLog=${gpLog:-0}
     gpFacility=${gpFacility:=user}
@@ -662,13 +680,14 @@ fComGetConfig()
     local pType=""
     local pKey=""
     local pDefault=""
+    local pAll=""
 
     local tValue=""
 
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glf:ibk:d: tArg; do
+    while getopts :glf:ibk:d:a tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
@@ -677,6 +696,7 @@ fComGetConfig()
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
             d) pDefault="${OPTARG}" ;;
+	    a) pAll="--all" ;;
             :) fError "Internal fComGetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComGetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
@@ -698,22 +718,24 @@ fComUnsetConfig()
 {
     local pScope="--local"
     local pKey=""
+    local pAll="--unset"
 
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glf:k: tArg; do
+    while getopts :glf:k:a tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
 	    f) pScope="--file ${OPTARG}" ;;
             k) pKey="${OPTARG}" ;;
+	    a) pAll="--unset-all" ;
             :) fError "Internal fComUnsetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComUnsetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
     done
 
-    git config --unset $pScope $pKey
+    git config $pAll $pScope $pKey
 } # fComUnsetConfig
 
 # --------------------
@@ -731,7 +753,7 @@ fMustBeNoGit()
     local tFound=0
     local tGitDir
 
-    if git $cOrigin; then
+    if $cGetOrigin; then
         git branch
         tFound=1
     else

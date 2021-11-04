@@ -1,0 +1,28 @@
+# git init local, will copy this file to ~/.gitproj.config
+# Then put this in ~/.gitconfig
+#    [include]
+#        path = ~/.gitproj.config
+
+[gitproj "config"]
+	ver = 1.0
+	syslog = yes
+	facility = user
+	# git --exec-path
+	bin = /usr/lib/git-core
+	doc = /usr/share/doc/git-proj
+	test = /usr/share/doc/git-proj/test
+	# Relative to the top project dir, dir that [ProjName].raw
+	# will be in.
+	raw-dir = ..
+	# Symlink, relative to the top project dir. Example of how used:
+	# cd ProjDir; ln -s [raw-dir]/[ProjName].raw [raw-symlink]
+	raw-symlink = raw
+[gitproj "hook"]
+	source = /usr/share/doc/git-proj/hooks/pre-commit
+	pre-commit-enabled = yes
+	check-file-names = yes
+	check-for-big-files = yes
+	# End size with b, k, m, or g
+	binary-file-size-limit = 1k
+[include]
+	path = ~/.gitproj-test.config
