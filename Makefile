@@ -4,7 +4,8 @@
 
 sh-files = \
 	git-core/* \
-	doc/hooks/*
+	doc/hooks/* \
+	doc/test/*
 
 # --------------------
 clean :
@@ -12,7 +13,7 @@ clean :
 	-find . -name '*.tmp' -exec rm {} \;
 
 test : clean
-	cd git-core; ./gitproj-com.test
+	cd doc/test; make test
 
 build : test
 	-rm -rf dist

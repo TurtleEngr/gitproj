@@ -5,34 +5,42 @@ fUsage()
     # Quick help, run this:
     # git-proj -h | less
 
-    local pStyle="${1:-short}"
+    local pStyle="${1:-usage}"
 
     local tFileList="\
 	-f $cBin/git-proj \
 	-f $cBin/git-proj-init \
-	-f $cBin/git-proj-clone \
-	-f $cBin/git-proj-add \
-	-f $cBin/git-proj-push \
-	-f $cBin/git-proj-pull \
-	-f $cBin/git-proj-config \
-	-f $cBin/git-proj-status \
-    "
+	"
+    tFileList="$(echo $tFileList)"
+	
+    	#-f $cBin/git-proj-remote \
+	#-f $cBin/git-proj-clone \
+	#-f $cBin/git-proj-add \
+	#-f $cBin/git-proj-push \
+	#-f $cBin/git-proj-pull \
+	#-f $cBin/git-proj-add \
+	#-f $cBin/git-proj-move \
+	#-f $cBin/git-proj-rm \
+	#-f $cBin/git-proj-config \
+	#-f $cBin/git-proj-status \
+	#-f $cBin/git-proj-check \
 
     local tIntFileList="\
         $tFileList \
 	-f $cBin/gitproj-com.inc \
 	-f $cBin/gitproj-com.test \
     "
-
+    tIntFileList="$(echo $tIntFileList)"
+    
     case $pStyle in
         short | usage | man)
-            fComUsage -s $pStyle -f $cCurDir/$cName
+            fComUsage -s $pStyle -f $cBin/$cName
             ;;
         long | text | md)
             fComUsage -s $pStyle $tFileList
             ;;
         html)
-            fComUsage -s $pStyle -t "$cName Usage" $tFileList
+            fComUsage -s $pStyle -t "git proj Usage" $tFileList
             ;;
         int)
             fComUsage -i -s long $tIntFileList
@@ -52,36 +60,40 @@ fUsage()
     cat <<\EOF >/dev/null
 =pod
 
-=head1 NAME
+=head1 NAME git proj
 
-git-proj - this implements the "git proj"
+This implements the "git proj" subcommand, for managing large binary
+files, and repositiories on external drives.
 
 =head1 SYNOPSIS
 
  	git proj [pSubCmd] [pSubCmdOptions] [pComOpt]
 
- 	pSubCmd: init, clone, add, push, pull, set, status
- 	pComOpt: [-h] -H pStyle] [-v] [-x]
+ 	pSubCmd: init, clone, push, pull, add, move, rm, config, status, check
+ 	pComOpt: [-h] [-H pStyle] [-x]
  
 =head1 DESCRIPTION
 
 The "git proj" subcommand supports using git repo for versioning files to
 locally mounted external drives.
 
-git-proj also supports the issue with large
-binary files causing git repo "bloat". Large files are not versioned,
-they are only copied. So if a version important, just rename the file.
-(symlinks are used and versioned to point to the large binary files.)
+git-proj also mostly solves the issue with large binary files causing
+git repo "bloat". Large files are not versioned, they are only
+copied. So if a version important, just rename the file.  (symlinks
+are used and versioned to point to the large binary files.)
 
 This is a much simpler implementation than git-lfs for managing the
 versioning of large binary files. Since the large files are not
 versioned, i.e. only the last version is saved, this is a comompromize
-on having "perfect" version control of the files. The main inspiration
-for the proj tool came from the need to versioning video
-projects. Video files are HUGE, yet they don't change much. Since most
-video files are rendered from files that do not change, it is only
-important to version the video editor's file, if you need to recreate
-a particular video file version.
+on having "perfect" version control of the files.
+
+The main inspiration for the proj tool came from the need to
+versioning video projects. Video files are HUGE, yet they don't change
+much. Since most video files are rendered from files that do not
+change, it is only important to version the video editor's file, so
+that you can recreate a particular video file version. Since rendering
+takes time you will want to save the rendered file. But there is usually
+no need to save every rendered version.
 
 =head1 OPTIONS
 
@@ -317,28 +329,31 @@ EOF
 
 # ====================
 # Main
-export PWD Tmp cBin cCurDir cName cPID cTmp1 cTmp2 cTmpF cVer
-export gErr gpDebug gpFacility gpLog gpVerbose
 
 # -------------------
 # Set current directory location in PWD and cCurDir
 if [ -z "$PWD" ]; then
     PWD=$(pwd)
 fi
-cCurDir=$PWD
+if [ -z "$cCurDir" ]; then
+    cCurDir=$PWD
+fi
 
 # -------------------
-# Define the location of this script
-cBin=${0%/*}
-if [ "$cBin" = "." ]; then
-    cBin=$PWD
-fi
-cd $cBin
-cBin=$PWD
-cd $cCurDir
+    # Define the location of the com script if not already set
+    if [ -z "$cBin" ]; then
+        cBin=${0%/*}
+        if [ "$cBin" = "." ]; then
+            cBin=$PWD
+        fi
+        cd $cBin >/dev/null 2>&1
+        cBin=$PWD
+        cd - >/dev/null 2>&1
+    fi
 
 # -----
 . $cBin/gitproj-com.inc
+cName=git-proj
 
 # shellcheck disable=SC2016
 cVer='$Revision: 1.49 $'
@@ -347,30 +362,29 @@ cVer='$Revision: 1.49 $'
 fComSetGlobals
 
 if [ $# -eq 0 ]; then
-    fUsage short
+    fUsage usage
 fi
 
 # -------------------
 # Get Args Section
 if [ $# -eq 0 ]; then
-    fError2 -m "Missing options." -l $LINENO
+    fError -m "Missing options." -l $LINENO
 fi
-while getopts :hH:lvx tArg; do
+while getopts :hH:lx tArg; do
     case $tArg in
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
         l) gpLog=1 ;;
-        v) let gpVerbose=gpVerbose+1 ;;
         x) let gpDebug=gpDebug+1 ;;
         # Problem arguments
-        :) fError "Value required for option: -$OPTARG" $LINENO ;;
-        \?) fError "Unknown option: $OPTARG" $LINENO ;;
+        :) fError -m "Value required for option: $OPTARG" -l $LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $LINENO ;;
     esac
 done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
-    fError "Unexpected option: $*" $LINENO
+    fError -m "Unexpected option: $*" -l $LINENO
 fi
 
 exit 0

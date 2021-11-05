@@ -16,13 +16,13 @@ fUsage()
 
 =for html <hr/>
 
-=head1 test-com.inc
+=head1 test-gitproj.sh
 
 test-com.inc - Common functions used in the test scripts
 
 =head1 SYNOPSIS
 
-    ./test.com.sh [all] [test,test,...]
+    ./test.gitproj.sh [test,test,...]
 
 =head1 DESCRIPTION
 
@@ -111,7 +111,6 @@ setUp()
     # Restore default global values, before each test
     unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
     fComSetupTestEnv
-    fCreateTestEnv
     gpUnitDebug=0
     return 0
 
@@ -129,10 +128,7 @@ EOF
 
 tearDown()
 {
-    git config --global --remove-section gitproj.test &>/dev/null
-    if [ $gpDebug -ne 0 ]; then
-        fRmTestEnv
-    fi
+##    git config --global --remove-section gitproj.test &>/dev/null
     gpUnitDebug=0
     return 0
 } # tearDown
@@ -143,22 +139,22 @@ tearDown()
 testGitProj()
 {
     local tResult
-
+    
     tResult=$($cBin/git-proj 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
-    assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
+    assertContains "$LINENO" "$tResult" 'Usage:'
 
     tResult=$($cBin/git-proj -h 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
-    assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
+    assertContains "$LINENO =" "$tResult" 'DESCRIPTION'
 
     tResult=$($cBin/git-proj -H html 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
-    assertContains "$LINENO $tResult" "$tResult" '<title>git-proj Usage</title>'
+    assertContains "$LINENO" "$tResult" '<title>git proj Usage</title>'
 
     tResult=$($cBin/git-proj -H int 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
-
+    return 0
 } # testGitProj
 
 # ====================

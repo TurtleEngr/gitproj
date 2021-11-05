@@ -3,8 +3,11 @@
 # --------------------------------
 # Test globals
 
-export cTest cTestCurDir gpTest gpUnitDebug
-export cTestSrcDir cTestDestDir cTestFiles cTestConfig SHUNIT_COLOR
+export PWD cBin cCurDir cName cPID cVer cHome
+export gErr gpDebug gpFacility gpLog gpVerbose
+export cDoc cTest cRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
+export cTestCurDir cTestSrcDir cTestDestDir cTestFiles cTestConfig
+export gpTest gpUnitDebugSHUNIT_COLOR
 
 # Relative to $HOME
 export cDatProj1 cDatProj2 cDatProj3
@@ -67,7 +70,7 @@ fComSetupTestEnv()
 
     cTestConfig=$cDoc/config/gitproj.config.test-dev
 
-    cTestDestDir=$cTest/../..
+    cTestDestDir=$cTest/../../..
     cd $cTestDestDir >/dev/null 2>&1
     cTestDestDir=$PWD
     cd - >/dev/null
@@ -106,7 +109,7 @@ fCreateTestEnv()
     cd $cDatHome >/dev/null 2>&1
     HOME=$PWD
     cd - >/dev/null 2>&1
-
+    return 0
 } # fCreateTestEnv
 
 fSetupTestConfig()

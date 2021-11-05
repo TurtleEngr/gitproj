@@ -130,7 +130,7 @@ fComSetGlobals()
 {
     # -------------------
     # Set name of this script
-    if [ -z "$cName=" ]; then
+    if [ -z "$cName" ]; then
         cName=${0##*/}
     fi
 
@@ -160,6 +160,9 @@ fComSetGlobals()
     # Constants
     if [ -z "$cDoc" ]; then
         cDoc=/usr/share/doc/gitproj
+    fi
+    if [ ! -d $cDoc ]; then
+        cDoc=$cBin/../doc
     fi
     if [ ! -d $cDoc ]; then
         fError -m "Error: Cannot find gitproj doc directory: $cDoc" -l $LINENO
@@ -309,7 +312,6 @@ fComUsage()
     local pTitle="$cName Usage"
 
     local tProg=""
-    local tFileList=""
     local tTidy='tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no'
 
     local OPTIND=1
@@ -368,42 +370,36 @@ fComUsage()
     esac
 
     # Validate
-    pFileList=$pFileList
+    pFileList="$(echo $pFileList)"
     if [ -z "$pFileList" ]; then
         fError -i -m "fComUsage missing pFileList" -l $LINENO
     fi
     for tFile in $pFileList; do
-        if [ -r $tFile ]; then
-            tFileList="$tFileList $tFile"
-        else
+        if [ ! -r $tFile ]; then
             fError -i -m "fComUsage cannot read: $tFile" -l $LINENO
         fi
     done
-    tFileList=$tFileList
-    if [ -z "$tFileList" ]; then
-        fError -i -m "fComUsage missing a valid pFileList" -l $LINENO
-    fi
-
+    
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $tFileList | $tProg --title="$pTitle" | $tTidy
+            cat $pFileList | $tProg --title="$pTitle" | $tTidy
         else
             if [ "$pStyle" = "short" ]; then
                 # shellcheck disable=SC2002
-                cat $tFileList | pod2text | head -n 10
+                cat $pFileList | pod2text | head -n 10
             else
                 # shellcheck disable=SC2002
-                cat $tFileList | $tProg
+                cat $pFileList | $tProg
             fi
         fi
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $tFileList | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
+            cat $pFileList | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
         else
             # shellcheck disable=SC2002
-            cat $tFileList | fComInternalDoc $pAll | $tProg
+            cat $pFileList | fComInternalDoc $pAll | $tProg
         fi
     fi
 

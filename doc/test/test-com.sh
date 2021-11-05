@@ -111,7 +111,6 @@ setUp()
     # Restore default global values, before each test
     unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
     fComSetupTestEnv
-    fCreateTestEnv
     gpUnitDebug=0
     return 0
 
@@ -130,9 +129,6 @@ EOF
 tearDown()
 {
     git config --global --remove-section gitproj.test &>/dev/null
-    if [ $gpDebug -ne 0 ]; then
-        fRmTestEnv
-    fi
     gpUnitDebug=0
     return 0
 } # tearDown
@@ -143,13 +139,15 @@ tearDown()
 testSetup()
 {
     assertTrue "$LINENO" "[ -x $cBin/gitproj-com.inc ]"
+    assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
+    return 0
+
     assertTrue "$LINENO" "[ -r $cTestFiles ]"
     assertTrue "$LINENO" "[ -d $cTestSrcDir ]"
     assertTrue "$LINENO" "[ -d $cTestDestDir ]"
     assertNotEquals "$LINENO" "$cHome" "$HOME"
     assertTrue "$LINENO" "[ -r $HOME/.gitproj.config ]"
     assertTrue "$LINENO" "[ -r $HOME/.gitproj-test.config ]"
-    assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
 
     for i in $cDatMount1 $cDatMount2 $cDatMount3; do
         fComUDebug "i=$i"
