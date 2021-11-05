@@ -356,7 +356,7 @@ testComErrorLog()
         assertContains "$LINENO $tTestMsg.line" "$tResult" '['$tLine']'
         assertContains "$LINENO $tTestMsg.err" "$tResult" '(1)'
         assertContains "$LINENO $tTestMsg.usage" "$tResult" "Usage"
-	assertNotContains "$LINENO" "$tResult" "Internal:"
+        assertNotContains "$LINENO" "$tResult" "Internal:"
     done
     gpUnitDebug=0
     return

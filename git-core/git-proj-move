@@ -12,8 +12,8 @@ if [ -f pFileOld ]; then
         rename -s $pFileOld $pFileNew
     fi
     mv $pFileOld $pFileNew
-done
+fi
 
 if [ -d pFileOld ]; then
-   #?
+   echo "TBD"
 fi

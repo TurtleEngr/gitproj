@@ -409,7 +409,7 @@ fCreateLocalGit()
 {
     fMustBeNoGit
     fAllMustBeReadable
-    
+
     # Prompt/Response or if -a, just validate the options
     fGetLocalPath $gpLocalPath
     fGetRawLocalPath $gpRawLocalPath

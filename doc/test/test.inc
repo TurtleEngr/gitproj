@@ -3,7 +3,7 @@
 # --------------------------------
 # Test globals
 
-export cTest cTestCurDir gpTest gpUnitDebug 
+export cTest cTestCurDir gpTest gpUnitDebug
 export cTestSrcDir cTestDestDir cTestFiles cTestConfig SHUNIT_COLOR
 
 # Relative to $HOME
@@ -62,7 +62,7 @@ fComSetupTestEnv()
     cTestFiles=$cTestSrcDir/test-env.tgz
     if [ ! -r $cTestFiles ]; then
         echo "Error: Cannot find: $cTestFiles. [$LINENO]"
-	exit 1
+        exit 1
     fi
 
     cTestConfig=$cDoc/config/gitproj.config.test-dev
@@ -113,7 +113,7 @@ fSetupTestConfig()
 {
     if [ ! -d $cDatHome ]; then
         echo "Error: Test env is not seetup. Missing $cDatHome [$LINENO]"
-	exit 1
+        exit 1
     fi
     cp $cDoc/config/gitproj.config.global $HOME/.gitproj.config.global
     cp $cTestConfig $HOME/.gitproj.config.test

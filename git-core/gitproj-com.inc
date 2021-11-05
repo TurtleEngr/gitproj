@@ -159,7 +159,7 @@ fComSetGlobals()
     # -------------------
     # Constants
     if [ -z "$cDoc" ]; then
-	cDoc=/usr/share/doc/gitproj
+        cDoc=/usr/share/doc/gitproj
     fi
     if [ ! -d $cDoc ]; then
         fError -m "Error: Cannot find gitproj doc directory: $cDoc" -l $LINENO
@@ -662,10 +662,11 @@ fComSetConfig()
             g) pScope="--global" ;;
             G) pScope="---file ~/.gitproj.config" ;;
             l) pScope="--local" ;;
-            L) tTopDir="$($cGetTopDir)"
-	       pScope="--file $tTopDir/gitproj/config.$HOSTNAME"
-	       ;;
-	    f) pScope="--file ${OPTARG}" ;;
+            L)
+                tTopDir="$($cGetTopDir)"
+                pScope="--file $tTopDir/gitproj/config.$HOSTNAME"
+                ;;
+            f) pScope="--file ${OPTARG}" ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
@@ -702,12 +703,12 @@ fComGetConfig()
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
-	    f) pScope="--file ${OPTARG}" ;;
+            f) pScope="--file ${OPTARG}" ;;
             i) pType="--type int" ;;
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
             d) pDefault="${OPTARG}" ;;
-	    a) pAll="--all" ;;
+            a) pAll="--all" ;;
             :) fError "Internal fComGetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComGetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
@@ -738,9 +739,9 @@ fComUnsetConfig()
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
-	    f) pScope="--file ${OPTARG}" ;;
+            f) pScope="--file ${OPTARG}" ;;
             k) pKey="${OPTARG}" ;;
-	    a) pAll="--unset-all" ;;
+            a) pAll="--unset-all" ;;
             :) fError "Internal fComUnsetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComUnsetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
