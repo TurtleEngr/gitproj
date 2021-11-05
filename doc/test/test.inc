@@ -64,11 +64,11 @@ fComSetupTestEnv()
     cTestSrcDir=$cTest
     cTestFiles=$cTestSrcDir/test-env.tgz
     if [ ! -r $cTestFiles ]; then
-        echo "Error: Cannot find: $cTestFiles. [$LINENO]"
+        echo "Error: Cannot find: $cTestFiles. [test.inc:$LINENO]"
         exit 1
     fi
 
-    cTestConfig=$cDoc/config/gitproj.config.test-dev
+    cTestConfig=$cDoc/config/gitproj.config.test
 
     cTestDestDir=$cTest/../../..
     cd $cTestDestDir >/dev/null 2>&1
@@ -87,7 +87,7 @@ fComSetupTestEnv()
     cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
 
     return
-} # fComSetup
+} # fComSetupTestEnv
 
 # --------------------------------
 fRmTestEnv()
@@ -97,7 +97,34 @@ fRmTestEnv()
         rm -rf $cTestDestDir/test
     fi
     return 0
-}
+} # fRmTestEnv
+
+# --------------------------------
+fSetupTestConfig()
+{
+    local tInclude
+    local tTopDir
+
+    if [ ! -d $cDatHome ]; then
+        echo "Error: Test env is not seetup. Missing $cDatHome [test.inc:$LINENO]"
+        exit 1
+    fi
+    if [ "$HOME" != "$cDatHome" ]; then
+	echo "Error: Test home is not setup. $cDatHome [test.inc:$LINENO]"
+	exit 1"
+    fi
+    cp $cTestConfig $HOME/.gitproj.config.test
+    tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.test)
+    if [ -z "$tInclude" ]; then
+        fComSetConfig -a -g -k "include.path" -v .gitproj.test.config
+    fi
+
+    tTopDir=${cTest%/*/*}
+    sed -i "s;GIT_DIR;$tTopDir;g" $HOME/.gitproj.test.config
+
+    return 0
+} # fSetupTestConfig
+
 # --------------------------------
 fCreateTestEnv()
 {
@@ -111,25 +138,6 @@ fCreateTestEnv()
     cd - >/dev/null 2>&1
     return 0
 } # fCreateTestEnv
-
-fSetupTestConfig()
-{
-    if [ ! -d $cDatHome ]; then
-        echo "Error: Test env is not seetup. Missing $cDatHome [$LINENO]"
-        exit 1
-    fi
-    cp $cDoc/config/gitproj.config.global $HOME/.gitproj.config.global
-    cp $cTestConfig $HOME/.gitproj.config.test
-    fComSetConfig -a -g -k "include.path" -v ".gitproj.config"
-    fComSetConfig -a -g -k "include.path" -v ".gitproj.test.config"
-
-    if [ -d $cBin/../.git ]; then
-        # We are testing from the git clone, so set GIT_DIR
-        tGitTop=$(git rev-parse --show-toplevel)
-        sed -i "s;GIT_DIR;$tGitTop;g" $HOME/.gitproj.test.config
-    fi
-    return 0
-} # fSetupTestConfig
 
 # ========================================
 fComSetupTestEnv

@@ -8,7 +8,7 @@ fUsage()
 
     local pStyle="${1:-usage}"
 
-    fComUsage -s $pStyle -f $cCurDir/$cName
+    fComUsage -s $pStyle -f $cBin/$cName
     exit 1
 
     cat <<\EOF >/dev/null
@@ -205,8 +205,12 @@ EOF
     exit 1
 } # fUsage
 
-# ====================
+# ========================================
 # Main
+
+export cBin cCurDir cName
+
+cName=git-proj-init
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -227,12 +231,15 @@ cd $cCurDir
 
 # -------------------
 . $cBin/gitproj-com.inc
+# Calls: fComSetGlobals
 
 if [ $# -eq 0 ]; then
     fError -m "Missing options." -l $LINENO
 fi
 
 . $cBin/gitproj-init.inc
+# Calls: fSetInitGlobals
+
 while getopts :al:r:k:s:mfhH:x tArg; do
     case $tArg in
         # Script arguments

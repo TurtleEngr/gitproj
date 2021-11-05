@@ -129,7 +129,6 @@ EOF
 
 tearDown()
 {
-    git config --global --remove-section gitproj.test &>/dev/null
     if [ $gpDebug -ne 0 ]; then
         fRmTestEnv
     fi
@@ -223,5 +222,8 @@ gpTest="$*"
 
 # -----
 . $cTest/test.inc
+fCreateTestEnv
+. $cBin/gitproj-init.inc
+fSetupTestConfig
 
 fComRunTests $gpTest

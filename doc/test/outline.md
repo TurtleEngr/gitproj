@@ -159,14 +159,23 @@ installed files would be tricky, and of low value.
 2. /home/USER/.gitconfig and .gitproj.config.global (include path location matters)
 3. GIT_PROJECT/.git/config and GIT_PROJECT/.gitproj.config.local
 
+## Coding patterns
+
+### fLog and fError
+
+local tFile=FILENAME
+e: -l $tFile:$LINENO
+
 ## File include pattern - prod
 
     cBin=/usr/lib/git-core - set when a CMD is run
     cDoc=/usr/share/doc/gitproj
 
         $cBin/git-proj-CMD
-                $cBin/gitproj-com.inc
-                $cBin/gitproj-CMD.inc
+            . $cBin/gitproj-com.inc
+	        fComSetGlobals
+            . $cBin/gitproj-CMD.inc
+	        fCMDSetGlobals
 
 ## File include pattern - dev
 
@@ -174,8 +183,10 @@ installed files would be tricky, and of low value.
     cDoc=$cBin/../doc or DIR/gitproj/doc
 
         $cBin/git-proj-CMD
-                $cBin/gitproj-com.inc
-                $cBin/gitproj-CMD.inc
+            . $cBin/gitproj-com.inc
+	        fComSetGlobals
+            . $cBin/gitproj-CMD.inc
+	        fCMDSetGlobals
 
 ## File include pattern - dev-test
 
@@ -185,21 +196,21 @@ installed files would be tricky, and of low value.
 
         $cTest/test-com.sh*
             . $cTest/test.inc
-		fComSetup
-            . $cBin/gitproj-com.inc
-		fComSetGlobals
+		fComSetupTestEnv
+            	. $cBin/gitproj-com.inc
+		    fComSetGlobals
 	    fComRunTests
                 . $cTest/shunit2.1*
 
         $cTest/test-CMD.sh
             . $cTest/test.inc
-		fComSetup
-            . $cBin/gitproj-CMD.inc
-                . $cBin/gitproj-com.inc
+		fComSetupTestEnv
+            	. $cBin/gitproj-com.inc
 		    fComSetGlobals
-		. fSetGlobals
-	    fComRunTests
-                . $cTest/shunit2.1*
+	    fCreateTestEnv
+            . $cBin/gitproj-CMD.inc
+	        fCMDSetGlobals
+	    fSetupTestConfig
 
 ## dev-test Environment
 
@@ -219,22 +230,22 @@ Creates:
     |   |   |test-files.txt - this outline
     |   |   |root/
             |   |mnt/
-            |   |   |disk-2/ - $cDatMount1
-            |   |   |usb-misc/ - $cDatMount2
+            |   |   |disk-2/		- $cDatMount1
+            |   |   |usb-misc/ 		- $cDatMount2
             |   |   |   |files-2021-08-12/ 
-            |   |   |usb-video/ - $cDatMount3
+            |   |   |usb-video/ 	- $cDatMount3
             |   |   |   |video-2020-04-02/
             |   |home/
-            |   |   |john/ - $HOME
+            |   |   |john/		- $HOME
             |   |   |   |project/
-            |   |   |   |   |beach/ - $cDatProj3
+            |   |   |   |   |beach/	- $cDatProj3
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |file1.txt
             |   |   |   |   |   |   |file2.txt
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |file.txt
             |   |   |   |   |   |.git/
-            |   |   |   |   |george/ - $cDatProj1
+            |   |   |   |   |george/	- $cDatProj1
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
@@ -247,14 +258,14 @@ Creates:
             |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj1Big
             |   |   |   |   |   |.gitignore
             |   |   |   |   |   |README.html
-            |   |   |   |   |paulb/ - $cDatProj2
+            |   |   |   |   |paulb/		- $cDatProj2
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |paulb.kdenlive
             |   |   |   |   |   |src/
             |   |   |   |   |   |   |final/
-            |   |   |   |   |   |   |   |paulb.mp4 - $cDatProj2Big
+            |   |   |   |   |   |   |   |paulb.mp4  - $cDatProj2Big
             |   |   |   |   |   |   |raw/
             |   |   |   |   |   |   |   |MOV001.MP3 - $cDatProj2Big
             |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj2Big

@@ -128,6 +128,8 @@ EOF
 # -------------------
 fComSetGlobals()
 {
+    local tFile=${BASH_SOURCE##*/}
+
     # -------------------
     # Set name of this script
     if [ -z "$cName" ]; then
@@ -165,7 +167,7 @@ fComSetGlobals()
         cDoc=$cBin/../doc
     fi
     if [ ! -d $cDoc ]; then
-        fError -m "Error: Cannot find gitproj doc directory: $cDoc" -l $LINENO
+        fError -m "Error: Cannot find gitproj doc directory: $cDoc" -l $tFile:$LINENO
     fi
 
     # Included in ~/.gitproj.config (use -G to set config vars to this)
@@ -225,6 +227,7 @@ fComCheckDeps()
     local pRequired="$1"
     local pOptional="$2"
 
+    local tFile=${BASH_SOURCE##*/}
     local tProg
     local tErr=0
     local tComReq='logger pod2text pod2usage'
@@ -245,7 +248,7 @@ fComCheckDeps()
     done
 
     if [ $tErr -eq 2 ]; then
-        fError -m "Missing one or more required programs." -l $LINENO
+        fError -m "Missing one or more required programs." -l $tFile:$LINENO
     fi
     if [ $tErr -eq 1 ]; then
         fLog -p warning -m "Missing some some optional programs." -l $LINENO
@@ -311,6 +314,7 @@ fComUsage()
     local pAll=""
     local pTitle="$cName Usage"
 
+    local tFile=${BASH_SOURCE##*/}
     local tProg=""
     local tTidy='tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no'
 
@@ -328,13 +332,13 @@ fComUsage()
                 pInt=1
                 pAll='-a'
                 ;;
-            :) fError -i -m "fComUsage: Value required for option: -$OPTARG" -l $LINENO ;;
-            \?) fError -i "fComUsage: Unknown option: $OPTARG" -l $LINENO ;;
+            :) fError -i -m "fComUsage: Value required for option: -$OPTARG" -l $tFile:$LINENO ;;
+            \?) fError -i "fComUsage: Unknown option: $OPTARG" -l $tFile:$LINENO ;;
         esac
     done
     shift $((OPTIND - 1))
     if [ $# -ne 0 ]; then
-        fError -i -m "fComUsage: Unknown option: $*" -l $LINENO
+        fError -i -m "fComUsage: Unknown option: $*" -l tFile:$LINENO
     fi
     while [ $# -ne 0 ]; do
         shift
@@ -372,11 +376,11 @@ fComUsage()
     # Validate
     pFileList="$(echo $pFileList)"
     if [ -z "$pFileList" ]; then
-        fError -i -m "fComUsage missing pFileList" -l $LINENO
+        fError -i -m "fComUsage missing pFileList" -l $tFile:$LINENO
     fi
     for tFile in $pFileList; do
         if [ ! -r $tFile ]; then
-            fError -i -m "fComUsage cannot read: $tFile" -l $LINENO
+            fError -i -m "fComUsage cannot read: $tFile" -l $tFile:$LINENO
         fi
     done
     
@@ -443,6 +447,7 @@ fFmtLog()
     local pLine=$3
     local pErr=$4
 
+    local tFile=${BASH_SOURCE##*/}
     local tDebugLevel
     local tLevel
     local tLine
@@ -527,6 +532,7 @@ fLog()
     local pLine=""
     local pErr=""
 
+    local tFile=${BASH_SOURCE##*/}
     local OPTARG=1
     local OPTIND
     local tArg
@@ -539,8 +545,8 @@ fLog()
                 pErr="${OPTARG}"
                 gErr="${OPTARG}"
                 ;;
-            :) echo "Internal: Value required for option: -$OPTARG [$LINENO]" ;;
-            \?) echo "Internal: Unknown option: $OPTARG [$LINENO]" ;;
+            :) echo "Internal: Value required for option: -$OPTARG [$tFile:$LINENO]" ;;
+            \?) echo "Internal: Unknown option: $OPTARG [$tFile:$LINENO]" ;;
         esac
     done
     shift $((OPTIND - 1))
@@ -580,6 +586,7 @@ fError()
     local pErr=1
     local pInt=0
 
+    local tFile=${BASH_SOURCE##*/}
     local OPTIND=1
     local OPTARG
     local tArg
@@ -590,8 +597,8 @@ fError()
             l) pLine="${OPTARG}" ;;
             e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
-            :) echo "Internal: Value required for option: -$OPTARG [$LINENO]" ;;
-            \?) echo "Internal: Unknown option: $OPTARG [$LINENO]" ;;
+            :) echo "Internal: Value required for option: -$OPTARG [$tFile:$LINENO]" ;;
+            \?) echo "Internal: Unknown option: $OPTARG [$tFile:$LINENO]" ;;
         esac
     done
     shift $((OPTIND - 1))
@@ -648,6 +655,7 @@ fComSetConfig()
     local pValue=""
     local pAdd=""
 
+    local tFile=${BASH_SOURCE##*/}
     local tTopDir
     local OPTIND=1
     local OPTARG
@@ -667,15 +675,15 @@ fComSetConfig()
             b) pType="--type bool" ;;
             k) pKey="${OPTARG}" ;;
             v) pValue="${OPTARG}" ;;
-            :) fError "Internal fComSetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
-            \?) fError "Internal fComSetConfig:: Unknown option: $OPTARG [$LINENO]" ;;
+            :) fError -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tFile:$LINENO ;;
+            \?) fError -i -m "fComSetConfig:: Unknown option: $OPTARG" -l $tFile:$LINENO ;;
         esac
     done
     if [ -z "$pKey" ]; then
-        fError -m "Internal fComSetConfig: missing key" -l $LINENO
+        fError -i -m "fComSetConfig: missing key" -l $tFile:$LINENO
     fi
     if [ -z "$pValue" ]; then
-        fError -m "Internal fComSetConfig: missing value" -l $LINENO
+        fError -i -m "fComSetConfig: missing value" -l $tFile:$LINENO
     fi
 
     git config $pScope $pAdd $pType $pKey "$pValue"
@@ -689,13 +697,15 @@ fComGetConfig()
     local pKey=""
     local pDefault=""
     local pAll=""
-
+    local pFilter=""
+    
+    local tFile=${BASH_SOURCE##*/}
     local tValue=""
 
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glf:ibk:d:a tArg; do
+    while getopts :glf:ibk:d:av: tArg; do
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
@@ -705,15 +715,16 @@ fComGetConfig()
             k) pKey="${OPTARG}" ;;
             d) pDefault="${OPTARG}" ;;
             a) pAll="--all" ;;
-            :) fError "Internal fComGetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
-            \?) fError "Internal fComGetConfig: Unknown option: $OPTARG [$LINENO]" ;;
+	    v) pFiler="${OPTARG}" ;;
+            :) fError -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tFile:$LINENO" ;;
+            \?) fError -i -m "fComGetConfig: Unknown option: $OPTARG" -l $tFile:LINENO ;;
         esac
     done
     if [ -z "$pKey" ]; then
-        fError -m "Internal fComGetConfig: missing key" -l $LINENO
+        fError -i -m "fComGetConfig: missing key" -l $tFile:$LINENO
     fi
 
-    tValue=$(git config --get --includes $pScope $pType $pKey)
+    tValue=$(git config --get --includes $pScope $pType $pKey $tFilter)
     if [ -z "$tValue" ] && [ -n "$pDefault" ]; then
         tValue=$pDefault
     fi
@@ -728,6 +739,7 @@ fComUnsetConfig()
     local pKey=""
     local pAll="--unset"
 
+    local tFile=${BASH_SOURCE##*/}
     local OPTIND=1
     local OPTARG
     local tArg
@@ -738,8 +750,8 @@ fComUnsetConfig()
             f) pScope="--file ${OPTARG}" ;;
             k) pKey="${OPTARG}" ;;
             a) pAll="--unset-all" ;;
-            :) fError "Internal fComUnsetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
-            \?) fError "Internal fComUnsetConfig: Unknown option: $OPTARG [$LINENO]" ;;
+            :) fError -i -m "Internal fComUnsetConfig: Value required for option: $OPTARG" -l $tFile:$LINENO" ;;
+            \?) fError -i -m "Internal fComUnsetConfig: Unknown option: $OPTARG" -l $tFile:$LINENO" ;;
         esac
     done
 
@@ -749,8 +761,10 @@ fComUnsetConfig()
 # --------------------
 fMustBeInGitRepo()
 {
+    local tFile=${BASH_SOURCE##*/}
+
     if [ ! -d .git ]; then
-        fError -m "You need to be in a git repo for this to work." -l $LINENO
+        fError -m "You need to be in a git repo for this to work." -l $tFile:$LINENO
     fi
     return 0
 } # fMustBeInGitRepo
@@ -758,6 +772,7 @@ fMustBeInGitRepo()
 # --------------------
 fMustBeNoGit()
 {
+    local tFile=${BASH_SOURCE##*/}
     local tFound=0
     local tGitDir
 
@@ -771,7 +786,7 @@ fMustBeNoGit()
         fi
     fi
     if [ $tFound -ne 0 ]; then
-        fError -m "You should NOT be in a git repo, or a directory above a git repo" -l $LINENO
+        fError -m "You should NOT be in a git repo, or a directory above a git repo" -l $tFile:$LINENO
     fi
     return 0
 } # fMustBeNoGit
@@ -779,14 +794,17 @@ fMustBeNoGit()
 fAllMustBeReadable()
 {
     local pDir=$1
+
+    local tFile=${BASH_SOURCE##*/}
     local tFound
 
     pDir=${pDir:-$PWD}
     tFound=$(find $pDir \! -readable -print)
     if [ -n "$tFound" ]; then
-        fError -m "All directories and files must be readable, under $pDir" -l $LINENO
+        fError -m "All directories and files must be readable, under $pDir" -l $tFile:$LINENO
     fi
 } # fAllMustBeReadable
 
 # ========================================
+tFile=${BASH_SOURCE##*/}
 fComSetGlobals

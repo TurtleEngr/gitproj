@@ -8,7 +8,7 @@
 # git rev-parse --show-toplevel
 # Then put this in ~/.gitproj.config (after path = .gitproj.config)
 #[include]
-#	path = .gitproj-test.config
+#	path = .gitproj.config.test
 
 [gitproj "config"]
 	syslog = no
