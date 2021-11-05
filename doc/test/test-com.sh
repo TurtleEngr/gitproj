@@ -1,68 +1,68 @@
 #!/bin/bash
-# Test suite to gitproj functions and scripts.
 
 # ========================================
 fUsage()
 {
-    fComUsage -i -s short -f $cCurDir/$cName
+    fComUsage -s usage -f $cTestCurDir/test-com.sh
 
     # This is the start of the testing internal documentation. See:
     # fGitProjComInternalDoc()
     return
 
     cat <<\EOF >/dev/null
-=internal-pod
+=pod
 
-=internal-head2 gitproj-com.test
+=for text ========================================
 
-=internal-for text ========================================
+=for html <hr/>
 
-=internal-for html <hr/>
+=head1 test-com.inc
 
-gitproj-com.test - test the gitproj-com.inc functions
+test-com.inc - Common functions used in the test scripts
 
-=internal-head3 SYNOPSIS
+=head1 SYNOPSIS
 
-        gitproj-com.test [testName,testName,...]
+    ./test.com.sh [test,test,...]
 
-=internal-head3 DESCRIPTION
+=head1 DESCRIPTION
 
 shunit2.1 is used to run the unit tests. If no test function names are
 listed, then all of the test functions will be run.
 
-=internal-head1 RETURN VALUE
+=head1 RETURN VALUE
 
 0 - if OK
 
-=internal-head1 ERRORS
+=head1 ERRORS
 
-=internal-head1 EXAMPLES
+=head1 EXAMPLES
 
-=internal-head1 ENVIRONMENT
+=head1 ENVIRONMENT
 
-=internal-head1 FILES
+=head1 FILES
 
-=internal-head1 SEE ALSO
+=head1 SEE ALSO
 
 shunit2.1
 
-=internal-head1 NOTES
+=head1 NOTES
 
-=internal-head1 CAVEATS
+=head1 CAVEATS
 
-=internal-head1 DIAGNOSTICS
+=head1 DIAGNOSTICS
 
-=internal-head1 BUGS
+=head1 BUGS
 
-=internal-head1 RESTRICTIONS
+=head1 RESTRICTIONS
 
-=internal-head1 AUTHOR
+=head1 AUTHOR
 
-=internal-head1 HISTORY
+=head1 HISTORY
 
 $Revision: 1.2 $ $Date: 2021/09/08 01:39:35 $ GMT 
 
-=internal-cut
+=cut
+
 EOF
 }
 
@@ -71,8 +71,6 @@ EOF
 # --------------------------------
 oneTimeSetUp()
 {
-    local tGitTop
-
     return 0
 
     cat <<EOF >/dev/null
@@ -112,7 +110,7 @@ setUp()
 {
     # Restore default global values, before each test
     unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
-    fComSetGlobals
+    fComSetupTestEnv
     fCreateTestEnv
     gpUnitDebug=0
     return 0
@@ -145,7 +143,8 @@ tearDown()
 testSetup()
 {
     assertTrue "$LINENO" "[ -x $cBin/gitproj-com.inc ]"
-    assertTrue "$LINENO" "[ -r $cTestSrcDir/$cTestFiles ]"
+    assertTrue "$LINENO" "[ -r $cTestFiles ]"
+    assertTrue "$LINENO" "[ -d $cTestSrcDir ]"
     assertTrue "$LINENO" "[ -d $cTestDestDir ]"
     assertNotEquals "$LINENO" "$cHome" "$HOME"
     assertTrue "$LINENO" "[ -r $HOME/.gitproj.config ]"
@@ -176,28 +175,25 @@ testComInitialConfig()
     local tProg
     local tResult
 
-    assertEquals "$LINENO tcic-1" "$PWD" "$cCurDir"
-    assertTrue "$LINENO tcic-2" "[ -d $cCurDir ]"
+    assertTrue "$LINENO -d $cCurDir" "[ -d $cCurDir ]"
+    assertNotNull "$LINENO $cBin" "$cBin"
+    assertTrue "$LINENO -d $cBin" "[ -d $cBin ]"
+    assertTrue "$LINENO -f $cBin/$cName" "[ -f $cBin/$cName ]"
+    assertTrue "$LINENO -x $cBin/$cName" "[ -x $cBin/$cName ]"
+    assertTrue "$LINENO -x $cBin/gitproj-com.inc" "[ -x $cBin/gitproj-com.inc ]"
 
-    assertNotNull "$LINENO tcic-3" "$cBin"
-    assertTrue "$LINENO tcic-4" "[ -d $cBin ]"
-    assertTrue "$LINENO tcic-5" "[ -f $cBin/$cName ]"
-    assertTrue "$LINENO tcic-6" "[ -x $cBin/$cName ]"
-    assertTrue "$LINENO tcic-7" "[ -x $cBin/gitproj-com.inc ]"
-    assertTrue "$LINENO tcic-8" "[ -x $cBin/gitproj-com.test ]"
-
-    assertEquals "$LINENO tcic-10" "0" "$gpDebug"
-    assertEquals "$LINENO tcic-11" "0" "$gpVerbose"
-    assertEquals "$LINENO tcic-12" "0" "$gpLog"
-    assertEquals "$LINENO tcic-13" "user" "$gpFacility"
-    assertEquals "$LINENO tcic-14" "0" "$gErr"
-    assertNull "$LINENO tcic-15" "$(echo $cVer | tr -d '.[:digit:]')"
+    assertEquals "$LINENO" "0" "$gpDebug"
+    assertEquals "$LINENO" "2" "$gpVerbose"
+    assertEquals "$LINENO" "0" "$gpLog"
+    assertEquals "$LINENO" "user" "$gpFacility"
+    assertEquals "$LINENO" "0" "$gErr"
+    assertNull "$LINENO" "$(echo $cVer | tr -d '.[:digit:]')"
 
     for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr; do
         which $tProg &>/dev/null
-        assertTrue "$LINENO tcic-20 missing: $tProg" "[ $? -eq 0 ]"
+        assertTrue "$LINENO missing: $tProg" "[ $? -eq 0 ]"
     done
-    return
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -342,6 +338,7 @@ testComErrorLog()
     local tResult
     local tTestMsg
 
+    gpUnitDebug=0
     gpLog=0
     gpVerbose=0
     local tMsg="Testing 123"
@@ -353,14 +350,15 @@ testComErrorLog()
         fComUDebug "Call: fError -m \"$tMsg\" -l $tLine"
         tResult=$(fError -m "$tMsg" -l $tLine 2>&1)
         fComUDebug "tResult=$tResult"
-        assertContains "$LINENO tcel-$tTestMsg.name" "$tResult" "$cName"
-        assertContains "$LINENO tcel-$tTestMsg.crit" "$tResult" "crit:"
-        assertContains "$LINENO tcel-$tTestMsg.msg" "$tResult" "$tMsg"
-        assertContains "$LINENO tcel-$tTestMsg.line" "$tResult" '['$tLine']'
-        assertContains "$LINENO tcel-$tTestMsg.err" "$tResult" '('1')'
-        assertContains "$LINENO tcel-$tTestMsg.usage" "$tResult" "Usage"
+        assertContains "$LINENO $tTestMsg.name" "$tResult" "$cName"
+        assertContains "$LINENO $tTestMsg.crit" "$tResult" "crit:"
+        assertContains "$LINENO $tTestMsg.msg" "$tResult" "$tMsg"
+        assertContains "$LINENO $tTestMsg.line" "$tResult" '['$tLine']'
+        assertContains "$LINENO $tTestMsg.err" "$tResult" '(1)'
+        assertContains "$LINENO $tTestMsg.usage" "$tResult" "Usage"
+	assertNotContains "$LINENO" "$tResult" "Internal:"
     done
-    echo 1>&2
+    gpUnitDebug=0
     return
 
     cat <<EOF >/dev/null
@@ -378,52 +376,56 @@ EOF
 testComUsage()
 {
     local tResult
+    local tUsageScript=$cTest/test-com.sh
+    local tInternalScript=$cBin/gitproj-com.inc
+
+    gpUnitDebug=0
 
     #-----
-    tResult=$(fComUsage -s usage -f $cBin/$cName 2>&1)
+    tResult=$(fComUsage -s usage -f $tUsageScript 2>&1)
     fComUDebug "tResult=$tResult"
     assertContains "$LINENO tcu-short" "$tResult" "Usage"
 
     #-----
-    tResult=$(fComUsage -s foo -f $cBin/$cName 2>&1)
+    tResult=$(fComUsage -s foo -f $tUsageScript 2>&1)
     fComUDebug "tResult=$tResult"
     assertContains "$LINENO tcu-s-foo.1" "$tResult" "DESCRIPTION"
     assertContains "$LINENO tcu-s-foo.2" "$tResult" "HISTORY"
 
     #-----
-    tResult=$(fComUsage -f $cBin/$cName -s 2>&1)
+    tResult=$(fComUsage -f $tUsageScript -s 2>&1)
     fComUDebug "tResult=$tResult"
     assertContains "$LINENO tcu-s-null.1" "$tResult" "crit: Internal: fComUsage: Value required"
 
     #-----
-    tResult=$(fComUsage -s long -f $cBin/$cName 2>&1)
+    tResult=$(fComUsage -s long -f $tUsageScript 2>&1)
     assertContains "$LINENO tcu-long.1" "$tResult" "DESCRIPTION"
     assertContains "$LINENO tcu-long.2" "$tResult" "HISTORY"
 
     #-----
-    tResult=$(fComUsage -s man -f $cBin/$cName 2>&1)
+    tResult=$(fComUsage -s man -f $tUsageScript 2>&1)
     assertContains "$LINENO tcu-man.1" "$tResult" '.IX Header "DESCRIPTION"'
     assertContains "$LINENO tcu-man.2" "$tResult" '.IX Header "HISTORY"'
 
     #-----
-    tResult=$(fComUsage -s html -f $cBin/$cName -t "$cName Usage" 2>&1)
+    tResult=$(fComUsage -s html -f $tUsageScript -t "$cName Usage" 2>&1)
     assertContains "$LINENO tcu-html.1" "$tResult" '<li><a href="#DESCRIPTION">DESCRIPTION</a></li>'
     assertContains "$LINENO tcu-html.2" "$tResult" '<h1 id="HISTORY">HISTORY</h1>'
     assertContains "$LINENO tcu-html.3" "$tResult" "<title>$cName Usage</title>"
 
     #-----
-    tResult=$(fComUsage -s md -f $cBin/$cName 2>&1)
+    tResult=$(fComUsage -s md -f $tUsageScript 2>&1)
     assertContains "$LINENO tcu-md.1" "$tResult" '# DESCRIPTION'
     assertContains "$LINENO tcu-md.2" "$tResult" '# HISTORY'
 
     #-----
-    tResult=$(fComUsage -i -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)
+    tResult=$(fComUsage -i -s long -f $tUsageScript -f $tInternalScript 2>&1)
     fComUDebug "tResult=$tResult"
     assertContains "$LINENO tcu-internal.1" "$tResult" 'Template Use'
     assertContains "$LINENO tcu-internal.2" "$tResult" 'fComSetGlobals'
 
     #-----
-    tResult=$(fComUsage -i -s html -t "Internal Doc" -f $cBin/$cName -f $cBin/gitproj-com.inc -f $cBin/gitproj-com.test 2>&1)
+    tResult=$(fComUsage -i -s html -t "Internal Doc" -f $tUsageScript -f $tInternalScript 2>&1)
     fComUDebug "tResult=$tResult"
     assertContains "$LINENO tcu-int-html.1" "$tResult" '<a href="#Template-Use">Template Use</a>'
     assertContains "$LINENO tcu-int-html.2" "$tResult" '<h3 id="fComSetGlobals">fComSetGlobals</h3>'
@@ -431,16 +433,17 @@ testComUsage()
     assertContains "$LINENO tcu-int-html.4" "$tResult" '<h3 id="testComUsage">testComUsage</h3>'
 
     #-----
-    tResult=$(fComUsage -i -s md -f $cBin/$cName -f $cBin/gitproj-com.inc -f $cBin/gitproj-com.test 2>&1)
+    tResult=$(fComUsage -i -s md -f $tUsageScript -f $tInternalScript 2>&1)
     assertContains "$LINENO tcu-int-md.1" "$tResult" '## Template Use'
     assertContains "$LINENO tcu-int-md.2" "$tResult" '### fComSetGlobals'
     assertContains "$LINENO tcu-int-md.3" "$tResult" '### testComUsage'
 
     #-----
-    tResult=$(fComUsage -a -s long -f $cBin/$cName -f $cBin/gitproj-com.inc 2>&1)
+    tResult=$(fComUsage -a -s long -f $tUsageScript -f $tInternalScript 2>&1)
     assertContains "$LINENO long" "$tResult" "DESCRIPTION"
 
     #-----
+    gpUnitDebug=0
     return
 
     cat <<EOF >/dev/null
@@ -488,12 +491,13 @@ testComSetConfigGlobal()
     local tResult
     local tGlobal=$HOME/.gitconfig
 
-    assertTrue "$LINENO -g" "[ -r $tGlobal ]"
+    # Note: more complete "git config" is done when a test env is setup.
 
     grep -q '\[gitproj "testit"\]' $tGlobal
     assertFalse "$LINENO tearDown ran" "[ $? -eq 0 ]"
 
     fComSetConfig -g -k gitproj.testit.test-str -v "test a string"
+    assertTrue "$LINENO -g" "[ -r $tGlobal ]"
     grep -q '\[gitproj "testit"\]' $tGlobal
     assertTrue "$LINENO" "[ $? -eq 0 ]"
     grep -q 'test-str = test a string' $tGlobal
@@ -546,69 +550,23 @@ testComUnsetConfigGlobal()
     assertFalse "$LINENO" "[ $? -eq 0 ]"
 } # testComUnsetConfigGlobal
 
-# --------------------------------
-testGitProj()
-{
-    local tResult
-
-    tResult=$($cBin/git-proj 2>&1)
-    assertFalse "$LINENO" "[ $? -eq 0 ]"
-    assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
-
-    tResult=$($cBin/git-proj -h 2>&1)
-    assertFalse "$LINENO" "[ $? -eq 0 ]"
-    assertContains "$LINENO $tResult" "$tResult" 'git proj [pSubCmd] [pSubCmdOptions] [pComOpt]'
-
-    tResult=$($cBin/git-proj -H html 2>&1)
-    assertFalse "$LINENO" "[ $? -eq 0 ]"
-    assertContains "$LINENO $tResult" "$tResult" '<title>git-proj Usage</title>'
-
-    tResult=$($cBin/git-proj -H int 2>&1)
-    assertFalse "$LINENO" "[ $? -eq 0 ]"
-
-} # testGitProj
-
-# --------------------------------
-testGitProjInit()
-{
-    local tResult
-
-    tResult=$($cBin/git-proj-init 2>&1)
-    assertContains "$LINENO $tResult" "$tResult" 'Usage'
-
-    tResult=$($cBin/git-proj-init -h)
-    assertContains "$LINENO $tResult" "$tResult" 'DESCRIPTION'
-
-    # git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
-
-    cd $HOME/$cDatProj1
-    assertFalse "$LINENO" "[ -d .git ]"
-    tResult=$($cBin/git-proj-init -l $PWD)
-    assertTrue "$LINENO" "[ -d .git ]"
-
-    assertTrue "$LINENO" "[ -f .gitignore ]"
-
-    # check for git-flow settings
-    # git is already in project dir
-
-    # git-flow not installed
-} # testGitProjInit
-
 # ====================
 # This should be the last defined function
 fComRunTests()
 {
-    if [ ! -x $cBin/shunit2.1 ]; then
-        echo "Error: Missing: $cBin/shunit2.1"
+    if [ ! -x $cTest/shunit2.1 ]; then
+        echo "Error: Missing: $cTest/shunit2.1"
         exit 1
     fi
-    if [ "${gpTest:-all}" = "all" ]; then
+    shift $#
+    if [ -z "$gpTest" ]; then
         # shellcheck disable=SC1091
-        . $cBin/shunit2.1
+        . $cTest/shunit2.1
         exit $?
     fi
+
     # shellcheck disable=SC1091
-    . $cBin/shunit2.1 -- $gpTest
+    . $cTest/shunit2.1 -- $gpTest
     exit $?
 
     cat <<EOF >/dev/null
@@ -625,6 +583,8 @@ EOF
 # ====================
 # Main
 
+export cTest cTestCurDir gpTest
+
 # -------------------
 # Set current directory location in PWD and cTestCurDir
 if [ -z "$PWD" ]; then
@@ -634,12 +594,12 @@ cTestCurDir=$PWD
 
 # -------------------
 # Define the location of this script
-cTestBin=${0%/*}
+cTest=${0%/*}
 if [ "$cTesBin" = "." ]; then
-    cTestBin=$PWD
+    cTest=$PWD
 fi
-cd $cTestBin
-cTestBin=$PWD
+cd $cTest
+cTest=$PWD
 cd $cTestCurDir
 
 # -----
@@ -647,6 +607,6 @@ cd $cTestCurDir
 gpTest="$*"
 
 # -----
-. $cTestBin/gitproj.test.inc
+. $cTest/test.inc
 
 fComRunTests $gpTest

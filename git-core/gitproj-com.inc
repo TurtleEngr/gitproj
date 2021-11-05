@@ -3,8 +3,7 @@
 # --------------------------------
 export PWD cBin cCurDir cName cPID cVer cHome
 export gErr gpDebug gpFacility gpLog gpVerbose
-export cDoc cTest cRawDir cGetOrigin cGetTopDir
-. fComSetGlobals
+export cDoc cTest cRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
 
 # --------------------------------
 fGitProjComInternalDoc()
@@ -131,8 +130,9 @@ fComSetGlobals()
 {
     # -------------------
     # Set name of this script
-    local tName=${0##*/}
-    cName=$tName
+    if [ -z "$cName=" ]; then
+        cName=${0##*/}
+    fi
 
     # -------------------
     # Set current directory location in PWD and cCurDir, because with cron
@@ -140,7 +140,9 @@ fComSetGlobals()
     if [ -z "$PWD" ]; then
         PWD=$(pwd)
     fi
-    cCurDir=${cCurDir:-$PWD}
+    if [ -z "$cCurDir" ]; then
+        cCurDir=$PWD
+    fi
 
     # -------------------
     # Define the location of the com script if not already set
@@ -149,15 +151,24 @@ fComSetGlobals()
         if [ "$cBin" = "." ]; then
             cBin=$PWD
         fi
-        cd $cBin
+        cd $cBin >/dev/null 2>&1
         cBin=$PWD
-        cd $cCurDir
+        cd - >/dev/null 2>&1
     fi
 
     # -------------------
-    # Useful constants
-    cDoc=$(fComGetConfig -k "gitproj.config.doc")
-    cTest=$(fComGetConfig -k "gitproj.config.test")
+    # Constants
+    if [ -z "$cDoc" ]; then
+	cDoc=/usr/share/doc/gitproj
+    fi
+    if [ ! -d $cDoc ]; then
+        fError -m "Error: Cannot find gitproj doc directory: $cDoc" -l $LINENO
+    fi
+
+    # Included in ~/.gitproj.config (use -G to set config vars to this)
+    cConfigGlobal='~/.gitproj.config.global'
+    # In $cGetTopDir (use -L to set config vars to this)
+    cConfigLocal='.gitproj.config.local'
 
     # Use:
     #     tOrigin=$($cGetOrigin)
@@ -165,7 +176,7 @@ fComSetGlobals()
     cGetOrigin='git config --get remote.origin.url'
 
     # Use:
-    #     tTop=$($cTopDir); cd $tTop
+    #     tTop=$($cGetTopDir); cd $tTop
     cGetTopDir='git rev-parse --show-toplevel'
 
     # -------------------
@@ -628,7 +639,7 @@ fComMkHostConfig()
     mkdir -p $cTop/gitproj 2>&1
     touch $cTop/gitproj/config.$HOSTNAME
     git config --local include.path $cTop/gitproj/config.$HOSTNAME
-    cd $cTop
+    cd $cTop >/dev/null 2>&1
     git add gitproj/config.$HOSTNAME
 } # fComMkHostConfig
 
@@ -651,7 +662,7 @@ fComSetConfig()
             g) pScope="--global" ;;
             G) pScope="---file ~/.gitproj.config" ;;
             l) pScope="--local" ;;
-            L) tTopDir="$($cTopDir)"
+            L) tTopDir="$($cGetTopDir)"
 	       pScope="--file $tTopDir/gitproj/config.$HOSTNAME"
 	       ;;
 	    f) pScope="--file ${OPTARG}" ;;
@@ -729,7 +740,7 @@ fComUnsetConfig()
             l) pScope=--local ;;
 	    f) pScope="--file ${OPTARG}" ;;
             k) pKey="${OPTARG}" ;;
-	    a) pAll="--unset-all" ;
+	    a) pAll="--unset-all" ;;
             :) fError "Internal fComUnsetConfig: Value required for option: -$OPTARG [$LINENO]" ;;
             \?) fError "Internal fComUnsetConfig: Unknown option: $OPTARG [$LINENO]" ;;
         esac
@@ -779,3 +790,6 @@ fAllMustBeReadable()
         fError -m "All directories and files must be readable, under $pDir" -l $LINENO
     fi
 } # fAllMustBeReadable
+
+# ========================================
+fComSetGlobals

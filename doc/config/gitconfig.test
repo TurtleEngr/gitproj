@@ -1,0 +1,29 @@
+# gitconfig.test
+
+[core]
+	filemode = true
+	autocrlf = false
+	#editor = /usr/bin/emacs-w32.exe
+	editor = /usr/bin/emacs
+	excludesFile = ~/.gitignore_global
+	ignorecase = true
+	logAllRefUpdates = true
+	quotePath = false
+	trustctime = false
+[color]
+	ui = never
+[alias]
+	br = branch
+	br-all = branch -r
+	ci = commit
+	co = checkout
+	df = diff
+	merge = merge --no-ff
+	origin = config --get remote.origin.url
+	push-tags = push --tags origin
+	revert-all = reset --hard HEAD
+	st = status
+	tracked = remote show origin
+[user]
+	name = TurtleEngr
+	email = turtle.engr@gmail.com

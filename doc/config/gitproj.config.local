@@ -1,3 +1,5 @@
+# gitproj.config.local
+
 # "git proj init local" will setup this file
 # Copy this file to gitproj/config.$HOSTNAME
 # Then put this in .git/config

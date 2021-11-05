@@ -8,8 +8,7 @@
     |   |   |   |gitproj.config.system
     |   |   |   |gitproj.config.global
     |   |   |   |getproj.config.local
-    |   |   |   |gitproj-config.test-dev
-    |   |   |   |gitproj-config.test-prod
+    |   |   |   |gitproj.config.test
     |   |   |hooks/
     |   |   |   |pre-commit*
     |   |   |html/ - generated user level docs
@@ -25,20 +24,21 @@
     |   |   |   |outline.md
     |   |   |   |shunit2 -> shunit2.1*
     |   |   |   |shunit2.1*
-    |   |   |   |test.inc
-    |   |   |   |test-com-inc*
     |   |   |   |test-env.tgz -> ../../../test-env.tgz
-    |   |   |   |test-add.inc*
-    |   |   |   |test-check.inc*
-    |   |   |   |test-clone.inc*
-    |   |   |   |test-config.inc*
-    |   |   |   |test-init.inc*
-    |   |   |   |test-move.inc*
-    |   |   |   |test-pull.inc*
-    |   |   |   |test-push.inc*
-    |   |   |   |test-remote.inc*
-    |   |   |   |test-rm.inc*
-    |   |   |   |test-status.inc*
+    |   |   |   |test-install.sh*
+    |   |   |   |test.inc
+    |   |   |   |test-com.sh*
+    |   |   |   |test-add.sh*
+    |   |   |   |test-check.sh*
+    |   |   |   |test-clone.sh*
+    |   |   |   |test-config.sh*
+    |   |   |   |test-init.sh*
+    |   |   |   |test-move.sh*
+    |   |   |   |test-pull.sh*
+    |   |   |   |test-push.sh*
+    |   |   |   |test-remote.sh*
+    |   |   |   |test-rm.sh*
+    |   |   |   |test-status.sh*
     |   |   |LICENSE
     |   |git-core/
     |   |   |gitproj-com.inc*
@@ -71,6 +71,10 @@
     |   |TODO.md
 
 ## gitproj Installed Files - prod
+
+Note: The tests will only check for a vailded installation. Unit test
+will only be supported in a dev env. Running unit test on the
+installed files would be tricky, and of low value.
 
     /usr/
     |   |lib/
@@ -109,28 +113,13 @@
     |   |   |   |   |   |gitproj.config.system
     |   |   |   |   |   |gitproj.config.global
     |   |   |   |   |   |getproj.config.local
-    |   |   |   |   |   |gitproj-config.test-dev
-    |   |   |   |   |   |gitproj-config.test-prod
     |   |   |   |   |hooks/
     |   |   |   |   |   |pre-commit*
     |   |   |   |   |test/
     |   |   |   |   |   |outline.md
     |   |   |   |   |   |shunit2 -> shunit2.1*
     |   |   |   |   |   |shunit2.1*
-    |   |   |   |   |   |test.inc
-    |   |   |   |   |   |test-com-inc*
-    |   |   |   |   |   |test-env.tgz
-    |   |   |   |   |   |test-add.inc*
-    |   |   |   |   |   |test-check.inc*
-    |   |   |   |   |   |test-clone.inc*
-    |   |   |   |   |   |test-config.inc*
-    |   |   |   |   |   |test-init.inc*
-    |   |   |   |   |   |test-move.inc*
-    |   |   |   |   |   |test-pull.inc*
-    |   |   |   |   |   |test-push.inc*
-    |   |   |   |   |   |test-remote.inc*
-    |   |   |   |   |   |test-rm.inc*
-    |   |   |   |   |   |test-status.inc*
+    |   |   |   |   |   |test-install.sh*
     |   |   |man/
     |   |   |   |man1/
     |   |   |   |   |gitproj.1.gz - generated, all user commands
@@ -179,22 +168,6 @@
                 $cBin/gitproj-com.inc
                 $cBin/gitproj-CMD.inc
 
-## File include pattern - prod-test
-
-    cTest=/usr/share/doc/gitproj/test - set when a test-*.inc is run
-    cDoc=$cTest/.. or /usr/share/doc/gitproj
-    cBin=/usr/lib/git-core
-
-        $cTest/test-com-inc*
-                $cBin/gitproj-com.inc
-                $cTest/shunit2.1*
-
-        $cTest/test-CMD.inc
-                $cBin/gitproj-com.inc
-                $cBin/gitproj-CMD.inc
-                $cTest/test.inc
-                $cTest/shunit2.1*
-
 ## File include pattern - dev
 
     cBin=DIR/gitproj/git-core - set when a CMD is run
@@ -210,30 +183,24 @@
     cBin=$cTest/../../git-core or DIR/gitproj/git-core
     cDoc=$cTest/.. or DIR/gitproj/doc
 
-        $cTest/test-com-inc*
-                $cBin/gitproj-com.inc
-                $cTest/shunit2.1*
+        $cTest/test-com.sh*
+            . $cTest/test.inc
+		fComSetup
+            . $cBin/gitproj-com.inc
+		fComSetGlobals
+	    fComRunTests
+                . $cTest/shunit2.1*
 
-        $cTest/test-CMD.inc
-                $cBin/gitproj-com.inc
-                $cBin/gitproj-CMD.inc
-                $cTest/test.inc
-                $cTest/shunit2.1*
+        $cTest/test-CMD.sh
+            . $cTest/test.inc
+		fComSetup
+            . $cBin/gitproj-CMD.inc
+                . $cBin/gitproj-com.inc
+		    fComSetGlobals
+		. fSetGlobals
+	    fComRunTests
+                . $cTest/shunit2.1*
 
-## prod-test Environment
-
-    cTest=/usr/share/doc/gitproj/test
-    cTestEnv=~/test-gitproj.tmp
-    HOME=$cTestEnv/root/home/john
-
-Create with:
-
-    mkdir $cTestEnv
-    cd $cTestEnv
-    tar -xzf $cTest/test-env.tgz
-
-See dev-test Environment for more details
-    
 ## dev-test Environment
 
     cTest=DIR/gitproj/doc/test
@@ -252,43 +219,43 @@ Creates:
     |   |   |test-files.txt - this outline
     |   |   |root/
             |   |mnt/
-            |   |   |disk-2/
-            |   |   |usb-misc/
-            |   |   |   |files-2021-08-12/
-            |   |   |usb-video/
+            |   |   |disk-2/ - $cDatMount1
+            |   |   |usb-misc/ - $cDatMount2
+            |   |   |   |files-2021-08-12/ 
+            |   |   |usb-video/ - $cDatMount3
             |   |   |   |video-2020-04-02/
             |   |home/
             |   |   |john/ - $HOME
             |   |   |   |project/
-            |   |   |   |   |beach/
+            |   |   |   |   |beach/ - $cDatProj3
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |file1.txt
             |   |   |   |   |   |   |file2.txt
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |file.txt
             |   |   |   |   |   |.git/
-            |   |   |   |   |george/
+            |   |   |   |   |george/ - $cDatProj1
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |george.kdenlive
             |   |   |   |   |   |src/
             |   |   |   |   |   |   |final/
-            |   |   |   |   |   |   |   |george.mp4
+            |   |   |   |   |   |   |   |george.mp4 - $cDatProj1Big
             |   |   |   |   |   |   |raw/
-            |   |   |   |   |   |   |   |MOV001.MP3
-            |   |   |   |   |   |   |   |MOV001.mp4
+            |   |   |   |   |   |   |   |MOV001.MP3 - $cDatProj1Big
+            |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj1Big
             |   |   |   |   |   |.gitignore
             |   |   |   |   |   |README.html
-            |   |   |   |   |paulb/
+            |   |   |   |   |paulb/ - $cDatProj2
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |paulb.kdenlive
             |   |   |   |   |   |src/
             |   |   |   |   |   |   |final/
-            |   |   |   |   |   |   |   |paulb.mp4
+            |   |   |   |   |   |   |   |paulb.mp4 - $cDatProj2Big
             |   |   |   |   |   |   |raw/
-            |   |   |   |   |   |   |   |MOV001.MP3
-            |   |   |   |   |   |   |   |MOV001.mp4
+            |   |   |   |   |   |   |   |MOV001.MP3 - $cDatProj2Big
+            |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj2Big
             |   |   |   |   |   |README.html

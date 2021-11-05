@@ -1,3 +1,5 @@
+# gitproj.config.global
+
 # git init local, will copy this file to ~/.gitproj.config
 # Then put this in ~/.gitconfig
 #    [include]
