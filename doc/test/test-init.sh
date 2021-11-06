@@ -111,7 +111,7 @@ setUp()
     # Restore default global values, before each test
     unset cBin cCurDir cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
     fTestSetupEnv
-    fCreateTestEnv
+    fTestCreateEnv
     gpUnitDebug=0
     return 0
 
@@ -130,7 +130,7 @@ EOF
 tearDown()
 {
     if [ $gpDebug -ne 0 ]; then
-        fRmTestEnv
+        fTestRmEnv
     fi
     gpUnitDebug=0
     return 0
@@ -224,8 +224,8 @@ gpTest="$*"
 
 # -----
 . $cTest/test.inc
-fCreateTestEnv
+fTestCreateEnv
 . $cBin/gitproj-init.inc
-fSetupTestConfig
+fTestConfigSetup
 
 fTestRun $gpTest

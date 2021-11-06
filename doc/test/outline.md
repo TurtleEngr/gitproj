@@ -230,10 +230,10 @@ called by a user.
 		fTestSetupEnv
             	. $cBin/gitproj-com.inc
 		    fComSetGlobals
-	    fCreateTestEnv
+	    fTestCreateEnv
             . $cBin/gitproj-CMD.inc
 	        fCMDSetGlobals
-	    fSetupTestConfig
+	    fTestConfigSetup
 
 ## dev-test Environment
 

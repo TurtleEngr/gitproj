@@ -87,17 +87,17 @@ fTestSetupEnv()
 } # fTestSetupEnv
 
 # --------------------------------
-fRmTestEnv()
+fTestRmEnv()
 {
     if [ -d $cTestDestDir/test ]; then
         find $cTestDestDir/test -type l -exec rm {} \;
         rm -rf $cTestDestDir/test
     fi
     return 0
-} # fRmTestEnv
+} # fTestRmEnv
 
 # --------------------------------
-fSetupTestConfig()
+fTestConfigSetup()
 {
     local tInclude
     local tTopDir
@@ -112,12 +112,12 @@ fSetupTestConfig()
     fi
 
     return 0
-} # fSetupTestConfig
+} # fTestConfigSetup
 
 # --------------------------------
-fCreateTestEnv()
+fTestCreateEnv()
 {
-    fRmTestEnv
+    fTestRmEnv
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $cTestFiles
 
@@ -126,7 +126,7 @@ fCreateTestEnv()
     HOME=$PWD
     cd - >/dev/null 2>&1
     return 0
-} # fCreateTestEnv
+} # fTestCreateEnv
 
 # ========================================
 fTestSetupEnv
