@@ -56,10 +56,10 @@ fValidLocalPath()
 {
     local pLocalPath=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -d $pLocalPath ]; then
-       fLog -p Err -m "Project directory not found: $pLocalPath" -l $tFile:$LINENO
+       fLog -p Err -m "Project directory not found: $pLocalPath" -l $tSrc:$LINENO
        return 1
     fi
 
@@ -73,12 +73,12 @@ fGetLocalPath()
 {
     local pLocalPath=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
         if ! fValidLocalPath $pLocalPath; then
-            fError -m "Invalid -l pLocalPath: $pLocalPath" -l $tFile:$LINENO
+            fError -m "Invalid -l pLocalPath: $pLocalPath" -l $tSrc:$LINENO
         fi
         return 0
     fi
@@ -89,7 +89,7 @@ for the name of the project. Default: current directory
 EOF
         read -p "Project Path (-l) [$pLocalPath/quit]? " tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tFile:$LINENO
+            fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -107,15 +107,15 @@ fValidRawLocalPath()
 {
     local pRawLocalPath=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
 
     if [ "${pRawLocalPath#../}" = "$pRawLocalPath" ]; then
-        fLog -p warning -m "RawLocalPath works best if it is relative to LocalPath" -l $tFile:$LINENO
+        fLog -p warning -m "RawLocalPath works best if it is relative to LocalPath" -l $tSrc:$LINENO
     fi
 
     cd $gpLocalPath >/dev/null 2>&1
     if [ ! -d $pRawLocalPath ]; then
-        fLog -p err -m "Raw directory not found: $pRawLocalPath" -l $tFile:$LINENO
+        fLog -p err -m "Raw directory not found: $pRawLocalPath" -l $tSrc:$LINENO
         cd $cCurDir >/dev/null 2>&1
         return 1
     fi
@@ -123,7 +123,7 @@ fValidRawLocalPath()
     cd $pRawLocalPath >/dev/null 2>&1
     echo $PWD | grep -q "/$gpProjName/"
     if [ $? -ne 0 ]; then
-        fLog -p err -m "Raw directory cannot be in $gpLocalPath" -l $tFile:$LINENO
+        fLog -p err -m "Raw directory cannot be in $gpLocalPath" -l $tSrc:$LINENO
     fi
 
     gpRawLocalPath=$pRawLocalPath
@@ -138,12 +138,12 @@ fGetRawLocalPath()
 {
     local pRawLocalPath=$1
     
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     local tResult
 
     if [ $gpAuto -ne 0 ]; then
         if ! fValidRawLocalPath $pRawLocalPath; then
-            fError -m "Invalid -l pRawLocalPath: $pRawLocalPath" -l $tFile:$LINENO
+            fError -m "Invalid -l pRawLocalPath: $pRawLocalPath" -l $tSrc:$LINENO
         fi
         return 0
     fi
@@ -158,7 +158,7 @@ NOT be versioned--only the latest copy will be saved. Default: ../Name.raw
 EOF
         read -p "Raw dir (-r) [../$gpProjName.raw | quit]? "
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tFile:$LINENO
+            fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -175,11 +175,11 @@ fValidSymLink()
 {
     local pSymLinkName=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalPath >/dev/null 2>&1
     if [ ! -e $pSymLinkName ]; then
-        fLog -p err -m "Symlink: $pSymLinkName already exists. Pick another name or quit and remove it." -l $tFile:$LINENO
+        fLog -p err -m "Symlink: $pSymLinkName already exists. Pick another name or quit and remove it." -l $tSrc:$LINENO
         cd $cCurDir >/dev/null 2>&1
         return 1
     fi
@@ -193,12 +193,12 @@ fGetSymLink()
 {
     local pSymLinkName=$1
     
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     local tResult
 
     if [ $gpAuto -ne 0 ]; then
         if ! fValidSymLink $pSymLinkName; then
-            fError -m "Invalid -k pSymLinkName: $pSymLinkName" -l $tFile:$LINENO
+            fError -m "Invalid -k pSymLinkName: $pSymLinkName" -l $tSrc:$LINENO
         fi
         return 0
     fi
@@ -213,7 +213,7 @@ this dir and the symlinks will be versioned.
 EOF
         read -p "Symlink (-k) [$pSymLinkName/quit]? " tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tFile:$LINENO
+            fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -231,14 +231,14 @@ fValidSize()
 {
     local pMaxSize=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
 
     echo $pMaxSize | grep -q '[0-9]+[bkmg]'
     if [ $? -eq 0 ]; then
         gpMaxSize=$pMaxSize
         return 0
     fi
-    fLog -p err -m "Size must be numbers followed by b, k, m, or g]" -l $tFile:$LINENO
+    fLog -p err -m "Size must be numbers followed by b, k, m, or g]" -l $tSrc:$LINENO
     return 1
 } # fValidSize
 
@@ -246,12 +246,12 @@ fGetSize()
 {
     local pMaxSize=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
         if ! fValidSize $pMaxSize; then
-            fError -m "Invalid -s pSize: $pMaxSize" -l $tFile:$LINENO
+            fError -m "Invalid -s pSize: $pMaxSize" -l $tSrc:$LINENO
         fi
         return 0
     fi
@@ -262,7 +262,7 @@ Define the "size" for large binary files. Format: Nb, Nk, Nm, or Ng
 EOF
         read -p "Size (-s) [$pSize/quit]? " tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tFile:$LINENO
+            fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -303,14 +303,14 @@ EOF
 # --------------------
 fGetMoveFiles()
 {
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
 
     if [ $gpAuto -ne 0 ]; then
         return 0
     fi
 
     if ! fGetBinaryFiles; then
-        fLog -m 'No "large" binary files were found.' -l $tFile:$LINENO
+        fLog -m 'No "large" binary files were found.' -l $tSrc:$LINENO
         return 0
     fi
 
@@ -325,7 +325,7 @@ EOF
         read -p "Move the files (-m) [y/n/quit]? " tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ $tResult = "q" ]; then
-            fLog -m "Quitting" -l $tFile:$LINENO
+            fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ $tResult = "y" ]; then
@@ -343,7 +343,7 @@ EOF
 # --------------------
 fGetGetFlow()
 {
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
     local tGitFlowInstalled
 
@@ -351,7 +351,7 @@ fGetGetFlow()
     tGitFlowInstalled=$?
 
     if [ $tGitFlowInstalled -ne 0 ] [ $tGitFlowInstalled -ne 0 ]; then
-        fLog -p warning -m "git-flow is not installed." -l $tFile:$LINENO
+        fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
         gpGitFlow=0
     fi
     if [ $gpAuto -ne 0 ]; then
@@ -362,7 +362,7 @@ fGetGetFlow()
         read -p "Setup git-flow (-f) [y/n/quit]? " tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tFile:$LINENO
+            fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ "$tResult" = "y" ]; then
@@ -387,7 +387,7 @@ fMkGitDir()
             read -p "Continue with creating a local git repo [y/n/quit]? " tResult
             tResult=${tResult%${tResult#[a-z]}}
             if [ $tResult = "q" ]; then
-                fLog -m "Quitting" -l $tFile:$LINENO
+                fLog -m "Quitting" -l $tSrc:$LINENO
                 exit 1
             fi
             if [ $tResult = "y" ]; then
@@ -475,17 +475,17 @@ fCheckPath()
 {
     local pPath=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     local tName=${PWD##*/}
 
     if [ ! -d $pPath ]; then
-        fError -m "Could not find: $pPath" -l $tFile:$LINENO
+        fError -m "Could not find: $pPath" -l $tSrc:$LINENO
     fi
     if [ ! -w $pPath ]; then
-        fError -m "$pPath is not writable for you." -l $tFile:$LINENO
+        fError -m "$pPath is not writable for you." -l $tSrc:$LINENO
     fi
     if [ -e $pPath/$tName.git ]; then
-        fError -m "$pPath/$tName.git already exists." -l $tFile:$LINENO
+        fError -m "$pPath/$tName.git already exists." -l $tSrc:$LINENO
     fi
 } # fCheckPath
 
@@ -493,7 +493,7 @@ fCheckSpace()
 {
     local pPath=$1
 
-    local tFile=${BASH_SOURCE##*/}
+    local tSrc=${BASH_SOURCE##*/}
     local tAvail
     local tGitSize
     local tRawSize
@@ -511,7 +511,7 @@ fCheckSpace()
     let tDesiredSize=tGitSize+tRawSize
 
     if [ $tDesiredSize -gt $tAvail ]; then
-        fError -m "There is not enough space at $pPath. $pPath has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tFile:$LINENO
+        fError -m "There is not enough space at $pPath. $pPath has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
     fi
 } # fCheckSpace
 
@@ -557,5 +557,5 @@ fCreateRemoteGit()
 } # fCreateRemoteGit
 
 # ========================================
-tFile=${BASH_SOURCE##*/}
+export tSrc=${BASH_SOURCE##*/}
 fInitSetGlobals

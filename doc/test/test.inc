@@ -121,6 +121,7 @@ fSetupTestConfig()
 
     tTopDir=${cTest%/*/*}
     sed -i "s;GIT_DIR;$tTopDir;g" $HOME/.gitproj.test.config
+    echo "TBD: why??? make these relatave to topdir"
 
     return 0
 } # fSetupTestConfig

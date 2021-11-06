@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export cName cBin cCurDiir cVer
+
 fUsage()
 {
     # Quick help, run this:
@@ -31,7 +33,7 @@ fUsage()
 	-f $cBin/gitproj-com.test \
     "
     tIntFileList="$(echo $tIntFileList)"
-    
+
     case $pStyle in
         short | usage | man)
             fComUsage -s $pStyle -f $cBin/$cName
@@ -52,7 +54,7 @@ fUsage()
             fComUsage -i -s md $tIntFileList
             ;;
         *)
-            fComUsage -s short -f $cCurDir/$cName
+            fComUsage -s usage -f $cBin/$cName
             ;;
     esac
     exit 1
@@ -325,10 +327,13 @@ $Revision: 1.0 $
 
 =cut
 EOF
-}
+} # fUsage
 
 # ====================
 # Main
+
+cName=${BASH_SOURCE##*/}
+export tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -340,20 +345,19 @@ if [ -z "$cCurDir" ]; then
 fi
 
 # -------------------
-    # Define the location of the com script if not already set
-    if [ -z "$cBin" ]; then
-        cBin=${0%/*}
-        if [ "$cBin" = "." ]; then
-            cBin=$PWD
-        fi
-        cd $cBin >/dev/null 2>&1
+# Define the location of the com script if not already set
+if [ -z "$cBin" ]; then
+    cBin=${0%/*}
+    if [ "$cBin" = "." ]; then
         cBin=$PWD
-        cd - >/dev/null 2>&1
     fi
+    cd $cBin >/dev/null 2>&1
+    cBin=$PWD
+    cd - >/dev/null 2>&1
+fi
 
 # -----
 . $cBin/gitproj-com.inc
-cName=git-proj
 
 # shellcheck disable=SC2016
 cVer='$Revision: 1.49 $'
@@ -368,7 +372,7 @@ fi
 # -------------------
 # Get Args Section
 if [ $# -eq 0 ]; then
-    fError -m "Missing options." -l $LINENO
+    fError -m "Missing options." -l $tSrc:$LINENO
 fi
 while getopts :hH:lx tArg; do
     case $tArg in
@@ -378,13 +382,13 @@ while getopts :hH:lx tArg; do
         l) gpLog=1 ;;
         x) let gpDebug=gpDebug+1 ;;
         # Problem arguments
-        :) fError -m "Value required for option: $OPTARG" -l $LINENO ;;
-        \?) fError -m "Unknown option: $OPTARG" -l $LINENO ;;
+        :) fError -m "Value required for option: $OPTARG" -l $tSrc:$LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
     esac
 done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
-    fError -m "Unexpected option: $*" -l $LINENO
+    fError -m "Unexpected option: $*" -l $tSrc:$LINENO
 fi
 
 exit 0

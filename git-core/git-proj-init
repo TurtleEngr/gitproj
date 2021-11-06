@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export cName cBin cCurDiir cVer
+
 #--------------------
 fUsage()
 {
@@ -208,9 +210,8 @@ EOF
 # ========================================
 # Main
 
-export cBin cCurDir cName
-
-cName=git-proj-init
+cName=${BASH_SOURCE##*/}
+export tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -234,7 +235,7 @@ cd $cCurDir
 # Calls: fComSetGlobals
 
 if [ $# -eq 0 ]; then
-    fError -m "Missing options." -l $LINENO
+    fError -m "Missing options." -l $tSrc:$LINENO
 fi
 
 . $cBin/gitproj-init.inc
@@ -267,12 +268,12 @@ while getopts :al:r:k:s:mfhH:x tArg; do
 done
 shift $((OPTIND - 1))
 if [ $# -ne 1 ]; then
-    fError -m "local or remote needs to be specified." -l $LINENO
+    fError -m "local or remote needs to be specified." -l $tSrc:$LINENO
 fi
 case $1 in
     local) gpAction="fCreateLocalGit" ;;
     remote) gpAction="fCreateRemoteGit" ;;
-    *) fError -m "Invalid option: $1. Expeced 'local' or 'remote'." -l $LINENO ;;
+    *) fError -m "Invalid option: $1. Expeced 'local' or 'remote'." -l $tSrc:$LINENO ;;
 esac
 
 $gpAction
