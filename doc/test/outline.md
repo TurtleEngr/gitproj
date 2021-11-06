@@ -219,7 +219,7 @@ called by a user.
 
         $cTest/test-com.sh*
             . $cTest/test.inc
-		fComSetupTestEnv
+		fTestSetupEnv
             	. $cBin/gitproj-com.inc
 		    fComSetGlobals
 	    fComRunTests
@@ -227,7 +227,7 @@ called by a user.
 
         $cTest/test-CMD.sh
             . $cTest/test.inc
-		fComSetupTestEnv
+		fTestSetupEnv
             	. $cBin/gitproj-com.inc
 		    fComSetGlobals
 	    fCreateTestEnv

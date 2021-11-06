@@ -69,7 +69,7 @@ EOF
 # ========================================
 
 # --------------------------------
-oneTimeSetUp()
+NAoneTimeSetUp()
 {
     return 0
 
@@ -98,7 +98,7 @@ Calls:
 EOF
 } # oneTimeSetUp
 
-oneTimeTearDown()
+NAoneTimeTearDown()
 {
     if [ -n "$cHome" ]; then
         HOME=$cHome
@@ -110,7 +110,7 @@ setUp()
 {
     # Restore default global values, before each test
     unset cBin cCurDir cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
-    fComSetupTestEnv
+    fTestSetupEnv
     fCreateTestEnv
     gpUnitDebug=0
     return 0
@@ -166,7 +166,7 @@ testGitProjInit()
 
 # ====================
 # This should be the last defined function
-fComRunTests()
+fTestRun()
 {
     if [ ! -x $cTest/shunit2.1 ]; then
         echo "Error: Missing: $cTest/shunit2.1"
@@ -186,13 +186,13 @@ fComRunTests()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head3 fComRunTests
+=internal-head3 fTestRun
 
 Run unit tests for the common functions.
 
 =internal-cut
 EOF
-} # fComRunTests
+} # fTestRun
 
 # ====================
 # Main
@@ -228,4 +228,4 @@ fCreateTestEnv
 . $cBin/gitproj-init.inc
 fSetupTestConfig
 
-fComRunTests $gpTest
+fTestRun $gpTest

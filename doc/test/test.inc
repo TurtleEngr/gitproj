@@ -35,10 +35,10 @@ EOF
 }
 
 # --------------------------------
-fComUDebug()
+fTestDebug()
 {
     if [ ${gpUnitDebug:-0} -ne 0 ]; then
-        echo "fComUDebug: $*" 1>&2
+        echo "fTestDebug: $*" 1>&2
     fi
     return 0
     cat <<EOF
@@ -46,10 +46,10 @@ fComUDebug()
 =internal-head2 Com Unit Test Functions
 
 EOF
-} # fComUDebug
+} # fTestDebug
 
 # --------------------------------
-fComSetupTestEnv()
+fTestSetupEnv()
 {
     cBin=$cTest/../../git-core
     cd $cBin >/dev/null 2>&1
@@ -84,7 +84,7 @@ fComSetupTestEnv()
     cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
 
     return
-} # fComSetupTestEnv
+} # fTestSetupEnv
 
 # --------------------------------
 fRmTestEnv()
@@ -129,4 +129,4 @@ fCreateTestEnv()
 } # fCreateTestEnv
 
 # ========================================
-fComSetupTestEnv
+fTestSetupEnv

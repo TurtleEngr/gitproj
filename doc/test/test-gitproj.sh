@@ -110,7 +110,7 @@ setUp()
 {
     # Restore default global values, before each test
     unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
-    fComSetupTestEnv
+    fTestSetupEnv
     gpUnitDebug=0
     return 0
 
@@ -159,7 +159,7 @@ testGitProj()
 
 # ====================
 # This should be the last defined function
-fComRunTests()
+fTestRun()
 {
     if [ ! -x $cTest/shunit2.1 ]; then
         echo "Error: Missing: $cTest/shunit2.1"
@@ -179,13 +179,13 @@ fComRunTests()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head3 fComRunTests
+=internal-head3 fTestRun
 
 Run unit tests for the common functions.
 
 =internal-cut
 EOF
-} # fComRunTests
+} # fTestRun
 
 # ====================
 # Main
@@ -216,4 +216,4 @@ gpTest="$*"
 # -----
 . $cTest/test.inc
 
-fComRunTests $gpTest
+fTestRun $gpTest

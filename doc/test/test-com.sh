@@ -110,7 +110,7 @@ setUp()
 {
     # Restore default global values, before each test
     unset cBin cCurDir cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
-    fComSetupTestEnv
+    fTestSetupEnv
     gpUnitDebug=0
     return 0
 
@@ -150,19 +150,19 @@ testSetup()
     assertTrue "$LINENO" "[ -r $HOME/.gitproj-test.config ]"
 
     for i in $cDatMount1 $cDatMount2 $cDatMount3; do
-        fComUDebug "i=$i"
+        fTestDebug "i=$i"
         assertTrue "$LINENO ${i##*/}" "[ -d $i ]"
     done
     for i in $cDatProj1 $cDatProj2; do
-        fComUDebug "i=$i"
+        fTestDebug "i=$i"
         assertTrue "$LINENO ${i}" "[ -d $HOME/$i ]"
     done
     for i in $cDatProj1Big; do
-        fComUDebug "i=$i"
+        fTestDebug "i=$i"
         assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj1/$i ]"
     done
     for i in $cDatProj2Big $cDatProj2Big; do
-        fComUDebug "i=$i"
+        fTestDebug "i=$i"
         assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj2/$i ]"
     done
 }
@@ -228,10 +228,10 @@ testComLog_MultiplePermutations()
                 for tLevel in alert crit err warning notice info debug debug-1 debug-3; do
                     echo -n '.' 1>&2
                     tTestMsg="l-$gpLog.v-$gpVerbose.d-$gpDebug.$tLevel.fLog"
-                    fComUDebug " "
-                    fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\" -l $tLine -e $tErr"
+                    fTestDebug " "
+                    fTestDebug "Call: fLog -p $tLevel -m \"$tMsg\" -l $tLine -e $tErr"
                     tResult=$(fLog -p $tLevel -m "$tMsg" -l $tLine -e $tErr 2>&1)
-                    fComUDebug "tResult=$tResult"
+                    fTestDebug "tResult=$tResult"
 
                     if [ $gpVerbose -eq 0 ] && echo $tLevel | grep -Eq 'notice|info'; then
                         assertNull "$LINENO tcl1-$tTestMsg not notice,info" "$tResult"
@@ -300,13 +300,13 @@ testComSysLog()
     for tLevel in alert crit err warning; do
         echo -n '.' 1>&2
         tTestMsg="$tLevel.fLog"
-        fComUDebug " "
-        fComUDebug "Call: fLog -p $tLevel -m \"$tMsg\""
+        fTestDebug " "
+        fTestDebug "Call: fLog -p $tLevel -m \"$tMsg\""
         tResult=$(fLog -p $tLevel -m "$tMsg" 2>&1)
-        fComUDebug "tResult=$tResult"
+        fTestDebug "tResult=$tResult"
         assertContains "$LINENO tcl11-$tTestMsg" "$tResult" "$tLevel:"
         tResult=$(tail -n1 $tSyslog)
-        fComUDebug "syslog tResult=$tResult"
+        fTestDebug "syslog tResult=$tResult"
         assertContains "$LINENO tcl12-$tTestMsg" "$tResult" "$tLevel:"
         assertContains "$LINENO tcl13-$tTestMsg" "$tResult" "$tMsg"
     done
@@ -343,10 +343,10 @@ testComErrorLog()
     for gpLog in 0 1; do
         echo -n '.' 1>&2
         tTestMsg="l-$gpLog.fError"
-        fComUDebug " "
-        fComUDebug "Call: fError -m \"$tMsg\" -l $tSrc:$tLine"
+        fTestDebug " "
+        fTestDebug "Call: fError -m \"$tMsg\" -l $tSrc:$tLine"
         tResult=$(fError -m "$tMsg" -l $tSrc:$tLine 2>&1)
-        fComUDebug "tResult=$tResult"
+        fTestDebug "tResult=$tResult"
         assertContains "$LINENO $tTestMsg.name" "$tResult" "$cName"
         assertContains "$LINENO $tTestMsg.crit" "$tResult" "crit:"
         assertContains "$LINENO $tTestMsg.msg" "$tResult" "$tMsg"
@@ -380,18 +380,18 @@ testComUsage()
 
     #-----
     tResult=$(fComUsage -s usage -f $tUsageScript 2>&1)
-    fComUDebug "tResult=$tResult"
+    fTestDebug "tResult=$tResult"
     assertContains "$LINENO tcu-short" "$tResult" "Usage"
 
     #-----
     tResult=$(fComUsage -s foo -f $tUsageScript 2>&1)
-    fComUDebug "tResult=$tResult"
+    fTestDebug "tResult=$tResult"
     assertContains "$LINENO tcu-s-foo.1" "$tResult" "DESCRIPTION"
     assertContains "$LINENO tcu-s-foo.2" "$tResult" "HISTORY"
 
     #-----
     tResult=$(fComUsage -f $tUsageScript -s 2>&1)
-    fComUDebug "tResult=$tResult"
+    fTestDebug "tResult=$tResult"
     assertContains "$LINENO tcu-s-null.1" "$tResult" "crit: Internal: fComUsage: Value required"
 
     #-----
@@ -417,13 +417,13 @@ testComUsage()
 
     #-----
     tResult=$(fComUsage -i -s long -f $tUsageScript -f $tInternalScript 2>&1)
-    fComUDebug "tResult=$tResult"
+    fTestDebug "tResult=$tResult"
     assertContains "$LINENO tcu-internal.1" "$tResult" 'Template Use'
     assertContains "$LINENO tcu-internal.2" "$tResult" 'fComSetGlobals'
 
     #-----
     tResult=$(fComUsage -i -s html -t "Internal Doc" -f $tUsageScript -f $tInternalScript 2>&1)
-    fComUDebug "tResult=$tResult"
+    fTestDebug "tResult=$tResult"
     assertContains "$LINENO tcu-int-html.1" "$tResult" '<a href="#Template-Use">Template Use</a>'
     assertContains "$LINENO tcu-int-html.2" "$tResult" '<h3 id="fComSetGlobals">fComSetGlobals</h3>'
     assertContains "$LINENO tcu-int-html.3" "$tResult" '<title>Internal Doc</title>'
@@ -549,7 +549,7 @@ testComUnsetConfigGlobal()
 
 # ====================
 # This should be the last defined function
-fComRunTests()
+fTestRun()
 {
     if [ ! -x $cTest/shunit2.1 ]; then
         echo "Error: Missing: $cTest/shunit2.1"
@@ -569,13 +569,13 @@ fComRunTests()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head3 fComRunTests
+=internal-head3 fTestRun
 
 Run unit tests for the common functions.
 
 =internal-cut
 EOF
-} # fComRunTests
+} # fTestRun
 
 # ====================
 # Main
@@ -608,4 +608,4 @@ gpTest="$*"
 # -----
 . $cTest/test.inc
 
-fComRunTests $gpTest
+fTestRun $gpTest
