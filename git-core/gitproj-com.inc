@@ -168,7 +168,8 @@ fComSetGlobals()
     # Included in ~/.gitproj.config (use -G to set config vars to this)
     # shellcheck disable=SC2088
     cConfigGlobal='~/.gitproj.config.global'
-    # In $cGetTopDir (use -L to set config vars to this)
+    # This is put in cTop, project dir. Use -L to set config vars to this)
+    # shellcheck disable=SC2088
     cConfigLocal='.gitproj.config.local'
 
     # Use:
@@ -579,7 +580,7 @@ EOF
 fError()
 {
     local pMsg="Error"
-    local pLine="."
+    local pLine=""
     local pErr=1
     local pInt=0
 

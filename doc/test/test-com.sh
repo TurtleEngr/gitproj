@@ -109,7 +109,7 @@ oneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
+    unset cBin cCurDir cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
     fComSetupTestEnv
     gpUnitDebug=0
     return 0
@@ -128,7 +128,7 @@ EOF
 
 tearDown()
 {
-    git config --global --remove-section gitproj.test &>/dev/null
+    git config --global --remove-section gitproj.testit &>/dev/null
     gpUnitDebug=0
     return 0
 } # tearDown
@@ -176,8 +176,6 @@ testComInitialConfig()
     assertTrue "$LINENO -d $cCurDir" "[ -d $cCurDir ]"
     assertNotNull "$LINENO $cBin" "$cBin"
     assertTrue "$LINENO -d $cBin" "[ -d $cBin ]"
-    assertTrue "$LINENO -f $cBin/$cName" "[ -f $cBin/$cName ]"
-    assertTrue "$LINENO -x $cBin/$cName" "[ -x $cBin/$cName ]"
     assertTrue "$LINENO -x $cBin/gitproj-com.inc" "[ -x $cBin/gitproj-com.inc ]"
 
     assertEquals "$LINENO" "0" "$gpDebug"
@@ -329,6 +327,7 @@ EOF
 # --------------------------------
 testComErrorLog()
 {
+    local tSrc=${BASH_SOURCE##*/}
     local tMsg
     local tLevel
     local tLine
@@ -345,13 +344,13 @@ testComErrorLog()
         echo -n '.' 1>&2
         tTestMsg="l-$gpLog.fError"
         fComUDebug " "
-        fComUDebug "Call: fError -m \"$tMsg\" -l $tLine"
-        tResult=$(fError -m "$tMsg" -l $tLine 2>&1)
+        fComUDebug "Call: fError -m \"$tMsg\" -l $tSrc:$tLine"
+        tResult=$(fError -m "$tMsg" -l $tSrc:$tLine 2>&1)
         fComUDebug "tResult=$tResult"
         assertContains "$LINENO $tTestMsg.name" "$tResult" "$cName"
         assertContains "$LINENO $tTestMsg.crit" "$tResult" "crit:"
         assertContains "$LINENO $tTestMsg.msg" "$tResult" "$tMsg"
-        assertContains "$LINENO $tTestMsg.line" "$tResult" '['$tLine']'
+        assertContains "$LINENO $tTestMsg.line" "$tResult" '['$tSrc:$tLine']'
         assertContains "$LINENO $tTestMsg.err" "$tResult" '(1)'
         assertContains "$LINENO $tTestMsg.usage" "$tResult" "Usage"
         assertNotContains "$LINENO" "$tResult" "Internal:"
@@ -492,7 +491,7 @@ testComSetConfigGlobal()
     # Note: more complete "git config" is done when a test env is setup.
 
     grep -q '\[gitproj "testit"\]' $tGlobal
-    assertFalse "$LINENO tearDown ran" "[ $? -eq 0 ]"
+    assertFalse "$LINENO did tearDown run?" "[ $? -eq 0 ]"
 
     fComSetConfig -g -k gitproj.testit.test-str -v "test a string"
     assertTrue "$LINENO -g" "[ -r $tGlobal ]"
@@ -581,7 +580,9 @@ EOF
 # ====================
 # Main
 
-export cTest cTestCurDir gpTest
+export cTest cTestCurDir gpTest cName
+
+cName=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir

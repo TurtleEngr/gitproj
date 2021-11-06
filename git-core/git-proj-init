@@ -239,7 +239,7 @@ if [ $# -eq 0 ]; then
 fi
 
 . $cBin/gitproj-init.inc
-# Calls: fSetInitGlobals
+# Calls: fInitSetGlobals
 
 while getopts :al:r:k:s:mfhH:x tArg; do
     case $tArg in

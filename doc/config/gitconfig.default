@@ -1,4 +1,4 @@
-# gitconfig.test
+# ~/.gitconfig.default
 
 [core]
 	filemode = true

@@ -6,7 +6,7 @@
 export PWD cBin cCurDir cName cPID cVer cHome
 export gErr gpDebug gpFacility gpLog gpVerbose
 export cDoc cTest cRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
-export cTestCurDir cTestSrcDir cTestDestDir cTestFiles cTestConfig
+export cTestCurDir cTestSrcDir cTestDestDir cTestFiles
 export gpTest gpUnitDebugSHUNIT_COLOR
 
 # Relative to $HOME
@@ -58,7 +58,6 @@ fComSetupTestEnv()
 
     cDoc=${cTest%/test}
 
-    cName=gitproj-com.inc
     . $cBin/gitproj-com.inc
 
     cTestSrcDir=$cTest
@@ -67,8 +66,6 @@ fComSetupTestEnv()
         echo "Error: Cannot find: $cTestFiles. [test.inc:$LINENO]"
         exit 1
     fi
-
-    cTestConfig=$cDoc/config/gitproj.config.test
 
     cTestDestDir=$cTest/../../..
     cd $cTestDestDir >/dev/null 2>&1
@@ -106,22 +103,13 @@ fSetupTestConfig()
     local tTopDir
 
     if [ ! -d $cDatHome ]; then
-        echo "Error: Test env is not seetup. Missing $cDatHome [test.inc:$LINENO]"
+        echo "Error: Test env is not setup. Missing $cDatHome [test.inc:$LINENO]"
         exit 1
     fi
     if [ "$HOME" != "$cDatHome" ]; then
 	echo "Error: Test home is not setup. $cDatHome [test.inc:$LINENO]"
-	exit 1"
+	exit 1
     fi
-    cp $cTestConfig $HOME/.gitproj.config.test
-    tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.test)
-    if [ -z "$tInclude" ]; then
-        fComSetConfig -a -g -k "include.path" -v .gitproj.test.config
-    fi
-
-    tTopDir=${cTest%/*/*}
-    sed -i "s;GIT_DIR;$tTopDir;g" $HOME/.gitproj.test.config
-    echo "TBD: why??? make these relatave to topdir"
 
     return 0
 } # fSetupTestConfig

@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # --------------------
-export gpAuto gpLocalPath gpRawLocalPath gpSymLinkName gpMaxSize gpMove
-export gpGitFlow gpAction gpProjName
+export cExpectVer cRawDir gpAction gpAuto gpFacility gpGitFlow
+export gpLocalPath gpMaxSize gpMove gpProjName gpRawLocalPath gpSymLinkName
+export gpSysLog
 
 # --------------------
 fFirstTimeSet()
@@ -28,7 +29,7 @@ fInitSetGlobals()
 
     gpAuto=0
     gpLocalPath=$PWD
-    gpProjName=${gpLocalPath##*/}"
+    gpProjName="${gpLocalPath##*/}"
     cRawDir=$(fComGetConfig -k "gitproj.config.raw-dir")
     gpRawLocalPath=$cRawDir/${gpLocalPath##*/}
     gpSymLinkName=$(fComGetConfig -k "gitproj.config.raw-symlink")
@@ -37,6 +38,7 @@ fInitSetGlobals()
     gpGitFlow=0
     gpAction=""
 
+    return 0
 } # fInitSetGlobals
 
 # ========================================
@@ -64,7 +66,7 @@ fValidLocalPath()
     fi
 
     gpLocalPath=$pLocalPath
-    gpProjName=${gpLocalPath##*/}"
+    gpProjName="${gpLocalPath##*/}"
     echo "The project Name will be: $gpProjName"
     return 0
 } # fValidLocalPath
@@ -87,7 +89,7 @@ fGetLocalPath()
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 EOF
-        read -p "Project Path (-l) [$pLocalPath/quit]? " tResult
+        read -rp "Project Path (-l) [$pLocalPath/quit]? " tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
@@ -122,6 +124,7 @@ fValidRawLocalPath()
 
     cd $pRawLocalPath >/dev/null 2>&1
     echo $PWD | grep -q "/$gpProjName/"
+    # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
         fLog -p err -m "Raw directory cannot be in $gpLocalPath" -l $tSrc:$LINENO
     fi
@@ -156,7 +159,7 @@ path must be relative to the project dir (and not too far away or
 cloning the project may not work). The files in the raw directory will
 NOT be versioned--only the latest copy will be saved. Default: ../Name.raw
 EOF
-        read -p "Raw dir (-r) [../$gpProjName.raw | quit]? "
+        read -rp "Raw dir (-r) [../$gpProjName.raw | quit]? "
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
@@ -211,7 +214,7 @@ will need to be updated. Symlink in the git directories will point to
 this dir and the symlinks will be versioned.
 
 EOF
-        read -p "Symlink (-k) [$pSymLinkName/quit]? " tResult
+        read -rp "Symlink (-k) [$pSymLinkName/quit]? " tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
@@ -234,11 +237,12 @@ fValidSize()
     local tSrc=${BASH_SOURCE##*/}
 
     echo $pMaxSize | grep -q '[0-9]+[bkmg]'
+    # shellcheck disable=SC2181
     if [ $? -eq 0 ]; then
         gpMaxSize=$pMaxSize
         return 0
     fi
-    fLog -p err -m "Size must be numbers followed by b, k, m, or g]" -l $tSrc:$LINENO
+    fLog -p err -m "Size must be numbers followed by b, k, m, or g" -l $tSrc:$LINENO
     return 1
 } # fValidSize
 
@@ -260,13 +264,13 @@ fGetSize()
         cat <<EOF | fmt
 Define the "size" for large binary files. Format: Nb, Nk, Nm, or Ng
 EOF
-        read -p "Size (-s) [$pSize/quit]? " tResult
+        read -rp "Size (-s) [$pMaxSize/quit]? " tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
-            tResult=$pSize
+            tResult=$pMaxSize
         fi
         if fValidSize $tResult; then
             break
@@ -281,18 +285,18 @@ fGetBinaryFiles()
     local tFileList=""
     local tSize
 
-    tSize=$(echo "$gpSize" | tr 'bBKmg' 'cckMG')
+    tSize=$(echo "$gpMaxSize" | tr 'bBKmg' 'cckMG')
 
-    for tFile in $(find $gpLocalPath -type f -size +$gpSize); do
+    for tFile in $(find $gpLocalPath -type f -size +$tSize); do
         if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
             tFileList="$tFileList, $tFile"
         fi
     done
     if [ -n "$tFileList" ]; then
         cat <<EOF | fmt
-These binary files are greater than $gpSize:
+These binary files are greater than $gpMaxSize:
 
-    ${tFileLIst#, }
+    ${tFileList#, }
 
 EOF
         return 0
@@ -322,7 +326,7 @@ directory. A symlink will replace the moved file. The symlink will
 point to [raw]
 
 EOF
-        read -p "Move the files (-m) [y/n/quit]? " tResult
+        read -rp "Move the files (-m) [y/n/quit]? " tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ $tResult = "q" ]; then
             fLog -m "Quitting" -l $tSrc:$LINENO
@@ -359,7 +363,7 @@ fGetGetFlow()
     fi
 
     while true; do
-        read -p "Setup git-flow (-f) [y/n/quit]? " tResult
+        read -rp "Setup git-flow (-f) [y/n/quit]? " tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ "$tResult" = "q" ]; then
             fLog -m "Quitting" -l $tSrc:$LINENO
@@ -384,7 +388,7 @@ fMkGitDir()
 
     if [ $gpAuto -eq 0 ]; then
         while true; do
-            read -p "Continue with creating a local git repo [y/n/quit]? " tResult
+            read -rp "Continue with creating a local git repo [y/n/quit]? " tResult
             tResult=${tResult%${tResult#[a-z]}}
             if [ $tResult = "q" ]; then
                 fLog -m "Quitting" -l $tSrc:$LINENO
@@ -414,7 +418,7 @@ tmp/
 EOF
     set -x >/dev/null 2>&1
     git init
-    git add .gitignore *
+    git add .gitignore ./*
     git commit -am "Initial commit"
     git branch --move master main
     git branch develop
@@ -461,7 +465,7 @@ fCreateLocalGit()
 fGetMountPath()
 {
     #$gpMountPath
-    fCheckPath $gpPath
+    fCheckPath $gpPath	# gpPath??? TBD
 } # fGetMountPath
 
 fGetRawRemotePath()
@@ -546,9 +550,9 @@ EOF
 # --------------------
 fCreateRemoteGit()
 {
-    fGetMountPath $gpMountPath
+    fGetMountPath $gpMountPath		# gpMountPath??? TBD
     #    	fCheckPath $gpPath
-    fGetRawRemotePath $gpRawRemotePath
+    fGetRawRemotePath $gpRawRemotePath	# gpRawRemotePath??? TBD
 
     fMustBeInGitRepo
     fCheckSpace $gpPath

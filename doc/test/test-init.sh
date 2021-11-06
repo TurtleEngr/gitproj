@@ -109,7 +109,7 @@ oneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
+    unset cBin cCurDir cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
     fComSetupTestEnv
     fCreateTestEnv
     gpUnitDebug=0
@@ -197,7 +197,9 @@ EOF
 # ====================
 # Main
 
-export cTest cTestCurDir gpTest
+export cTest cTestCurDir gpTest cName
+
+cName=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir

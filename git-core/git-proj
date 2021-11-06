@@ -173,8 +173,119 @@ See: fLog (Internal documentation)
 
 =back
 
+=head2 ~/.gitconfig
 
-=head2 Config
+Source: cDoc/config/gitconfig.default
+
+If this doesn't exist, git proj init will create it from "Source":
+
+This will be put in ~/.gitconfig
+
+    [include]
+        path = ~/.gitproj.config.global
+
+=head2 ~/.gitproj.config.global
+
+Source: cDoc/config/gitproj.config.global
+
+git proj init local, will create the initial ~/.gitproj.config.
+
+=head2 top-dir/.git/config
+
+This will be put in the initial the local .git/config file:
+
+    [include]
+        path = ../.gitproj.config.HOSTNAME
+
+Where HOSTNAME will be set to $HOSTNAME. This allows for different
+locations of fiile, based on the host. For example the remote-raw-url
+(mount point) could be very different between hosts.
+
+=head2 top-dir/.gitproj.config.$HOSTNAME
+
+Initial Source: cDoc/config/gitproj.config.HOSTNAME
+
+This will be created when git project repo is first created on a host.
+
+This will be put at the beginning of the config file, so that common
+project defaults can be defined. Then .gitproj.config.HOSTNAME can
+override variables. Any changed to the variables in
+.gitproj.config.local variables will be written to
+.gitproj.config.HOSTNAME
+
+=head2 top-dir/.gitproj.config.local
+
+Source: cDoc/config/gitproj.config.local
+
+Uncomment the variables that should override ~/.gitconfig or
+~/.gitproj.config.global. If the variables are host specific, then the
+variable should be put in the correspoinding .gitproj.config.$HOSTNAME
+file.
+
+	[gitproj "config"]
+		ver = 1.0
+		syslog = yes
+		facility = user
+
+		bin = /usr/lib/git-core
+		# bin = $(git --exec-path)
+
+		doc = /usr/share/doc/git-proj
+		test = /usr/share/doc/git-proj/test
+
+	 	# See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
+	
+		# States: not-setup, setup-err, config-err, OK
+		gitproj-status = not-set-up
+	
+		# origin-url with path and .git removed
+		name = TBD
+	
+		# This should only be changed on the matching host
+		# git rev-parse --show-toplevel
+		top-dir = TBD
+	
+			# If $t = $r, then set hardlink to yes
+		# t=$(df -BM top-dir --output=source | tail -n 1)
+		# r=$(df -BM raw-dir --output=source | tail -n 1)
+		hardlink = no
+	
+		# Set raw-url to only one of these values
+	
+		# Local mount examples
+		remote-raw-url = TBD
+		#remote.origin.url = /MOUNT-DIR/DIR/NAME.git
+
+		# Remote examples
+		#remove-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
+		#remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
+		#remote.origin-url=git@github.com:TurtleEngr/gitproj.git
+
+		# Set by init. Changing these will require manual repair.
+		# If no ~ or /, this is relative to top-dir, create:
+                #  dir/Name.raw
+		# This should NOT be in a git dir.
+		# Relative to top-dir
+		local-raw-dir = ..
+
+		# Relative to top-dir; cd top-dir; ln -s
+                # raw-dir/name.raw symlink
+		# This should be in a git dir.
+		# Relative to top-dir
+		local-raw-symlink = raw
+
+	[gitproj "hook"]
+		# If pre-commit-enabled = yes, pre-commit hook script will be
+		# installed into .git/hooks/
+		# Relative to cDoc
+		source = hooks/pre-commit
+		pre-commit-enabled = yes
+		check-file-names = yes
+		check-for-big-files = yes
+		# End size with b, k, m, or g
+		binary-file-size-limit = 1k
+
+=head2 Env. Var. Config
 
 These are globals that may affect how the script runs. Just about all
 of these globals that begin with "gp" can be set and exported before
