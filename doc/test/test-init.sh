@@ -22,7 +22,7 @@ test-com.inc - Common functions used in the test scripts
 
 =head1 SYNOPSIS
 
-    ./test.com.sh [all] [test,test,...]
+    ./test-init.sh [all] [test,test,...]
 
 =head1 DESCRIPTION
 
@@ -133,7 +133,8 @@ tearDown()
         fTestRmEnv
     fi
     gpUnitDebug=0
-    return 0
+    cd $cCurDir >/dev/null 2>&1
+ return 0
 } # tearDown
 
 # ========================================
@@ -151,18 +152,40 @@ testGitProjInit()
 
     # git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
 
-    cd $HOME/$cDatProj1
+    cd $HOME/$cDatProj1 >/dev/null 2>&1
     assertFalse "$LINENO" "[ -d .git ]"
-    tResult=$($cBin/git-proj-init -l $PWD)
-    assertTrue "$LINENO" "[ -d .git ]"
-
-    assertTrue "$LINENO" "[ -f .gitignore ]"
-
-    # check for git-flow settings
-    # git is already in project dir
-
-    # git-flow not installed
 } # testGitProjInit
+
+testFirstTimeSet()
+{
+    assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
+    assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+
+    fFirstTimeSet
+    assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
+    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+    grep path $HOME/.gitconfig
+    assertTrue "$LINENO" "[ $? -eq 0 ]"
+} # testFirstTimeSet
+
+testIniitSetGlobals()
+{
+    assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
+    cd $HOME/$cDatProj1
+
+    fInitSetGlobals
+    assertEquals "$LINENO" "1.1"  "$cExpectVer"
+    assertEquals "$LINENO" "yes"  "$gpSysLog"
+    assertEquals "$LINENO" "user" "$gpFacility"
+    assertEquals "$LINENO" "0" 	  "$gpAuto"
+    assertEquals "$LINENO" ".."   "$cRawDir"
+    assertEquals "$LINENO" "raw" "$gpSymLinkName"
+    assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
+    assertEquals "$LINENO" "${cRawDir}/${gpProjName}.raw" "$gpRawLocalPath"
+    assertEquals "$LINENO" "1k" "$gpMaxSize"
+    assertEquals "$LINENO" "0" 	"$gpGitFlow"
+    assertNull "$LINENO" "$gpAction"
+} # testIniitSetGlobals
 
 # ====================
 # This should be the last defined function
@@ -214,9 +237,9 @@ cTest=${0%/*}
 if [ "$cTesBin" = "." ]; then
     cTest=$PWD
 fi
-cd $cTest
+cd $cTest >/dev/null 2>&1
 cTest=$PWD
-cd $cTestCurDir
+cd - >/dev/null 2>&1
 
 # -----
 # Optional input: a comma separated list of test function names
@@ -226,6 +249,8 @@ gpTest="$*"
 . $cTest/test.inc
 fTestCreateEnv
 . $cBin/gitproj-init.inc
+
+# Look for serious setup errors
 fTestConfigSetup
 
 fTestRun $gpTest

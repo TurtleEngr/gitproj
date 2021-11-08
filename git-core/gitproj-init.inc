@@ -13,9 +13,9 @@ fFirstTimeSet()
     if [ ! -f $HOME/.gitproj.config.global ]; then
         cp $cDoc/config/gitproj.config.global $HOME/.gitproj.config.global
     fi
-    tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config)
+    tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
-    	fComSetConfig -a -g -k "include.path" -v .gitproj.config
+    	fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
     fi
 } # fFirstTimeSet
 
@@ -23,17 +23,37 @@ fFirstTimeSet()
 fInitSetGlobals()
 {
     fFirstTimeSet
-    cExpectVer=$(fComGetConfig -k "gitproj.config.ver")
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog")
-    gpFacility=$(fComGetConfig -k "gitproj.config.facility")
+    
+    # TBD set the default to the installed version
+    cExpectVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
+
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d 1)
+    gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
     gpAuto=0
-    gpLocalPath=$PWD
-    gpProjName="${gpLocalPath##*/}"
-    cRawDir=$(fComGetConfig -k "gitproj.config.raw-dir")
-    gpRawLocalPath=$cRawDir/${gpLocalPath##*/}
-    gpSymLinkName=$(fComGetConfig -k "gitproj.config.raw-symlink")
-    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit")
+
+    # Absolute or relative to top-dir
+    cRawDir=$(fComGetConfig -k "gitproj.config.local-raw-dir" -d "..")
+
+    gpSymLinkName=$(fComGetConfig -k "gitproj.config.local-raw-symlink" -d raw)
+
+    gpLocalPath=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
+    if [ "$gpLocalPath" = "TBD" ]; then
+        gpLocalPath=$PWD
+    fi
+    if [ ! -d $gpLocalPath ]; then
+        gpLocalPath="TBD"
+    fi
+    
+    gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "TBD")
+    if [ "$gpProjName" = "TBD" ]; then
+        gpProjName="${gpLocalPath##*/}"
+    fi
+
+    # TBD - path is relative to top-dir? Make it absolute?
+    gpRawLocalPath=${cRawDir}/${gpProjName}.raw
+
+    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
     gpMove=0
     gpGitFlow=0
     gpAction=""
