@@ -25,7 +25,7 @@ fUsage()
 =head1 SYNOPSIS
 
     git proj init local [-a] [-l pLocalPath]
-                        [-r pRawLocalPath] [-k pSymLink]
+                        [-r pLocalRawDirPat] [-k pSymLink]
                         [-s pSize] [-m] [-f] [-h]
         Defaults: [-l $PWD] [-r ../[NAME].raw] [-k raw] [-s 1K] [-m] [-f]
 
@@ -76,16 +76,16 @@ for the name of the project. Default: current directory
     Path (-l) [$PWD]? $gpLocalTopDir
         So the project Name will be: ${gpLocalTopDir##*/}
 
-=item B<-r pRawLocalPath>
+=item B<-r pLocalRawDirPat>
 
 Set the location for large binary files. It cannot be *in* any of the
 project directories. It will be created, if it does not existi. The
 path must be relative to the project dir (and not too far away or
 cloning the project may not work). The files in the raw directory will
-NOT be versioned--only the latest copy will be saved. Default: ../Name.raw
+NOT be versioned--only the latest copy will be saved. Default: ..
 
-    Raw dir (-r) [../$Name.raw]?
-        The README.txt file will point to the project dir.
+    Raw dir (-r) [..]?
+        The README.txt file will point to the raw dir.
 
 =item B<-k pSymLink>
 

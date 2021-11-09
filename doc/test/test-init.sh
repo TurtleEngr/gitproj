@@ -133,7 +133,7 @@ tearDown()
         fTestRmEnv
     fi
     gpUnitDebug=0
-    cd $cCurDir >/dev/null 2>&1
+    cd $gpTest >/dev/null 2>&1
  return 0
 } # tearDown
 
@@ -154,6 +154,7 @@ testGitProjInit()
 
     cd $HOME/$cDatProj1 >/dev/null 2>&1
     assertFalse "$LINENO" "[ -d .git ]"
+    cd - >/dev/null 2>&1
 } # testGitProjInit
 
 testFirstTimeSet()
@@ -173,7 +174,7 @@ testIniitSetGlobals()
     cd $HOME/$cDatProj1
 
     fInitSetGlobals
-    assertEquals "$LINENO" "1.1"  "$gpVar"
+    assertEquals "$LINENO" "1.1"  "$gpVer"
     assertEquals "$LINENO" "true"  "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" 	  "$gpAuto"
@@ -184,6 +185,8 @@ testIniitSetGlobals()
     assertEquals "$LINENO" "1k" "$gpMaxSize"
     assertEquals "$LINENO" "0" 	"$gpGitFlow"
     assertNull "$LINENO" "$gpAction"
+
+    cd - >/dev/null 2>&1
 } # testIniitSetGlobals
 
 checkComMustNotBeInGit()
@@ -302,6 +305,7 @@ testInitGettingStarted()
     tStatus=$?
     assertFalse $LINENO $tStatus
 
+    cd - >/dev/null 2>&1
 } # testInitGettingStarted
 
 testInitValidLocalPath()
@@ -563,7 +567,7 @@ cTestCurDir=$PWD
 # -------------------
 # Define the location of this script
 gpTest=${0%/*}
-if [ "$cTesBin" = "." ]; then
+if [ "$gpTest" = "." ]; then
     gpTest=$PWD
 fi
 cd $gpTest >/dev/null 2>&1

@@ -3,11 +3,11 @@
 # --------------------------------
 # Test globals
 
-export PWD gpBin cCurDir gpCmdName cPID gpCmdVer cHome
-export gErr gpDebug gpFacility gpSysLog gpVerbose
-export gpDoc gpTest gpLocalRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
-export cTestCurDir cTestSrcDirg cTestDestDir cTestFiles
-export gpTest gpUnitDebugSHUNIT_COLOR
+export cCurDir cDatHome cHome cTestCurDir cTestDestDir cTestDestDir \
+       cTestFiles cTestFiles cTestSrcDir cTestSrcDir
+export gpBin gpDoc gpTest
+export gpDebug gpUnitDebug SHUNIT_COLOR
+export gpCmdName gpCmdVer
 
 # Relative to $HOME
 export cDatProj1 cDatProj2 cDatProj3
@@ -17,6 +17,11 @@ export cDatProj1Big cDatProj2Big
 
 # These are simulations of local mount points, using absolute paths.
 export cDatMount1 cDatMount2 cDatMount3
+
+# Probably experted by other inc files
+export gpAction gpAuto gpFacility gpGitFlow gpLocalRawDir \
+       gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+       gpProjName gpSysLog gpTestList gpVer gpVerbose
 
 # ========================================
 
@@ -60,8 +65,8 @@ fTestSetupEnv()
 
     . $gpBin/gitproj-com.inc
 
-    cTestSrcDirg=$gpTest
-    cTestFiles=$cTestSrcDirg/test-env.tgz
+    cTestSrcDir=$gpTest
+    cTestFiles=$cTestSrcDir/test-env.tgz
     if [ ! -r $cTestFiles ]; then
         echo "Error: Cannot find: $cTestFiles. [test.inc:$LINENO]"
         exit 1
@@ -120,6 +125,7 @@ fTestCreateEnv()
     fTestRmEnv
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $cTestFiles
+    cd - >/dev/null 2>&1
 
     cHome=$HOME
     cd $cDatHome >/dev/null 2>&1

@@ -1,15 +1,21 @@
 #!/bin/bash
 
 # --------------------
-export gpVar gpLocalRawDir gpAction gpAuto gpFacility gpGitFlow
-export gpLocalTopDir gpMaxSize gpMove gpProjName gpLocalRawDir
-export gpLocalRawDirPat gpLocalRawSymLink gpSysLog
+export cCurDir cGetOrigin cGetTopDir cTop
+export gpAction gpAuto gpBin gpCmdName gpCmdVer gpDebug gpDoc \
+       gpFacility gpGitFlow gpLocalRawDir gpLocalRawDirPat \
+       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpMove gpPath \
+       gpProjName gpSysLog gpVar gpVerbose
+# ???
+export gpMountPath gpRawRemotePath
+
 
 # --------------------
 fInitFirstTimeSet()
 {
     local tInclude
 
+    # TBD: see cConfigGlobal
     if [ ! -f $HOME/.gitproj.config.global ]; then
         cp $gpDoc/config/gitproj.config.global $HOME/.gitproj.config.global
     fi
@@ -25,7 +31,7 @@ fInitSetGlobals()
     fInitFirstTimeSet
     
     # TBD set the default to the installed version
-    gpVar=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
+    gpVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
 
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
@@ -33,6 +39,7 @@ fInitSetGlobals()
     gpAuto=0
 
     # Relative to top-dir
+    # TBD: see cConfigLocal
     gpLocalRawDirPat=$(fComGetConfig -k "gitproj.config.local-raw-dir-pat" -d "..")
 
     gpLocalRawSymLink=$(fComGetConfig -k "gitproj.config.local-raw-symlink" -d raw)

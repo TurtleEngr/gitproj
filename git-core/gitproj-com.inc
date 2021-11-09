@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --------------------------------
-export PWD gpBin cCurDir gpCmdName cPID gpCmdVer cHome
-export gErr gpDebug gpFacility gpSysLog gpVerbose
-export gpDoc gpTest gpLocalRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
+export cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir cPID
+export gErr gpBin gpCmdName gpCmdVer gpDebug gpDoc gpFacility \
+       gpLocalRawDir gpSysLog gpVerbose
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -651,7 +651,7 @@ fComMkHostConfig()
 fComSetConfig()
 {
     local pScope="--local"
-    local pType="--no-type"
+    local pType=""
     local pKey=""
     local pValue=""
     local pAdd=""
