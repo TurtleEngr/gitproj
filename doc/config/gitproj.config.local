@@ -4,13 +4,13 @@
 	path = .gitproj.config.local
 
 [gitproj "config"]
-	gitproj-status = not-set-up
-	name = TBD
-	top-dir = TBD
-	hardlink = no
+	proj-status = not-set-up
+	proj-name = TBD
+	hard-link = no
 	remote-raw-url = /MOUNT-DIR/DIR/NAME.raw
+	local-top-dir = TBD
 	local-raw-dir = ..
-	local-raw-symlink = raw
+	local-raw-sym-link = raw
 [gitproj "hook"]
 	pre-commit-enabled = yes
 	check-file-names = yes

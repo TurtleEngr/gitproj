@@ -1,20 +1,33 @@
 # ~/.gitproj.config.global
 
 [gitproj "config"]
+	# gpVer
 	ver = 1.1
-	syslog = yes
+	# gpSyslog
+	sys-log = yes
+	# gpFacility
 	facility = user
+	# gpBin
+	# gpBin = $(git --exec-path)
 	bin = /usr/lib/git-core
-	# bin = $(git --exec-path)
+	# gpDoc
 	doc = /usr/share/doc/git-proj
+	# gpTest
 	test = /usr/share/doc/git-proj/test
-	gitproj-status = not-set-up
-	name = TBD
-	top-dir = TBD
-	hardlink = no
+	# gpProjStatus
+	proj-status = not-set-up
+	# gpProjName
+	proj-name = TBD
+	# gpHardLink
+	hard-link = no
+	# gpRemoteRawUrl
 	remote-raw-url = TBD
+	# gpLocalTopDir
+	local-top-dir = TBD
+	# gpLocalRawDir
 	local-raw-dir = ..
-	local-raw-symlink = raw
+	# gpLocalRawSymLink
+	local-raw-sym-link = raw
 [gitproj "hook"]
 	source = hooks/pre-commit
 	pre-commit-enabled = yes

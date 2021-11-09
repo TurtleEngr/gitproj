@@ -27,7 +27,7 @@ fInitSetGlobals()
     # TBD set the default to the installed version
     cExpectVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
 
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d 1)
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "yes")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
     gpAuto=0

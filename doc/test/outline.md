@@ -155,9 +155,27 @@ installed files would be tricky, and of low value.
 
 ## Git Config Definition Order
 
-1. /etc/gitconfig and /etc/gitproj.config.system - optional
-2. /home/USER/.gitconfig and .gitproj.config.global (include path location matters)
-3. GIT_PROJECT/.git/config and GIT_PROJECT/.gitproj.config.local
+The last definition 'wins".
+
+1. /etc/gitproj.config.system - optional
+2. /etc/gitconfig - optional
+3. /home/USER/.gitconfig
+4. /home/USER/.gitproj.config.global (include.path at end of .gitconfig)
+5. GIT_DIR/.git/config
+6. GIT_DIR/.gitproj.config.local  (include.path at beginning of GIT_DIR/.gitproj.config.$HOSTNAME)
+7. GIT_DIR/.gitproj.config.$HOSTNAME (include.path at end of GIT_DIR/.git/config)
+8. Env. var. will override corresponding .git config vars.
+9. Command line options will override env. var. and corresponding .git config vars.
+
+Naming conventions for the config vars:
+
+* gpVar - if not already defined before script (#8), set the initial
+value to filse #1 through #7.  The command line option can always set
+the value (#9)
+
+git config vars are usually all lower case with words separated by hyphens
+(-).  Bash variables usually use CamelCase, with each word beginning
+with an upper case letter (no hypens or underscores).
 
 ## Coding patterns
 

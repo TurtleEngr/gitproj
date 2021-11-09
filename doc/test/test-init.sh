@@ -387,6 +387,113 @@ testInitGetLocalPath()
     assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
 } # testInitGetLocalPath
 
+testInitValidRawLocalPath()
+{
+    fail "TBD"
+    return 0
+}
+testInitGetRawLocalPath()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitValidSymLink()
+{
+    fail "TBD"
+    return 0
+}
+testInitGetSymLink()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitValidSize()
+{
+    fail "TBD"
+    return 0
+}
+testInitGetSize()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitGetBinaryFiles()
+{
+    fail "TBD"
+    return 0
+}
+testInitGetMoveFiles()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitGetGetFlow()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitMkGitDir()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitMkRaw()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitCreateLocalGit()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitGetMountPath()
+{
+    fail "TBD"
+    return 0
+}
+testInitGetRawRemotePath()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitCheckPath()
+{
+    fail "TBD"
+    return 0
+}
+testInitCheckSpace()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitMkRemote()
+{
+    fail "TBD"
+    return 0
+}
+testInitReport()
+{
+    fail "TBD"
+    return 0
+}
+
+testInitCreateRemoteGit()
+{
+    fail "TBD"
+    return 0
+}
+
 # ====================
 # This should be the last defined function
 fTestRun()
