@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export cName cBin cCurDiir cVer
+export cName cBin cCurDir cVer
 
 fUsage()
 {
@@ -198,7 +198,7 @@ This will be put in the initial the local .git/config file:
         path = ../.gitproj.config.HOSTNAME
 
 Where HOSTNAME will be set to $HOSTNAME. This allows for different
-locations of fiile, based on the host. For example the remote-raw-url
+locations of file, based on the host. For example the remote-raw-url
 (mount point) could be very different between hosts.
 
 =head2 top-dir/.gitproj.config.$HOSTNAME

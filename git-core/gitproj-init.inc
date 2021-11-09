@@ -366,7 +366,7 @@ fInitGetMoveFiles()
 
     while true; do
         cat <<EOF | fmt
-The listed files can be moved to the project's raw diirectory. Paths
+The listed files can be moved to the project's raw directory. Paths
 will be created in the raw directory that correspond to the project's
 directory. A symlink will replace the moved file. The symlink will
 point to [raw]
