@@ -6,7 +6,7 @@ export gErr gpDebug gpFacility gpLog gpVerbose
 export cDoc cTest cRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
 
 # --------------------------------
-fGitProjComInternalDoc()
+fComGitProjInternalDoc()
 {
     return
     # This should be the first =internal-pod
@@ -438,7 +438,7 @@ EOF
 } # fComUsage
 
 # ------------------
-fFmtLog()
+fComFmtLog()
 {
     local pLevel=$1
     local pMsg="$2"
@@ -477,8 +477,7 @@ fFmtLog()
     fi
 
     # Check verbose
-    if [ $gpVerbose -eq 0 ] &&
-        [ "$pLevel" = "notice" ] || [ "$pLevel" = "info" ]; then
+    if [ $gpVerbose -eq 0 ] && ( [ "$pLevel" = "notice" ] || [ "$pLevel" = "info" ] ); then
         return
     fi
     if [ $gpVerbose -eq 1 ] && [ "$pLevel" = "info" ]; then
@@ -513,14 +512,14 @@ fFmtLog()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head3 fFmtLog pLevel "pMsg" pLine pErr
+=internal-head3 fComFmtLog pLevel "pMsg" pLine pErr
 
 This function formats and outputs a consistent log message output.
 See: fLog and fError.
 
 =internal-cut
 EOF
-} # fFmtLog
+} # fComFmtLog
 
 # ------------------
 fLog()
@@ -552,7 +551,7 @@ fLog()
         shift
     done
 
-    fFmtLog $pLevel "$pMsg" $pLine $pErr
+    fComFmtLog $pLevel "$pMsg" $pLine $pErr
     return
 
     cat <<EOF >/dev/null
@@ -561,6 +560,10 @@ fLog()
 =internal-head3 fLog -m pMsg [-p pLevel] [-l $LINENO] [-e pErr]
 
 pLevel - emerg alert crit err warning notice info debug debug-N
+
+ if gpVerbose = 0, don't output notice or info
+ if gpVerbose = 1, don't output info
+ if gpVerbose >= 2, output all logs
 
 See Globals: gpLog, gpFacility, gpVerbose, gpDebug
 
@@ -756,40 +759,75 @@ fComUnsetConfig()
     git config $pAll $pScope $pKey
 } # fComUnsetConfig
 
-# --------------------
-fMustBeInGitRepo()
+
+fComCheckPkg()
 {
+    local pPkg=$1
+
+    dpkg -l $pPkg 2>/dev/null | grep -q "^ii *$pPkg"
+    return $?
+} # fComCheckPkg
+
+# --------------------
+fComMustBeInGitRepo()
+{
+    local pDir=$1
+
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ ! -d .git ]; then
-        fError -m "You need to be in a git repo for this to work." -l $tSrc:$LINENO
+    if [ ! -d $pDir ]; then
+        fLog -p err -m "$pDir does not exist." -l $tSrc:$LINENO
+	return 1
     fi
-    return 0
-} # fMustBeInGitRepo
+    cd $pDir >/dev/null 2>&1
+    
+    if [ -d $PWD/.git ]; then
+        cd - >/dev/null 2>&1
+        return 0
+    fi
+    if $cGetTopDir >/dev/null 2>&1; then
+        cd - >/dev/null 2>&1
+        return 0
+    fi
+    cd - >/dev/null 2>&1
+    fLog -p err -m "$pDir must be in a git repo for this to work." -l $tSrc:$LINENO
+    cd - >/dev/null 2>&1
+    return 1
+} # fComMustBeInGitRepo
 
 # --------------------
-fMustBeNoGit()
+fComMustNotBeInGit()
 {
+    local pDir=$1
+    
     local tSrc=${BASH_SOURCE##*/}
     local tFound=0
     local tGitDir
 
-    if $cGetOrigin; then
+    if [ ! -d $pDir ]; then
+        fLog -p err -m "$pDir does not exist." -l $tSrc:$LINENO
+	return 1
+    fi
+    cd $pDir >/dev/null 2>&1
+    if $cGetTopDir >/dev/null 2>&1; then
         git branch
         tFound=1
-    else
+    fi
+    if [ $tFound -eq 0 ]; then
         tGitDir=$(find . -type d -name .git)
         if [ -n "$tGitDir" ]; then
             tFound=1
         fi
     fi
+    cd - >/dev/null 2>&1
     if [ $tFound -ne 0 ]; then
-        fError -m "You should NOT be in a git repo, or a directory above a git repo" -l $tSrc:$LINENO
+        fLog -p err -m "$pDir must NOT be in a git repo, or a directory above a git repo" -l $tSrc:$LINENO
+    	return 1
     fi
     return 0
-} # fMustBeNoGit
+} # fComMustNotBeInGit
 
-fAllMustBeReadable()
+fComAllMustBeReadable()
 {
     local pDir=$1
 
@@ -799,9 +837,16 @@ fAllMustBeReadable()
     pDir=${pDir:-$PWD}
     tFound=$(find $pDir \! -readable -print)
     if [ -n "$tFound" ]; then
-        fError -m "All directories and files must be readable, under $pDir" -l $tSrc:$LINENO
+        fLog -p err -m "All directories and files must be readable, under $pDir" -l $tSrc:$LINENO
+	return 1
     fi
-} # fAllMustBeReadable
+    tFound=$(find $pDir -type d \! -executable -print)
+    if [ -n "$tFound" ]; then
+        fLog -p err -m "All directories must be executable, under $pDir" -l $tSrc:$LINENO
+	return 1
+    fi    
+    return 0
+} # fComAllMustBeReadable
 
 # ========================================
 export tSrc=${BASH_SOURCE##*/}

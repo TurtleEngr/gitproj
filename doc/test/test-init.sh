@@ -161,11 +161,10 @@ testFirstTimeSet()
     assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
     assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
 
-    fFirstTimeSet
+    fInitFirstTimeSet
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
     assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-    grep path $HOME/.gitconfig
-    assertTrue "$LINENO" "[ $? -eq 0 ]"
+    assertTrue "$LINENO" "$(grep -q path $HOME/.gitconfig; echo $?)"
 } # testFirstTimeSet
 
 testIniitSetGlobals()
@@ -186,6 +185,207 @@ testIniitSetGlobals()
     assertEquals "$LINENO" "0" 	"$gpGitFlow"
     assertNull "$LINENO" "$gpAction"
 } # testIniitSetGlobals
+
+checkComMustNotBeInGit()
+{
+    local pFun=$1
+
+    local tResult
+    local tStatus
+
+    local tResult
+    local tStatus
+
+    gpUnitDebug=0
+
+    # This dir does not exist
+    tResult=$($pFun $HOME/foo-bar 2>&1)
+    tStatus=$?
+    fTestDebug "Check: $HOME/foo-bar"
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "does not exist"
+
+    # Git is below this dir
+    tResult=$($pFun $HOME 2>&1)
+    tStatus=$?
+    fTestDebug "Check: $HOME"
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+
+    # This is in a git dir
+    tResult=$($pFun $HOME/$cDatProj3 2>&1)
+    tStatus=$?
+    fTestDebug "Check: $HOME/$cDatProj3"
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+
+    # This is in a git dir
+    tResult=$($pFun $HOME/$cDatProj3/edit 2>&1)
+    tStatus=$?
+    fTestDebug "Check: $HOME/$cDatProj3/edit"
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+
+    # No git dir above or below this dir
+    tResult=$($pFun $HOME/$cDatProj1 2>&1)
+    tStatus=$?
+    fTestDebug "Check: $HOME/$cDatProj1"
+    assertTrue $LINENO $tStatus
+} # checkComMustNotBeInGit
+
+testComMustNotBeInGit()
+{
+    gpUnitDebug=0
+    checkComMustNotBeInGit fComMustNotBeInGit
+} # testComMustNotBeInGit
+
+checkComAllMustBeReadable()
+{
+    local tResult
+    local tStatus
+
+    tResult=$(fComAllMustBeReadable $HOME 2>&1)
+    tStatus=$?
+    assertTrue $LINENO $tStatus
+
+    # Create a file and make it unreadable
+    touch $HOME/foo
+    chmod a-r $HOME/foo
+    tResult=$(fComAllMustBeReadable $HOME 2>&1)
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable"
+
+    # Create a dir and make it unreadable
+    rm $HOME/foo
+    mkdir $HOME/foo
+    chmod a-r $HOME/foo
+    tResult=$(fComAllMustBeReadable $HOME 2>&1)
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable"
+
+    # A dir can not be listed
+    chmod a+r,a-x $HOME/foo
+    tResult=$(fComAllMustBeReadable $HOME 2>&1)
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable"
+} # checkComAllMustBeReadable
+
+testComAllMustBeReadable()
+{
+    gpUnitDebug=0
+    checkComAllMustBeReadable fComAllMustBeReadable
+} # testComAllMustBeReadable
+
+testInitGettingStarted()
+{
+    local tResult
+    local tStatus
+
+    gpUnitDebug=0
+
+    cd $HOME/$cDatProj1
+    gpAuto=1
+    tResult=$(fInitGettingStarted)
+    assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
+
+    gpAuto=0
+    tResult=$(fInitGettingStarted 2>&1 < <(echo -e "\nx\ny"))
+    tStatus=$?
+    fTestDebug "tResult=$tResult"
+    assertContains "$LINENO $tResult" "$tResult" "is not valid"
+    assertTrue $LINENO $tStatus
+
+    tResult=$(fInitGettingStarted 2>&1 < <(echo -e "n"))
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+
+} # testInitGettingStarted
+
+testInitValidLocalPath()
+{
+    local tResult
+    local tStatus
+
+    gpUnitDebug=1
+
+    checkComMustNotBeInGit fInitValidLocalPath
+    checkComAllMustBeReadable fInitValidLocalPath
+
+    tResult=$(fInitValidLocalPath  $HOME/$cDatProj1 2>&1)
+    tStatus=$?
+    gpUnitDebug=0
+    fTestDebug "Check: $HOME/$cDatProj1"
+    fTestDebug "tResult: $tResult"
+    assertTrue $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
+
+    # Called again, so that the global vars will be defined.
+    fInitValidLocalPath  $HOME/$cDatProj1 >/dev/null 2>&1
+    assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalPath"
+    assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
+} # testInitValidLocalPath
+
+testInitGetLocalPath()
+{
+    local tResult
+    local tStatus
+
+    gpAuto=1
+    # Auto
+
+    # Auto fail
+    tResult=$(fInitGetLocalPath $HOME/foo-bar 2>&1)
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "does not exist"
+
+    # Auto success
+    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1)
+    tStatus=$?
+    assertTrue $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
+
+    gpAuto=0
+    # No auto, prompt/response
+    
+    # Just Enter, i.e. defaultt. Look for success
+    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "\n"))
+    tStatus=$?
+    assertTrue $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Define the existing project directory"
+    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
+
+
+    # Enter "quit". Look for quit
+    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "quit"))
+    tStatus=$?
+    gpUnitDebug=0
+    fTestDebug "tResult=$tResult"
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    # Enter $HOME; $HOME/$cDatProj3; quit
+    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj3\nquit"))
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    # Enter $HOME; $HOME/$cDatProj1
+    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj1"))
+    tStatus=$?
+    assertTrue $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
+
+    # Called again, so that the global vars will be defined.
+    fInitGetLocalPath $HOME/$cDatProj1 < <(echo -e "$HOME\n$HOME/$cDatProj1") >/dev/null 2>&1
+    assertTrue $LINENO $tStatus
+    assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalPath"
+    assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
+} # testInitGetLocalPath
 
 # ====================
 # This should be the last defined function

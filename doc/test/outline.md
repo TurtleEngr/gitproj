@@ -161,21 +161,28 @@ installed files would be tricky, and of low value.
 
 ## Coding patterns
 
-At the top off include files define exports for all the globals that
+* At the top off include files define exports for all the globals that
 the include file reads writes to.
 
-At the end of an include file, call a function that will define
+* At the end of an include file, call a function that will define
 defaults for the important globals used by the include file.
 
-For user callable scripts, do minimal setup, include files with common
+* For user callable scripts, do minimal setup, include files with common
 functions and functions specific to the script. Put as much as
 possible into function in script's include file, so that the fucntions
 can be directly tested with unit test scripts found in doc/test.
 
-Minimal vars: cBin, cCurDIr, cDoc, cTest if a test script.
+* Minimal vars: cBin, cCurDIr, cDoc, cTest if a test script.
 All other vars can be defined from include files or from git config vars.
 
-fLog and fError messages
+* Define cName at the top of each each script, that is a main script
+called by a user.
+
+* The -p option is not used with the "read" command, because this
+prompt is not captured with the test scripts. So use "echo -n" for the
+prompts before the read command.
+
+* fLog and fError messages
 
     # Put this at the beginning or end of each file
     export tSrc=${BASH_SOURCE##*/}
@@ -185,9 +192,6 @@ fLog and fError messages
 
     # in Error and Log pass this argument:
     -l $tSrc:$LINENO
-
-Define cName at the top of each each script, that is a main script
-called by a user.
 
 ## File include pattern - prod
 

@@ -6,7 +6,7 @@ export gpLocalPath gpMaxSize gpMove gpProjName gpRawLocalPath gpSymLinkName
 export gpSysLog
 
 # --------------------
-fFirstTimeSet()
+fInitFirstTimeSet()
 {
     local tInclude
 
@@ -17,12 +17,12 @@ fFirstTimeSet()
     if [ -z "$tInclude" ]; then
     	fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
     fi
-} # fFirstTimeSet
+} # fInitFirstTimeSet
 
 # --------------------
 fInitSetGlobals()
 {
-    fFirstTimeSet
+    fInitFirstTimeSet
     
     # TBD set the default to the installed version
     cExpectVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
@@ -62,36 +62,58 @@ fInitSetGlobals()
 } # fInitSetGlobals
 
 # ========================================
-# fCreateLocalGit Section
+# fInitCreateLocalGit Section
 
 # --------------------
-fCheckPkg()
-{
-    local pPkg=$1
+fInitGettingStarted() {
+    cat <<EOF
 
-    dpkg -l $pPkg 2>/dev/null | grep -q "^ii *$pPkg"
-    return $?
-} # fCheckPkg
+Be sure you are "cd" to the "top" project directory. Or use the "-l
+pLocalPath" option. The directory name will be used for the git repo
+name. The project directory should not already be a git repo, and it
+cannot contain any git repos under it.  Also, all of the directories
+and files need to be readable by your user.
+
+EOF
+    if [ $gpAuto -ne 0 ]; then
+        return 0
+    fi
+    while true; do
+    	echo -n "Continue [y/n]? "
+        read -r tResult
+        tResult=${tResult%${tResult#[a-z]}}
+        if [ "$tResult" = "y" ]; then
+            return 0
+	fi
+        if [ "$tResult" = "n" ]; then
+	    exit 1
+	fi
+	echo "$tResult is not valid."
+    done
+    return 0
+} #fInitGettingStarted
 
 # --------------------
-fValidLocalPath()
+fInitValidLocalPath()
 {
     local pLocalPath=$1
 
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ ! -d $pLocalPath ]; then
-       fLog -p Err -m "Project directory not found: $pLocalPath" -l $tSrc:$LINENO
-       return 1
+    if ! fComMustNotBeInGit $pLocalPath; then
+        return 1
+    fi
+    if ! fComAllMustBeReadable $pLocalPath; then
+        return 1
     fi
 
     gpLocalPath=$pLocalPath
     gpProjName="${gpLocalPath##*/}"
     echo "The project Name will be: $gpProjName"
     return 0
-} # fValidLocalPath
+} # fInitValidLocalPath
 
-fGetLocalPath()
+fInitGetLocalPath()
 {
     local pLocalPath=$1
 
@@ -99,7 +121,7 @@ fGetLocalPath()
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
-        if ! fValidLocalPath $pLocalPath; then
+        if ! fInitValidLocalPath $pLocalPath; then
             fError -m "Invalid -l pLocalPath: $pLocalPath" -l $tSrc:$LINENO
         fi
         return 0
@@ -109,23 +131,24 @@ fGetLocalPath()
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 EOF
-        read -rp "Project Path (-l) [$pLocalPath/quit]? " tResult
+        echo -n "Project Path (-l) [$pLocalPath/quit]? "
+        read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
             tResult=$pLocalPath
         fi
-        if fValidLocalPath $tResult; then
+        if fInitValidLocalPath $tResult; then
             break
         fi
     done
     return 0
-} # fGetLocalPath
+} # fInitGetLocalPath
 
 # --------------------
-fValidRawLocalPath()
+fInitValidRawLocalPath()
 {
     local pRawLocalPath=$1
 
@@ -155,9 +178,9 @@ The $gpRawLocalPath/README.txt file will point to the project dir.
 EOF
     cd $cCurDir >/dev/null 2>&1
     return 0
-} # fValidRawLocalPath
+} # fInitValidRawLocalPath
 
-fGetRawLocalPath()
+fInitGetRawLocalPath()
 {
     local pRawLocalPath=$1
     
@@ -179,9 +202,10 @@ path must be relative to the project dir (and not too far away or
 cloning the project may not work). The files in the raw directory will
 NOT be versioned--only the latest copy will be saved. Default: ../Name.raw
 EOF
-        read -rp "Raw dir (-r) [../$gpProjName.raw | quit]? "
+        echo -n "Raw dir (-r) [../$gpProjName.raw | quit]? "
+        read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -191,10 +215,10 @@ EOF
             break
         fi
     done
-} # fGetRawLocalPath
+} # fInitGetRawLocalPath
 
 # --------------------
-fValidSymLink()
+fInitValidSymLink()
 {
     local pSymLinkName=$1
 
@@ -210,9 +234,9 @@ fValidSymLink()
     gpSymLinkName=$pSymLinkName
     cd $cCurDir >/dev/null 2>&1
     return 0
-} # fValidSymLink
+} # fInitValidSymLink
 
-fGetSymLink()
+fInitGetSymLink()
 {
     local pSymLinkName=$1
     
@@ -234,9 +258,10 @@ will need to be updated. Symlink in the git directories will point to
 this dir and the symlinks will be versioned.
 
 EOF
-        read -rp "Symlink (-k) [$pSymLinkName/quit]? " tResult
+        echo -n "Symlink (-k) [$pSymLinkName/quit]? "
+        read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tSrc:$LINENO
+            fLog -m warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -247,10 +272,10 @@ EOF
         fi
     done
     return 0
-} # fGetSymLink
+} # fInitGetSymLink
 
 # --------------------
-fValidSize()
+fInitValidSize()
 {
     local pMaxSize=$1
 
@@ -264,9 +289,9 @@ fValidSize()
     fi
     fLog -p err -m "Size must be numbers followed by b, k, m, or g" -l $tSrc:$LINENO
     return 1
-} # fValidSize
+} # fInitValidSize
 
-fGetSize()
+fInitGetSize()
 {
     local pMaxSize=$1
 
@@ -284,9 +309,10 @@ fGetSize()
         cat <<EOF | fmt
 Define the "size" for large binary files. Format: Nb, Nk, Nm, or Ng
 EOF
-        read -rp "Size (-s) [$pMaxSize/quit]? " tResult
+        echo "Size (-s) [$pMaxSize/quit]? "
+        read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
@@ -296,10 +322,10 @@ EOF
             break
         fi
     done
-} # fGetSize
+} # fInitGetSize
 
 # --------------------
-fGetBinaryFiles()
+fInitGetBinaryFiles()
 {
     local tFile
     local tFileList=""
@@ -322,10 +348,10 @@ EOF
         return 0
     fi
     return 1
-} # fGetBinaryFiles
+} # fInitGetBinaryFiles
 
 # --------------------
-fGetMoveFiles()
+fInitGetMoveFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
 
@@ -334,7 +360,7 @@ fGetMoveFiles()
     fi
 
     if ! fGetBinaryFiles; then
-        fLog -m 'No "large" binary files were found.' -l $tSrc:$LINENO
+        fLog -p warning -m 'No "large" binary files were found.' -l $tSrc:$LINENO
         return 0
     fi
 
@@ -346,10 +372,11 @@ directory. A symlink will replace the moved file. The symlink will
 point to [raw]
 
 EOF
-        read -rp "Move the files (-m) [y/n/quit]? " tResult
+        echo -n "Move the files (-m) [y/n/quit]? "
+        read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ $tResult = "q" ]; then
-            fLog -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ $tResult = "y" ]; then
@@ -362,10 +389,10 @@ EOF
         fi
     done
     return 0
-} # fGetMoveFiles
+} # fInitGetMoveFiles
 
 # --------------------
-fGetGetFlow()
+fInitGetGetFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
@@ -383,10 +410,11 @@ fGetGetFlow()
     fi
 
     while true; do
-        read -rp "Setup git-flow (-f) [y/n/quit]? " tResult
+        echo -n "Setup git-flow (-f) [y/n/quit]? "
+        read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ "$tResult" = "q" ]; then
-            fLog -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warnint -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ "$tResult" = "y" ]; then
@@ -399,26 +427,27 @@ fGetGetFlow()
         fi
     done
     return 0
-} # fGetGetFlow
+} # fInitGetGetFlow
 
 # --------------------
-fMkGitDir()
+fInitMkGitDir()
 {
     declare -l tResult
 
     if [ $gpAuto -eq 0 ]; then
         while true; do
-            read -rp "Continue with creating a local git repo [y/n/quit]? " tResult
+            echo -n "Continue with creating a local git repo [y/n/quit]? "
+            read -r tResult
             tResult=${tResult%${tResult#[a-z]}}
             if [ $tResult = "q" ]; then
-                fLog -m "Quitting" -l $tSrc:$LINENO
+                fLog -p warning -m "Quitting" -l $tSrc:$LINENO
                 exit 1
             fi
             if [ $tResult = "y" ]; then
                 break
             fi
             if [ $tResult = "n" ]; then
-                flog -m "Quitting, nothing will be done." -l $LINE
+                flog -p warning -m "Quitting, nothing will be done." -l $LINE
                 exit 1
             fi
         done
@@ -453,49 +482,48 @@ EOF
     git branch
     git status
     set +x >/dev/null 2>&1
-} # fMkGitDir
+} # fInitMkGitDir
 
-fMkRaw()
+fInitMkRaw()
 {
     echo "TBD"
     # The $gpRawLocalPath/README.txt file will point to the project dir.
 } # fMkRaw
 
 # --------------------
-fCreateLocalGit()
+fInitCreateLocalGit()
 {
-    fMustBeNoGit
-    fAllMustBeReadable
+    fInitGettingStarted
 
     # Prompt/Response or if -a, just validate the options
-    fGetLocalPath $gpLocalPath
-    fGetRawLocalPath $gpRawLocalPath
-    fGetSymLink $gpSymLinkName
-    fGetSize $gpMaxSize
-    fGetMoveFiles $gpMove
-    fGetGetFlow $gpGitFlow
+    fInitGetLocalPath $gpLocalPath
+    fInitGetRawLocalPath $gpRawLocalPath
+    fInitGetSymLink $gpSymLinkName
+    fInitGetSize $gpMaxSize
+    fInitGetMoveFiles $gpMove
+    fInitGetGetFlow $gpGitFlow
 
-    fMkGitDir
-    fMkRaw
-} # fCreateLocalGit
+    fInitMkGitDir
+    fInitMkRaw
+} # fInitCreateLocalGit
 
 # ========================================
-# fCreateRemoteGit Section
+# fInitCreateRemoteGit Section
 
-fGetMountPath()
+fInitGetMountPath()
 {
     #$gpMountPath
     fCheckPath $gpPath	# gpPath??? TBD
-} # fGetMountPath
+} # fInitGetMountPath
 
-fGetRawRemotePath()
+fInitGetRawRemotePath()
 {
     echo TBD
     #$gpRawRemotePath
-} # fGetRawRemotePath
+} # fInitGetRawRemotePath
 
 # --------------------
-fCheckPath()
+fInitCheckPath()
 {
     local pPath=$1
 
@@ -511,9 +539,9 @@ fCheckPath()
     if [ -e $pPath/$tName.git ]; then
         fError -m "$pPath/$tName.git already exists." -l $tSrc:$LINENO
     fi
-} # fCheckPath
+} # fInitCheckPath
 
-fCheckSpace()
+fInitCheckSpace()
 {
     local pPath=$1
 
@@ -537,10 +565,10 @@ fCheckSpace()
     if [ $tDesiredSize -gt $tAvail ]; then
         fError -m "There is not enough space at $pPath. $pPath has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
     fi
-} # fCheckSpace
+} # fInitCheckSpace
 
 # --------------------
-fMkRemote()
+fInitMkRemote()
 {
     local pPath=$1
 
@@ -553,10 +581,10 @@ fMkRemote()
     cd - >/dev/null 2>&1
     git remote add origin $pPath/$tProjName.git
     set +x >/dev/null 2>&1
-} # fMkRemote
+} # fInitMkRemote
 
 # --------------------
-fReport()
+fInitReport()
 {
     echo 'Remote origin is now set to:'
     $cGetOrigin
@@ -565,10 +593,10 @@ Be sure the disk is mounted and $gpPath exists.
 Then you can use: "git push origin develop"
 If the mount path is changed, use "git proj set -e" to update the origin.
 EOF
-} # fReport
+} # fInitReport
 
 # --------------------
-fCreateRemoteGit()
+fInitCreateRemoteGit()
 {
     fGetMountPath $gpMountPath		# gpMountPath??? TBD
     #    	fCheckPath $gpPath

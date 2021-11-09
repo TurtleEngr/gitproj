@@ -128,7 +128,7 @@ EOF
 
 tearDown()
 {
-    git config --global --remove-section gitproj.testit &>/dev/null
+    git config --global --remove-section gitproj.testit >/dev/null 2>&1
     gpUnitDebug=0
     return 0
 } # tearDown
@@ -186,8 +186,8 @@ testComInitialConfig()
     assertNull "$LINENO" "$(echo $cVer | tr -d '.[:digit:]')"
 
     for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr; do
-        which $tProg &>/dev/null
-        assertTrue "$LINENO missing: $tProg" "[ $? -eq 0 ]"
+        
+        assertTrue "$LINENO missing: $tProg" "$(which $tProg >/dev/null 2>&1; echo $?)"
     done
     return 0
 
@@ -223,7 +223,7 @@ testComLog_MultiplePermutations()
     tErr="42"
 
     for gpLog in 0 1; do
-        for gpVerbose in 0 1; do
+        for gpVerbose in 0 1 2; do
             for gpDebug in 0 1 2; do
                 for tLevel in alert crit err warning notice info debug debug-1 debug-3; do
                     echo -n '.' 1>&2
@@ -241,6 +241,10 @@ testComLog_MultiplePermutations()
                         assertNull "$LINENO tcl1-$tTestMsg not info" "$tResult"
                         continue
                     fi
+                    if [ $gpVerbose -eq 2 ] && echo $tLevel | grep -Eq 'info'; then
+                        assertNotNull "$LINENO tcl1-$tTestMsg info" "$tResult"
+                        continue
+		    fi
                     if [ $gpDebug -eq 0 ] && [ "${tLevel%%-*}" = "debug" ]; then
                         assertNull "$LINENO tcl2-$tTestMsg not debug" "$tResult"
                         continue
@@ -490,8 +494,7 @@ testComSetConfigGlobal()
 
     # Note: more complete "git config" is done when a test env is setup.
 
-    grep -q '\[gitproj "testit"\]' $tGlobal
-    assertFalse "$LINENO did tearDown run?" "[ $? -eq 0 ]"
+    assertFalse "$LINENO did tearDown run?" "$(grep -q '\[gitproj "testit"\]' $tGlobal; echo $?)"
 
     fComSetConfig -g -k gitproj.testit.test-str -v "test a string"
     assertTrue "$LINENO -g" "[ -r $tGlobal ]"
@@ -546,6 +549,12 @@ testComUnsetConfigGlobal()
     grep -q "test unset" $tGlobal
     assertFalse "$LINENO" "[ $? -eq 0 ]"
 } # testComUnsetConfigGlobal
+
+testCheckPkg()
+{
+    assertTrue "$LINENO" $(fComCheckPkg less; echo $?)
+    assertFalse "$LINENO" $(fComCheckPkg foobar; echo $?)
+} # testCheckPkg
 
 # ====================
 # This should be the last defined function

@@ -76,7 +76,7 @@ fTestSetupEnv()
     cDatHome=$cTestDestDir/test/root/home/john
     cDatProj1=project/george
     cDatProj2=project/paulb
-    cDatProj3=project/paulb
+    cDatProj3=project/beach
     cDatProj1Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/george.mp4"
     cDatProj2Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/paulb.mp4"
     cDatMount1=$cTestDestDir/test/root/mnt/disk-2

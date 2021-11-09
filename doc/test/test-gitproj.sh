@@ -128,7 +128,7 @@ EOF
 
 tearDown()
 {
-##    git config --global --remove-section gitproj.test &>/dev/null
+##    git config --global --remove-section gitproj.test >/dev/null 2>&1
     gpUnitDebug=0
     return 0
 } # tearDown
