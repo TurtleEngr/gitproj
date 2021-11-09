@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --------------------
-export cExpectVer cRawDir gpAction gpAuto gpFacility gpGitFlow
-export gpLocalPath gpMaxSize gpMove gpProjName gpRawLocalPath gpSymLinkName
-export gpSysLog
+export gpVar gpLocalRawDir gpAction gpAuto gpFacility gpGitFlow
+export gpLocalTopDir gpMaxSize gpMove gpProjName gpLocalRawDir
+export gpLocalRawDirPat gpLocalRawSymLink gpSysLog
 
 # --------------------
 fInitFirstTimeSet()
@@ -11,7 +11,7 @@ fInitFirstTimeSet()
     local tInclude
 
     if [ ! -f $HOME/.gitproj.config.global ]; then
-        cp $cDoc/config/gitproj.config.global $HOME/.gitproj.config.global
+        cp $gpDoc/config/gitproj.config.global $HOME/.gitproj.config.global
     fi
     tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
@@ -25,33 +25,33 @@ fInitSetGlobals()
     fInitFirstTimeSet
     
     # TBD set the default to the installed version
-    cExpectVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
+    gpVar=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
 
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "yes")
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
     gpAuto=0
 
-    # Absolute or relative to top-dir
-    cRawDir=$(fComGetConfig -k "gitproj.config.local-raw-dir" -d "..")
+    # Relative to top-dir
+    gpLocalRawDirPat=$(fComGetConfig -k "gitproj.config.local-raw-dir-pat" -d "..")
 
-    gpSymLinkName=$(fComGetConfig -k "gitproj.config.local-raw-symlink" -d raw)
+    gpLocalRawSymLink=$(fComGetConfig -k "gitproj.config.local-raw-symlink" -d raw)
 
-    gpLocalPath=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
-    if [ "$gpLocalPath" = "TBD" ]; then
-        gpLocalPath=$PWD
+    gpLocalTopDir=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
+    if [ "$gpLocalTopDir" = "TBD" ]; then
+        gpLocalTopDir=$PWD
     fi
-    if [ ! -d $gpLocalPath ]; then
-        gpLocalPath="TBD"
+    if [ ! -d $gpLocalTopDir ]; then
+        gpLocalTopDir="TBD"
     fi
     
     gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "TBD")
     if [ "$gpProjName" = "TBD" ]; then
-        gpProjName="${gpLocalPath##*/}"
+        gpProjName="${gpLocalTopDir##*/}"
     fi
 
-    # TBD - path is relative to top-dir? Make it absolute?
-    gpRawLocalPath=${cRawDir}/${gpProjName}.raw
+    # TBD - path is relative to top-dir. Or make it absolute?
+    gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
     gpMove=0
@@ -107,8 +107,8 @@ fInitValidLocalPath()
         return 1
     fi
 
-    gpLocalPath=$pLocalPath
-    gpProjName="${gpLocalPath##*/}"
+    gpLocalTopDir=$pLocalPath
+    gpProjName="${gpLocalTopDir##*/}"
     echo "The project Name will be: $gpProjName"
     return 0
 } # fInitValidLocalPath
@@ -148,17 +148,17 @@ EOF
 } # fInitGetLocalPath
 
 # --------------------
-fInitValidRawLocalPath()
+fInitValidLocalRawDir()
 {
     local pRawLocalPath=$1
 
     local tSrc=${BASH_SOURCE##*/}
 
     if [ "${pRawLocalPath#../}" = "$pRawLocalPath" ]; then
-        fLog -p warning -m "RawLocalPath works best if it is relative to LocalPath" -l $tSrc:$LINENO
+        fLog -p warning -m "RawLocalPath works best if it is relative to top-dir" -l $tSrc:$LINENO
     fi
 
-    cd $gpLocalPath >/dev/null 2>&1
+    cd $gpLocalTopDir >/dev/null 2>&1
     if [ ! -d $pRawLocalPath ]; then
         fLog -p err -m "Raw directory not found: $pRawLocalPath" -l $tSrc:$LINENO
         cd $cCurDir >/dev/null 2>&1
@@ -169,18 +169,18 @@ fInitValidRawLocalPath()
     echo $PWD | grep -q "/$gpProjName/"
     # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
-        fLog -p err -m "Raw directory cannot be in $gpLocalPath" -l $tSrc:$LINENO
+        fLog -p err -m "Raw directory cannot be in $gpLocalTopDir" -l $tSrc:$LINENO
     fi
 
-    gpRawLocalPath=$pRawLocalPath
+    gpLocalRawDir=$pRawLocalPath
     cat <<EOF | fmt
-The $gpRawLocalPath/README.txt file will point to the project dir.
+The $gpLocalRawDir/README.txt file will point to the project dir.
 EOF
     cd $cCurDir >/dev/null 2>&1
     return 0
-} # fInitValidRawLocalPath
+} # fInitValidLocalRawDir
 
-fInitGetRawLocalPath()
+fInitGetLocalRawDir()
 {
     local pRawLocalPath=$1
     
@@ -188,7 +188,7 @@ fInitGetRawLocalPath()
     local tResult
 
     if [ $gpAuto -ne 0 ]; then
-        if ! fValidRawLocalPath $pRawLocalPath; then
+        if ! fInitValidLocalRawDir $pRawLocalPath; then
             fError -m "Invalid -l pRawLocalPath: $pRawLocalPath" -l $tSrc:$LINENO
         fi
         return 0
@@ -211,11 +211,11 @@ EOF
         if [ -z "$tResult" ]; then
             tResult=../$gpProjName.raw
         fi
-        if fValidRawLocalPath $tResult; then
+        if fInitValidLocalRawDir $tResult; then
             break
         fi
     done
-} # fInitGetRawLocalPath
+} # fInitGetLocalRawDir
 
 # --------------------
 fInitValidSymLink()
@@ -224,14 +224,14 @@ fInitValidSymLink()
 
     local tSrc=${BASH_SOURCE##*/}
 
-    cd $gpLocalPath >/dev/null 2>&1
+    cd $gpLocalTopDir >/dev/null 2>&1
     if [ ! -e $pSymLinkName ]; then
         fLog -p err -m "Symlink: $pSymLinkName already exists. Pick another name or quit and remove it." -l $tSrc:$LINENO
         cd $cCurDir >/dev/null 2>&1
         return 1
     fi
 
-    gpSymLinkName=$pSymLinkName
+    gpLocalRawSymLink=$pSymLinkName
     cd $cCurDir >/dev/null 2>&1
     return 0
 } # fInitValidSymLink
@@ -333,7 +333,7 @@ fInitGetBinaryFiles()
 
     tSize=$(echo "$gpMaxSize" | tr 'bBKmg' 'cckMG')
 
-    for tFile in $(find $gpLocalPath -type f -size +$tSize); do
+    for tFile in $(find $gpLocalTopDir -type f -size +$tSize); do
         if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
             tFileList="$tFileList, $tFile"
         fi
@@ -487,7 +487,7 @@ EOF
 fInitMkRaw()
 {
     echo "TBD"
-    # The $gpRawLocalPath/README.txt file will point to the project dir.
+    # The $gpLocalRawDir/README.txt file will point to the project dir.
 } # fMkRaw
 
 # --------------------
@@ -496,9 +496,9 @@ fInitCreateLocalGit()
     fInitGettingStarted
 
     # Prompt/Response or if -a, just validate the options
-    fInitGetLocalPath $gpLocalPath
-    fInitGetRawLocalPath $gpRawLocalPath
-    fInitGetSymLink $gpSymLinkName
+    fInitGetLocalPath $gpLocalTopDir
+    fInitGetLocalRawDir $gpLocalRawDir
+    fInitGetSymLink $gpLocalRawSymLink
     fInitGetSize $gpMaxSize
     fInitGetMoveFiles $gpMove
     fInitGetGetFlow $gpGitFlow

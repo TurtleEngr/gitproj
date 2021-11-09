@@ -190,10 +190,10 @@ functions and functions specific to the script. Put as much as
 possible into function in script's include file, so that the fucntions
 can be directly tested with unit test scripts found in doc/test.
 
-* Minimal vars: cBin, cCurDIr, cDoc, cTest if a test script.
+* Minimal vars: gpBin, cCurDIr, gpDoc, gpTest if a test script.
 All other vars can be defined from include files or from git config vars.
 
-* Define cName at the top of each each script, that is a main script
+* Define gpCmdName at the top of each each script, that is a main script
 called by a user.
 
 * The -p option is not used with the "read" command, because this
@@ -213,60 +213,60 @@ prompts before the read command.
 
 ## File include pattern - prod
 
-    cBin=/usr/lib/git-core - set when a CMD is run
-    cDoc=/usr/share/doc/gitproj
+    gpBin=/usr/lib/git-core - set when a CMD is run
+    gpDoc=/usr/share/doc/gitproj
 
-        $cBin/git-proj-CMD
-            . $cBin/gitproj-com.inc
+        $gpBin/git-proj-CMD
+            . $gpBin/gitproj-com.inc
 	        fComSetGlobals
-            . $cBin/gitproj-CMD.inc
+            . $gpBin/gitproj-CMD.inc
 	        fCMDSetGlobals
 
 ## File include pattern - dev
 
-    cBin=DIR/gitproj/git-core - set when a CMD is run
-    cDoc=$cBin/../doc or DIR/gitproj/doc
+    gpBin=DIR/gitproj/git-core - set when a CMD is run
+    gpDoc=$gpBin/../doc or DIR/gitproj/doc
 
-        $cBin/git-proj-CMD
-            . $cBin/gitproj-com.inc
+        $gpBin/git-proj-CMD
+            . $gpBin/gitproj-com.inc
 	        fComSetGlobals
-            . $cBin/gitproj-CMD.inc
+            . $gpBin/gitproj-CMD.inc
 	        fCMDSetGlobals
 
 ## File include pattern - dev-test
 
-    cTest=DIR/gitproj/doc/test - set when a test-*.inc is run
-    cBin=$cTest/../../git-core or DIR/gitproj/git-core
-    cDoc=$cTest/.. or DIR/gitproj/doc
+    gpTest=DIR/gitproj/doc/test - set when a test-*.inc is run
+    gpBin=$gpTest/../../git-core or DIR/gitproj/git-core
+    gpDoc=$gpTest/.. or DIR/gitproj/doc
 
-        $cTest/test-com.sh*
-            . $cTest/test.inc
+        $gpTest/test-com.sh*
+            . $gpTest/test.inc
 		fTestSetupEnv
-            	. $cBin/gitproj-com.inc
+            	. $gpBin/gitproj-com.inc
 		    fComSetGlobals
 	    fComRunTests
-                . $cTest/shunit2.1*
+                . $gpTest/shunit2.1*
 
-        $cTest/test-CMD.sh
-            . $cTest/test.inc
+        $gpTest/test-CMD.sh
+            . $gpTest/test.inc
 		fTestSetupEnv
-            	. $cBin/gitproj-com.inc
+            	. $gpBin/gitproj-com.inc
 		    fComSetGlobals
 	    fTestCreateEnv
-            . $cBin/gitproj-CMD.inc
+            . $gpBin/gitproj-CMD.inc
 	        fCMDSetGlobals
 	    fTestConfigSetup
 
 ## dev-test Environment
 
-    cTest=DIR/gitproj/doc/test
-    cTestEnv=$cTest/../../..
+    gpTest=DIR/gitproj/doc/test
+    cTestEnv=$gpTest/../../..
     HOME=$cTestEnv/root/home/john
 
 Create with:
 
     cd $cTestEnv
-    tar -xzf $cTest/test-env.tgz
+    tar -xzf $gpTest/test-env.tgz
 
 Creates:
 

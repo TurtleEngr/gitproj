@@ -91,7 +91,7 @@ Env Var
 
 Calls:
 
- $cBin/gitproj-com.inc
+ $gpBin/gitproj-com.inc
  fComSetGlobals
 
 =internal-cut
@@ -109,7 +109,7 @@ oneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset cBin cCurDir cName cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
+    unset gpBin cCurDir gpCmdName cPID gpCmdVer gErr gpDebug gpFacility gpSysLog gpVerbose
     fTestSetupEnv
     gpUnitDebug=0
     return 0
@@ -140,19 +140,19 @@ testGitProj()
 {
     local tResult
     
-    tResult=$($cBin/git-proj 2>&1)
+    tResult=$($gpBin/git-proj 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     assertContains "$LINENO" "$tResult" 'Usage:'
 
-    tResult=$($cBin/git-proj -h 2>&1)
+    tResult=$($gpBin/git-proj -h 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     assertContains "$LINENO =" "$tResult" 'DESCRIPTION'
 
-    tResult=$($cBin/git-proj -H html 2>&1)
+    tResult=$($gpBin/git-proj -H html 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     assertContains "$LINENO" "$tResult" '<title>git proj Usage</title>'
 
-    tResult=$($cBin/git-proj -H int 2>&1)
+    tResult=$($gpBin/git-proj -H int 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     return 0
 } # testGitProj
@@ -161,19 +161,19 @@ testGitProj()
 # This should be the last defined function
 fTestRun()
 {
-    if [ ! -x $cTest/shunit2.1 ]; then
-        echo "Error: Missing: $cTest/shunit2.1"
+    if [ ! -x $gpTest/shunit2.1 ]; then
+        echo "Error: Missing: $gpTest/shunit2.1"
         exit 1
     fi
     shift $#
-    if [ -z "$gpTest" ]; then
+    if [ -z "$gpTestList" ]; then
         # shellcheck disable=SC1091
-        . $cTest/shunit2.1
+        . $gpTest/shunit2.1
         exit $?
     fi
 
     # shellcheck disable=SC1091
-    . $cTest/shunit2.1 -- $gpTest
+    . $gpTest/shunit2.1 -- $gpTestList
     exit $?
 
     cat <<EOF >/dev/null
@@ -190,7 +190,7 @@ EOF
 # ====================
 # Main
 
-export cTest cTestCurDir gpTest
+export gpTest cTestCurDir gpTestList
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir
@@ -201,19 +201,19 @@ cTestCurDir=$PWD
 
 # -------------------
 # Define the location of this script
-cTest=${0%/*}
+gpTest=${0%/*}
 if [ "$cTesBin" = "." ]; then
-    cTest=$PWD
+    gpTest=$PWD
 fi
-cd $cTest
-cTest=$PWD
+cd $gpTest
+gpTest=$PWD
 cd $cTestCurDir
 
 # -----
 # Optional input: a comma separated list of test function names
-gpTest="$*"
+gpTestList="$*"
 
 # -----
-. $cTest/test.inc
+. $gpTest/test.inc
 
-fTestRun $gpTest
+fTestRun $gpTestList

@@ -91,7 +91,7 @@ Env Var
 
 Calls:
 
- $cBin/gitproj-com.inc
+ $gpBin/gitproj-com.inc
  fComSetGlobals
 
 =internal-cut
@@ -109,7 +109,7 @@ oneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset cBin cCurDir cPID cVer gErr gpDebug gpFacility gpLog gpVerbose
+    unset gpBin cCurDir cPID gpCmdVer gErr gpDebug gpFacility gpSysLog gpVerbose
     fTestSetupEnv
     gpUnitDebug=0
     return 0
@@ -138,12 +138,12 @@ tearDown()
 # --------------------------------
 testSetup()
 {
-    assertTrue "$LINENO" "[ -x $cBin/gitproj-com.inc ]"
-    assertTrue "$LINENO" "[ -x $cBin/git-proj ]"
+    assertTrue "$LINENO" "[ -x $gpBin/gitproj-com.inc ]"
+    assertTrue "$LINENO" "[ -x $gpBin/git-proj ]"
     return 0
 
     assertTrue "$LINENO" "[ -r $cTestFiles ]"
-    assertTrue "$LINENO" "[ -d $cTestSrcDir ]"
+    assertTrue "$LINENO" "[ -d $cTestSrcDirg ]"
     assertTrue "$LINENO" "[ -d $cTestDestDir ]"
     assertNotEquals "$LINENO" "$cHome" "$HOME"
     assertTrue "$LINENO" "[ -r $HOME/.gitproj.config ]"
@@ -174,16 +174,16 @@ testComInitialConfig()
     local tResult
 
     assertTrue "$LINENO -d $cCurDir" "[ -d $cCurDir ]"
-    assertNotNull "$LINENO $cBin" "$cBin"
-    assertTrue "$LINENO -d $cBin" "[ -d $cBin ]"
-    assertTrue "$LINENO -x $cBin/gitproj-com.inc" "[ -x $cBin/gitproj-com.inc ]"
+    assertNotNull "$LINENO $gpBin" "$gpBin"
+    assertTrue "$LINENO -d $gpBin" "[ -d $gpBin ]"
+    assertTrue "$LINENO -x $gpBin/gitproj-com.inc" "[ -x $gpBin/gitproj-com.inc ]"
 
     assertEquals "$LINENO" "0" "$gpDebug"
     assertEquals "$LINENO" "2" "$gpVerbose"
-    assertEquals "$LINENO" "0" "$gpLog"
+    assertEquals "$LINENO" "false" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" "$gErr"
-    assertNull "$LINENO" "$(echo $cVer | tr -d '.[:digit:]')"
+    assertNull "$LINENO" "$(echo $gpCmdVer | tr -d '.[:digit:]')"
 
     for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr; do
         
@@ -215,19 +215,19 @@ testComLog_MultiplePermutations()
     local tTestMsg
 
     # Check the format, for a number of settings
-    gpLog=0
+    gpSysLog=false
     gpVerbose=0
     gpDebug=0
     tMsg="Testing 123"
     tLine="458"
     tErr="42"
 
-    for gpLog in 0 1; do
+    for gpSysLog in false true; do
         for gpVerbose in 0 1 2; do
             for gpDebug in 0 1 2; do
                 for tLevel in alert crit err warning notice info debug debug-1 debug-3; do
                     echo -n '.' 1>&2
-                    tTestMsg="l-$gpLog.v-$gpVerbose.d-$gpDebug.$tLevel.fLog"
+                    tTestMsg="l-$gpSysLog.v-$gpVerbose.d-$gpDebug.$tLevel.fLog"
                     fTestDebug " "
                     fTestDebug "Call: fLog -p $tLevel -m \"$tMsg\" -l $tLine -e $tErr"
                     tResult=$(fLog -p $tLevel -m "$tMsg" -l $tLine -e $tErr 2>&1)
@@ -257,7 +257,7 @@ testComLog_MultiplePermutations()
                         assertNull "$LINENO tcl4-$tTestMsg not debug-3" "$tResult"
                         continue
                     fi
-                    assertContains "$LINENO tcl5-$tTestMsg.name" "$tResult" "$cName"
+                    assertContains "$LINENO tcl5-$tTestMsg.name" "$tResult" "$gpCmdName"
                     assertContains "$LINENO tcl6-$tTestMsg.level" "$tResult" "$tLevel:"
                     assertContains "$LINENO tcl7-$tTestMsg.msg" "$tResult" "$tMsg"
                     assertContains "$LINENO tcl8-$tTestMsg.line" "$tResult" '['$tLine']'
@@ -265,7 +265,7 @@ testComLog_MultiplePermutations()
                 done # tLevel
             done     # gpDebug
         done         # gpVerbose
-    done             # gpLog
+    done             # gpSysLog
 
     echo 1>&2
     return
@@ -292,12 +292,12 @@ testComSysLog()
     local tTestMsg
 
     # ADJUST? This is dependent on your syslog configuration.
-    export tSyslog=/var/log/user.log
-    #export tSyslog=/var/log/messages.log
-    #export tSyslog=/var/log/syslog
+    export tSysLog=/var/log/user.log
+    #export tSysLog=/var/log/messages.log
+    #export tSysLog=/var/log/syslog
 
     # Check syslog
-    gpLog=1
+    gpSysLog=true
     gpVerbose=0
     tMsg="Testing 123"
     #for tLevel in emerg alert crit err warning; do
@@ -309,7 +309,7 @@ testComSysLog()
         tResult=$(fLog -p $tLevel -m "$tMsg" 2>&1)
         fTestDebug "tResult=$tResult"
         assertContains "$LINENO tcl11-$tTestMsg" "$tResult" "$tLevel:"
-        tResult=$(tail -n1 $tSyslog)
+        tResult=$(tail -n1 $tSysLog)
         fTestDebug "syslog tResult=$tResult"
         assertContains "$LINENO tcl12-$tTestMsg" "$tResult" "$tLevel:"
         assertContains "$LINENO tcl13-$tTestMsg" "$tResult" "$tMsg"
@@ -340,18 +340,18 @@ testComErrorLog()
     local tTestMsg
 
     gpUnitDebug=0
-    gpLog=0
+    gpSysLog=false
     gpVerbose=0
     local tMsg="Testing 123"
     local tLine="458"
-    for gpLog in 0 1; do
+    for gpSysLog in false true; do
         echo -n '.' 1>&2
-        tTestMsg="l-$gpLog.fError"
+        tTestMsg="l-$gpSysLog.fError"
         fTestDebug " "
         fTestDebug "Call: fError -m \"$tMsg\" -l $tSrc:$tLine"
         tResult=$(fError -m "$tMsg" -l $tSrc:$tLine 2>&1)
         fTestDebug "tResult=$tResult"
-        assertContains "$LINENO $tTestMsg.name" "$tResult" "$cName"
+        assertContains "$LINENO $tTestMsg.name" "$tResult" "$gpCmdName"
         assertContains "$LINENO $tTestMsg.crit" "$tResult" "crit:"
         assertContains "$LINENO $tTestMsg.msg" "$tResult" "$tMsg"
         assertContains "$LINENO $tTestMsg.line" "$tResult" '['$tSrc:$tLine']'
@@ -377,8 +377,8 @@ EOF
 testComUsage()
 {
     local tResult
-    local tUsageScript=$cTest/test-com.sh
-    local tInternalScript=$cBin/gitproj-com.inc
+    local tUsageScript=$gpTest/test-com.sh
+    local tInternalScript=$gpBin/gitproj-com.inc
 
     gpUnitDebug=0
 
@@ -409,10 +409,10 @@ testComUsage()
     assertContains "$LINENO tcu-man.2" "$tResult" '.IX Header "HISTORY"'
 
     #-----
-    tResult=$(fComUsage -s html -f $tUsageScript -t "$cName Usage" 2>&1)
+    tResult=$(fComUsage -s html -f $tUsageScript -t "$gpCmdName Usage" 2>&1)
     assertContains "$LINENO tcu-html.1" "$tResult" '<li><a href="#DESCRIPTION">DESCRIPTION</a></li>'
     assertContains "$LINENO tcu-html.2" "$tResult" '<h1 id="HISTORY">HISTORY</h1>'
-    assertContains "$LINENO tcu-html.3" "$tResult" "<title>$cName Usage</title>"
+    assertContains "$LINENO tcu-html.3" "$tResult" "<title>$gpCmdName Usage</title>"
 
     #-----
     tResult=$(fComUsage -s md -f $tUsageScript 2>&1)
@@ -507,7 +507,7 @@ testComSetConfigGlobal()
     grep -q 'test-int = 2048' $tGlobal
     assertTrue "$LINENO" "[ $? -eq 0 ]"
 
-    fComSetConfig -g -b -k gitproj.testit.test-bool -v "yes"
+    fComSetConfig -g -b -k gitproj.testit.test-bool -v "true"
     grep -q 'test-bool = true' $tGlobal
     assertTrue "$LINENO" "[ $? -eq 0 ]"
 } # testComSetConfigGlobal
@@ -520,7 +520,7 @@ testComGetConfigGlobal()
 
     fComSetConfig -g -k gitproj.testit.test-str-get -v "test a string"
     fComSetConfig -g -k gitproj.testit.test-int-get -v "2K"
-    fComSetConfig -g -k gitproj.testit.test-bool-get -v "yes"
+    fComSetConfig -g -k gitproj.testit.test-bool-get -v "true"
 
     tResult=$(fComGetConfig -g -k gitproj.testit.test-str-get)
     assertEquals "$LINENO -g" "test a string" "$tResult"
@@ -560,19 +560,19 @@ testCheckPkg()
 # This should be the last defined function
 fTestRun()
 {
-    if [ ! -x $cTest/shunit2.1 ]; then
-        echo "Error: Missing: $cTest/shunit2.1"
+    if [ ! -x $gpTest/shunit2.1 ]; then
+        echo "Error: Missing: $gpTest/shunit2.1"
         exit 1
     fi
     shift $#
-    if [ -z "$gpTest" ]; then
+    if [ -z "$gpTestList" ]; then
         # shellcheck disable=SC1091
-        . $cTest/shunit2.1
+        . $gpTest/shunit2.1
         exit $?
     fi
 
     # shellcheck disable=SC1091
-    . $cTest/shunit2.1 -- $gpTest
+    . $gpTest/shunit2.1 -- $gpTestList
     exit $?
 
     cat <<EOF >/dev/null
@@ -589,9 +589,9 @@ EOF
 # ====================
 # Main
 
-export cTest cTestCurDir gpTest cName
+export gpTest cTestCurDir gpTestList gpCmdName
 
-cName=${BASH_SOURCE##*/}
+gpCmdName=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir
@@ -602,19 +602,19 @@ cTestCurDir=$PWD
 
 # -------------------
 # Define the location of this script
-cTest=${0%/*}
+gpTest=${0%/*}
 if [ "$cTesBin" = "." ]; then
-    cTest=$PWD
+    gpTest=$PWD
 fi
-cd $cTest
-cTest=$PWD
+cd $gpTest
+gpTest=$PWD
 cd $cTestCurDir
 
 # -----
 # Optional input: a comma separated list of test function names
-gpTest="$*"
+gpTestList="$*"
 
 # -----
-. $cTest/test.inc
+. $gpTest/test.inc
 
-fTestRun $gpTest
+fTestRun $gpTestList

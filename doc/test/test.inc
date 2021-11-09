@@ -3,10 +3,10 @@
 # --------------------------------
 # Test globals
 
-export PWD cBin cCurDir cName cPID cVer cHome
-export gErr gpDebug gpFacility gpLog gpVerbose
-export cDoc cTest cRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
-export cTestCurDir cTestSrcDir cTestDestDir cTestFiles
+export PWD gpBin cCurDir gpCmdName cPID gpCmdVer cHome
+export gErr gpDebug gpFacility gpSysLog gpVerbose
+export gpDoc gpTest gpLocalRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
+export cTestCurDir cTestSrcDirg cTestDestDir cTestFiles
 export gpTest gpUnitDebugSHUNIT_COLOR
 
 # Relative to $HOME
@@ -51,23 +51,23 @@ EOF
 # --------------------------------
 fTestSetupEnv()
 {
-    cBin=$cTest/../../git-core
-    cd $cBin >/dev/null 2>&1
-    cBin=$PWD
+    gpBin=$gpTest/../../git-core
+    cd $gpBin >/dev/null 2>&1
+    gpBin=$PWD
     cd - >/dev/null 2>&1
 
-    cDoc=${cTest%/test}
+    gpDoc=${gpTest%/test}
 
-    . $cBin/gitproj-com.inc
+    . $gpBin/gitproj-com.inc
 
-    cTestSrcDir=$cTest
-    cTestFiles=$cTestSrcDir/test-env.tgz
+    cTestSrcDirg=$gpTest
+    cTestFiles=$cTestSrcDirg/test-env.tgz
     if [ ! -r $cTestFiles ]; then
         echo "Error: Cannot find: $cTestFiles. [test.inc:$LINENO]"
         exit 1
     fi
 
-    cTestDestDir=$cTest/../../..
+    cTestDestDir=$gpTest/../../..
     cd $cTestDestDir >/dev/null 2>&1
     cTestDestDir=$PWD
     cd - >/dev/null

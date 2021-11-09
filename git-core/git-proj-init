@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export cName cBin cCurDir cVer
+export gpCmdName gpBin cCurDir gpCmdVer
 
 #--------------------
 fUsage()
@@ -10,7 +10,7 @@ fUsage()
 
     local pStyle="${1:-usage}"
 
-    fComUsage -s $pStyle -f $cBin/$cName
+    fComUsage -s $pStyle -f $gpBin/$gpCmdName
     exit 1
 
     cat <<\EOF >/dev/null
@@ -73,8 +73,8 @@ settings.
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 
-    Path (-l) [$PWD]? $gpLocalPath
-        So the project Name will be: ${gpLocalPath##*/}
+    Path (-l) [$PWD]? $gpLocalTopDir
+        So the project Name will be: ${gpLocalTopDir##*/}
 
 =item B<-r pRawLocalPath>
 
@@ -210,7 +210,7 @@ EOF
 # ========================================
 # Main
 
-cName=${BASH_SOURCE##*/}
+gpCmdName=${BASH_SOURCE##*/}
 export tSrc=${BASH_SOURCE##*/}
 
 # -------------------
@@ -222,23 +222,23 @@ cCurDir=$PWD
 
 # -------------------
 # Define the location of this script
-cBin=${0%/*}
-if [ "$cBin" = "." ]; then
-    cBin=$PWD
+gpBin=${0%/*}
+if [ "$gpBin" = "." ]; then
+    gpBin=$PWD
 fi
-cd $cBin
-cBin=$PWD
+cd $gpBin
+gpBin=$PWD
 cd $cCurDir
 
 # -------------------
-. $cBin/gitproj-com.inc
+. $gpBin/gitproj-com.inc
 # Calls: fComSetGlobals
 
 if [ $# -eq 0 ]; then
     fError -m "Missing options." -l $tSrc:$LINENO
 fi
 
-. $cBin/gitproj-init.inc
+. $gpBin/gitproj-init.inc
 # Calls: fInitSetGlobals
 
 while getopts :al:r:k:s:mfhH:x tArg; do
@@ -246,14 +246,14 @@ while getopts :al:r:k:s:mfhH:x tArg; do
         # Script arguments
         a) gpAuto=1 ;;
         l)
-            gpLocalPath="$OPTARG"
-            gpRawLocalPath=../${gpLocal##*/}
+            gpLocalTopDir="$OPTARG"
+            gpLocalRawDir=../${gpLocal##*/}
             ;;
         r)
-            gpRawLocalPath="$OPTARG"
+            gpLocalRawDir="$OPTARG"
             gpRawRemotePath="$OPTARG"
             ;;
-        k) gpSymLinkName="$OPTARG" ;;
+        k) gpLocalRawSymLink="$OPTARG" ;;
         s) gpMaxSize=1K ;;
         m) gpMove=1 ;;
         f) gpGitFlow=1 ;;

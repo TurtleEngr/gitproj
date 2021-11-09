@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export cName cBin cCurDir cVer
+export gpCmdName gpBin cCurDir gpCmdVer
 
 fUsage()
 {
@@ -10,33 +10,33 @@ fUsage()
     local pStyle="${1:-usage}"
 
     local tFileList="\
-	-f $cBin/git-proj \
-	-f $cBin/git-proj-init \
+	-f $gpBin/git-proj \
+	-f $gpBin/git-proj-init \
 	"
     tFileList="$(echo $tFileList)"
 	
-    	#-f $cBin/git-proj-remote \
-	#-f $cBin/git-proj-clone \
-	#-f $cBin/git-proj-add \
-	#-f $cBin/git-proj-push \
-	#-f $cBin/git-proj-pull \
-	#-f $cBin/git-proj-add \
-	#-f $cBin/git-proj-move \
-	#-f $cBin/git-proj-rm \
-	#-f $cBin/git-proj-config \
-	#-f $cBin/git-proj-status \
-	#-f $cBin/git-proj-check \
+    	#-f $gpBin/git-proj-remote \
+	#-f $gpBin/git-proj-clone \
+	#-f $gpBin/git-proj-add \
+	#-f $gpBin/git-proj-push \
+	#-f $gpBin/git-proj-pull \
+	#-f $gpBin/git-proj-add \
+	#-f $gpBin/git-proj-move \
+	#-f $gpBin/git-proj-rm \
+	#-f $gpBin/git-proj-config \
+	#-f $gpBin/git-proj-status \
+	#-f $gpBin/git-proj-check \
 
     local tIntFileList="\
         $tFileList \
-	-f $cBin/gitproj-com.inc \
-	-f $cBin/gitproj-com.test \
+	-f $gpBin/gitproj-com.inc \
+	-f $gpBin/gitproj-com.test \
     "
     tIntFileList="$(echo $tIntFileList)"
 
     case $pStyle in
         short | usage | man)
-            fComUsage -s $pStyle -f $cBin/$cName
+            fComUsage -s $pStyle -f $gpBin/$gpCmdName
             ;;
         long | text | md)
             fComUsage -s $pStyle $tFileList
@@ -48,13 +48,13 @@ fUsage()
             fComUsage -i -s long $tIntFileList
             ;;
         int-html)
-            fComUsage -i -s html -t "$cName Internal Doc" $tIntFileList
+            fComUsage -i -s html -t "$gpCmdName Internal Doc" $tIntFileList
             ;;
         int-md)
             fComUsage -i -s md $tIntFileList
             ;;
         *)
-            fComUsage -s usage -f $cBin/$cName
+            fComUsage -s usage -f $gpBin/$gpCmdName
             ;;
     esac
     exit 1
@@ -175,7 +175,7 @@ See: fLog (Internal documentation)
 
 =head2 ~/.gitconfig
 
-Source: cDoc/config/gitconfig.default
+Source: gpDoc/config/gitconfig.default
 
 If this doesn't exist, git proj init will create it from "Source":
 
@@ -186,7 +186,7 @@ This will be put in ~/.gitconfig
 
 =head2 ~/.gitproj.config.global
 
-Source: cDoc/config/gitproj.config.global
+Source: gpDoc/config/gitproj.config.global
 
 git proj init local, will create the initial ~/.gitproj.config.
 
@@ -203,7 +203,7 @@ locations of file, based on the host. For example the remote-raw-url
 
 =head2 top-dir/.gitproj.config.$HOSTNAME
 
-Initial Source: cDoc/config/gitproj.config.HOSTNAME
+Initial Source: gpDoc/config/gitproj.config.HOSTNAME
 
 This will be created when git project repo is first created on a host.
 
@@ -215,7 +215,7 @@ override variables. Any changed to the variables in
 
 =head2 top-dir/.gitproj.config.local
 
-Source: cDoc/config/gitproj.config.local
+Source: gpDoc/config/gitproj.config.local
 
 Uncomment the variables that should override ~/.gitconfig or
 ~/.gitproj.config.global. If the variables are host specific, then the
@@ -224,7 +224,7 @@ file.
 
 	[gitproj "config"]
 		ver = 1.0
-		syslog = yes
+		syslog = true
 		facility = user
 
 		bin = /usr/lib/git-core
@@ -236,7 +236,7 @@ file.
 	 	# See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
 	
 		# States: not-setup, setup-err, config-err, OK
-		gitproj-status = not-set-up
+		proj-status = not-set-up
 	
 		# origin-url with path and .git removed
 		name = TBD
@@ -245,18 +245,16 @@ file.
 		# git rev-parse --show-toplevel
 		top-dir = TBD
 	
-			# If $t = $r, then set hardlink to yes
+			# If $t = $r, then set hardlink to true
 		# t=$(df -BM top-dir --output=source | tail -n 1)
 		# r=$(df -BM raw-dir --output=source | tail -n 1)
 		hardlink = no
 	
-		# Set raw-url to only one of these values
-	
 		# Local mount examples
-		remote-raw-url = TBD
+		remote-raw-dir = TBD
 		#remote.origin.url = /MOUNT-DIR/DIR/NAME.git
 
-		# Remote examples
+		# Remote examples (not implemented. TBD)
 		#remove-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
 		#remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
 		#remote.origin-url=git@github.com:TurtleEngr/gitproj.git
@@ -266,7 +264,7 @@ file.
                 #  dir/Name.raw
 		# This should NOT be in a git dir.
 		# Relative to top-dir
-		local-raw-dir = ..
+		local-raw-dir-pat = ..
 
 		# Relative to top-dir; cd top-dir; ln -s
                 # raw-dir/name.raw symlink
@@ -275,13 +273,13 @@ file.
 		local-raw-symlink = raw
 
 	[gitproj "hook"]
-		# If pre-commit-enabled = yes, pre-commit hook script will be
+		# If pre-commit-enabled = true, pre-commit hook script will be
 		# installed into .git/hooks/
-		# Relative to cDoc
+		# Relative to gpDoc
 		source = hooks/pre-commit
-		pre-commit-enabled = yes
-		check-file-names = yes
-		check-for-big-files = yes
+		pre-commit-enabled = true
+		check-file-names = true
+		check-for-big-files = true
 		# End size with b, k, m, or g
 		binary-file-size-limit = 1k
 
@@ -296,7 +294,7 @@ The the "common" CLI flags will override the initial variable settings.
 
 =over 4
 
-=item B<gpLog>
+=item B<gpSysLog>
 
 If set to 0, log messages will only be sent to stderr.
 
@@ -385,7 +383,7 @@ See gitproj-com.test
 
 See Globals section for details.
 
-HOME,USER, gpLog, gpFacility, gpVerbose, gpDebug, gpUnitDebug
+HOME,USER, gpSysLog, gpFacility, gpVerbose, gpDebug, gpUnitDebug
 
 =head1 FILES
 
@@ -443,7 +441,7 @@ EOF
 # ====================
 # Main
 
-cName=${BASH_SOURCE##*/}
+gpCmdName=${BASH_SOURCE##*/}
 export tSrc=${BASH_SOURCE##*/}
 
 # -------------------
@@ -457,21 +455,21 @@ fi
 
 # -------------------
 # Define the location of the com script if not already set
-if [ -z "$cBin" ]; then
-    cBin=${0%/*}
-    if [ "$cBin" = "." ]; then
-        cBin=$PWD
+if [ -z "$gpBin" ]; then
+    gpBin=${0%/*}
+    if [ "$gpBin" = "." ]; then
+        gpBin=$PWD
     fi
-    cd $cBin >/dev/null 2>&1
-    cBin=$PWD
+    cd $gpBin >/dev/null 2>&1
+    gpBin=$PWD
     cd - >/dev/null 2>&1
 fi
 
 # -----
-. $cBin/gitproj-com.inc
+. $gpBin/gitproj-com.inc
 
 # shellcheck disable=SC2016
-cVer='$Revision: 1.49 $'
+gpCmdVer='$Revision: 1.49 $'
 
 #fSetGlobals
 fComSetGlobals
@@ -490,7 +488,7 @@ while getopts :hH:lx tArg; do
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-        l) gpLog=1 ;;
+        l) gpSysLog=true ;;
         x) let gpDebug=gpDebug+1 ;;
         # Problem arguments
         :) fError -m "Value required for option: $OPTARG" -l $tSrc:$LINENO ;;

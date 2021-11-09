@@ -4,7 +4,7 @@
 	# gpVer
 	ver = 1.1
 	# gpSyslog
-	sys-log = yes
+	syslog = true
 	# gpFacility
 	facility = user
 	# gpBin
@@ -19,18 +19,18 @@
 	# gpProjName
 	proj-name = TBD
 	# gpHardLink
-	hard-link = no
-	# gpRemoteRawUrl
-	remote-raw-url = TBD
+	hardlink = false
+	# gpRemoteRawUrl /MOUNT-DIR/DIR/NAME.raw
+	remote-raw-dir = TBD
 	# gpLocalTopDir
 	local-top-dir = TBD
-	# gpLocalRawDir
-	local-raw-dir = ..
+	# gpLocalRawDirPat
+	local-raw-dir-pat = ..
 	# gpLocalRawSymLink
-	local-raw-sym-link = raw
+	local-raw-symlink = raw
 [gitproj "hook"]
 	source = hooks/pre-commit
-	pre-commit-enabled = yes
-	check-file-names = yes
-	check-for-big-files = yes
+	pre-commit-enabled = true
+	check-file-names = true
+	check-for-big-files = true
 	binary-file-size-limit = 1k

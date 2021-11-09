@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --------------------------------
-export PWD cBin cCurDir cName cPID cVer cHome
-export gErr gpDebug gpFacility gpLog gpVerbose
-export cDoc cTest cRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
+export PWD gpBin cCurDir gpCmdName cPID gpCmdVer cHome
+export gErr gpDebug gpFacility gpSysLog gpVerbose
+export gpDoc gpTest gpLocalRawDir cGetOrigin cGetTopDir cConfigGlobal cConfigLocal
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -82,18 +82,18 @@ where the variables are set.
 
 For more help, see the Globals section in fUsage.
 
- gpLog - -l
+ gpSysLog - -l
  gpVerbose - -v, -vv
  gpDebug - -x, -xx, ...
  gpTest - -t
  gErr - error code (0 = no error)
- cName - script's name taken from $0
+ gpCmdName - script's name taken from $0
  cCurDir - current directory
- cBin - directory where the script is executing from
- cDoc - directory for config/, hooks/, test/
- cVer - current version. For example, if using CVS:
+ gpBin - directory where the script is executing from
+ gpDoc - directory for config/, hooks/, test/
+ gpCmdVer - current version. For example, if using CVS:
 	# shellcheck disable=SC2016
-	cVer='$Revision: 1.4 $'
+	gpCmdVer='$Revision: 1.4 $'
 
 =internal-head3 Documentation Format
 
@@ -143,26 +143,26 @@ fComSetGlobals()
 
     # -------------------
     # Define the location of the com script if not already set
-    if [ -z "$cBin" ]; then
-        cBin=${0%/*}
-        if [ "$cBin" = "." ]; then
-            cBin=$PWD
+    if [ -z "$gpBin" ]; then
+        gpBin=${0%/*}
+        if [ "$gpBin" = "." ]; then
+            gpBin=$PWD
         fi
-        cd $cBin >/dev/null 2>&1
-        cBin=$PWD
+        cd $gpBin >/dev/null 2>&1
+        gpBin=$PWD
         cd - >/dev/null 2>&1
     fi
 
     # -------------------
     # Constants
-    if [ -z "$cDoc" ]; then
-        cDoc=/usr/share/doc/gitproj
+    if [ -z "$gpDoc" ]; then
+        gpDoc=/usr/share/doc/gitproj
     fi
-    if [ ! -d $cDoc ]; then
-        cDoc=$cBin/../doc
+    if [ ! -d $gpDoc ]; then
+        gpDoc=$gpBin/../doc
     fi
-    if [ ! -d $cDoc ]; then
-        fError -m "Error: Cannot find gitproj doc directory: $cDoc" -l $tSrc:$LINENO
+    if [ ! -d $gpDoc ]; then
+        fError -m "Error: Cannot find gitproj doc directory: $gpDoc" -l $tSrc:$LINENO
     fi
 
     # Included in ~/.gitproj.config (use -G to set config vars to this)
@@ -188,18 +188,18 @@ fComSetGlobals()
     # -v
     gpVerbose=${gpVerbose:-2}
     # -l
-    gpLog=${gpLog:-0}
-    gpFacility=${gpFacility:=user}
+    gpSysLog=${gpSysLog:-false}
+    gpFacility=${gpFacility:-user}
     gErr=0
 
     # -------------------
     # If your script defines a version with the Revision keyword, clean it
     # shellcheck disable=SC2016
-    #cVer='$Revision: 1.4 $'
+    #gpCmdVer='$Revision: 1.4 $'
 
-    if [ "$cVer" != "${cVer#*' '}" ]; then
-        cVer=${cVer#*' '}
-        cVer=${cVer%' '*}
+    if [ "$gpCmdVer" != "${gpCmdVer#*' '}" ]; then
+        gpCmdVer=${gpCmdVer#*' '}
+        gpCmdVer=${gpCmdVer%' '*}
     fi
 
     return
@@ -309,7 +309,7 @@ fComUsage()
     local pStyle="long"
     local pInt=0
     local pAll=""
-    local pTitle="$cName Usage"
+    local pTitle="$gpCmdName Usage"
 
     local tSrc=${BASH_SOURCE##*/}
     local tProg=""
@@ -457,7 +457,7 @@ fComFmtLog()
     local tPID_Opt=""
 
     # Set any missing globals
-    gpLog=${gpLog:-0}
+    gpSysLog=${gpSysLog:-false}
     gpFacility=${gpFacility:-user}
     gpVerbose=${gpVerbose:-0}
     gpDebug=${gpDebug:-0}
@@ -502,10 +502,10 @@ fComFmtLog()
     fi
 
     # Output
-    if [ $gpLog -eq 0 ]; then
-        echo "${cName}$tPID $pLevel: $pMsg $tLine$tErr" 1>&2
+    if [ "$gpSysLog" = "false" ]; then
+        echo "${gpCmdName}$tPID $pLevel: $pMsg $tLine$tErr" 1>&2
     else
-        logger -s $tPID_Opt -t $cName -p $gpFacility.$tLevel "$pLevel: $pMsg $tLine$tErr"
+        logger -s $tPID_Opt -t $gpCmdName -p $gpFacility.$tLevel "$pLevel: $pMsg $tLine$tErr"
     fi
     return
 
@@ -565,7 +565,7 @@ pLevel - emerg alert crit err warning notice info debug debug-N
  if gpVerbose = 1, don't output info
  if gpVerbose >= 2, output all logs
 
-See Globals: gpLog, gpFacility, gpVerbose, gpDebug
+See Globals: gpSysLog, gpFacility, gpVerbose, gpDebug
 
 =internal-head4 fLog Examples:
 

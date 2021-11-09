@@ -6,13 +6,13 @@
 [gitproj "config"]
 	proj-status = not-set-up
 	proj-name = TBD
-	hard-link = no
-	remote-raw-url = /MOUNT-DIR/DIR/NAME.raw
+	hardlink = false
+	remote-raw-dir = TBD
 	local-top-dir = TBD
-	local-raw-dir = ..
-	local-raw-sym-link = raw
+	local-raw-dir-pat = ..
+	local-raw-symlink = raw
 [gitproj "hook"]
-	pre-commit-enabled = yes
-	check-file-names = yes
-	check-for-big-files = yes
+	pre-commit-enabled = true
+	check-file-names = true
+	check-for-big-files = true
 	binary-file-size-limit = 2M
