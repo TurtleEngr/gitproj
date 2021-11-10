@@ -441,7 +441,7 @@ EOF
 # ====================
 # Main
 
-gpCmdName=${BASH_SOURCE##*/}
+export gpCmdName=${BASH_SOURCE##*/}
 export tSrc=${BASH_SOURCE##*/}
 
 # -------------------
@@ -483,8 +483,10 @@ fi
 if [ $# -eq 0 ]; then
     fError -m "Missing options." -l $tSrc:$LINENO
 fi
-while getopts :hH:lx tArg; do
+pShowVer=0
+while getopts :vVhH:lx tArg; do
     case $tArg in
+    	v|V) pShowVer=1;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -497,7 +499,15 @@ while getopts :hH:lx tArg; do
 done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
-    fError -m "Unexpected option: $*" -l $tSrc:$LINENO
+    if [ "$1" = "version" ]; then
+        pShowVer=1
+    else
+        fError -m "Unexpected option: $*" -l $tSrc:$LINENO
+    fi
+fi
+
+if [ $pShowVer -ne 0 ]; then
+    echo $cGitProjVersion
 fi
 
 exit 0

@@ -3,7 +3,7 @@
 # --------------------
 export cCurDir cGetOrigin cGetTopDir cTop
 export gpAction gpAuto gpBin gpCmdName gpCmdVer gpDebug gpDoc \
-       gpFacility gpGitFlow gpHardlink gpLocalRawDir gpLocalRawDirPat \
+       gpFacility gpGitFlow gpHardLink gpLocalRawDir gpLocalRawDirPat \
        gpLocalRawSymLink gpLocalTopDir gpMaxSize gpAutoMove gpPath \
        gpProjName gpSysLog gpVar gpVerbose
 # ???
@@ -388,7 +388,7 @@ fInitGetBinaryFiles()
     for tFile in $(find * -type f -size +$tSize); do
     	# If char are found outside of the space to ~ range, it is
 	# probably a binary file.
-        if [ "$(tr -d '[ -~]\0' <$tFile | wc -c)" != "0" ]; then
+        if [ "$(tr -d '[ -~\n\r\b\f\t\v]' <$tFile | wc -c)" != "0" ]; then
             tFileList="$tFileList $tFile"
         fi
     done
@@ -449,7 +449,6 @@ fInitGetGetFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
-    local tGitFlowInstalled
 
     fComCheckPkg $gpGitFlowPkg
     if [ $? -ne 0 ]; then
@@ -557,6 +556,9 @@ The initial working directory was created at $cHostName:$gpLocalTopDir
 For help with the "git proj" subcommand, just cd into the working directory
 and type "git proj".
 EOF
+
+    fLog -p notice -m "Created: TOP_DIR/$gpLocalRawSymLink -> $gpLocalRawDir" -l $tSrc:$LINENO
+    fLog -p notice -m "Use $gpLocalRawSymLink to access the files in $gpLocalRawDir  That way, if $gpLocalRawDir moves, only one place needs to be fixed up." -l $tSrc:$LINENO
     return 0
 } # fInitMkRaw
 
@@ -569,31 +571,49 @@ fInitMoveBinaryFiles()
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tFileList=$(fInitGetBinaryFiles)
-    if [ $? -eq 0 ]; then
+    if [ $? -ne 0 ]; then
         return 0
     fi
-    if [ "$gpAutoMove" = "false" ]
+    if [ "$gpAutoMove" = "false" ]; then
         fLog -p warning -m "Binary files were found, but will not be moved." -l $tSrc:$LINENO
         return 0
     fi
     fLog -p notice -m "Moving large binary files." -l $tSrc:$LINENO
     for tFile in $tFileList; do
     	tDir=${tFile%/*}
-	if [ "$tDir" != "$tFile" ]; then
-	    mkdir -p $gpLocalRawSymLink/$tDir
-	else
+	if [ "$tDir" = "$tFile" ]; then
 	    tDir=""
+	else
+	    if [ ! -d $gpLocalRawSymLink/$tDir ]; then
+	        mkdir -p $gpLocalRawSymLink/$tDir >/dev/null 2>&1
+	    fi
+	    if [ ! -d $gpLocalRawSymLink/$tDir ]; then
+    		fError -i -m "Could not create: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
+	    fi
+    	    fLog -p info -m "Exists: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
 	fi
-        if [ "$gpHardlink" = "true" ]; then
-	    mv $tFile $gpLocalRawSymLink/$tDir
+	echo "gpHardLink=$gpHardLink"
+        if [ "$gpHardLink" = "true" ]; then
+	    mv -v $tFile $gpLocalRawSymLink/$tDir
 	else
 	    'rsync' -vP $tFile $gpLocalRawSymLink/$tDir
 	fi
-	if [ -s $gpLocalRawSymLink/$tDir/$tFile ]; then
-	    rm $tFile
-	    ln -s $gpLocalRawSymLink/$tFile $tFile
+	if [ ! -s $gpLocalRawSymLink/$tFile ]; then
+    	    fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
 	fi
+	if [ -f $tFile ]; then
+    	    rm $tFile
+	fi
+	ln -s $gpLocalRawSymLink/$tFile $tFile
+	if [ ! -L $tFile ]; then
+    	    fError -i -m "Could not create symlink for: $tFile" -l $tSrc:$LINENO
+	fi
+	tLink=$('ls' -l $tFile | awk '{print $9,$10,$11}')
+	fLog -p notice -m "Created link: $tLink" -l $tSrc:$LINENO
     done
+
+    fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files through project's $gpLocalRawSymLink symlink." -l $tSrc:$LINENO
+
     return 0
 } # fInitMoveBinaryFiles
 

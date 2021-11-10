@@ -681,7 +681,6 @@ testInitSummary()
 testInitMkRaw()
 {
     local tResult
-    local tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitFirstTimeSet
@@ -696,19 +695,126 @@ testInitMkRaw()
     gpMaxSize="1k"
     gpAutoMove=true
     gpAuto=0
+    gpVerbose=2
 
+    cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkRaw 2>&1)
-    
+    assertTrue $LINENO $?
+    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    assertTrue $LINENO "[ -L $gpLocalRawSymLink ]"
+    assertTrue $LINENO "[ -f $gpLocalRawDir/README.txt ]"
+    assertTrue $LINENO "$(grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt; echo $?)"
+    assertContains "$LINENO $tResult" "$tResult" "Created:"
+    assertContains "$LINENO $tResult" "$tResult" "to access the files in"
+
+    gpUnitDebug=1
+    fTestDebug "$tResult"
+
     return 0
 } # testInitMkRaw
 
-testInitMoveBinaryFiles()
+testInitMoveBinaryFiles_Move()
 {
     local tResult
 
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitFirstTimeSet
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpLocalRawDirPat=".."
+    gpLocalRawDir=$gpLocalRawDirPat/$gpProjName.raw
+    gpLocalRawSymLink="raw"
+    gpHardLink="true"
+    gpGitFlow=1
+    gpAutoMove=true
+    gpAuto=0
+    gpVerbose=2
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitMkRaw >/dev/null 2>&1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    assertTrue "$LINENO $gpLocalRawSymLink"  "[ -L $gpLocalRawSymLink ]"
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    gpMaxSize="10k"
+    gpHardLink="true"
+    tResult=$(fInitMoveBinaryFiles 2>&1)
+    assertTrue $LINENO $?
+    assertNotContains "$LINENO" "$tResult" "Binary files were found"
+    assertNotContains "$LINENO" "$tResult" "Could not create:"
+    assertNotContains "$LINENO" "$tResult" "Could not move:"
+    assertNotContains "$LINENO" "$tResult" "Could not create symlink for:"
+    assertContains "$LINENO" "$tResult" "Moving large binary file"
+    assertContains "$LINENO" "$tResult" "Exists:"
+    assertContains "$LINENO" "$tResult" "Created link"
+    assertContains "$LINENO" "$tResult" "Version and use the file symlinks,"
+    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    assertTrue $LINENO "[ ! -f raw/edit/george.kdenlive ]"
+    assertTrue $LINENO "[ -f raw/src/raw/MOV001.mp4 ]"
+    assertTrue $LINENO "[ -f raw/src/raw/MOV001.MP3 ]"
+    assertTrue $LINENO "[ -f raw/src/final/george.mp4 ]"
+    assertTrue $LINENO "[ -L src/raw/MOV001.mp4 ]"
+    assertTrue $LINENO "[ -L src/raw/MOV001.MP3 ]"
+    assertTrue $LINENO "[ -L src/final/george.mp4 ]"
+
+    gpUnitDebug=0
+    fTestDebug "HardLink=true, and Size 10k: $tResult"
 
     return 0
-} # testInitMoveBinaryFiles
+} # testInitMoveBinaryFiles_Move
+
+testInitMoveBinaryFiles_Copy()
+{
+    local tResult
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitFirstTimeSet
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpLocalRawDirPat=".."
+    gpLocalRawDir=$gpLocalRawDirPat/$gpProjName.raw
+    gpLocalRawSymLink="raw"
+    gpGitFlow=1
+    gpAutoMove=true
+    gpAuto=0
+    gpVerbose=2
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitMkRaw >/dev/null 2>&1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    assertTrue "$LINENO $gpLocalRawSymLink"  "[ -L $gpLocalRawSymLink ]"
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    gpMaxSize="200k"
+    gpHardLink="false"
+    tResult=$(fInitMoveBinaryFiles 2>&1)
+    assertTrue $LINENO $?
+    assertNotContains "$LINENO" "$tResult" "Binary files were found"
+    assertNotContains "$LINENO" "$tResult" "Could not create:"
+    assertNotContains "$LINENO" "$tResult" "Could not move:"
+    assertNotContains "$LINENO" "$tResult" "Could not create symlink for:"
+    assertContains "$LINENO" "$tResult" "Moving large binary file"
+    assertContains "$LINENO" "$tResult" "Exists:"
+    assertContains "$LINENO" "$tResult" "Created link"
+    assertContains "$LINENO" "$tResult" "Version and use the file symlinks,"
+    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    assertTrue $LINENO "[ -f raw/src/final/george.mp4 ]"
+    assertTrue $LINENO "[ -L src/final/george.mp4 ]"
+    assertTrue $LINENO "[ ! -f raw/edit/george.kdenlive ]"
+    assertTrue $LINENO "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertTrue $LINENO "[ ! -f raw/src/raw/MOV001.MP3 ]"
+    assertTrue $LINENO "[ ! -L src/raw/MOV001.mp4 ]"
+    assertTrue $LINENO "[ ! -L src/raw/MOV001.MP3 ]"
+
+    gpUnitDebug=0
+    fTestDebug "HardLink=false, and Size 200k: $tResult"
+
+    return 0
+} # testInitMoveBinaryFiles_Copy
 
 testInitMkGitDir()
 {

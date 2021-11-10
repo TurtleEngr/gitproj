@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # --------------------------------
-export cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir cPID
+export cConfigGlobal cHostName cConfigLocal cCurDir cGitProjVersion \
+      cGetOrigin cGetTopDir cPID
 export gErr gpBin gpCmdName gpCmdVer gpDebug gpDoc gpFacility \
        gpLocalRawDir gpSysLog gpVerbose
 
@@ -164,6 +165,8 @@ fComSetGlobals()
     if [ ! -d $gpDoc ]; then
         fError -m "Error: Cannot find gitproj doc directory: $gpDoc" -l $tSrc:$LINENO
     fi
+
+    cGitProjVersion=$($gpDoc/VERSION)
 
     # Included in ~/.gitproj.config (Use -G to set config vars to this)
     # shellcheck disable=SC2088

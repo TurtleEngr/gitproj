@@ -178,6 +178,10 @@ testComInitialConfig()
     assertTrue "$LINENO -d $gpBin" "[ -d $gpBin ]"
     assertTrue "$LINENO -x $gpBin/gitproj-com.inc" "[ -x $gpBin/gitproj-com.inc ]"
 
+    assertNotNull "$LINENO $gpDoc" "$gpDoc"
+    assertTrue "$LINENO -d $gpDoc" "[ -d $gpDoc ]"
+
+
     assertEquals "$LINENO" "0" "$gpDebug"
     assertEquals "$LINENO" "2" "$gpVerbose"
     assertEquals "$LINENO" "false" "$gpSysLog"
@@ -185,7 +189,7 @@ testComInitialConfig()
     assertEquals "$LINENO" "0" "$gErr"
     assertNull "$LINENO" "$(echo $gpCmdVer | tr -d '.[:digit:]')"
 
-    for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr; do
+    for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr rsync; do
         
         assertTrue "$LINENO missing: $tProg" "$(which $tProg >/dev/null 2>&1; echo $?)"
     done
