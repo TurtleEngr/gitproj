@@ -468,8 +468,13 @@ testInitGetRawLocalDirPat()
     assertContains "$LINENO $tResult" "$tResult" "does not exist"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
+    gpAuto=1
+    fInitGetLocalRawDirPat ".." >/dev/null 2>&1
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "true" "$gpHardLink"
+
     return 0
-}
+} # testInitGetRawLocalDirPat
 
 testInitValidSymLink()
 {
@@ -607,12 +612,12 @@ testInitGetMoveFiles()
     gpMaxSize="18k"
     fInitGetMoveFiles 2>&1 < <(echo -e "x\nn")
     assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "0" "$gpMove"
+    assertEquals "$LINENO" "0" "$gpAutoMove"
 
     gpMaxSize="18k"
     fInitGetMoveFiles 2>&1 < <(echo -e "y")
     assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "1" "$gpMove"
+    assertEquals "$LINENO" "1" "$gpAutoMove"
 
     return 0
 } # testInitGetMoveFiles
@@ -642,13 +647,72 @@ testInitGetGetFlow()
     return 0
 } # testInitGetGetFlow
 
-testInitMkGitDir()
+testInitSummary()
 {
     local tResult
     local tStatus
 
-    startSkipping
-    fail "TBD"
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpHardLink="true"
+    gpGitFlow=1
+    gpMaxSize="1k"
+
+    tResult=$(fInitSummary 2>&1)
+    assertTrue "$LINENO" $?
+    assertContains "$LINENO $tResult" "$tResult" "Summary"
+    assertContains "$LINENO $tResult" "$tResult" "auto-move"
+
+    gpUnitDebug=1
+    fTestDebug "$tResult"
+
+    return 0
+} # testInitSummary
+
+testInitMkGitDir()
+{
+    local tResult
+    local tStatus
+    local tTop
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitFirstTimeSet
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpHardLink="true"
+    gpGitFlow=1
+    gpMaxSize="1k"
+    gpAutoMove=true
+    gpAuto=0
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitMkGitDir 2>&1 < <(echo -e "n"))
+    assertFalse $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitMkGitDir 2>&1 < <(echo -e "y"))
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
+
+    gpUnitDebug=1
+    fTestDebug "$tResult"
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+
+    assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
+    assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
+    assertTrue $LINENO "grep -q core $gpLocalTopDir/.gitignore; echo $?"
+
+    tTop=$($cGetTopDir)
+    assertEquals $LINENO "$gpLocalTopDir" "$tTop"
+
+    tResult=$(git branch 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "develop"
+    assertContains "$LINENO $tResult" "$tResult" "main"
+
     return 0
 } # testInitMkGitDir
 

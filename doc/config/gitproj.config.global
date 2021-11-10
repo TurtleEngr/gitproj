@@ -36,3 +36,4 @@
 	check-file-names = true
 	check-for-big-files = true
 	binary-file-size-limit = 1k
+	auto-move = true

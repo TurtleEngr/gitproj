@@ -3,18 +3,21 @@
 # --------------------
 export cCurDir cGetOrigin cGetTopDir cTop
 export gpAction gpAuto gpBin gpCmdName gpCmdVer gpDebug gpDoc \
-       gpFacility gpGitFlow gpLocalRawDir gpLocalRawDirPat \
-       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpMove gpPath \
+       gpFacility gpGitFlow gpHardlink gpLocalRawDir gpLocalRawDirPat \
+       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpAutoMove gpPath \
        gpProjName gpSysLog gpVar gpVerbose
 # ???
 export gpMountPath gpRawRemotePath
-
 
 # --------------------
 fInitFirstTimeSet()
 {
     local tInclude
 
+    if [ ! -f $HOME/.gitconfig ]; then
+        cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
+    fi
+    
     # TBD: see cConfigGlobal
     if [ ! -f $HOME/.gitproj.config.global ]; then
         cp $gpDoc/config/gitproj.config.global $HOME/.gitproj.config.global
@@ -60,10 +63,13 @@ fInitSetGlobals()
     gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
-    gpMove=0
+    gpAutoMove="true"
     gpGitFlow=0
     gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
     gpAction=""
+
+    gpProjStatus=$(fComGetConfig -k "gitproj.config.proj-status" -d "not-set-up")
+    gpHardLink=$(fComGetConfig -k "gitproj.config.hardlink" -d "false")
 
     return 0
 } # fInitSetGlobals
@@ -198,6 +204,22 @@ EOF
     return 0
 } # fInitValidLocalRawDirPat
 
+fInitSetHardLink()
+{
+    local tDevTopDir
+    local tDevRawDir
+
+    # If on same filesystem, hardlinks can be used to move files quickly
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tDevTopDir=$(df -BM $gpLocalTopDir --output=source | tail -n 1)
+    tDevRawDir=$(df -BM $gpLocalRawDirPat --output=source | tail -n 1)
+    gpHardLink=false
+    if [ "$tDevTopDir" = "$tDevRawDir" ]; then
+        gpHardLink=true
+    fi
+    return 0
+} # fInitSetHardLink
+
 fInitGetLocalRawDirPat()
 {
     local pLocalRawDirPat=$1
@@ -209,6 +231,7 @@ fInitGetLocalRawDirPat()
         if ! fInitValidLocalRawDirPat $pLocalRawDirPat; then
             fError -m "Invalid -l pLocalRawDirPat: $pLocalRawDirPat" -l $tSrc:$LINENO
         fi
+        fInitSetHardLink
         return 0
     fi
 
@@ -236,7 +259,7 @@ EOF
         fi
     done
 
-#NA    gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
+    fInitSetHardLink
     return 0
 } # fInitGetLocalRawDirPat
 
@@ -410,11 +433,11 @@ EOF
             exit 1
         fi
         if [ $tResult = "y" ]; then
-            gpMove=1
+            gpAutoMove=1
             break
         fi
         if [ $tResult = "n" ]; then
-            gpMove=0
+            gpAutoMove=0
             break
         fi
     done
@@ -459,10 +482,51 @@ fInitGetGetFlow()
 } # fInitGetGetFlow
 
 # --------------------
+fInitSummary()
+{
+    cat <<EOF
+Summary
+           "auto" = $gpAuto
+          "exits"   HOME/.gitconfig
+        "created"   HOME/.gitproj.config.global
+[gitproj "config"]
+      proj-status = $gpProjStatus
+              ver = $gpVer
+           syslog = $gpSysLog
+         facility = $gpFacility
+              bin = $gpBin
+              doc = $gpDoc
+             test = $gpTest
+    local-top-dir = $gpLocalTopDir
+        proj-name = $gpProjName
+local-raw-dir-pat = $gpLocalRawDirPat
+ "local-raw-dir"  = $gpLocalRawDirPat/$gpProjName.raw
+local-raw-symlink = $gpLocalRawSymLink
+	 hardlink = $gpHardLink
+     git-flow-pkg = $gpGitFlowPkg
+  "git-flow init" = $gpGitFlow
+[gitproj "hook"]
+    binary-file-size-limit = $gpMaxSize
+                 auto-move = $gpAutoMove
+EOF
+    return 0
+} # fInitSummary
+
+# --------------------
+fInitMkRaw()
+{
+    echo "TBD"
+    # The $gpLocalRawDir/README.txt file will point to the project dir.
+# create ../Name.raw
+# move binary files
+} # fInitMkRaw
+
+# --------------------
 fInitMkGitDir()
 {
     declare -l tResult
 
+# TBD move this to fInitSummary
     if [ $gpAuto -eq 0 ]; then
         while true; do
             echo -n "Continue with creating a local git repo [y/n/quit]? "
@@ -476,12 +540,13 @@ fInitMkGitDir()
                 break
             fi
             if [ $tResult = "n" ]; then
-                flog -p warning -m "Quitting, nothing will be done." -l $LINE
+                fLog -p warning -m "Quitting, nothing will be done." -l $LINE
                 exit 1
             fi
         done
     fi
 
+    cd $gpLocalTopDir >/dev/null 2>&1
     cat <<EOF >.gitignore
 *.tmp
 *~
@@ -496,28 +561,31 @@ tmp/
 EOF
     set -x >/dev/null 2>&1
     git init
-    git add .gitignore ./*
+    git add .gitignore *
     git commit -am "Initial commit"
     git branch --move master main
     git branch develop
     git checkout develop
     set +x >/dev/null 2>&1
-    if fCheckPkg git-flow; then
+    if fComCheckPkg git-flow; then
         set -x >/dev/null 2>&1
         git flow init -d
-        set +x >/dev/null 2>&1
+	set +x >/dev/null 2>&1
+	# TBD define default prefixes
+#	[gitflow "prefix"]
+#        feature = feature/
+#        bugfix = bug/
+#        release = release/
+#        hotfix = hotfix/
+#        support = suport/
+#        versiontag = ver-
     fi
     set -x >/dev/null 2>&1
     git branch
     git status
     set +x >/dev/null 2>&1
+    # TBD: setup .gitproj.config.local and .gitproj.config.$HOSTNAME
 } # fInitMkGitDir
-
-fInitMkRaw()
-{
-    echo "TBD"
-    # The $gpLocalRawDir/README.txt file will point to the project dir.
-} # fMkRaw
 
 # --------------------
 fInitCreateLocalGit()
@@ -529,11 +597,12 @@ fInitCreateLocalGit()
     fInitGetLocalRawDirPat $gpLocalRawDirPat
     fInitGetSymLink $gpLocalRawSymLink
     fInitGetSize $gpMaxSize
-    fInitGetMoveFiles $gpMove
+    fInitGetMoveFiles $gpAutoMove
     fInitGetGetFlow $gpGitFlow
 
-    fInitMkGitDir
+    fInitSummary
     fInitMkRaw
+    fInitMkGitDir
 } # fInitCreateLocalGit
 
 # ========================================
@@ -542,7 +611,7 @@ fInitCreateLocalGit()
 fInitGetMountPath()
 {
     #$gpMountPath
-    fCheckPath $gpPath	# gpPath??? TBD
+    fInitCheckPath $gpPath	# gpPath??? TBD
 } # fInitGetMountPath
 
 fInitGetRawRemotePath()
@@ -632,9 +701,9 @@ fInitCreateRemoteGit()
     fGetRawRemotePath $gpRawRemotePath	# gpRawRemotePath??? TBD
 
     fMustBeInGitRepo
-    fCheckSpace $gpPath
-    fMkRemote $gpPath
-    fReport
+    fInitCheckSpace $gpPath
+    fInitMkRemote $gpPath
+    fInitReport
 } # fCreateRemoteGit
 
 # ========================================

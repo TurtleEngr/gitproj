@@ -17,3 +17,4 @@
 	check-file-names = true
 	check-for-big-files = true
 	binary-file-size-limit = 2M
+	auto-move = true
