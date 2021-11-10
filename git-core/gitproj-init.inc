@@ -39,7 +39,6 @@ fInitSetGlobals()
     gpAuto=0
 
     # Relative to top-dir
-    # TBD: see cConfigLocal
     gpLocalRawDirPat=$(fComGetConfig -k "gitproj.config.local-raw-dir-pat" -d "..")
 
     gpLocalRawSymLink=$(fComGetConfig -k "gitproj.config.local-raw-symlink" -d raw)
@@ -57,12 +56,13 @@ fInitSetGlobals()
         gpProjName="${gpLocalTopDir##*/}"
     fi
 
-    # TBD - path is relative to top-dir. Or make it absolute?
+    # Path is relative to top-dir
     gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
     gpMove=0
     gpGitFlow=0
+    gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
     gpAction=""
 
     return 0
@@ -155,74 +155,90 @@ EOF
 } # fInitGetLocalPath
 
 # --------------------
-fInitValidLocalRawDir()
+fInitValidLocalRawDirPat()
 {
-    local pRawLocalPath=$1
+    local pLocalRawDirPat=$1
 
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ "${pRawLocalPath#../}" = "$pRawLocalPath" ]; then
-        fLog -p warning -m "RawLocalPath works best if it is relative to top-dir" -l $tSrc:$LINENO
+    if [ "${pLocalRawDirPat#..}" = "$pLocalRawDirPat" ]; then
+        fLog -p warning -m "RawLocalPathPat works best if it is relative to top-dir: $gpLocalTopDir" -l $tSrc:$LINENO
     fi
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    if [ ! -d $pRawLocalPath ]; then
-        fLog -p err -m "Raw directory not found: $pRawLocalPath" -l $tSrc:$LINENO
-        cd $cCurDir >/dev/null 2>&1
+    if [ ! -d $pLocalRawDirPat ]; then
+        fLog -p err -m "Raw directory $pLocalRawDirPat not found relative to $gpLocalTopDir" -l $tSrc:$LINENO
+        cd - >/dev/null 2>&1
         return 1
     fi
+    cd - >/dev/null 2>&1
 
-    cd $pRawLocalPath >/dev/null 2>&1
+    cd $gpLocalTopDir/$pLocalRawDirPat >/dev/null 2>&1
     echo $PWD | grep -q "/$gpProjName/"
     # shellcheck disable=SC2181
-    if [ $? -ne 0 ]; then
+    if [ $? -eq 0 ]; then
         fLog -p err -m "Raw directory cannot be in $gpLocalTopDir" -l $tSrc:$LINENO
+        cd - >/dev/null 2>&1
+        return 1
     fi
+    cd - >/dev/null 2>&1
 
-    gpLocalRawDir=$pRawLocalPath
+    # TBD: error for gpLocalRawDirPat to be "in" a raw dir.
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
+    if [ -d $gpLocalRawDir ]; then
+        fLog -p warn -m "Raw directory already exists: $gpLocalRawDir" -l $tSrc:$LINENO
+    fi
+    cd - >/dev/null 2>&1
     cat <<EOF | fmt
-The $gpLocalRawDir/README.txt file will point to the project dir.
+$gpLocalRawDir will be created.
+README.txt will be updated.
 EOF
-    cd $cCurDir >/dev/null 2>&1
     return 0
-} # fInitValidLocalRawDir
+} # fInitValidLocalRawDirPat
 
-fInitGetLocalRawDir()
+fInitGetLocalRawDirPat()
 {
-    local pRawLocalPath=$1
+    local pLocalRawDirPat=$1
     
     local tSrc=${BASH_SOURCE##*/}
     local tResult
 
     if [ $gpAuto -ne 0 ]; then
-        if ! fInitValidLocalRawDir $pRawLocalPath; then
-            fError -m "Invalid -l pRawLocalPath: $pRawLocalPath" -l $tSrc:$LINENO
+        if ! fInitValidLocalRawDirPat $pLocalRawDirPat; then
+            fError -m "Invalid -l pLocalRawDirPat: $pLocalRawDirPat" -l $tSrc:$LINENO
         fi
         return 0
     fi
 
     while true; do
         cat <<EOF | fmt
+	
 Set the location for large binary files. It cannot be *in* any of the
-project directories. It will be created, if it does not existi. The
-path must be relative to the project dir (and not too far away or
-cloning the project may not work). The files in the raw directory will
-NOT be versioned--only the latest copy will be saved. Default: ../Name.raw
+project directories. It will be created, if it does not exist. The
+path should be relative to the project dir. The files in the raw
+directory will NOT be versioned--only the latest copy will be
+saved. Default: ..
+
 EOF
-        echo -n "Raw dir (-r) [../$gpProjName.raw | quit]? "
+        echo -n "Raw dir (-r) [$gpLocalRawDirPat/quit]? "
         read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
-            tResult=../$gpProjName.raw
+            tResult=$gpLocalRawDirPat
         fi
-        if fInitValidLocalRawDir $tResult; then
+        if fInitValidLocalRawDirPat $tResult; then
             break
         fi
     done
-} # fInitGetLocalRawDir
+
+#NA    gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
+    return 0
+} # fInitGetLocalRawDirPat
 
 # --------------------
 fInitValidSymLink()
@@ -232,14 +248,14 @@ fInitValidSymLink()
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    if [ ! -e $pSymLinkName ]; then
+    if [ -e $pSymLinkName ]; then
         fLog -p err -m "Symlink: $pSymLinkName already exists. Pick another name or quit and remove it." -l $tSrc:$LINENO
-        cd $cCurDir >/dev/null 2>&1
+        cd - >/dev/null 2>&1
         return 1
     fi
+    cd - >/dev/null 2>&1
 
     gpLocalRawSymLink=$pSymLinkName
-    cd $cCurDir >/dev/null 2>&1
     return 0
 } # fInitValidSymLink
 
@@ -251,7 +267,7 @@ fInitGetSymLink()
     local tResult
 
     if [ $gpAuto -ne 0 ]; then
-        if ! fValidSymLink $pSymLinkName; then
+        if ! fInitValidSymLink $pSymLinkName; then
             fError -m "Invalid -k pSymLinkName: $pSymLinkName" -l $tSrc:$LINENO
         fi
         return 0
@@ -259,22 +275,23 @@ fInitGetSymLink()
 
     while true; do
         cat <<EOF | fmt
+	
 Define the symlink name that will point to the Raw dir. It will be
 created in the project's top dir. If the Raw dir is moved, this link
 will need to be updated. Symlink in the git directories will point to
-this dir and the symlinks will be versioned.
+this dir and the symlinks will be versioned. Default: raw
 
 EOF
         echo -n "Symlink (-k) [$pSymLinkName/quit]? "
         read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -m warning -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ -z "$tResult" ]; then
             tResult=$pSymLinkName
         fi
-        if fValidSymLink $tResult; then
+        if fInitValidSymLink $tResult; then
             break
         fi
     done
@@ -284,11 +301,11 @@ EOF
 # --------------------
 fInitValidSize()
 {
-    local pMaxSize=$1
+    declare -l pMaxSize=$1
 
     local tSrc=${BASH_SOURCE##*/}
 
-    echo $pMaxSize | grep -q '[0-9]+[bkmg]'
+    echo $pMaxSize | grep -Eq '[0-9]+[bkmg]'
     # shellcheck disable=SC2181
     if [ $? -eq 0 ]; then
         gpMaxSize=$pMaxSize
@@ -306,7 +323,7 @@ fInitGetSize()
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
-        if ! fValidSize $pMaxSize; then
+        if ! fInitValidSize $pMaxSize; then
             fError -m "Invalid -s pSize: $pMaxSize" -l $tSrc:$LINENO
         fi
         return 0
@@ -314,7 +331,7 @@ fInitGetSize()
 
     while true; do
         cat <<EOF | fmt
-Define the "size" for large binary files. Format: Nb, Nk, Nm, or Ng
+Define the size for large binary files. Format: Nb, Nk, Nm, or Ng
 EOF
         echo "Size (-s) [$pMaxSize/quit]? "
         read -r tResult
@@ -325,7 +342,7 @@ EOF
         if [ -z "$tResult" ]; then
             tResult=$pMaxSize
         fi
-        if fValidSize $tResult; then
+        if fInitValidSize $tResult; then
             break
         fi
     done
@@ -338,10 +355,14 @@ fInitGetBinaryFiles()
     local tFileList=""
     local tSize
 
+    # shellcheck disable=SC2020
     tSize=$(echo "$gpMaxSize" | tr 'bBKmg' 'cckMG')
 
+    # shellcheck disable=SC2044
     for tFile in $(find $gpLocalTopDir -type f -size +$tSize); do
-        if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
+    	# If char are found outside of the space to ~ range, it is
+	# probably a binary file.
+        if [ "$(tr -d '[ -~]\0' <$tFile | wc -c)" != "0" ]; then
             tFileList="$tFileList, $tFile"
         fi
     done
@@ -361,22 +382,24 @@ EOF
 fInitGetMoveFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
+    declare -l tResult
+
+    if ! fInitGetBinaryFiles; then
+        fLog -p warning -m 'No large binary files were found.' -l $tSrc:$LINENO
+        return 0
+    fi
 
     if [ $gpAuto -ne 0 ]; then
         return 0
     fi
 
-    if ! fGetBinaryFiles; then
-        fLog -p warning -m 'No "large" binary files were found.' -l $tSrc:$LINENO
-        return 0
-    fi
-
     while true; do
         cat <<EOF | fmt
+
 The listed files can be moved to the project's raw directory. Paths
 will be created in the raw directory that correspond to the project's
 directory. A symlink will replace the moved file. The symlink will
-point to [raw]
+point to [raw]. Quit if you want to change the MaxSize.
 
 EOF
         echo -n "Move the files (-m) [y/n/quit]? "
@@ -405,12 +428,11 @@ fInitGetGetFlow()
     declare -l tResult
     local tGitFlowInstalled
 
-    fCheckPkg git-flow
-    tGitFlowInstalled=$?
-
-    if [ $tGitFlowInstalled -ne 0 ] [ $tGitFlowInstalled -ne 0 ]; then
+    fComCheckPkg $gpGitFlowPkg
+    if [ $? -ne 0 ]; then
         fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
         gpGitFlow=0
+        return 0
     fi
     if [ $gpAuto -ne 0 ]; then
         return 0
@@ -504,7 +526,7 @@ fInitCreateLocalGit()
 
     # Prompt/Response or if -a, just validate the options
     fInitGetLocalPath $gpLocalTopDir
-    fInitGetLocalRawDir $gpLocalRawDir
+    fInitGetLocalRawDirPat $gpLocalRawDirPat
     fInitGetSymLink $gpLocalRawSymLink
     fInitGetSize $gpMaxSize
     fInitGetMoveFiles $gpMove

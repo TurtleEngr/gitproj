@@ -64,7 +64,7 @@ $Revision: 1.2 $ $Date: 2021/09/08 01:39:35 $ GMT
 =cut
 
 EOF
-}
+} # fUsage
 
 # ========================================
 
@@ -155,6 +155,7 @@ testGitProjInit()
     cd $HOME/$cDatProj1 >/dev/null 2>&1
     assertFalse "$LINENO" "[ -d .git ]"
     cd - >/dev/null 2>&1
+    return 0
 } # testGitProjInit
 
 testFirstTimeSet()
@@ -166,6 +167,7 @@ testFirstTimeSet()
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
     assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
     assertTrue "$LINENO" "$(grep -q path $HOME/.gitconfig; echo $?)"
+    return 0
 } # testFirstTimeSet
 
 testIniitSetGlobals()
@@ -187,6 +189,7 @@ testIniitSetGlobals()
     assertNull "$LINENO" "$gpAction"
 
     cd - >/dev/null 2>&1
+    return 0
 } # testIniitSetGlobals
 
 checkComMustNotBeInGit()
@@ -234,12 +237,14 @@ checkComMustNotBeInGit()
     tStatus=$?
     fTestDebug "Check: $HOME/$cDatProj1"
     assertTrue $LINENO $tStatus
+    return 0
 } # checkComMustNotBeInGit
 
 testComMustNotBeInGit()
 {
     gpUnitDebug=0
     checkComMustNotBeInGit fComMustNotBeInGit
+    return 0
 } # testComMustNotBeInGit
 
 checkComAllMustBeReadable()
@@ -274,12 +279,14 @@ checkComAllMustBeReadable()
     tStatus=$?
     assertFalse $LINENO $tStatus
     assertContains "$LINENO $tResult" "$tResult" "All directories must be executable"
+    return 0
 } # checkComAllMustBeReadable
 
 testComAllMustBeReadable()
 {
     gpUnitDebug=0
     checkComAllMustBeReadable fComAllMustBeReadable
+    return 0
 } # testComAllMustBeReadable
 
 testInitGettingStarted()
@@ -306,6 +313,7 @@ testInitGettingStarted()
     assertFalse $LINENO $tStatus
 
     cd - >/dev/null 2>&1
+    return 0
 } # testInitGettingStarted
 
 testInitValidLocalPath()
@@ -330,6 +338,7 @@ testInitValidLocalPath()
     fInitValidLocalPath  $HOME/$cDatProj1 >/dev/null 2>&1
     assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalTopDir"
     assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
+    return 0
 } # testInitValidLocalPath
 
 testInitGetLocalPath()
@@ -389,136 +398,330 @@ testInitGetLocalPath()
     assertTrue $LINENO $tStatus
     assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalTopDir"
     assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
+    return 0
 } # testInitGetLocalPath
 
-testInitValidRawLocalPath()
+testInitValidLocalRawDirPat()
 {
-    startSkipping
-    fail "TBD"
-    return 0
-}
+    local tResult
+    local tStatus
 
-testInitGetRawLocalPath()
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+
+    tResult=$(fInitValidLocalRawDirPat ".." 2>&1)
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
+    assertContains "$LINENO $tResult" "$tResult" "../${gpProjName}.raw"
+
+    tResult=$(fInitValidLocalRawDirPat "doc" 2>&1)
+    tStatus=$?
+    assertFalse "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "works best if it is relative to"
+    assertContains "$LINENO $tResult" "$tResult" "Raw directory cannot be in"
+
+    tResult=$(fInitValidLocalRawDirPat "$HOME" 2>&1)
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "works best if it is relative to"
+
+    tResult=$(fInitValidLocalRawDirPat "../foo-bar" 2>&1)
+    tStatus=$?
+    assertFalse "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "not found relative to"
+
+    mkdir $gpLocalTopDir/../$gpProjName.raw
+    tResult=$(fInitValidLocalRawDirPat ".." 2>&1)
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Raw directory already exists"
+    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
+
+    return 0
+} # testInitValidLocalRawDirPat
+
+testInitGetRawLocalDirPat()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+
+    tResult=$(fInitGetLocalRawDirPat 2>&1< <(echo -e "\n"))
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Set the location for large binary files."
+    assertContains "$LINENO $tResult" "$tResult" "../$gpProjName.raw will be created."
+    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
+
+    tResult=$(fInitGetLocalRawDirPat 2>&1< <(echo -e ".."))
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "../$gpProjName.raw will be created."
+    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
+
+    tResult=$(fInitGetLocalRawDirPat 2>&1 < <(echo -e "foo-bar\nquit"))
+    tStatus=$?
+    assertFalse "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "does not exist"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
     return 0
 }
 
 testInitValidSymLink()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+
+    tResult=$(fInitValidSymLink "doc" 2>&1)
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "already exists"
+
+    tResult=$(fInitValidSymLink "raw" 2>&1)
+    tStatus=$?
+    assertTrue $LINENO $tStatus
+
+    fInitValidSymLink "raw"
+    assertEquals "$LINENO" "raw" "$gpLocalRawSymLink"
+
     return 0
-}
+} # testInitValidSymLink
+
 testInitGetSymLink()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+
+    tResult=$(fInitGetSymLink 2>&1 < <(echo -e "doc\nquit"))
+    tStatus=$?
+    assertFalse $LINENO $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Define the symlink name that will point to the Raw dir"
+    assertContains "$LINENO $tResult" "$tResult" "already exists"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
     return 0
-}
+} # testInitGetSymLink
 
 testInitValidSize()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+    declare -l tLower
+
+    tResult=$(fInitValidSize "12K" 2>&1)
+    tStatus=$?
+    assertTrue $LINENO $tStatus
+
+    fInitValidSize "12K"
+    assertEquals $LINENO "12k" "$gpMaxSize"
+
+    for i in 3b 34k 8m 2g 3B 34k 8M 2G; do
+        fInitValidSize "$i"
+	tLower=$i
+        assertEquals "$LINENO $i" "$tLower" "$gpMaxSize"
+    done
+
+    for i in 3x k 8 2 K2; do
+        tResult=$(fInitValidSize "$i" 2>&1)
+    	tStatus=$?
+    	assertFalse "$LINENO $i" $tStatus
+    	assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
+    done
+
     return 0
-}
+} # testInitValidSize
 
 testInitGetSize()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+    declare -l tLower
+
+    tResult=$(fInitGetSize 2>&1 < <(echo -e "12K"))
+    tStatus=$?
+    assertTrue "$LINENO $i" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Define the size for large binary files"
+    
+    fInitGetSize >/dev/null 2>&1 < <(echo -e "12K")
+    assertTrue $LINENO $?
+    assertEquals "$LINENO $i" "12k" "$gpMaxSize"
+
+    tResult=$(fInitGetSize 2>&1 < <(echo -e "42\n66x\nq"))
+    tStatus=$?
+    assertFalse "$LINENO $i" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"    
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
     return 0
 }
 
 testInitGetBinaryFiles()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+
+    gpMaxSize="18k"
+    gpLocalTopDir=$HOME/$cDatProj1
+
+    tResult=$(fInitGetBinaryFiles 2>&1)
+    tStatus=$?
+    assertTrue "$LINENO $i" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "These binary files are greater than $gpMaxSize"
+    assertContains "$LINENO $tResult" "$tResult" "src/final/george.mp4"
+    assertContains "$LINENO $tResult" "$tResult" "src/raw/MOV001.mp4"
+    assertNotContains "$LINENO $tResult" "$tResult" "src/raw/MOV001.mp3"
+
     return 0
-}
+} # testInitGetBinaryFiles
 
 testInitGetMoveFiles()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+
+    gpLocalTopDir=$HOME/$cDatProj1
+
+    gpMaxSize="24m"
+    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "q"))
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "No large binary files were found"
+
+    gpMaxSize="18k"
+    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "x\nquit"))
+    tStatus=$?
+    assertFalse "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "The listed files can be moved"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    gpMaxSize="18k"
+    fInitGetMoveFiles 2>&1 < <(echo -e "x\nn")
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "0" "$gpMove"
+
+    gpMaxSize="18k"
+    fInitGetMoveFiles 2>&1 < <(echo -e "y")
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "1" "$gpMove"
+
     return 0
-}
+} # testInitGetMoveFiles
 
 testInitGetGetFlow()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tStatus
+
+    tResult=$(fInitGetGetFlow 2>&1 < <(echo -e "\nquit"))
+    assertFalse "$LINENO" $?
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    
+    fInitGetGetFlow >/dev/null 2>&1 < <(echo -e "yes")
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "1" "$gpGitFlow"
+    
+    fInitGetGetFlow >/dev/null 2>&1 < <(echo -e "No")
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "0" "$gpGitFlow"
+
+    gpGitFlowPkg=foo-bar
+    tResult=$(fInitGetGetFlow 2>&1 < <(echo -e "\n"))
+    assertTrue "$LINENO" $?
+    assertContains "$LINENO $tResult" "$tResult" "git-flow is not installed"
+
     return 0
-}
+} # testInitGetGetFlow
 
 testInitMkGitDir()
 {
+    local tResult
+    local tStatus
+
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitMkGitDir
 
 testInitMkRaw()
 {
+    local tResult
+    local tStatus
+
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitMkRaw
 
 testInitCreateLocalGit()
 {
+    local tResult
+    local tStatus
+
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitCreateLocalGit
+
+# ========================================
 
 testInitGetMountPath()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitGetMountPath
+
 testInitGetRawRemotePath()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitGetRawRemotePath
 
 testInitCheckPath()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitCheckPath
+
 testInitCheckSpace()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitCheckSpace
 
 testInitMkRemote()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitMkRaw
+
 testInitReport()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitReport
 
 testInitCreateRemoteGit()
 {
     startSkipping
     fail "TBD"
     return 0
-}
+} # testInitCreateRemoteGit
 
 # ====================
 # This should be the last defined function

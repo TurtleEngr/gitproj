@@ -11,6 +11,7 @@
 	local-top-dir = TBD
 	local-raw-dir-pat = ..
 	local-raw-symlink = raw
+	git-flow-pkg = git-flow
 [gitproj "hook"]
 	pre-commit-enabled = true
 	check-file-names = true

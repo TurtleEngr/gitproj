@@ -28,6 +28,8 @@
 	local-raw-dir-pat = ..
 	# gpLocalRawSymLink
 	local-raw-symlink = raw
+	# gpGitFlowPkg
+	git-flow-pkg = git-flow
 [gitproj "hook"]
 	source = hooks/pre-commit
 	pre-commit-enabled = true
