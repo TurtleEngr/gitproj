@@ -13,14 +13,14 @@ export gpMountPath gpRawRemotePath
 fInitFirstTimeSet()
 {
     local tInclude
+    local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -f $HOME/.gitconfig ]; then
         cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
     fi
-    
-    # TBD: see cConfigGlobal
-    if [ ! -f $HOME/.gitproj.config.global ]; then
-        cp $gpDoc/config/gitproj.config.global $HOME/.gitproj.config.global
+
+    if [ ! -f $cConfigGlobal ]; then
+        cp $gpDoc/config/gitproj.config.global $cConfigGlobal
     fi
     tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
@@ -31,8 +31,10 @@ fInitFirstTimeSet()
 # --------------------
 fInitSetGlobals()
 {
+    local tSrc=${BASH_SOURCE##*/}
+
     fInitFirstTimeSet
-    
+
     # TBD set the default to the installed version
     gpVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
 
@@ -79,6 +81,8 @@ fInitSetGlobals()
 
 # --------------------
 fInitGettingStarted() {
+    local tSrc=${BASH_SOURCE##*/}
+
     cat <<EOF
 
 Be sure you are "cd" to the "top" project directory. Or use the "-l
@@ -197,15 +201,12 @@ fInitValidLocalRawDirPat()
         fLog -p warn -m "Raw directory already exists: $gpLocalRawDir" -l $tSrc:$LINENO
     fi
     cd - >/dev/null 2>&1
-    cat <<EOF | fmt
-$gpLocalRawDir will be created.
-README.txt will be updated.
-EOF
     return 0
 } # fInitValidLocalRawDirPat
 
 fInitSetHardLink()
 {
+    local tSrc=${BASH_SOURCE##*/}
     local tDevTopDir
     local tDevRawDir
 
@@ -374,6 +375,7 @@ EOF
 # --------------------
 fInitGetBinaryFiles()
 {
+    local tSrc=${BASH_SOURCE##*/}
     local tFile
     local tFileList=""
     local tSize
@@ -381,21 +383,17 @@ fInitGetBinaryFiles()
     # shellcheck disable=SC2020
     tSize=$(echo "$gpMaxSize" | tr 'bBKmg' 'cckMG')
 
+    cd $gpLocalTopDir >/dev/null 2>&1
     # shellcheck disable=SC2044
-    for tFile in $(find $gpLocalTopDir -type f -size +$tSize); do
+    for tFile in $(find * -type f -size +$tSize); do
     	# If char are found outside of the space to ~ range, it is
 	# probably a binary file.
         if [ "$(tr -d '[ -~]\0' <$tFile | wc -c)" != "0" ]; then
-            tFileList="$tFileList, $tFile"
+            tFileList="$tFileList $tFile"
         fi
     done
     if [ -n "$tFileList" ]; then
-        cat <<EOF | fmt
-These binary files are greater than $gpMaxSize:
-
-    ${tFileList#, }
-
-EOF
+        echo $tFileList | fmt
         return 0
     fi
     return 1
@@ -406,6 +404,8 @@ fInitGetMoveFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
+
+    fLog -p info -m "These binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
 
     if ! fInitGetBinaryFiles; then
         fLog -p warning -m 'No large binary files were found.' -l $tSrc:$LINENO
@@ -428,15 +428,15 @@ EOF
         echo -n "Move the files (-m) [y/n/quit]? "
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
-        if [ $tResult = "q" ]; then
+        if [ "$tResult" = "q" ]; then
             fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
-        if [ $tResult = "y" ]; then
+        if [ "$tResult" = "y" ]; then
             gpAutoMove=1
             break
         fi
-        if [ $tResult = "n" ]; then
+        if [ "$tResult" = "n" ]; then
             gpAutoMove=0
             break
         fi
@@ -484,7 +484,11 @@ fInitGetGetFlow()
 # --------------------
 fInitSummary()
 {
+    local tSrc=${BASH_SOURCE##*/}
+    declare -l tResult
+
     cat <<EOF
+
 Summary
            "auto" = $gpAuto
           "exits"   HOME/.gitconfig
@@ -508,43 +512,95 @@ local-raw-symlink = $gpLocalRawSymLink
 [gitproj "hook"]
     binary-file-size-limit = $gpMaxSize
                  auto-move = $gpAutoMove
+
 EOF
+    if [ $gpAuto -eq 0 ]; then
+        while true; do
+            echo -n "Continue with creating a local git repo [y/n]? "
+            read -r tResult
+            tResult=${tResult%${tResult#[a-z]}}
+            if [ "$tResult" = "y" ]; then
+                break
+            fi
+            if [ "$tResult" = "n" ]; then
+                fLog -p warning -m "Quitting, nothing will be done." -l $tSrc:$LINENO
+                exit 1
+            fi
+	    fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
+        done
+    fi
     return 0
 } # fInitSummary
 
 # --------------------
 fInitMkRaw()
 {
-    echo "TBD"
-    # The $gpLocalRawDir/README.txt file will point to the project dir.
-# create ../Name.raw
-# move binary files
+    local tSrc=${BASH_SOURCE##*/}
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    mkdir $gpLocalRawDir
+
+    ln -s $gpLocalRawDir $gpLocalRawSymLink
+
+    cd $gpLocalTopDir/$gpLocalRawSymLink >/dev/null 2>&1
+    cat <<EOF | fmt >README.txt
+    
+Do NOT remove these files or this directory.
+
+These files are managed by the "git proj" subcommand. It's purpose is
+to keep large binary files out of git repositories. Large files are
+put in this directory and symlinks in the git managed area will point
+to the files.
+
+The initial working directory was created at $cHostName:$gpLocalTopDir
+
+For help with the "git proj" subcommand, just cd into the working directory
+and type "git proj".
+EOF
+    return 0
 } # fInitMkRaw
+
+fInitMoveBinaryFiles()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tFileList
+    local tFile
+    local tDir
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tFileList=$(fInitGetBinaryFiles)
+    if [ $? -eq 0 ]; then
+        return 0
+    fi
+    if [ "$gpAutoMove" = "false" ]
+        fLog -p warning -m "Binary files were found, but will not be moved." -l $tSrc:$LINENO
+        return 0
+    fi
+    fLog -p notice -m "Moving large binary files." -l $tSrc:$LINENO
+    for tFile in $tFileList; do
+    	tDir=${tFile%/*}
+	if [ "$tDir" != "$tFile" ]; then
+	    mkdir -p $gpLocalRawSymLink/$tDir
+	else
+	    tDir=""
+	fi
+        if [ "$gpHardlink" = "true" ]; then
+	    mv $tFile $gpLocalRawSymLink/$tDir
+	else
+	    'rsync' -vP $tFile $gpLocalRawSymLink/$tDir
+	fi
+	if [ -s $gpLocalRawSymLink/$tDir/$tFile ]; then
+	    rm $tFile
+	    ln -s $gpLocalRawSymLink/$tFile $tFile
+	fi
+    done
+    return 0
+} # fInitMoveBinaryFiles
 
 # --------------------
 fInitMkGitDir()
 {
-    declare -l tResult
-
-# TBD move this to fInitSummary
-    if [ $gpAuto -eq 0 ]; then
-        while true; do
-            echo -n "Continue with creating a local git repo [y/n/quit]? "
-            read -r tResult
-            tResult=${tResult%${tResult#[a-z]}}
-            if [ $tResult = "q" ]; then
-                fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-                exit 1
-            fi
-            if [ $tResult = "y" ]; then
-                break
-            fi
-            if [ $tResult = "n" ]; then
-                fLog -p warning -m "Quitting, nothing will be done." -l $LINE
-                exit 1
-            fi
-        done
-    fi
+    local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
     cat <<EOF >.gitignore
@@ -590,6 +646,8 @@ EOF
 # --------------------
 fInitCreateLocalGit()
 {
+    local tSrc=${BASH_SOURCE##*/}
+
     fInitGettingStarted
 
     # Prompt/Response or if -a, just validate the options
@@ -602,6 +660,7 @@ fInitCreateLocalGit()
 
     fInitSummary
     fInitMkRaw
+    fInitMoveBinaryFiles
     fInitMkGitDir
 } # fInitCreateLocalGit
 
@@ -610,12 +669,16 @@ fInitCreateLocalGit()
 
 fInitGetMountPath()
 {
+    local tSrc=${BASH_SOURCE##*/}
+
     #$gpMountPath
     fInitCheckPath $gpPath	# gpPath??? TBD
 } # fInitGetMountPath
 
 fInitGetRawRemotePath()
 {
+    local tSrc=${BASH_SOURCE##*/}
+
     echo TBD
     #$gpRawRemotePath
 } # fInitGetRawRemotePath
@@ -670,6 +733,7 @@ fInitMkRemote()
 {
     local pPath=$1
 
+    local tSrc=${BASH_SOURCE##*/}
     local tSrcPath=$PWD
     local tProjName=${PWD##*/}
 
@@ -684,6 +748,8 @@ fInitMkRemote()
 # --------------------
 fInitReport()
 {
+    local tSrc=${BASH_SOURCE##*/}
+
     echo 'Remote origin is now set to:'
     $cGetOrigin
     cat <<EOF
@@ -696,6 +762,8 @@ EOF
 # --------------------
 fInitCreateRemoteGit()
 {
+    local tSrc=${BASH_SOURCE##*/}
+
     fGetMountPath $gpMountPath		# gpMountPath??? TBD
     #    	fCheckPath $gpPath
     fGetRawRemotePath $gpRawRemotePath	# gpRawRemotePath??? TBD

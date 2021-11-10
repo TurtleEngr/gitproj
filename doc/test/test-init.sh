@@ -554,16 +554,16 @@ testInitGetSize()
 
     tResult=$(fInitGetSize 2>&1 < <(echo -e "12K"))
     tStatus=$?
-    assertTrue "$LINENO $i" $tStatus
+    assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Define the size for large binary files"
     
     fInitGetSize >/dev/null 2>&1 < <(echo -e "12K")
     assertTrue $LINENO $?
-    assertEquals "$LINENO $i" "12k" "$gpMaxSize"
+    assertEquals "$LINENO" "12k" "$gpMaxSize"
 
     tResult=$(fInitGetSize 2>&1 < <(echo -e "42\n66x\nq"))
     tStatus=$?
-    assertFalse "$LINENO $i" $tStatus
+    assertFalse "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"    
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
@@ -573,18 +573,19 @@ testInitGetSize()
 testInitGetBinaryFiles()
 {
     local tResult
-    local tStatus
 
     gpMaxSize="18k"
     gpLocalTopDir=$HOME/$cDatProj1
 
     tResult=$(fInitGetBinaryFiles 2>&1)
-    tStatus=$?
-    assertTrue "$LINENO $i" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "These binary files are greater than $gpMaxSize"
+    assertTrue "$LINENO" $?
     assertContains "$LINENO $tResult" "$tResult" "src/final/george.mp4"
     assertContains "$LINENO $tResult" "$tResult" "src/raw/MOV001.mp4"
     assertNotContains "$LINENO $tResult" "$tResult" "src/raw/MOV001.mp3"
+
+    gpMaxSize="2g"
+    tResult=$(fInitGetBinaryFiles 2>&1)
+    assertFalse "$LINENO" $?
 
     return 0
 } # testInitGetBinaryFiles
@@ -658,16 +659,56 @@ testInitSummary()
     gpGitFlow=1
     gpMaxSize="1k"
 
-    tResult=$(fInitSummary 2>&1)
-    assertTrue "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "Summary"
-    assertContains "$LINENO $tResult" "$tResult" "auto-move"
+    tResult=$(fInitSummary 2>&1 < <(echo -e "foo\nn"))
+    assertFalse $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
+    assertContains "$LINENO $tResult" "$tResult" "Invalid answer:"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-    gpUnitDebug=1
-    fTestDebug "$tResult"
+    gpUnitDebug=0
+    fTestDebug "No result = $tResult"
+
+    tResult=$(fInitSummary 2>&1 < <(echo -e "y"))
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
+
+    gpUnitDebug=0
+    fTestDebug "Yes result = $tResult"
 
     return 0
 } # testInitSummary
+
+testInitMkRaw()
+{
+    local tResult
+    local tStatus
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitFirstTimeSet
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpLocalRawDirPat=".."
+    gpLocalRawDir=$gpLocalRawDirPat/$gpProjName.raw
+    gpLocalRawSymLink="raw"
+    gpHardLink="true"
+    gpGitFlow=1
+    gpMaxSize="1k"
+    gpAutoMove=true
+    gpAuto=0
+
+    tResult=$(fInitMkRaw 2>&1)
+    
+    return 0
+} # testInitMkRaw
+
+testInitMoveBinaryFiles()
+{
+    local tResult
+
+
+    return 0
+} # testInitMoveBinaryFiles
 
 testInitMkGitDir()
 {
@@ -686,20 +727,7 @@ testInitMkGitDir()
     gpAutoMove=true
     gpAuto=0
 
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fInitMkGitDir 2>&1 < <(echo -e "n"))
-    assertFalse $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fInitMkGitDir 2>&1 < <(echo -e "y"))
-    assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
-
-    gpUnitDebug=1
-    fTestDebug "$tResult"
-
-    cd $gpLocalTopDir >/dev/null 2>&1
+#???
 
     assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
     assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
@@ -715,16 +743,6 @@ testInitMkGitDir()
 
     return 0
 } # testInitMkGitDir
-
-testInitMkRaw()
-{
-    local tResult
-    local tStatus
-
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitMkRaw
 
 testInitCreateLocalGit()
 {

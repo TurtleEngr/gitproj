@@ -165,12 +165,22 @@ fComSetGlobals()
         fError -m "Error: Cannot find gitproj doc directory: $gpDoc" -l $tSrc:$LINENO
     fi
 
-    # Included in ~/.gitproj.config (use -G to set config vars to this)
+    # Included in ~/.gitproj.config (Use -G to set config vars to this)
     # shellcheck disable=SC2088
-    cConfigGlobal='~/.gitproj.config.global'
-    # This is put in cTop, project dir. Use -L to set config vars to this)
+    cConfigGlobal="$HOME/.gitproj.config.global"
+
+    # Use this, so unit tests can change this
+    cHostName=${cHostName:-$HOSTNAME}
+    
+    # This is put in cTop, project dir. (Use -L to set config vars to this)
+    # This is included in .git/config
+    # cConfigLocal also has an include to: .gitproj.config.local, which has
+    # starting values for the host specific configs.
     # shellcheck disable=SC2088
-    cConfigLocal='.gitproj.config.local'
+    cConfigLocal=".gitproj.config.$cHostName"
+
+    # cConfigGlobal, cConfigLocal, and .gitproj.config.local should be
+    # versioned.
 
     # Use:
     #     tOrigin=$($cGetOrigin)
@@ -186,7 +196,7 @@ fComSetGlobals()
     # -x
     gpDebug=${gpDebug:-0}
     # -v
-    gpVerbose=${gpVerbose:-2}
+    gpVerbose=${gpVerbose:-0}
     # -l
     gpSysLog=${gpSysLog:-false}
     gpFacility=${gpFacility:-user}
@@ -268,6 +278,8 @@ EOF
 fComInternalDoc()
 {
     local pAll=$1
+
+    local tSrc=${BASH_SOURCE##*/}
 
     if [ ".$pAll" = ".-a" ]; then
         awk '
@@ -637,13 +649,14 @@ EOF
 # --------------------------------
 fComMkHostConfig()
 {
-    local cTop
+    local tSrc=${BASH_SOURCE##*/}
+    local tTop
 
-    cTop=$(git rev-parse --show-toplevel)
-    mkdir -p $cTop/gitproj 2>&1
-    touch $cTop/gitproj/config.$HOSTNAME
-    git config --local include.path $cTop/gitproj/config.$HOSTNAME
-    cd $cTop >/dev/null 2>&1
+    tTop=$(git rev-parse --show-toplevel)
+    mkdir -p $tTop/gitproj 2>&1
+    touch $tTop/gitproj/config.$HOSTNAME
+    git config --local include.path $tTop/gitproj/config.$HOSTNAME
+    cd $tTop >/dev/null 2>&1
     git add gitproj/config.$HOSTNAME
 } # fComMkHostConfig
 
@@ -665,11 +678,11 @@ fComSetConfig()
         case $tArg in
             a) pAdd="--add" ;;
             g) pScope="--global" ;;
-            G) pScope="---file ~/.gitproj.config" ;;
+            G) pScope="---file $cConfigGlobal" ;;
             l) pScope="--local" ;;
             L)
                 tTopDir="$($cGetTopDir)"
-                pScope="--file $tTopDir/gitproj/config.$HOSTNAME"
+                pScope="--file $tTopDir/.gitproj.config.$HOSTNAME"
                 ;;
             f) pScope="--file ${OPTARG}" ;;
             i) pType="--type int" ;;
@@ -763,6 +776,8 @@ fComUnsetConfig()
 fComCheckPkg()
 {
     local pPkg=$1
+
+    local tSrc=${BASH_SOURCE##*/}
 
     dpkg -l $pPkg 2>/dev/null | grep -q "^ii *$pPkg"
     return $?
