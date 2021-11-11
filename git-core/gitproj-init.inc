@@ -2,7 +2,7 @@
 
 # --------------------
 export cCurDir cGetOrigin cGetTopDir cTop
-export gpAction gpAuto gpBin gpCmdName gpCmdVer gpDebug gpDoc \
+export gpAction gpAuto gpBin gpCmdName gpDebug gpDoc \
        gpFacility gpGitFlow gpHardLink gpLocalRawDir gpLocalRawDirPat \
        gpLocalRawSymLink gpLocalTopDir gpMaxSize gpAutoMove gpPath \
        gpProjName gpSysLog gpVar gpVerbose
@@ -40,11 +40,14 @@ fInitFirstTimeSet()
 fInitSetGlobals()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tTrim
 
     fInitFirstTimeSet
 
-    # TBD set the default to the installed version
-    gpVer=$(fComGetConfig -k "gitproj.config.ver" -d "1.1")
+    gpVer=$(fComGetConfig -k "gitproj.config.ver")
+    # Only the first two # are important
+    tTrim=${gpVer#*.*.}}
+    gpVer=${gpVer%.$tTrim}}
 
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
@@ -138,6 +141,7 @@ fInitValidLocalPath()
     return 0
 } # fInitValidLocalPath
 
+# --------------------
 fInitGetLocalPath()
 {
     local pLocalPath=$1
@@ -212,6 +216,7 @@ fInitValidLocalRawDirPat()
     return 0
 } # fInitValidLocalRawDirPat
 
+# --------------------
 fInitSetHardLink()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -229,6 +234,7 @@ fInitSetHardLink()
     return 0
 } # fInitSetHardLink
 
+# --------------------
 fInitGetLocalRawDirPat()
 {
     local pLocalRawDirPat=$1
@@ -291,6 +297,7 @@ fInitValidSymLink()
     return 0
 } # fInitValidSymLink
 
+# --------------------
 fInitGetSymLink()
 {
     local pSymLinkName=$1
@@ -347,6 +354,7 @@ fInitValidSize()
     return 1
 } # fInitValidSize
 
+# --------------------
 fInitGetSize()
 {
     local pMaxSize=$1
@@ -570,6 +578,7 @@ EOF
     return 0
 } # fInitMkRaw
 
+# --------------------
 fInitMoveBinaryFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -625,6 +634,7 @@ fInitMoveBinaryFiles()
     return 0
 } # fInitMoveBinaryFiles
 
+# --------------------
 fInitMkGitFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -653,24 +663,6 @@ fInitMkGitFlow()
 
     return 0
 } # fInitMkGitFlow
-
-fInitSaveVarsToConfigs()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-# TBD: ??? Thu Nov 11 00:36:46 PST 2021
-} # fInitSaveCurrentVarsToConfigs
-
-fInitMkLocalConfig()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    cp $gpDoc/config/gitproj.config.local .gitproj.config.local 
-    cp $gpDoc/config/gitproj.config.local .gitproj.config.$cHostName
-
-    return 0
-} # fInitMkLocalConfig
 
 # --------------------
 fInitMkGitDir()
@@ -705,11 +697,37 @@ EOF
     git status
     set +x >/dev/null 2>&1
 
-    fInitMkLocalConfig
-    fInitSaveVarsToConfigs
-
     return 0
 } # fInitMkGitDir
+
+# --------------------
+fInitMkLocalConfig()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    cp $gpDoc/config/gitproj.config.local .gitproj.config.local 
+    cp $gpDoc/config/gitproj.config.HOSTNAME .gitproj.config.$cHostName
+
+    tInclude=$(fComGetConfig -l -k "include.path" -v .gitproj.config.$cHostName)
+    if [ -n "$tInclude" ]; then
+        fLog -i -p warning -m "Weird, .gitproj.config.$cHostName is already included" -l $tSrc:$LINENO
+        return 0
+    fi
+
+    fComSetConfig -a -l -k "include.path" -v ../.gitproj.config.$cHostName
+
+    return 0
+} # fInitMkLocalConfig
+
+# --------------------
+fInitSaveVarsToConfigs()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+# TBD: ??? Thu Nov 11 00:36:46 PST 2021
+
+} # fInitSaveCurrentVarsToConfigs
 
 # --------------------
 fInitCreateLocalGit()
@@ -727,14 +745,19 @@ fInitCreateLocalGit()
     fInitGetGitFlow $gpGitFlow
 
     fInitSummary
+    
     fInitMkRaw
     fInitMoveBinaryFiles
+    
     fInitMkGitDir
+    fInitMkLocalConfig
+    fInitSaveVarsToConfigs
 } # fInitCreateLocalGit
 
 # ========================================
 # fInitCreateRemoteGit Section
 
+# --------------------
 fInitGetMountPath()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -743,6 +766,7 @@ fInitGetMountPath()
     fInitCheckPath $gpPath	# gpPath??? TBD
 } # fInitGetMountPath
 
+# --------------------
 fInitGetRawRemotePath()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -770,6 +794,7 @@ fInitCheckPath()
     fi
 } # fInitCheckPath
 
+# --------------------
 fInitCheckSpace()
 {
     local pPath=$1

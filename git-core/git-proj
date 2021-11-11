@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export gpCmdName gpBin cCurDir gpCmdVer
+export gpCmdName gpBin cCurDir
 
 fUsage()
 {
@@ -223,7 +223,10 @@ variable should be put in the correspoinding .gitproj.config.$HOSTNAME
 file.
 
 	[gitproj "config"]
-		ver = 1.0
+		# Expected version, only first N must be the same.
+		# Use backward compattable code, or exit.
+		# Warn if second N is different
+		ver = 1.0.0
 		syslog = true
 		facility = user
 
@@ -432,8 +435,6 @@ TurtleEngr
 
 (c) Copyright 2021 by TurtleEngr
 
-$Revision: 1.0 $
-
 =cut
 EOF
 } # fUsage
@@ -467,9 +468,6 @@ fi
 
 # -----
 . $gpBin/gitproj-com.inc
-
-# shellcheck disable=SC2016
-gpCmdVer='$Revision: 1.49 $'
 
 #fSetGlobals
 fComSetGlobals

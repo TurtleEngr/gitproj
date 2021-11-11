@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export gpCmdName gpBin cCurDir gpCmdVer
+export gpCmdName gpBin cCurDir
 
 #--------------------
 fUsage()
@@ -198,8 +198,6 @@ TurtleEngr
 =head1 HISTORY
 
 GPLv3 Copyright 2021 by TurtleEngr
-
-$Revision: 1.52 $
 
 =cut
 

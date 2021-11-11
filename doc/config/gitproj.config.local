@@ -1,23 +1,17 @@
 # Put this in your top git dir: .gitproj.config.local
-# Put this in your top git dir: .gitproj.config.$HOSTNAME
-# The above files should be versioned.
-# This will be put at end of .git/config by "git proj init" or "git proj clone"
-#      include.path=../.gitproj.config.$HOSTNAME
-# .gitproj.config.$HOSTNAME will first include .gitproj.config.local
+# This file should be versioned.
+# This file will be included by .gitproj.config.$HOSTNAME
 # From: /usr/share/doc/gitproj/config/gitproj.config.local
-
-[include]
-	path = .gitproj.config.local
 
 [gitproj "config"]
 	proj-status = not-set-up
 	proj-name = TBD
-	hardlink = false
+	hardlink = TBD
 	remote-raw-dir = TBD
 	local-top-dir = TBD
-	local-raw-dir-pat = ..
-	local-raw-symlink = raw
-	git-flow-pkg = git-flow
+	local-raw-dir-pat = TBD
+	local-raw-symlink = TBD
+	git-flow-pkg = TBD
 [gitproj "hook"]
 	pre-commit-enabled = true
 	check-file-names = true

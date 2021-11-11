@@ -28,7 +28,38 @@
 
 * Get travis-ci working. Run tests.
 
-* Cleanup the user docs.
+* Build: make a script to inc version tag "major.minor.fix-rc.N+build" parts
+  See: https://semver.org/ for a RegEx pattern matcher (so imp. with Perl)
+  This supports a proper sub-set of semver.
+    sem-ver [-M] [-m] [-p] [-b] FILE
+      -M inc major, set minor, see -m (if rc, inc it)
+      -m inc minor, set patch to 0, see -p (if rc, inc it)
+      -p inc patch, if "rc", set it to 1, if build, set it to 0, (if
+         rc, inc it)
+      -r inc the release number, if none, inc with -m option, then insert
+         "-rc.1" after "fix" and before +, if build set it to 1
+      -b inc build, if none, append "+1"
+      -c clear release and build parts (do this afer a "release")
+      If file does not exist, create file with 0.1.0
+      If no option, output the full version
+      -v output with no build part
+      -V output just the major.minor.fix parts
+      Difference compare with expected "ver"
+      -d "ver" - Build numbers are ignored. Return
+         -2 if ver < FILE if Major part is <
+         -1 if ver < FILE
+         0 if ver = FILE
+         1 if ver > FILE
+         2 if ver > FILE if Major part is >
+
+* Version management. If installed Major number is different from
+  expected "ver" in config. then exit with error. Ask user to install
+  the older version, or they should make changes to be compatable,
+  then set the "ver" number in the config. Or better supply an option
+  to automatically upgrade, and it will set "ver" in the configs.  If
+  the Minor number is different, just warn the user(?) and continue.
+
+* Cleanup the user docs. (bump the "patch" number for doc-only changes)
 
 * Make and cleanup the internal docs.
 

@@ -59,8 +59,6 @@ shunit2.1
 
 =head1 HISTORY
 
-$Revision: 1.2 $ $Date: 2021/09/08 01:39:35 $ GMT 
-
 =cut
 
 EOF
@@ -116,7 +114,7 @@ setUp()
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
     	  cGitProjVersion cHostName cPID gErr
 	  
-    unset gpAction gpAuto gpAutoMove gpBin gpCmdName gpCmdVer gpDebug \
+    unset gpAction gpAuto gpAutoMove gpBin gpCmdName gpDebug \
     	  gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
     	  gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
     	  gpPath gpProjName gpSysLog gpVar gpVerbose
@@ -141,9 +139,7 @@ EOF
 
 tearDown()
 {
-    if [ $gpDebug -ne 0 ]; then
-        fTestRmEnv
-    fi
+    # fTestRmEnv
     gpUnitDebug=0
     cd $gpTest >/dev/null 2>&1
  return 0
@@ -769,6 +765,15 @@ testInitMoveBinaryFiles_Move()
     gpUnitDebug=0
     fTestDebug "HardLink=true, and Size 10k: $tResult"
 
+    gpUnitDebug=1
+    if [ $gpUnitDebug -ne 0 ]; then
+       echo -e "\tCapture state of project after files have been moved."
+       echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
+       cd $HOME >/dev/null 2>&1
+       echo -en "\t"
+       tar -czf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 project/$gpProjName.raw
+    fi
+
     return 0
 } # testInitMoveBinaryFiles_Move
 
@@ -851,22 +856,10 @@ testInitMkGitFlow()
     return 0
 } # testInitMkGitFlow
 
-testInitMkLocalConfig()
-{
-    startSkipping
-} # testInitMkLocalConfig
-
-testInitSaveVarsToConfigs()
-{
-    startSkipping
-}
-
 testInitMkGitDir()
 {
     local tResult
-    local tStatus
     local tTop
-startSkipping
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitFirstTimeSet
@@ -879,27 +872,90 @@ startSkipping
     gpAutoMove=true
     gpAuto=0
 
-#???
-
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitMkGitDir 2>&1)
     assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
     assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
     assertTrue $LINENO "$(grep -q core $gpLocalTopDir/.gitignore; echo $?)"
 
     tTop=$($cGetTopDir)
-    assertEquals $LINENO "$gpLocalTopDir" "$tTop"
+    assertContains $LINENO "$tTop" "$gpLocalTopDir"
 
     tResult=$(git branch 2>&1)
     assertTrue $LINENO $?
     assertContains "$LINENO $tResult" "$tResult" "develop"
     assertContains "$LINENO $tResult" "$tResult" "main"
 
+    gpUnitDebug=1
+    if [ $gpUnitDebug -ne 0 ]; then
+       echo -e "\tCapture state of project after git init."
+       echo -e "\tRestore test-env_ProjAfterGInit.tgz relative to cDatHome/project"
+       cd $HOME/project >/dev/null 2>&1
+       tar -czf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
+    fi
+
     return 0
 } # testInitMkGitDir
+
+testInitMkLocalConfig()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tResult
+
+    if [ ! -f $gpTest/test-env_HomeAfterBMove.tgz ]; then
+        fail "Missing test-env_HomeAfterBMove.tgz [$tSrc:$LINENO]"
+	return 1
+    fi
+    if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
+        fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
+	return 1
+    fi
+    
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitFirstTimeSet
+    
+    cd $HOME >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
+    cd $gpTest
+    
+    cd $HOME/project >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_ProjAfterGInit.tgz
+    cd $gpTest
+
+    gpProjName=${cDatProj1##*/}
+    gpHardLink="true"
+    gpGitFlow="true"
+    gpMaxSize="10k"
+    gpAutoMove=true
+    gpAuto=0
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    assertFalse $LINENO "[ -f .gitproj.config.local ]"
+    assertFalse $LINENO "[ -f .gitproj.config.$cHostName ]"
+    assertFalse $LINENO "$(grep -q gitproj.config .git/config >/dev/null 2>&1); echo $?)"
+
+    tResult=$(fInitMkLocalConfig 2>&1)
+    assertTrue $LINENO "$?"
+    assertTrue $LINENO "[ -f .gitproj.config.local ]"
+    assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
+
+    tResult=$(git config --local --list --show-origin --includes 2>&1)
+    assertTrue $LINENO "$?"
+    assertContains "$LINENO $tResult" "include.path=../.gitproj.config.$cHostName"
+    
+} # testInitMkLocalConfig
+
+testInitSaveVarsToConfigs()
+{
+    local tResult
+    startSkipping
+    
+}
 
 testInitCreateLocalGit()
 {
     local tResult
-    local tStatus
 
     startSkipping
     fail "TBD"

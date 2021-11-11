@@ -3,34 +3,34 @@
 # From: /usr/share/doc/gitproj/config/gitproj.config.global
 
 [gitproj "config"]
-	# gpVer
+		# gpVer
 	ver = 1.1
-	# gpSyslog
+		# gpSyslog
 	syslog = true
-	# gpFacility
+		# gpFacility
 	facility = user
-	# gpBin
-	# gpBin = $(git --exec-path)
+		# gpBin
+		# gpBin = $(git --exec-path)
 	bin = /usr/lib/git-core
-	# gpDoc
+		# gpDoc
 	doc = /usr/share/doc/git-proj
-	# gpTest
+		# gpTest
 	test = /usr/share/doc/git-proj/test
-	# gpProjStatus
+		# gpProjStatus
 	proj-status = not-set-up
-	# gpProjName
+		# gpProjName
 	proj-name = TBD
-	# gpHardLink
+		# gpHardLink
 	hardlink = false
-	# gpRemoteRawUrl /MOUNT-DIR/DIR/NAME.raw
+		# gpRemoteRawUrl /MOUNT-DIR/DIR/NAME.raw
 	remote-raw-dir = TBD
-	# gpLocalTopDir
+		# gpLocalTopDir
 	local-top-dir = TBD
-	# gpLocalRawDirPat
+		# gpLocalRawDirPat
 	local-raw-dir-pat = ..
-	# gpLocalRawSymLink
+		# gpLocalRawSymLink
 	local-raw-symlink = raw
-	# gpGitFlowPkg
+		# gpGitFlowPkg
 	git-flow-pkg = git-flow
 [gitproj "hook"]
 	source = hooks/pre-commit

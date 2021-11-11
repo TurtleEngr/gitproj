@@ -56,6 +56,8 @@ EOF
 # --------------------------------
 fTestSetupEnv()
 {
+    local tSrc=${BASH_SOURCE##*/}
+    
     gpBin=$gpTest/../../git-core
     cd $gpBin >/dev/null 2>&1
     gpBin=$PWD
@@ -68,7 +70,7 @@ fTestSetupEnv()
     cTestSrcDir=$gpTest
     cTestFiles=$cTestSrcDir/test-env.tgz
     if [ ! -r $cTestFiles ]; then
-        echo "Error: Cannot find: $cTestFiles. [test.inc:$LINENO]"
+        echo "Error: Cannot find: $cTestFiles. [$tSrc:$LINENO]"
         exit 1
     fi
 
@@ -104,12 +106,14 @@ fTestRmEnv()
 # --------------------------------
 fTestConfigSetup()
 {
+    local tSrc=${BASH_SOURCE##*/}
+    
     if [ ! -d $cDatHome ]; then
-        echo "Error: Test env is not setup. Missing $cDatHome [test.inc:$LINENO]"
+        echo "Error: Test env is not setup. Missing $cDatHome [$tSrc:$LINENO]"
         exit 1
     fi
     if [ "$HOME" != "$cDatHome" ]; then
-	echo "Error: Test home is not setup. $cDatHome [test.inc:$LINENO]"
+	echo "Error: Test home is not setup. $cDatHome [$tSrc:$LINENO]"
 	exit 1
     fi
 
@@ -119,8 +123,16 @@ fTestConfigSetup()
 # --------------------------------
 fTestCreateEnv()
 {
+    local tSrc=${BASH_SOURCE##*/}
+    
     fTestRmEnv
     cd $cTestDestDir >/dev/null 2>&1
+    
+    if [ ! -f $cTestFiles ]; then
+        echo "Missing $cTestFiles [$tSrc:$LINENO]"
+	exit 1
+    fi
+
     tar -xzf $cTestFiles
     cd - >/dev/null 2>&1
 

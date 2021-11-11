@@ -3,7 +3,7 @@
 # --------------------------------
 export cConfigGlobal cHostName cConfigLocal cCurDir cGitProjVersion \
       cGetOrigin cGetTopDir cPID
-export gErr gpBin gpCmdName gpCmdVer gpDebug gpDoc gpFacility \
+export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
        gpLocalRawDir gpSysLog gpVerbose
 
 # --------------------------------
@@ -92,9 +92,6 @@ For more help, see the Globals section in fUsage.
  cCurDir - current directory
  gpBin - directory where the script is executing from
  gpDoc - directory for config/, hooks/, test/
- gpCmdVer - current version. For example, if using CVS:
-	# shellcheck disable=SC2016
-	gpCmdVer='$Revision: 1.4 $'
 
 =internal-head3 Documentation Format
 
@@ -166,7 +163,7 @@ fComSetGlobals()
         fError -m "Error: Cannot find gitproj doc directory: $gpDoc" -l $tSrc:$LINENO
     fi
 
-    cGitProjVersion=$($gpDoc/VERSION)
+    cGitProjVersion=$(cat $gpDoc/VERSION)
 
     # Included in ~/.gitproj.config (Use -G to set config vars to this)
     # shellcheck disable=SC2088
@@ -204,16 +201,6 @@ fComSetGlobals()
     gpSysLog=${gpSysLog:-false}
     gpFacility=${gpFacility:-user}
     gErr=0
-
-    # -------------------
-    # If your script defines a version with the Revision keyword, clean it
-    # shellcheck disable=SC2016
-    #gpCmdVer='$Revision: 1.4 $'
-
-    if [ "$gpCmdVer" != "${gpCmdVer#*' '}" ]; then
-        gpCmdVer=${gpCmdVer#*' '}
-        gpCmdVer=${gpCmdVer%' '*}
-    fi
 
     return
 

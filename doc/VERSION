@@ -1,7 +1,1 @@
-#!/bin/bash
-
-cGitProjVersion='$Revision: 1.1 $'
-cGitProjVersion=${cGitProjVersion#*' '}
-cGitProjVersion=${cGitProjVersion%' '*}
-
-echo $cGitProjVersion
+0.1.0

@@ -59,8 +59,6 @@ shunit2.1
 
 =head1 HISTORY
 
-$Revision: 1.2 $ $Date: 2021/09/08 01:39:35 $ GMT 
-
 =cut
 
 EOF
