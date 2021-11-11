@@ -39,3 +39,16 @@ test-cmds : $(mDepList)
 	for tCmd in $(mCmdList); do \
 		./test-$${tCmd}.sh; \
 	done
+
+stats :
+	@echo -n "Number of tests: "
+	@grep '^test' test-*.sh |grep '()' | wc -l
+	@echo -n "Number of asserts: "
+	@grep assert *.sh | wc -l
+	@echo -n "Total lines of code: "
+	@cat \
+		Makefile *.md *.sh *.inc \
+		../VERSION \
+		../config/* ../hooks/* \
+		../../git-core/* \
+	| wc -l

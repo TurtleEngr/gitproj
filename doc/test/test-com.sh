@@ -183,7 +183,7 @@ testComInitialConfig()
 
 
     assertEquals "$LINENO" "0" "$gpDebug"
-    assertEquals "$LINENO" "2" "$gpVerbose"
+    assertEquals "$LINENO" "0" "$gpVerbose"
     assertEquals "$LINENO" "false" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" "$gErr"

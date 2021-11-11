@@ -688,8 +688,8 @@ fComSetConfig()
                 pScope="--file $tTopDir/.gitproj.config.$HOSTNAME"
                 ;;
             f) pScope="--file ${OPTARG}" ;;
-            i) pType="--type int" ;;
-            b) pType="--type bool" ;;
+            i) pType="--int" ;;
+            b) pType="--bool" ;;
             k) pKey="${OPTARG}" ;;
             v) pValue="${OPTARG}" ;;
             :) fError -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO ;;
@@ -727,8 +727,8 @@ fComGetConfig()
             g) pScope=--global ;;
             l) pScope=--local ;;
             f) pScope="--file ${OPTARG}" ;;
-            i) pType="--type int" ;;
-            b) pType="--type bool" ;;
+            i) pType="--int" ;;
+            b) pType="--bool" ;;
             k) pKey="${OPTARG}" ;;
             d) pDefault="${OPTARG}" ;;
             a) pAll="--all" ;;
@@ -817,7 +817,7 @@ fComMustBeInGitRepo()
 fComMustNotBeInGit()
 {
     local pDir=$1
-    
+
     local tSrc=${BASH_SOURCE##*/}
     local tFound=0
     local tGitDir
@@ -834,7 +834,7 @@ fComMustNotBeInGit()
     if [ $tFound -eq 0 ]; then
         tGitDir=$(find . -type d -name .git)
         if [ -n "$tGitDir" ]; then
-            tFound=1
+            tFound=2
         fi
     fi
     cd - >/dev/null 2>&1

@@ -5,7 +5,7 @@
 
 export cCurDir cDatHome cHome cTestCurDir cTestDestDir cTestDestDir \
        cTestFiles cTestFiles cTestSrcDir cTestSrcDir
-export gpBin gpDoc gpTest
+export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
 
@@ -104,9 +104,6 @@ fTestRmEnv()
 # --------------------------------
 fTestConfigSetup()
 {
-    local tInclude
-    local tTopDir
-
     if [ ! -d $cDatHome ]; then
         echo "Error: Test env is not setup. Missing $cDatHome [test.inc:$LINENO]"
         exit 1

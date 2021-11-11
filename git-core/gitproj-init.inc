@@ -267,13 +267,13 @@ EOF
 # --------------------
 fInitValidSymLink()
 {
-    local pSymLinkName=$1
+    export pSymLinkName=$1
 
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
     if [ -e $pSymLinkName ]; then
-        fLog -p err -m "Symlink: $pSymLinkName already exists. Pick another name or quit and remove it." -l $tSrc:$LINENO
+        fLog -p err -m "Symlink or file: $pSymLinkName, already exists. Pick another name or quit and remove it." -l $tSrc:$LINENO
         cd - >/dev/null 2>&1
         return 1
     fi

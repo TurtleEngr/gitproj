@@ -100,6 +100,9 @@ EOF
 
 NAoneTimeTearDown()
 {
+    if [ $gpDebug -ne 0 ]; then
+        fTestRmEnv
+    fi
     if [ -n "$cHome" ]; then
         HOME=$cHome
     fi
@@ -109,8 +112,17 @@ NAoneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset gpBin cCurDir cPID gpCmdVer gErr gpDebug gpFacility gpSysLog gpVerbose
+
+    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
+    	  cGitProjVersion cHostName cPID gErr
+	  
+    unset gpAction gpAuto gpAutoMove gpBin gpCmdName gpCmdVer gpDebug \
+    	  gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
+    	  gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+    	  gpPath gpProjName gpSysLog gpVar gpVerbose
+
     fTestSetupEnv
+    fInitSetGlobals
     fTestCreateEnv
     gpUnitDebug=0
     return 0
@@ -170,7 +182,7 @@ testFirstTimeSet()
     return 0
 } # testFirstTimeSet
 
-testIniitSetGlobals()
+testInitSetGlobals()
 {
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
     cd $HOME/$cDatProj1
@@ -190,14 +202,11 @@ testIniitSetGlobals()
 
     cd - >/dev/null 2>&1
     return 0
-} # testIniitSetGlobals
+} # testInitSetGlobals
 
 checkComMustNotBeInGit()
 {
     local pFun=$1
-
-    local tResult
-    local tStatus
 
     local tResult
     local tStatus
@@ -208,34 +217,36 @@ checkComMustNotBeInGit()
     tResult=$($pFun $HOME/foo-bar 2>&1)
     tStatus=$?
     fTestDebug "Check: $HOME/foo-bar"
+    fTestDebug "Check: $tResult"
     assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "does not exist"
+    assertContains "$LINENO $pFun $tResult" "$tResult" "does not exist"
 
     # Git is below this dir
     tResult=$($pFun $HOME 2>&1)
     tStatus=$?
-    fTestDebug "Check: $HOME"
+    fTestDebug "$LINENO Check: $HOME"
+    fTestDebug "$LINENO Check: $tResult"
     assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+    assertContains "$LINENO $pFun x${HOME}x $tResult" "$tResult" "must NOT be in a git repo"
 
     # This is in a git dir
     tResult=$($pFun $HOME/$cDatProj3 2>&1)
     tStatus=$?
-    fTestDebug "Check: $HOME/$cDatProj3"
+    fTestDebug "$LINENO Check: $HOME/$cDatProj3"
     assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+    assertContains "$LINENO $pFun $tResult" "$tResult" "must NOT be in a git repo"
 
     # This is in a git dir
     tResult=$($pFun $HOME/$cDatProj3/edit 2>&1)
     tStatus=$?
-    fTestDebug "Check: $HOME/$cDatProj3/edit"
+    fTestDebug "$LINENO Check: $HOME/$cDatProj3/edit"
     assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+    assertContains "$LINENO $pFun $tResult" "$tResult" "must NOT be in a git repo"
 
     # No git dir above or below this dir
     tResult=$($pFun $HOME/$cDatProj1 2>&1)
     tStatus=$?
-    fTestDebug "Check: $HOME/$cDatProj1"
+    fTestDebug "$LINENO Check: $HOME/$cDatProj1"
     assertTrue $LINENO $tStatus
     return 0
 } # checkComMustNotBeInGit
@@ -321,7 +332,7 @@ testInitValidLocalPath()
     local tResult
     local tStatus
 
-    gpUnitDebug=1
+    gpUnitDebug=0
 
     checkComMustNotBeInGit fInitValidLocalPath
     checkComAllMustBeReadable fInitValidLocalPath
@@ -412,8 +423,6 @@ testInitValidLocalRawDirPat()
     tResult=$(fInitValidLocalRawDirPat ".." 2>&1)
     tStatus=$?
     assertTrue "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
-    assertContains "$LINENO $tResult" "$tResult" "../${gpProjName}.raw"
 
     tResult=$(fInitValidLocalRawDirPat "doc" 2>&1)
     tStatus=$?
@@ -435,8 +444,6 @@ testInitValidLocalRawDirPat()
     tResult=$(fInitValidLocalRawDirPat ".." 2>&1)
     tStatus=$?
     assertTrue "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Raw directory already exists"
-    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
 
     return 0
 } # testInitValidLocalRawDirPat
@@ -453,14 +460,11 @@ testInitGetRawLocalDirPat()
     tStatus=$?
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Set the location for large binary files."
-    assertContains "$LINENO $tResult" "$tResult" "../$gpProjName.raw will be created."
-    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
 
     tResult=$(fInitGetLocalRawDirPat 2>&1< <(echo -e ".."))
     tStatus=$?
     assertTrue "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "../$gpProjName.raw will be created."
-    assertContains "$LINENO $tResult" "$tResult" "README.txt will be updated"
+    assertContains "$LINENO $tResult" "$tResult" "Set the location for large binary files."
 
     tResult=$(fInitGetLocalRawDirPat 2>&1 < <(echo -e "foo-bar\nquit"))
     tStatus=$?
@@ -468,10 +472,10 @@ testInitGetRawLocalDirPat()
     assertContains "$LINENO $tResult" "$tResult" "does not exist"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-    gpAuto=1
-    fInitGetLocalRawDirPat ".." >/dev/null 2>&1
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "true" "$gpHardLink"
+#    gpAuto=1
+#    fInitGetLocalRawDirPat ".." >/dev/null 2>&1
+#    assertTrue "$LINENO" $?
+#    assertEquals "$LINENO" "true" "$gpHardLink"
 
     return 0
 } # testInitGetRawLocalDirPat
@@ -513,6 +517,9 @@ testInitGetSymLink()
     assertContains "$LINENO $tResult" "$tResult" "Define the symlink name that will point to the Raw dir"
     assertContains "$LINENO $tResult" "$tResult" "already exists"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    gpUnitDebug=0
+    fTestDebug "tResult=$tResult"
 
     return 0
 } # testInitGetSymLink
@@ -611,12 +618,12 @@ testInitGetMoveFiles()
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     gpMaxSize="18k"
-    fInitGetMoveFiles 2>&1 < <(echo -e "x\nn")
+    fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "x\nn")
     assertTrue "$LINENO" $?
     assertEquals "$LINENO" "0" "$gpAutoMove"
 
     gpMaxSize="18k"
-    fInitGetMoveFiles 2>&1 < <(echo -e "y")
+    fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "y")
     assertTrue "$LINENO" $?
     assertEquals "$LINENO" "1" "$gpAutoMove"
 
@@ -707,7 +714,7 @@ testInitMkRaw()
     assertContains "$LINENO $tResult" "$tResult" "Created:"
     assertContains "$LINENO $tResult" "$tResult" "to access the files in"
 
-    gpUnitDebug=1
+    gpUnitDebug=0
     fTestDebug "$tResult"
 
     return 0
@@ -821,6 +828,7 @@ testInitMkGitDir()
     local tResult
     local tStatus
     local tTop
+startSkipping
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitFirstTimeSet
@@ -926,6 +934,7 @@ fTestRun()
         exit $?
     fi
 
+    gpTestList=$(echo $gpTestList | tr "," " ")
     # shellcheck disable=SC1091
     . $gpTest/shunit2.1 -- $gpTestList
     exit $?
