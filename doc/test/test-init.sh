@@ -197,7 +197,7 @@ testInitSetGlobals()
     assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
     assertEquals "$LINENO" "${gpLocalRawDirPat}/${gpProjName}.raw" "$gpLocalRawDir"
     assertEquals "$LINENO" "1k" "$gpMaxSize"
-    assertEquals "$LINENO" "0" 	"$gpGitFlow"
+    assertEquals "$LINENO" "false" "$gpGitFlow"
     assertNull "$LINENO" "$gpAction"
 
     cd - >/dev/null 2>&1
@@ -630,30 +630,30 @@ testInitGetMoveFiles()
     return 0
 } # testInitGetMoveFiles
 
-testInitGetGetFlow()
+testInitGetGitFlow()
 {
     local tResult
     local tStatus
 
-    tResult=$(fInitGetGetFlow 2>&1 < <(echo -e "\nquit"))
+    tResult=$(fInitGetGitFlow 2>&1 < <(echo -e "\nquit"))
     assertFalse "$LINENO" $?
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
     
-    fInitGetGetFlow >/dev/null 2>&1 < <(echo -e "yes")
+    fInitGetGitFlow >/dev/null 2>&1 < <(echo -e "yes")
     assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "1" "$gpGitFlow"
+    assertEquals "$LINENO" "true" "$gpGitFlow"
     
-    fInitGetGetFlow >/dev/null 2>&1 < <(echo -e "No")
+    fInitGetGitFlow >/dev/null 2>&1 < <(echo -e "No")
     assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "0" "$gpGitFlow"
+    assertEquals "$LINENO" "false" "$gpGitFlow"
 
     gpGitFlowPkg=foo-bar
-    tResult=$(fInitGetGetFlow 2>&1 < <(echo -e "\n"))
+    tResult=$(fInitGetGitFlow 2>&1 < <(echo -e "\n"))
     assertTrue "$LINENO" $?
     assertContains "$LINENO $tResult" "$tResult" "git-flow is not installed"
 
     return 0
-} # testInitGetGetFlow
+} # testInitGetGitFlow
 
 testInitSummary()
 {
@@ -663,7 +663,7 @@ testInitSummary()
     gpLocalTopDir=$HOME/$cDatProj1
     gpProjName=${cDatProj1##*/}
     gpHardLink="true"
-    gpGitFlow=1
+    gpGitFlow="true"
     gpMaxSize="1k"
 
     tResult=$(fInitSummary 2>&1 < <(echo -e "foo\nn"))
@@ -698,7 +698,7 @@ testInitMkRaw()
     gpLocalRawDir=$gpLocalRawDirPat/$gpProjName.raw
     gpLocalRawSymLink="raw"
     gpHardLink="true"
-    gpGitFlow=1
+    gpGitFlow="true"
     gpMaxSize="1k"
     gpAutoMove=true
     gpAuto=0
@@ -733,7 +733,7 @@ testInitMoveBinaryFiles_Move()
     gpLocalRawDir=$gpLocalRawDirPat/$gpProjName.raw
     gpLocalRawSymLink="raw"
     gpHardLink="true"
-    gpGitFlow=1
+    gpGitFlow="true"
     gpAutoMove=true
     gpAuto=0
     gpVerbose=2
@@ -784,8 +784,8 @@ testInitMoveBinaryFiles_Copy()
     gpLocalRawDirPat=".."
     gpLocalRawDir=$gpLocalRawDirPat/$gpProjName.raw
     gpLocalRawSymLink="raw"
-    gpGitFlow=1
-    gpAutoMove=true
+    gpGitFlow="true"
+    gpAutoMove="true"
     gpAuto=0
     gpVerbose=2
 
@@ -823,6 +823,44 @@ testInitMoveBinaryFiles_Copy()
     return 0
 } # testInitMoveBinaryFiles_Copy
 
+testInitMkGitFlow()
+{
+    local tResult
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fInitFirstTimeSet
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpHardLink="true"
+    gpGitFlow="true"
+    gpMaxSize="1k"
+    gpAutoMove=true
+    gpAuto=0
+
+    tResult=$(fInitMkGitFlow 2>&1)
+    assertTrue $LINENO $?
+    assertEquals $LINENO "main" "$(git config --get --global gitflow.branch.main)"
+    assertEquals $LINENO "develop" "$(git config --get --global gitflow.branch.develop)"
+    assertEquals $LINENO "feature/" "$(git config --get --global gitflow.prefix.feature)"
+    assertEquals $LINENO "bug/" "$(git config --get --global gitflow.prefix.bugfix)"
+    assertEquals $LINENO "release/" "$(git config --get --global gitflow.prefix.release)"
+    assertEquals $LINENO "hotfix/" "$(git config --get --global gitflow.prefix.hotfix)"
+    assertEquals $LINENO "support/" "$(git config --get --global gitflow.prefix.support)"
+
+    return 0
+} # testInitMkGitFlow
+
+testInitMkLocalConfig()
+{
+    startSkipping
+} # testInitMkLocalConfig
+
+testInitSaveVarsToConfigs()
+{
+    startSkipping
+}
+
 testInitMkGitDir()
 {
     local tResult
@@ -836,7 +874,7 @@ startSkipping
     gpLocalTopDir=$HOME/$cDatProj1
     gpProjName=${cDatProj1##*/}
     gpHardLink="true"
-    gpGitFlow=1
+    gpGitFlow="true"
     gpMaxSize="1k"
     gpAutoMove=true
     gpAuto=0
@@ -845,7 +883,7 @@ startSkipping
 
     assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
     assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
-    assertTrue $LINENO "grep -q core $gpLocalTopDir/.gitignore; echo $?"
+    assertTrue $LINENO "$(grep -q core $gpLocalTopDir/.gitignore; echo $?)"
 
     tTop=$($cGetTopDir)
     assertEquals $LINENO "$gpLocalTopDir" "$tTop"

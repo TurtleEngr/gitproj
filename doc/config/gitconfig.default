@@ -1,17 +1,18 @@
-# ~/.gitconfig.default
+# Put this in ~/.gitconfig
+# From: /usr/share/doc/gitproj/config/gitconfig.default
 
 [core]
 	filemode = true
 	autocrlf = false
-	#editor = /usr/bin/emacs-w32.exe
+	ignorecase = true
 	editor = /usr/bin/emacs
 	excludesFile = ~/.gitignore_global
-	ignorecase = true
 	logAllRefUpdates = true
 	quotePath = false
 	trustctime = false
-[color]
-	ui = never
+[user]
+	name = YourName
+	email = YourEmail@example.com
 [alias]
 	br = branch
 	br-all = branch -r
@@ -23,7 +24,18 @@
 	push-tags = push --tags origin
 	revert-all = reset --hard HEAD
 	st = status
+	top = rev-parse --show-toplevel
 	tracked = remote show origin
-[user]
-	name = TurtleEngr
-	email = turtle.engr@gmail.com
+[color]
+	ui = never
+[branch "develop"]
+	mergeoptions = --log
+[gitflow "branch"]
+        main = main
+        develop = develop
+[gitflow "prefix"]
+        feature = feature/
+        release = release/
+        hotfix = hotfix/
+        bugfix = bugfix/
+        support = support/

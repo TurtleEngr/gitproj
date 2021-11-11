@@ -1,4 +1,6 @@
-# ~/.gitproj.config.global
+# Put this in: ~/.gitproj.config.global
+# Then in ~/.gitconfig define include.path=.gitproj.config.global
+# From: /usr/share/doc/gitproj/config/gitproj.config.global
 
 [gitproj "config"]
 	# gpVer

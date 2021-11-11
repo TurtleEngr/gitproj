@@ -45,7 +45,17 @@ stats :
 	@grep '^test' test-*.sh |grep '()' | wc -l
 	@echo -n "Number of asserts: "
 	@grep assert *.sh | wc -l
+	@echo -n "Total lines of test code: "
+	@cat \
+		Makefile *.md *.sh *.inc \
+	| wc -l
 	@echo -n "Total lines of code: "
+	@cat \
+		../VERSION \
+		../config/* ../hooks/* \
+		../../git-core/* \
+	| wc -l
+	@echo -n "Total for all: "
 	@cat \
 		Makefile *.md *.sh *.inc \
 		../VERSION \

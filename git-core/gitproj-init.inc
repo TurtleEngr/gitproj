@@ -12,11 +12,19 @@ export gpMountPath gpRawRemotePath
 # --------------------
 fInitFirstTimeSet()
 {
-    local tInclude
     local tSrc=${BASH_SOURCE##*/}
+    local tInclude
+    local tUserName
+    local tUserEmail
 
     if [ ! -f $HOME/.gitconfig ]; then
         cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
+    fi
+
+    tUserName=$(fComGetConfig -g -k "user.name")
+    tUserEmail=$(fComGetConfig -g -k "user.email")
+    if [ -z "$tUserName" ] || [ -z "$tUserEmail" ]; then
+        fError -m "user.name and user.email must be in your ~/.gitconfig file. See $cgDoc/config/gitconfig.default for some other useful settings." -l $tSrc:$LINENO
     fi
 
     if [ ! -f $cConfigGlobal ]; then
@@ -66,7 +74,7 @@ fInitSetGlobals()
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
     gpAutoMove="true"
-    gpGitFlow=0
+    gpGitFlow="false"
     gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
     gpAction=""
 
@@ -445,7 +453,7 @@ EOF
 } # fInitGetMoveFiles
 
 # --------------------
-fInitGetGetFlow()
+fInitGetGitFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
@@ -453,7 +461,7 @@ fInitGetGetFlow()
     fComCheckPkg $gpGitFlowPkg
     if [ $? -ne 0 ]; then
         fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
-        gpGitFlow=0
+        gpGitFlow="false"
         return 0
     fi
     if [ $gpAuto -ne 0 ]; then
@@ -469,16 +477,16 @@ fInitGetGetFlow()
             exit 1
         fi
         if [ "$tResult" = "y" ]; then
-            gpGitFlow=1
+            gpGitFlow="true"
             break
         fi
         if [ "$tResult" = "n" ]; then
-            gpGitFlow=0
+            gpGitFlow="false"
             break
         fi
     done
     return 0
-} # fInitGetGetFlow
+} # fInitGetGitFlow
 
 # --------------------
 fInitSummary()
@@ -617,6 +625,53 @@ fInitMoveBinaryFiles()
     return 0
 } # fInitMoveBinaryFiles
 
+fInitMkGitFlow()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ "$gpGitFlow" = "false" ]; then
+        return 0
+    fi
+    if ! fComCheckPkg git-flow; then
+        fLog -p err -m "git-flow is not installed" -l $tSrc:$LINENO
+        return 1
+    fi
+    set -x >/dev/null 2>&1
+    git flow init -d
+    set +x >/dev/null 2>&1
+
+    # Define the default prefixes
+
+    fComSetConfig -g -k gitflow.branch.main -v main
+    fComSetConfig -g -k gitflow.branch.develop -v develop
+
+    fComSetConfig -g -k gitflow.prefix.feature -v feature/
+    fComSetConfig -g -k gitflow.prefix.bugfix -v bug/
+    fComSetConfig -g -k gitflow.prefix.release -v release/
+    fComSetConfig -g -k gitflow.prefix.hotfix -v hotfix/
+    fComSetConfig -g -k gitflow.prefix.support -v support/
+
+    return 0
+} # fInitMkGitFlow
+
+fInitSaveVarsToConfigs()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+# TBD: ??? Thu Nov 11 00:36:46 PST 2021
+} # fInitSaveCurrentVarsToConfigs
+
+fInitMkLocalConfig()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    cp $gpDoc/config/gitproj.config.local .gitproj.config.local 
+    cp $gpDoc/config/gitproj.config.local .gitproj.config.$cHostName
+
+    return 0
+} # fInitMkLocalConfig
+
 # --------------------
 fInitMkGitDir()
 {
@@ -639,28 +694,21 @@ EOF
     git init
     git add .gitignore *
     git commit -am "Initial commit"
+    # TBD the commit much work, or the rest fails
     git branch --move master main
     git branch develop
     git checkout develop
     set +x >/dev/null 2>&1
-    if fComCheckPkg git-flow; then
-        set -x >/dev/null 2>&1
-        git flow init -d
-	set +x >/dev/null 2>&1
-	# TBD define default prefixes
-#	[gitflow "prefix"]
-#        feature = feature/
-#        bugfix = bug/
-#        release = release/
-#        hotfix = hotfix/
-#        support = suport/
-#        versiontag = ver-
-    fi
+    fInitMkGitFlow
     set -x >/dev/null 2>&1
     git branch
     git status
     set +x >/dev/null 2>&1
-    # TBD: setup .gitproj.config.local and .gitproj.config.$HOSTNAME
+
+    fInitMkLocalConfig
+    fInitSaveVarsToConfigs
+
+    return 0
 } # fInitMkGitDir
 
 # --------------------
@@ -676,7 +724,7 @@ fInitCreateLocalGit()
     fInitGetSymLink $gpLocalRawSymLink
     fInitGetSize $gpMaxSize
     fInitGetMoveFiles $gpAutoMove
-    fInitGetGetFlow $gpGitFlow
+    fInitGetGitFlow $gpGitFlow
 
     fInitSummary
     fInitMkRaw
