@@ -1,0 +1,108 @@
+
+
+# ------------------
+$ git config --global --list --show-origin --includes
+# Home dir
+
+Use --global to set these values (-g option)
+
+file:~/.gitconfig  alias.br-all=branch -r
+file:~/.gitconfig  alias.br=branch
+file:~/.gitconfig  alias.ci=commit
+file:~/.gitconfig  alias.co=checkout
+file:~/.gitconfig  alias.df=diff
+file:~/.gitconfig  alias.merge=merge --no-ff
+file:~/.gitconfig  alias.origin=config --get remote.origin.url
+file:~/.gitconfig  alias.push-tags=push --tags origin
+file:~/.gitconfig  alias.revert-all=reset --hard HEAD
+file:~/.gitconfig  alias.st=status
+file:~/.gitconfig  alias.top=rev-parse --show-toplevel
+file:~/.gitconfig  alias.tracked=remote show origin
+file:~/.gitconfig  branch.develop.mergeoptions=--log
+file:~/.gitconfig  color.ui=never
+file:~/.gitconfig  core.autocrlf=false
+file:~/.gitconfig  core.editor=/usr/bin/emacs
+file:~/.gitconfig  core.excludesfile=~/.gitignore_global
+file:~/.gitconfig  core.filemode=true
+file:~/.gitconfig  core.ignorecase=true
+file:~/.gitconfig  core.logallrefupdates=true
+file:~/.gitconfig  core.quotepath=false
+file:~/.gitconfig  core.trustctime=false
+file:~/.gitconfig  gitflow.branch.develop=develop
+file:~/.gitconfig  gitflow.branch.main=main
+file:~/.gitconfig  gitflow.prefix.bugfix=bugfix/
+file:~/.gitconfig  gitflow.prefix.feature=feature/
+file:~/.gitconfig  gitflow.prefix.hotfix=hotfix/
+file:~/.gitconfig  gitflow.prefix.release=release/
+file:~/.gitconfig  gitflow.prefix.support=support/
+file:~/.gitconfig  user.email=YourEmail@example.com
+file:~/.gitconfig  user.name=YourName
+file:~/.gitconfig  include.path=.gitproj.config.global
+    $cConfigGlobal=.gitproj.config.global
+		   
+Use $cConfigGlobal to set these values (-G)
+
+gpBin             file:~/.gitproj.config.global      gitproj.config.bin=/usr/lib/git-core
+gpDoc    	  file:~/.gitproj.config.global      gitproj.config.doc=/usr/share/doc/git-proj
+gpFacility 	  file:~/.gitproj.config.global      gitproj.config.facility=user
+TBD 	   	  file:~/.gitproj.config.global      gitproj.config.git-flow-pkg=git-flow
+gpHardLink 	  file:~/.gitproj.config.global      gitproj.config.hardlink=false
+gpLocalRawDirPat  file:~/.gitproj.config.global      gitproj.config.local-raw-dir-pat=..
+gpLocalRawSymLink file:~/.gitproj.config.global      gitproj.config.local-raw-symlink=raw
+gpLocalTopDir	  file:~/.gitproj.config.global      gitproj.config.local-top-dir=TBD
+gpProjName	  file:~/.gitproj.config.global      gitproj.config.proj-name=TBD
+gpProjStatus   	  file:~/.gitproj.config.global      gitproj.config.proj-status=not-set-up
+gpRemoteRawDir	  file:~/.gitproj.config.global      gitproj.config.remote-raw-dir=TBD
+gpSysLog   	  file:~/.gitproj.config.global      gitproj.config.syslog=true
+gpTest   	  file:~/.gitproj.config.global      gitproj.config.test=/usr/share/doc/git-proj/test
+cGitProjVersion   file:~/.gitproj.config.global      gitproj.config.ver=1.1
+
+gpAutoMove file:~/.gitproj.config.global      gitproj.hook.auto-move=true
+gpMaxSize  file:~/.gitproj.config.global      gitproj.hook.binary-file-size-limit=10k
+TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-file-names=true
+TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-for-big-files=true
+TBD 	   file:~/.gitproj.config.global      gitproj.hook.pre-commit-enabled=true
+TBD 	   file:~/.gitproj.config.global      gitproj.hook.source=hooks/pre-commit
+
+# ------------------
+$ git config --local --list --show-origin --includes
+# project top dir
+# All TBD should be replaced with the gp[Var] value defined when
+# running "git proj init"
+# "git proj clone" should have all the gitproj var set, because the
+# file should be versioned. clone will handle new hostnme config files.
+# Differences from .gitproj.config.local will be put in .gitproj.config.HOSTNAME
+
+Use --local to set these values (-l option)
+
+file:.git/config        core.bare=false
+file:.git/config        core.filemode=true
+file:.git/config        core.repositoryformatversion=0
+file:.git/config        gitflow.branch.master=main
+file:.git/config        gitflow.path.hooks=/home/bruce/ver/public/app/gitproj/test/root/home/john/project/george/.git/hooks
+file:.git/config        gitflow.prefix.versiontag=
+file:.git/config        include.path=../.gitproj.config.$HOSTNAME
+    $cConfigGlobal=.gitproj.config.global
+
+Use --file $tTop/.gitproj.config.local to set these values (-L option)
+tTop=$(git rev-parse --show-toplevel)
+
+TBD                file:.gitproj.config.local      gitproj.config.git-flow-pkg=TBD
+gpHardLink  	   file:.gitproj.config.local      gitproj.config.hardlink=TBD
+gpLocalRawDirPat   file:.gitproj.config.local      gitproj.config.local-raw-dir-pat=TBD
+gpLocalRawSymLink  file:.gitproj.config.local      gitproj.config.local-raw-symlink=TBD
+gpLocalTopDir      file:.gitproj.config.local      gitproj.config.local-top-dir=TBD
+gpProjName	   file:.gitproj.config.local      gitproj.config.proj-name=TBD
+gpProjStatus   	   file:.gitproj.config.local      gitproj.config.proj-status=not-set-up
+TBD 		   file:.gitproj.config.local      gitproj.config.remote-raw-dir=TBD
+
+gpAutoMove file:.gitproj.config.local      gitproj.hook.auto-move=true
+gpMaxSize  file:.gitproj.config.local      gitproj.hook.binary-file-size-limit=1k
+TBD 	   file:.gitproj.config.local      gitproj.hook.check-file-names=true
+TBD	   file:.gitproj.config.local      gitproj.hook.check-for-big-files=true
+TBD	   file:.gitproj.config.local      gitproj.hook.pre-commit-enabled=true
+
+Use $cConfigLocal to set these host specific values (-H option)
+
+file:.gitproj.config.$HOSTNAME     include.path=.gitproj.config.local
+    $cConfigLocal=.gitproj.config.$HOSTNAME

@@ -32,7 +32,7 @@ fInitFirstTimeSet()
     fi
     tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
-    	fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
+        fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
     fi
 } # fInitFirstTimeSet
 
@@ -107,16 +107,16 @@ EOF
         return 0
     fi
     while true; do
-    	echo -n "Continue [y/n]? "
+        echo -n "Continue [y/n]? "
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ "$tResult" = "y" ]; then
             return 0
-	fi
+        fi
         if [ "$tResult" = "n" ]; then
-	    exit 1
-	fi
-	echo "$tResult is not valid."
+            exit 1
+        fi
+        echo "$tResult is not valid."
     done
     return 0
 } #fInitGettingStarted
@@ -252,7 +252,7 @@ fInitGetLocalRawDirPat()
 
     while true; do
         cat <<EOF | fmt
-	
+        
 Set the location for large binary files. It cannot be *in* any of the
 project directories. It will be created, if it does not exist. The
 path should be relative to the project dir. The files in the raw
@@ -314,7 +314,7 @@ fInitGetSymLink()
 
     while true; do
         cat <<EOF | fmt
-	
+        
 Define the symlink name that will point to the Raw dir. It will be
 created in the project's top dir. If the Raw dir is moved, this link
 will need to be updated. Symlink in the git directories will point to
@@ -402,8 +402,8 @@ fInitGetBinaryFiles()
     cd $gpLocalTopDir >/dev/null 2>&1
     # shellcheck disable=SC2044
     for tFile in $(find * -type f -size +$tSize); do
-    	# If char are found outside of the space to ~ range, it is
-	# probably a binary file.
+        # If char are found outside of the space to ~ range, it is
+        # probably a binary file.
         if [ "$(tr -d '[ -~\n\r\b\f\t\v]' <$tFile | wc -c)" != "0" ]; then
             tFileList="$tFileList $tFile"
         fi
@@ -521,7 +521,7 @@ Summary
 local-raw-dir-pat = $gpLocalRawDirPat
  "local-raw-dir"  = $gpLocalRawDirPat/$gpProjName.raw
 local-raw-symlink = $gpLocalRawSymLink
-	 hardlink = $gpHardLink
+         hardlink = $gpHardLink
      git-flow-pkg = $gpGitFlowPkg
   "git-flow init" = $gpGitFlow
 [gitproj "hook"]
@@ -541,7 +541,7 @@ EOF
                 fLog -p warning -m "Quitting, nothing will be done." -l $tSrc:$LINENO
                 exit 1
             fi
-	    fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
+            fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
         done
     fi
     return 0
@@ -597,36 +597,36 @@ fInitMoveBinaryFiles()
     fi
     fLog -p notice -m "Moving large binary files." -l $tSrc:$LINENO
     for tFile in $tFileList; do
-    	tDir=${tFile%/*}
-	if [ "$tDir" = "$tFile" ]; then
-	    tDir=""
-	else
-	    if [ ! -d $gpLocalRawSymLink/$tDir ]; then
-	        mkdir -p $gpLocalRawSymLink/$tDir >/dev/null 2>&1
-	    fi
-	    if [ ! -d $gpLocalRawSymLink/$tDir ]; then
-    		fError -i -m "Could not create: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
-	    fi
-    	    fLog -p info -m "Exists: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
-	fi
-	echo "gpHardLink=$gpHardLink"
+        tDir=${tFile%/*}
+        if [ "$tDir" = "$tFile" ]; then
+            tDir=""
+        else
+            if [ ! -d $gpLocalRawSymLink/$tDir ]; then
+                mkdir -p $gpLocalRawSymLink/$tDir >/dev/null 2>&1
+            fi
+            if [ ! -d $gpLocalRawSymLink/$tDir ]; then
+                fError -i -m "Could not create: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
+            fi
+            fLog -p info -m "Exists: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
+        fi
+        echo "gpHardLink=$gpHardLink"
         if [ "$gpHardLink" = "true" ]; then
-	    mv -v $tFile $gpLocalRawSymLink/$tDir
-	else
-	    'rsync' -vP $tFile $gpLocalRawSymLink/$tDir
-	fi
-	if [ ! -s $gpLocalRawSymLink/$tFile ]; then
-    	    fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
-	fi
-	if [ -f $tFile ]; then
-    	    rm $tFile
-	fi
-	ln -s $gpLocalRawSymLink/$tFile $tFile
-	if [ ! -L $tFile ]; then
-    	    fError -i -m "Could not create symlink for: $tFile" -l $tSrc:$LINENO
-	fi
-	tLink=$('ls' -l $tFile | awk '{print $9,$10,$11}')
-	fLog -p notice -m "Created link: $tLink" -l $tSrc:$LINENO
+            mv -v $tFile $gpLocalRawSymLink/$tDir
+        else
+            'rsync' -vP $tFile $gpLocalRawSymLink/$tDir
+        fi
+        if [ ! -s $gpLocalRawSymLink/$tFile ]; then
+            fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
+        fi
+        if [ -f $tFile ]; then
+            rm $tFile
+        fi
+        ln -s $gpLocalRawSymLink/$tFile $tFile
+        if [ ! -L $tFile ]; then
+            fError -i -m "Could not create symlink for: $tFile" -l $tSrc:$LINENO
+        fi
+        tLink=$('ls' -l $tFile | awk '{print $9,$10,$11}')
+        fLog -p notice -m "Created link: $tLink" -l $tSrc:$LINENO
     done
 
     fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files through project's $gpLocalRawSymLink symlink." -l $tSrc:$LINENO
@@ -721,12 +721,65 @@ fInitMkLocalConfig()
 } # fInitMkLocalConfig
 
 # --------------------
+fInitSaveSingleConfig()
+{
+    local pFile="$1"
+    local pKey="$2"
+    local pVarName="$3"
+    
+    local tSrc=${BASH_SOURCE##*/}
+    local tValue
+
+    tValue=$(eval echo \$$pVarName)
+    if [ -z "$tValue" ]; then
+        tValue="TBD-imp"
+    fi
+    git config --file $pFile $pKey "$tValue"
+    if [ $? -ne 0 ]; then
+        fLog -i -p warning -m "There was problem saving $pVarName value to $pKey to file $pFile" -l $tSrc:$LINENO
+	gErr=1
+    fi
+} # fInitSaveSingleConfig
+
+# --------------------
 fInitSaveVarsToConfigs()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tFile
+    local tS
 
-# TBD: ??? Thu Nov 11 00:36:46 PST 2021
+    gErr=0
 
+    tFile=~/.gitproj.config.global
+    tS=gitproj.config
+    fInitSaveSingleConfig $tFile $tS.bin gpBin
+    fInitSaveSingleConfig $tFile $tS.doc gpDoc
+    fInitSaveSingleConfig $tFile $tS.test gpTest
+    fInitSaveSingleConfig $tFile $tS.facility gpFacility
+    fInitSaveSingleConfig $tFile $tS.syslog gpSysLog
+
+    tFile=$gpLocalTopDir/.gitproj.config.local
+    tS=gitproj.config
+    fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
+    fInitSaveSingleConfig $tFile $tS.proj-name     gpProjName
+    fInitSaveSingleConfig $tFile $tS.proj-status   gpProjStatus
+
+    for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
+        tS=gitproj.config
+        fInitSaveSingleConfig $tFile $tS.git-flow-pkg      gpGitFlow
+        fInitSaveSingleConfig $tFile $tS.hardlink          gpHardLink
+        fInitSaveSingleConfig $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
+        fInitSaveSingleConfig $tFile $tS.local-raw-symlink gpLocalRawSymLink
+        fInitSaveSingleConfig $tFile $tS.remote-raw-dir    gpRemoteRawDir
+        tS=gitproj.hook
+        fInitSaveSingleConfig $tFile $tS.auto-move              gpAutoMove
+        fInitSaveSingleConfig $tFile $tS.binary-file-size-limit gpMaxSize
+        fInitSaveSingleConfig $tFile $tS.check-file-names       gpCheckFileNames
+        fInitSaveSingleConfig $tFile $tS.check-for-big-files    gpCheckForBigFiles
+        fInitSaveSingleConfig $tFile $tS.pre-commit-enabled     gpPreCommitEnabled
+        fInitSaveSingleConfig $tFile $tS.source                 gpHookSource
+    done
+    return $gErr
 } # fInitSaveCurrentVarsToConfigs
 
 # --------------------
@@ -763,7 +816,7 @@ fInitGetMountPath()
     local tSrc=${BASH_SOURCE##*/}
 
     #$gpMountPath
-    fInitCheckPath $gpPath	# gpPath??? TBD
+    fInitCheckPath $gpPath      # gpPath??? TBD
 } # fInitGetMountPath
 
 # --------------------
@@ -857,9 +910,9 @@ fInitCreateRemoteGit()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    fGetMountPath $gpMountPath		# gpMountPath??? TBD
-    #    	fCheckPath $gpPath
-    fGetRawRemotePath $gpRawRemotePath	# gpRawRemotePath??? TBD
+    fGetMountPath $gpMountPath          # gpMountPath??? TBD
+    #           fCheckPath $gpPath
+    fGetRawRemotePath $gpRawRemotePath  # gpRawRemotePath??? TBD
 
     fMustBeInGitRepo
     fInitCheckSpace $gpPath

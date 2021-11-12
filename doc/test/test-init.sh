@@ -112,12 +112,12 @@ setUp()
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-    	  cGitProjVersion cHostName cPID gErr
-	  
+          cGitProjVersion cHostName cPID gErr
+          
     unset gpAction gpAuto gpAutoMove gpBin gpCmdName gpDebug \
-    	  gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
-    	  gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
-    	  gpPath gpProjName gpSysLog gpVar gpVerbose
+          gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
+          gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+          gpPath gpProjName gpSysLog gpVar gpVerbose
 
     fTestSetupEnv
     fInitSetGlobals
@@ -187,7 +187,7 @@ testInitSetGlobals()
     assertEquals "$LINENO" "1.1"  "$gpVer"
     assertEquals "$LINENO" "true"  "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
-    assertEquals "$LINENO" "0" 	  "$gpAuto"
+    assertEquals "$LINENO" "0"    "$gpAuto"
     assertEquals "$LINENO" ".."   "$gpLocalRawDirPat"
     assertEquals "$LINENO" "raw" "$gpLocalRawSymLink"
     assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
@@ -535,15 +535,15 @@ testInitValidSize()
 
     for i in 3b 34k 8m 2g 3B 34k 8M 2G; do
         fInitValidSize "$i"
-	tLower=$i
+        tLower=$i
         assertEquals "$LINENO $i" "$tLower" "$gpMaxSize"
     done
 
     for i in 3x k 8 2 K2; do
         tResult=$(fInitValidSize "$i" 2>&1)
-    	tStatus=$?
-    	assertFalse "$LINENO $i" $tStatus
-    	assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
+        tStatus=$?
+        assertFalse "$LINENO $i" $tStatus
+        assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
     done
 
     return 0
@@ -904,11 +904,11 @@ testInitMkLocalConfig()
 
     if [ ! -f $gpTest/test-env_HomeAfterBMove.tgz ]; then
         fail "Missing test-env_HomeAfterBMove.tgz [$tSrc:$LINENO]"
-	return 1
+        return 1
     fi
     if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
         fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
-	return 1
+        return 1
     fi
     
     gpLocalTopDir=$HOME/$cDatProj1
@@ -946,11 +946,107 @@ testInitMkLocalConfig()
     
 } # testInitMkLocalConfig
 
+checkConfigValue()
+{
+    local pFile="$1"
+    local pKey="$2"
+    local pVarName="$3"
+    local pExpect="$4"
+    
+    local tSrc=${BASH_SOURCE##*/}
+    local tResult
+    local tStatus
+    local tValue
+
+
+    assertTrue $LINENO "[ -f $pFile ]"
+    tResult=$(git config --file $pFile $pKey)
+    tStatus=$?
+    assertTrue $LINENO "$tStatus"
+    tValue=$(eval echo \$$pVarName)
+    if [ -z "$tValue" ]; then
+        tValue="${pVarName}-is-undefined"
+	echo -e "Checking: ${pFile##*/} | $pKey | $pVarName | $pExpect"
+    fi
+    assertEquals "$LINENO $tResult" "$tValue" "$tResult"
+    assertEquals "$LINENO $tResult" "$pExpect" "$tResult"
+
+    return $tStatus
+} # checkConfigValue
+
+# TBD Thu Nov 11 23:53:05 PST 2021 more work is needed to get config saved
+
 testInitSaveVarsToConfigs()
 {
+    local tSrc=${BASH_SOURCE##*/}
     local tResult
-    startSkipping
+    local tFile
+    local tS
+
+    if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
+        fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
+        return 1
+    fi
+    cd $HOME/project >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_ProjAfterGInit.tgz
+    cd $gpTest
     
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitMkLocalConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue $LINENO "[ -f .gitproj.config.local ]"
+    assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
+    
+    gpProjName=${cDatProj1##*/}
+    gpHardLink="true"
+    gpGitFlow="true"
+    gpMaxSize="10k"
+    gpAutoMove=true
+    gpAuto=0
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitSaveVarsToConfigs 2>&1)
+    assertTrue $LINENO "$?"
+
+    # TBD refactor to use for loops with hash array maps
+    # cMapConf[gpBin]=gitproj.config.bin
+    # generated from cMapConf: cMapVar[gitproj.config.bin]=gpBin
+    # cMapFile[gitproj.config.bin]=global
+    # cMapFile[gitproj.config.proj-name]=local
+    # if cMapFile[key] is undefined, then assume it is global and local
+
+    tFile=~/.gitproj.config.global
+    tS=gitproj.config
+    checkConfigValue $tFile $tS.bin      gpBin      /usr/lib/git-core
+    checkConfigValue $tFile $tS.doc      gpDoc      /usr/share/doc/git-proj
+    checkConfigValue $tFile $tS.test     gpTest     /usr/share/doc/git-proj/test
+    checkConfigValue $tFile $tS.facility gpFacility user
+    checkConfigValue $tFile $tS.syslog   gpSysLog   true
+
+    tFile=$gpLocalTopDir/.gitproj.config.local
+    tS=gitproj.config
+    checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
+    checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
+    checkConfigValue $tFile $tS.proj-status   gpProjStatus  not-set-up
+
+    for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
+        tS=gitproj.config
+        checkConfigValue $tFile $tS.git-flow-pkg      gpGitFlow         git-flow
+        checkConfigValue $tFile $tS.hardlink          gpHardLink        false
+        checkConfigValue $tFile $tS.local-raw-dir-pat gpLocalRawDirPat  ..
+        checkConfigValue $tFile $tS.local-raw-symlink gpLocalRawSymLink raw
+        checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteRawDir    TBD
+        tS=gitproj.hook
+        checkConfigValue $tFile $tS.auto-move              gpAutoMove         true
+        checkConfigValue $tFile $tS.binary-file-size-limit gpMaxSize          10k
+        checkConfigValue $tFile $tS.check-file-names       gpCheckFileNames   true
+        checkConfigValue $tFile $tS.check-for-big-files    gpCheckForBigFiles true
+        checkConfigValue $tFile $tS.pre-commit-enabled     gpPreCommitEnabled true
+        checkConfigValue $tFile $tS.source                 gpHookSource       hooks/pre-commit
+    done
+    
+    return 0
 }
 
 testInitCreateLocalGit()

@@ -238,7 +238,7 @@ file.
 
 	 	# See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
 	
-		# States: not-setup, setup-err, config-err, OK
+		# States: not-setup, setup-err, config-err, ok
 		proj-status = not-set-up
 	
 		# origin-url with path and .git removed

@@ -39,3 +39,13 @@
 	check-for-big-files = true
 	binary-file-size-limit = 1k
 	auto-move = true
+[gitflow "branch"]
+        master = main
+        main = main
+        develop = develop
+[gitflow "prefix"]
+        feature = feature/
+        release = release/
+        hotfix = hotfix/
+        bugfix = bugfix/
+        support = support/

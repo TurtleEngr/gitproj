@@ -552,6 +552,31 @@ testComUnsetConfigGlobal()
     assertFalse "$LINENO" "[ $? -eq 0 ]"
 } # testComUnsetConfigGlobal
 
+# --------------------------------
+testComSetConfigMore()
+{
+    startSkipping
+    fail "TBD"
+    # untar a git env., test in and out of git dir
+} # testComSetConfigMore
+
+# --------------------------------
+testComGetConfigMore()
+{
+    startSkipping
+    fail "TBD"
+    # untar a git env., test in and out of git dir
+} # testComGetConfigMore
+
+# --------------------------------
+testComUnsetConfigMore()
+{
+    startSkipping
+    fail "TBD"
+    # untar a git env., test in and out of git dir
+} #testComUnsetConfigMore
+
+# --------------------------------
 testCheckPkg()
 {
     assertTrue "$LINENO" $(fComCheckPkg less; echo $?)
