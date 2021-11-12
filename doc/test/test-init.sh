@@ -96,6 +96,7 @@ Calls:
 EOF
 } # oneTimeSetUp
 
+# --------------------------------
 NAoneTimeTearDown()
 {
     if [ $gpDebug -ne 0 ]; then
@@ -137,6 +138,7 @@ global variable settings,
 EOF
 } # setUp
 
+# --------------------------------
 tearDown()
 {
     # fTestRmEnv
@@ -166,6 +168,7 @@ testGitProjInit()
     return 0
 } # testGitProjInit
 
+# --------------------------------
 testFirstTimeSet()
 {
     assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
@@ -178,13 +181,14 @@ testFirstTimeSet()
     return 0
 } # testFirstTimeSet
 
+# --------------------------------
 testInitSetGlobals()
 {
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
     cd $HOME/$cDatProj1
 
     fInitSetGlobals
-    assertEquals "$LINENO" "1.1"  "$gpVer"
+    assertEquals "$LINENO" "$cGitProjVersion"  "$gpVer"
     assertEquals "$LINENO" "true"  "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0"    "$gpAuto"
@@ -192,7 +196,7 @@ testInitSetGlobals()
     assertEquals "$LINENO" "raw" "$gpLocalRawSymLink"
     assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
     assertEquals "$LINENO" "${gpLocalRawDirPat}/${gpProjName}.raw" "$gpLocalRawDir"
-    assertEquals "$LINENO" "1k" "$gpMaxSize"
+    assertEquals "$LINENO" "10k" "$gpMaxSize"
     assertEquals "$LINENO" "false" "$gpGitFlow"
     assertNull "$LINENO" "$gpAction"
 
@@ -200,6 +204,7 @@ testInitSetGlobals()
     return 0
 } # testInitSetGlobals
 
+# --------------------------------
 checkComMustNotBeInGit()
 {
     local pFun=$1
@@ -247,6 +252,7 @@ checkComMustNotBeInGit()
     return 0
 } # checkComMustNotBeInGit
 
+# --------------------------------
 testComMustNotBeInGit()
 {
     gpUnitDebug=0
@@ -254,6 +260,7 @@ testComMustNotBeInGit()
     return 0
 } # testComMustNotBeInGit
 
+# --------------------------------
 checkComAllMustBeReadable()
 {
     local tResult
@@ -289,6 +296,7 @@ checkComAllMustBeReadable()
     return 0
 } # checkComAllMustBeReadable
 
+# --------------------------------
 testComAllMustBeReadable()
 {
     gpUnitDebug=0
@@ -296,6 +304,7 @@ testComAllMustBeReadable()
     return 0
 } # testComAllMustBeReadable
 
+# --------------------------------
 testInitGettingStarted()
 {
     local tResult
@@ -323,6 +332,7 @@ testInitGettingStarted()
     return 0
 } # testInitGettingStarted
 
+# --------------------------------
 testInitValidLocalPath()
 {
     local tResult
@@ -348,6 +358,7 @@ testInitValidLocalPath()
     return 0
 } # testInitValidLocalPath
 
+# --------------------------------
 testInitGetLocalPath()
 {
     local tResult
@@ -408,6 +419,7 @@ testInitGetLocalPath()
     return 0
 } # testInitGetLocalPath
 
+# --------------------------------
 testInitValidLocalRawDirPat()
 {
     local tResult
@@ -444,6 +456,7 @@ testInitValidLocalRawDirPat()
     return 0
 } # testInitValidLocalRawDirPat
 
+# --------------------------------
 testInitGetRawLocalDirPat()
 {
     local tResult
@@ -476,6 +489,7 @@ testInitGetRawLocalDirPat()
     return 0
 } # testInitGetRawLocalDirPat
 
+# --------------------------------
 testInitValidSymLink()
 {
     local tResult
@@ -499,6 +513,7 @@ testInitValidSymLink()
     return 0
 } # testInitValidSymLink
 
+# --------------------------------
 testInitGetSymLink()
 {
     local tResult
@@ -520,6 +535,7 @@ testInitGetSymLink()
     return 0
 } # testInitGetSymLink
 
+# --------------------------------
 testInitValidSize()
 {
     local tResult
@@ -549,6 +565,7 @@ testInitValidSize()
     return 0
 } # testInitValidSize
 
+# --------------------------------
 testInitGetSize()
 {
     local tResult
@@ -573,6 +590,7 @@ testInitGetSize()
     return 0
 }
 
+# --------------------------------
 testInitGetBinaryFiles()
 {
     local tResult
@@ -593,6 +611,7 @@ testInitGetBinaryFiles()
     return 0
 } # testInitGetBinaryFiles
 
+# --------------------------------
 testInitGetMoveFiles()
 {
     local tResult
@@ -626,6 +645,7 @@ testInitGetMoveFiles()
     return 0
 } # testInitGetMoveFiles
 
+# --------------------------------
 testInitGetGitFlow()
 {
     local tResult
@@ -651,6 +671,7 @@ testInitGetGitFlow()
     return 0
 } # testInitGetGitFlow
 
+# --------------------------------
 testInitSummary()
 {
     local tResult
@@ -681,6 +702,7 @@ testInitSummary()
     return 0
 } # testInitSummary
 
+# --------------------------------
 testInitMkRaw()
 {
     local tResult
@@ -716,6 +738,7 @@ testInitMkRaw()
     return 0
 } # testInitMkRaw
 
+# --------------------------------
 testInitMoveBinaryFiles_Move()
 {
     local tResult
@@ -777,6 +800,7 @@ testInitMoveBinaryFiles_Move()
     return 0
 } # testInitMoveBinaryFiles_Move
 
+# --------------------------------
 testInitMoveBinaryFiles_Copy()
 {
     local tResult
@@ -828,6 +852,7 @@ testInitMoveBinaryFiles_Copy()
     return 0
 } # testInitMoveBinaryFiles_Copy
 
+# --------------------------------
 testInitMkGitFlow()
 {
     local tResult
@@ -856,6 +881,7 @@ testInitMkGitFlow()
     return 0
 } # testInitMkGitFlow
 
+# --------------------------------
 testInitMkGitDir()
 {
     local tResult
@@ -897,6 +923,7 @@ testInitMkGitDir()
     return 0
 } # testInitMkGitDir
 
+# --------------------------------
 testInitMkLocalConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -946,6 +973,7 @@ testInitMkLocalConfig()
     
 } # testInitMkLocalConfig
 
+# --------------------------------
 checkConfigValue()
 {
     local pFile="$1"
@@ -959,23 +987,23 @@ checkConfigValue()
     local tValue
 
 
-    assertTrue $LINENO "[ -f $pFile ]"
+    assertTrue "$LINENO $pFile" "[ -f $pFile ]"
     tResult=$(git config --file $pFile $pKey)
     tStatus=$?
-    assertTrue $LINENO "$tStatus"
+    assertTrue "$LINENO $pKey" "$tStatus"
     tValue=$(eval echo \$$pVarName)
     if [ -z "$tValue" ]; then
         tValue="${pVarName}-is-undefined"
-	echo -e "Checking: ${pFile##*/} | $pKey | $pVarName | $pExpect"
     fi
-    assertEquals "$LINENO $tResult" "$tValue" "$tResult"
-    assertEquals "$LINENO $tResult" "$pExpect" "$tResult"
+    assertContains "$LINENO $pVarName $tResult" "$tResult" "$tValue"
+    assertContains "$LINENO $pVarName $tResult" "$tResult" "$pExpect"
 
     return $tStatus
 } # checkConfigValue
 
 # TBD Thu Nov 11 23:53:05 PST 2021 more work is needed to get config saved
 
+# --------------------------------
 testInitSaveVarsToConfigs()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -1018,9 +1046,9 @@ testInitSaveVarsToConfigs()
 
     tFile=~/.gitproj.config.global
     tS=gitproj.config
-    checkConfigValue $tFile $tS.bin      gpBin      /usr/lib/git-core
-    checkConfigValue $tFile $tS.doc      gpDoc      /usr/share/doc/git-proj
-    checkConfigValue $tFile $tS.test     gpTest     /usr/share/doc/git-proj/test
+    checkConfigValue $tFile $tS.bin      gpBin      ${gBin#$gpLocalTopDir/}
+    checkConfigValue $tFile $tS.doc      gpDoc      ${gDoc#$gpLocalTopDir/}
+    checkConfigValue $tFile $tS.test     gpTest     ${gTest#$gpLocalTopDir/}
     checkConfigValue $tFile $tS.facility gpFacility user
     checkConfigValue $tFile $tS.syslog   gpSysLog   true
 
@@ -1029,14 +1057,14 @@ testInitSaveVarsToConfigs()
     checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
     checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
     checkConfigValue $tFile $tS.proj-status   gpProjStatus  not-set-up
+    checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteRawDir    TBD
 
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
         tS=gitproj.config
-        checkConfigValue $tFile $tS.git-flow-pkg      gpGitFlow         git-flow
-        checkConfigValue $tFile $tS.hardlink          gpHardLink        false
+        checkConfigValue $tFile $tS.git-flow-pkg      gpGitFlow         true
+        checkConfigValue $tFile $tS.hardlink          gpHardLink        $gpHardLink
         checkConfigValue $tFile $tS.local-raw-dir-pat gpLocalRawDirPat  ..
         checkConfigValue $tFile $tS.local-raw-symlink gpLocalRawSymLink raw
-        checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteRawDir    TBD
         tS=gitproj.hook
         checkConfigValue $tFile $tS.auto-move              gpAutoMove         true
         checkConfigValue $tFile $tS.binary-file-size-limit gpMaxSize          10k
@@ -1049,6 +1077,7 @@ testInitSaveVarsToConfigs()
     return 0
 }
 
+# --------------------------------
 testInitCreateLocalGit()
 {
     local tResult
@@ -1060,6 +1089,7 @@ testInitCreateLocalGit()
 
 # ========================================
 
+# --------------------------------
 testInitGetMountPath()
 {
     startSkipping
@@ -1067,6 +1097,7 @@ testInitGetMountPath()
     return 0
 } # testInitGetMountPath
 
+# --------------------------------
 testInitGetRawRemotePath()
 {
     startSkipping
@@ -1074,6 +1105,7 @@ testInitGetRawRemotePath()
     return 0
 } # testInitGetRawRemotePath
 
+# --------------------------------
 testInitCheckPath()
 {
     startSkipping
@@ -1081,6 +1113,7 @@ testInitCheckPath()
     return 0
 } # testInitCheckPath
 
+# --------------------------------
 testInitCheckSpace()
 {
     startSkipping
@@ -1088,6 +1121,7 @@ testInitCheckSpace()
     return 0
 } # testInitCheckSpace
 
+# --------------------------------
 testInitMkRemote()
 {
     startSkipping
@@ -1095,6 +1129,7 @@ testInitMkRemote()
     return 0
 } # testInitMkRaw
 
+# --------------------------------
 testInitReport()
 {
     startSkipping
@@ -1102,6 +1137,7 @@ testInitReport()
     return 0
 } # testInitReport
 
+# --------------------------------
 testInitCreateRemoteGit()
 {
     startSkipping
@@ -1109,8 +1145,10 @@ testInitCreateRemoteGit()
     return 0
 } # testInitCreateRemoteGit
 
-# ====================
+# ========================================
 # This should be the last defined function
+
+# --------------------------------
 fTestRun()
 {
     if [ ! -x $gpTest/shunit2.1 ]; then

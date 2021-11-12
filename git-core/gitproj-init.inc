@@ -2,12 +2,13 @@
 
 # --------------------
 export cCurDir cGetOrigin cGetTopDir cTop
-export gpAction gpAuto gpBin gpCmdName gpDebug gpDoc \
-       gpFacility gpGitFlow gpHardLink gpLocalRawDir gpLocalRawDirPat \
-       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpAutoMove gpPath \
-       gpProjName gpSysLog gpVar gpVerbose
-# ???
-export gpMountPath gpRawRemotePath
+
+export gpAction gpAuto gpAutoMove gpBin gpCheckFileNames \
+       gpCheckForBigFilesgpCmdName gpDebug gpDoc gpFacility gpGitFlow \
+       gpHardLink gpHookSource gpLocalRawDir gpLocalRawDirPat \
+       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpMountDir gpPath \
+       gpPreCommitEnabled gpProjName gpRemoteRawDir gpSysLog gpVar \
+       gpVerbose
 
 # --------------------
 fInitFirstTimeSet()
@@ -82,7 +83,15 @@ fInitSetGlobals()
     gpAction=""
 
     gpProjStatus=$(fComGetConfig -k "gitproj.config.proj-status" -d "not-set-up")
+    # Uknown at this point, to coping files is the safest option.
     gpHardLink=$(fComGetConfig -k "gitproj.config.hardlink" -d "false")
+
+    gpCheckFileNames=true
+    gpCheckForBigFiles=true
+    gpPreCommitEnabled=true
+    gpHookSource=hooks/pre-commit
+    gpMountDir=TBD
+    gpRemoteRawDir=TBD
 
     return 0
 } # fInitSetGlobals
@@ -732,7 +741,7 @@ fInitSaveSingleConfig()
 
     tValue=$(eval echo \$$pVarName)
     if [ -z "$tValue" ]; then
-        tValue="TBD-imp"
+        tValue="Undefined"
     fi
     git config --file $pFile $pKey "$tValue"
     if [ $? -ne 0 ]; then
@@ -811,21 +820,21 @@ fInitCreateLocalGit()
 # fInitCreateRemoteGit Section
 
 # --------------------
-fInitGetMountPath()
+fInitGetMountDir()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    #$gpMountPath
+    #$gpMountDir
     fInitCheckPath $gpPath      # gpPath??? TBD
 } # fInitGetMountPath
 
 # --------------------
-fInitGetRawRemotePath()
+fInitGetRemoteRawDir()
 {
     local tSrc=${BASH_SOURCE##*/}
 
     echo TBD
-    #$gpRawRemotePath
+    #$gpRemoteRawDir
 } # fInitGetRawRemotePath
 
 # --------------------
@@ -910,9 +919,9 @@ fInitCreateRemoteGit()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    fGetMountPath $gpMountPath          # gpMountPath??? TBD
-    #           fCheckPath $gpPath
-    fGetRawRemotePath $gpRawRemotePath  # gpRawRemotePath??? TBD
+    fGetMountPath $gpMountDir
+    #           fCheckPath $gpPath???
+    fGetRemoteRawDir $gpRemoteRawDir
 
     fMustBeInGitRepo
     fInitCheckSpace $gpPath

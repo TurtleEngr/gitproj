@@ -3,41 +3,26 @@
 # From: /usr/share/doc/gitproj/config/gitproj.config.global
 
 [gitproj "config"]
-		# gpVer
-	ver = 1.1
-		# gpSyslog
+	ver = 0.1.0
 	syslog = true
-		# gpFacility
 	facility = user
-		# gpBin
-		# gpBin = $(git --exec-path)
 	bin = /usr/lib/git-core
-		# gpDoc
 	doc = /usr/share/doc/git-proj
-		# gpTest
 	test = /usr/share/doc/git-proj/test
-		# gpProjStatus
 	proj-status = not-set-up
-		# gpProjName
 	proj-name = TBD
-		# gpHardLink
 	hardlink = false
-		# gpRemoteRawUrl /MOUNT-DIR/DIR/NAME.raw
 	remote-raw-dir = TBD
-		# gpLocalTopDir
 	local-top-dir = TBD
-		# gpLocalRawDirPat
 	local-raw-dir-pat = ..
-		# gpLocalRawSymLink
 	local-raw-symlink = raw
-		# gpGitFlowPkg
 	git-flow-pkg = git-flow
 [gitproj "hook"]
 	source = hooks/pre-commit
 	pre-commit-enabled = true
 	check-file-names = true
 	check-for-big-files = true
-	binary-file-size-limit = 1k
+	binary-file-size-limit = 10k
 	auto-move = true
 [gitflow "branch"]
         master = main
