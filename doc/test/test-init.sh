@@ -184,11 +184,18 @@ testFirstTimeSet()
 # --------------------------------
 testInitSetGlobals()
 {
+    local tTrim
+    local tVer
+
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
     cd $HOME/$cDatProj1
 
     fInitSetGlobals
-    assertEquals "$LINENO" "$cGitProjVersion"  "$gpVer"
+
+    tTrim=${cGitProjVersion#*.*.}
+    tVer=${cGitProjVersion%.$tTrim}
+    assertEquals "$LINENO" "$tVer"  "$gpVer"
+
     assertEquals "$LINENO" "true"  "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0"    "$gpAuto"
@@ -399,7 +406,7 @@ testInitGetLocalPath()
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     # Enter $HOME; $HOME/$cDatProj3; quit
-    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj3\nquit"))
+    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj3\nquit\nq"))
     tStatus=$?
     assertFalse $LINENO $tStatus
     assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
