@@ -24,13 +24,17 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj init local [-a] [-l pLocalPath]
-                        [-r pLocalRawDirPat] [-k pSymLink]
-                        [-s pSize] [-m] [-f] [-h]
-        Defaults: [-l $PWD] [-r ../[NAME].raw] [-k raw] [-s 1K] [-m] [-f]
+    git proj init local [-a]
+    	     	  	[-l pLocalDir]
+    	     	  	[-r pLocalRawDirPat]
+			[-k pSymLink] [-s pMaxSize] [-m] [-f] [-h]
 
-    git proj init remote [-a -d pMountPath] [-r pRawRemotePath ] [-h]
-        Defaults: [-r pMountPath/NAME.raw]
+        Defaults: [-l $PWD] [-r ../[NAME].raw] [-k raw] [-s 10K] [-m] [-f]
+
+    git proj init remote [-a] -d pMountDir [-r pRawRemoteDir ]
+    	     	  	 [-s pMinSpace] [-h]
+
+        Defaults: [-r pMountDir/NAME.raw]
 
 =head1 DESCRIPTION
 
@@ -68,12 +72,12 @@ The -a option will automattically run the whole init process with
 default settings. The options can be defined to override the default
 settings.
 
-=item B<-l pLocalPath>
+=item B<-l pLocalDir>
 
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 
-    Path (-l) [$PWD]? $gpLocalTopDir
+    Dir (-l) [$PWD]? $gpLocalTopDir
         So the project Name will be: ${gpLocalTopDir##*/}
 
 =item B<-r pLocalRawDirPat>
@@ -82,7 +86,7 @@ Set the location for large binary files. It cannot be *in* any of the
 project directories. It will be created, if it does not existi. The
 path must be relative to the project dir (and not too far away or
 cloning the project may not work). The files in the raw directory will
-NOT be versioned--only the latest copy will be saved. Default: ..
+NOT be versioned--only the latest copy will be saved. Default: ".."
 
     Raw dir (-r) [..]?
         The README.txt file will point to the raw dir.
@@ -92,24 +96,24 @@ NOT be versioned--only the latest copy will be saved. Default: ..
 Define the symlink name that will point to the Raw dir. It will be
 created in the project's top dir. If the Raw dir is moved, this link
 will need to be updated. Symlink in the git directories will point to
-this dir and the symlinks will be versioned.
+this dir and the symlinks will be versioned. Default: raw
 
     Symlink (-k) [raw]?
         (update the README.txt)
 
-=item B<-s pSize>
+=item B<-s pMaxSize>
 
-Define the "size" for large binary files.
+Define the "size" for large binary files. Default 10K
 
-    Size (-s) [1K]?
+    Size (-s) [10K]?
 
 =item B<-m>
 
-These binary files greater than [1K]  were found in your project dir:
+These binary files greater than [pSize]  were found in your project dir:
 
     [file list]
 
-The listed files can be moved to the project's raw directory. Paths
+The listed files can be moved to the project's raw directory. Dirs
 will be created in the raw directory that correspond to the project's
 directory. A symlink will replace the moved file. The symlink will
 point to [raw]
@@ -130,13 +134,13 @@ point to [raw]
 
 =over 4
 
-=item B<-d pMountPath>
+=item B<-d pMountDir>
 
 Export the git repo to an external drive (or another local dir) This
 is usually the removable drive's "top" directory.  Ideally the top
-directory should be different across a set of drives, so that the
-local "origin" can be used to make sure the proper git repo is round
-on the drive. "origin" will be set to $pDirPath
+directory should be different across a set of external drives, so that the
+local "origin" can be used to make sure the proper git repo is found
+on the drive. "origin" will be set to $pMountDir/ProjName.git
 
 After adding and committing files, run this script to copy this git
 repo to a mounted drive (or to another local directory).
@@ -149,10 +153,19 @@ at the top directory video-2019-04-01, with:
 
  git proj init -e /mnt/usb-video/video-2019-04-01
 
-=item B<-r pRawRemotePath>
+=item B<-r pRawRemoteDir>
 
- TBD???
- 
+        Default: [-r pMountDir/ProjName.raw]
+
+=item B<-s pMinSpace>
+
+This is the minium space that should be available on the external
+drive.  The command will not continue if there is not enough space.
+The available space must also be twice the size of the space used by
+ProjName.raw.
+
+Default: 20g
+
 =item B<-h>
 
 =back
@@ -249,10 +262,12 @@ while getopts :al:r:k:s:mfhH:x tArg; do
             ;;
         r)
             gpLocalRawDir="$OPTARG"
-            gpRawRemotePath="$OPTARG"
+            gpRawRemoteDir="$OPTARG"
             ;;
         k) gpLocalRawSymLink="$OPTARG" ;;
-        s) gpMaxSize=1K ;;
+        s) gpMaxSize=="$OPTARG"
+	   gpRemoveMinSpace="$OPTARG"
+	   ;;
         m) gpMove=1 ;;
         f) gpGitFlow=1 ;;
         # Common arguments

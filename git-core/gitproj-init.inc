@@ -6,9 +6,9 @@ export cCurDir cGetOrigin cGetTopDir cTop
 export gpAction gpAuto gpAutoMove gpBin gpCheckFileNames \
        gpCheckForBigFilesgpCmdName gpDebug gpDoc gpFacility gpGitFlow \
        gpHardLink gpHookSource gpLocalRawDir gpLocalRawDirPat \
-       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpMountDir gpPath \
-       gpPreCommitEnabled gpProjName gpRemoteRawDir gpSysLog gpVar \
-       gpVerbose
+       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpRemoteMinSpace gpMountDir \
+       gpPath gpPreCommitEnabled gpProjName gpRemoteRawDir gpSysLog \
+       gpVar gpVerbose
 
 # --------------------
 fInitFirstTimeSet()
@@ -77,6 +77,7 @@ fInitSetGlobals()
     gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
+    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "1k")
     gpAutoMove="true"
     gpGitFlow="false"
     gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
@@ -677,6 +678,7 @@ fInitMkGitFlow()
 fInitMkGitDir()
 {
     local tSrc=${BASH_SOURCE##*/}
+    locat tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
     cat <<EOF >.gitignore
@@ -695,7 +697,12 @@ EOF
     git init
     git add .gitignore *
     git commit -am "Initial commit"
-    # TBD the commit much work, or the rest fails
+    tStatus=$?
+    set +x >/dev/null 2>&1
+    if [ $tStatus -ne 0 ]; then
+        fError -i "Initial git commit failed." -l $tSrc:$LINENO
+    fi
+    set -x >/dev/null 2>&1
     git branch --move master main
     git branch develop
     git checkout develop
@@ -780,6 +787,7 @@ fInitSaveVarsToConfigs()
         fInitSaveSingleConfig $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
         fInitSaveSingleConfig $tFile $tS.local-raw-symlink gpLocalRawSymLink
         fInitSaveSingleConfig $tFile $tS.remote-raw-dir    gpRemoteRawDir
+        fInitSaveSingleConfig $tFile $tS.remote-raw-dir    gpRemoteMinSpace
         tS=gitproj.hook
         fInitSaveSingleConfig $tFile $tS.auto-move              gpAutoMove
         fInitSaveSingleConfig $tFile $tS.binary-file-size-limit gpMaxSize
@@ -794,16 +802,29 @@ fInitSaveVarsToConfigs()
 # --------------------
 fInitCreateLocalGit()
 {
+    # Called by "git proj init local"
     local tSrc=${BASH_SOURCE##*/}
 
     fInitGettingStarted
 
-    # Prompt/Response or if -a, just validate the options
+    # Prompt/Response or if -a, validate the options
+    
+    # -l pLocalDir
     fInitGetLocalPath $gpLocalTopDir
+    
+    # -k pSymLinkPat
     fInitGetLocalRawDirPat $gpLocalRawDirPat
+    
+    # combine gpLocalTopDir,  pSymLinkPat, and gpProjName
     fInitGetSymLink $gpLocalRawSymLink
+
+    # -s pSize
     fInitGetSize $gpMaxSize
+
+    # -m (if -a default is true)
     fInitGetMoveFiles $gpAutoMove
+
+    # -f
     fInitGetGitFlow $gpGitFlow
 
     fInitSummary
@@ -814,52 +835,80 @@ fInitCreateLocalGit()
     fInitMkGitDir
     fInitMkLocalConfig
     fInitSaveVarsToConfigs
+
+    cat <<EOF | fmt
+
+You now have a local git repository project (${gpProjName}) setup at
+${gpLocalTopDir} with support for managing large binary files (larger
+than $gpMaxSize).
+
+~/gitconfig will include the ~/gitproj.config.global file, which will
+be used for defaults when you create other "git proj" projects on your
+system.  The variables will also be used, if are not overridden by the
+project's config definitions found at: .gitproj.config.local and
+.gitproj.config.\$HOSTNAME You should version these files with your
+project.
+
+When you "clone" your git project to another system, a new
+.gitproj.config.\$HOSTNAME will be created, so that differences
+between systems are saved. For example, mount points and filesystem
+differences.
+
+Now would be a good time to setup an external drive for archiving your
+project: "git proj init remote -d pMountPath"
+
+[$tSrc:$LINENO]
+EOF
+    return 0
 } # fInitCreateLocalGit
 
 # ========================================
 # fInitCreateRemoteGit Section
 
 # --------------------
+fInitCheckDir()
+{
+    local pPath=$1
+
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ ! -d $pPath ]; then
+        fError -n -m "Could not find: $pPath" -l $tSrc:$LINENO
+        return 1
+    fi
+    if [ ! -w $pPath ]; then
+        fError -n -m "$pPath is not writable for you." -l $tSrc:$LINENO
+        return 1
+    fi
+    if [ -e $pPath/$gpProjName.git ]; then
+        fError -n -m "$pPath/$gpProjName.git already exists." -l $tSrc:$LINENO
+        return 1
+    fi
+    return 0
+} # fInitCheckDir
+
+# --------------------
 fInitGetMountDir()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    #$gpMountDir
-    fInitCheckPath $gpPath      # gpPath??? TBD
-} # fInitGetMountPath
+    if [ $gpAuto -ne 0 ]; then
+        if [ -z "$gpMountDir" ]; then
+            fError -m "The -d option is required." -l $tSrc:$LINENO
+	fi
+    	if ! fInitCheckDir $gpMountDir; then
+	    return 1
+	fi
+	return 0
+    fi
+
+} # fInitGetMountDir
 
 # --------------------
-fInitGetRemoteRawDir()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-    echo TBD
-    #$gpRemoteRawDir
-} # fInitGetRawRemotePath
-
-# --------------------
-fInitCheckPath()
-{
-    local pPath=$1
-
-    local tSrc=${BASH_SOURCE##*/}
-    local tName=${PWD##*/}
-
-    if [ ! -d $pPath ]; then
-        fError -m "Could not find: $pPath" -l $tSrc:$LINENO
-    fi
-    if [ ! -w $pPath ]; then
-        fError -m "$pPath is not writable for you." -l $tSrc:$LINENO
-    fi
-    if [ -e $pPath/$tName.git ]; then
-        fError -m "$pPath/$tName.git already exists." -l $tSrc:$LINENO
-    fi
-} # fInitCheckPath
-
-# --------------------
-fInitCheckSpace()
+fInitCheckDirSpace()
 {
     local pPath=$1
+    local pMinSpace=$2
 
     local tSrc=${BASH_SOURCE##*/}
     local tAvail
@@ -874,14 +923,39 @@ fInitCheckSpace()
     let tGitSize*=2
 
     tRawSize=$(du -sm raw | awk '{print $1}')
-    let tRawSize*+2
+    let tRawSize*=2
 
     let tDesiredSize=tGitSize+tRawSize
 
     if [ $tDesiredSize -gt $tAvail ]; then
         fError -m "There is not enough space at $pPath. $pPath has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
     fi
-} # fInitCheckSpace
+} # fInitCheckDirSpace
+
+# --------------------
+fInitGetMinSpace()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    
+    if [ $gpAuto -ne 0 ]; then
+        if ! fInitCheckDirSpace $gpMountDir $gpRemoteMinSpace; then
+	   echo TBD
+	   return 1
+        fi
+	return 0
+    fi
+    return 0
+} # fInitGetMinSpace
+
+# --------------------
+fInitGetRemoteRawDir()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    echo TBD
+    #$gpRemoteRawDir
+} # fInitGetRawRemotePath
+
 
 # --------------------
 fInitMkRemote()
@@ -917,14 +991,24 @@ EOF
 # --------------------
 fInitCreateRemoteGit()
 {
+    # Called by: "git proj remote -d pMountPath"
     local tSrc=${BASH_SOURCE##*/}
 
-    fGetMountPath $gpMountDir
-    #           fCheckPath $gpPath???
+    # Prompt/Response or if -a, validate the options
+
+    if ! fComMustBeInGitRepo $PWD; then
+       fUsage usage
+    fi
+
+    # -d pMountPath
+    fInitGetMountDir $gpMountDir
+
+    # -s pMinSpace
+    fInitGetMinSpace $gpRemoteMinSpace
+    
+    # -r pRawRemotePath
     fGetRemoteRawDir $gpRemoteRawDir
 
-    fMustBeInGitRepo
-    fInitCheckSpace $gpPath
     fInitMkRemote $gpPath
     fInitReport
 } # fCreateRemoteGit

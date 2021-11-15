@@ -7,11 +7,12 @@
 	proj-status = not-set-up
 	proj-name = TBD
 	hardlink = TBD
-	remote-raw-dir = TBD
 	local-top-dir = TBD
 	local-raw-dir-pat = TBD
 	local-raw-symlink = TBD
 	git-flow-pkg = TBD
+	remote-raw-dir = TBD
+	remove-min-size = 20g
 [gitproj "hook"]
 	pre-commit-enabled = true
 	check-file-names = true

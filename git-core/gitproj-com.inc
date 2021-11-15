@@ -893,7 +893,7 @@ fComMustBeInGitRepo()
         return 0
     fi
     cd - >/dev/null 2>&1
-    fError -n -m "$pDir must be in a git repo for this to work." -l $tSrc:$LINENO
+    fError -n -m "$pDir must be in a git repo for this command." -l $tSrc:$LINENO
     cd - >/dev/null 2>&1
     return 1
 } # fComMustBeInGitRepo

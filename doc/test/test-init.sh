@@ -1065,6 +1065,7 @@ testInitSaveVarsToConfigs()
     checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
     checkConfigValue $tFile $tS.proj-status   gpProjStatus  not-set-up
     checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteRawDir    TBD
+    checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteMinSpace  20g
 
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
         tS=gitproj.config
@@ -1087,10 +1088,39 @@ testInitSaveVarsToConfigs()
 # --------------------------------
 testInitCreateLocalGit()
 {
+    local tSrc=${BASH_SOURCE##*/}
     local tResult
+    local tFile
+    local tS
 
-    startSkipping
-    fail "TBD"
+    if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
+        fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
+        return 1
+    fi
+    
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitMkLocalConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue $LINENO "[ -f .gitproj.config.local ]"
+    assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
+    
+    gpProjName=${cDatProj1##*/}
+    gpHardLink="true"
+    gpGitFlow="true"
+    gpMaxSize="10k"
+    gpAutoMove=true
+    gpAuto=1
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    gpSysLog=true
+    tResult=$(fInitSaveVarsToConfigs 2>&1)
+    assertTrue $LINENO "$?"
+
+    # Create local git and local raw
+    tResult=$(fInitCreateLocalGit 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    
     return 0
 } # testInitCreateLocalGit
 
