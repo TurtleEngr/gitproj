@@ -31,18 +31,11 @@ fUsage()
 
         Defaults: [-l $PWD] [-r ../[NAME].raw] [-k raw] [-s 10K] [-m] [-f]
 
-    git proj init remote [-a] -d pMountDir [-r pRawRemoteDir ]
-    	     	  	 [-s pMinSpace] [-h]
-
-        Defaults: [-r pMountDir/NAME.raw]
-
 =head1 DESCRIPTION
-
-=head2 git proj init local
 
 This will create a local git repo with branches. If git-flow is
 installed can will optionally be setup too. After this setup
-the remove git repo with "git proj init remote"
+the remote git repo with "git proj init remote"
 
 If there is a -a option, "git proj init local" will be run with all
 the default options, which can be overridden with the options.
@@ -50,19 +43,12 @@ the default options, which can be overridden with the options.
 If there is no -a option, you will be prompted for the settings.  See
 the OPTION section for details.
 
-When the local and remove git repos are setup, all the setings
+When the local and remote git repos are setup, all the setings
 will be saved to ~/.gitproj.config and
 [project]/gitproj/config.$HOSTNAME. Includes are put in ~/.gitconfig
 and [project].git/config to point to the gitproj config files.
 
-=head2 git proj init remote
-
-This will create a remote git repo on an external drive.
-
-(Future versions may support repos on remove computers, where you have
-rsync access.)
-
-=head1 OPTIONS  git proj init local
+=head1 OPTIONS
 
 =over 4
 
@@ -130,46 +116,6 @@ point to [raw]
 
 =back
 
-=head1 OPTIONS  git proj init remote
-
-=over 4
-
-=item B<-d pMountDir>
-
-Export the git repo to an external drive (or another local dir) This
-is usually the removable drive's "top" directory.  Ideally the top
-directory should be different across a set of external drives, so that the
-local "origin" can be used to make sure the proper git repo is found
-on the drive. "origin" will be set to $pMountDir/ProjName.git
-
-After adding and committing files, run this script to copy this git
-repo to a mounted drive (or to another local directory).
-
-A mounted drive should have top directory that is different from other
-drives so that the repo can be found with it's "origin" name.
-
-For example, with a mount point: /mnt/usb-video create the remote git
-at the top directory video-2019-04-01, with:
-
- git proj init -e /mnt/usb-video/video-2019-04-01
-
-=item B<-r pRawRemoteDir>
-
-        Default: [-r pMountDir/ProjName.raw]
-
-=item B<-s pMinSpace>
-
-This is the minium space that should be available on the external
-drive.  The command will not continue if there is not enough space.
-The available space must also be twice the size of the space used by
-ProjName.raw.
-
-Default: 20g
-
-=item B<-h>
-
-=back
-
 =head1 RETURN VALUE
 
  0 - if OK
@@ -186,6 +132,7 @@ Default: 20g
 =head1 SEE ALSO
 
  git proj
+ git proj remote
  git proj clone
  git proj add
  git proj push
@@ -221,8 +168,10 @@ EOF
 # ========================================
 # Main
 
+export cCurDir gpBin gpCmdName tSrc
+
 gpCmdName=${BASH_SOURCE##*/}
-export tSrc=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -237,9 +186,9 @@ gpBin=${0%/*}
 if [ "$gpBin" = "." ]; then
     gpBin=$PWD
 fi
-cd $gpBin
+cd $gpBin >/dev/null 2>&1
 gpBin=$PWD
-cd $cCurDir
+cd - >/dev/null 2>&1
 
 # -------------------
 . $gpBin/gitproj-com.inc
@@ -252,42 +201,31 @@ fi
 . $gpBin/gitproj-init.inc
 # Calls: fInitSetGlobals
 
-while getopts :al:r:k:s:mfhH:x tArg; do
+while getopts :al:r:k:s:mfhH:vx tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
-        l)
-            gpLocalTopDir="$OPTARG"
-            gpLocalRawDir=../${gpLocal##*/}
-            ;;
-        r)
-            gpLocalRawDir="$OPTARG"
-            gpRawRemoteDir="$OPTARG"
-            ;;
+        l) gpLocalTopDir="$OPTARG" ;;
+        r) gpLocalRawDir="$OPTARG" ;;
         k) gpLocalRawSymLink="$OPTARG" ;;
-        s) gpMaxSize=="$OPTARG"
-	   gpRemoveMinSpace="$OPTARG"
-	   ;;
+        s) gpMaxSize=="$OPTARG" ;;
         m) gpMove=1 ;;
         f) gpGitFlow=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
+	v) let ++gpVerbose ;;
         x) let ++gpDebug ;;
         # Problem arguments
-        :) fError "Value required for option: -$OPTARG" $LINENO ;;
-        \?) fError "Unknown option: $OPTARG" $LINENO ;;
+        :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
     esac
 done
 shift $((OPTIND - 1))
-if [ $# -ne 1 ]; then
-    fError -m "local or remote needs to be specified." -l $tSrc:$LINENO
+if [ $# -ne 0 ]; then
+    fError -m "Unknown option: $*" -l $tSrc:$LINENO
 fi
-case $1 in
-    local) gpAction="fInitCreateLocalGit" ;;
-    remote) gpAction="fInitCreateRemoteGit" ;;
-    *) fError -m "Invalid option: $1. Expeced 'local' or 'remote'." -l $tSrc:$LINENO ;;
-esac
 
-$gpAction
+# ----------
+fInitCreateLocalGit
 exit 0

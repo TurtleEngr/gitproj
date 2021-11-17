@@ -69,10 +69,13 @@ files, and repositiories on external drives.
 
 =head1 SYNOPSIS
 
- 	git proj [pSubCmd] [pSubCmdOptions] [pComOpt]
+ 	git proj [-v] [-V] [--version]
+	
+ 	git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
- 	pSubCmd: init, clone, push, pull, add, move, rm, config, status, check
- 	pComOpt: [-h] [-H pStyle] [-x]
+ 	pSubCmd: init, remote, clone, push, pull, add, config, status, check
+	pSubCmdOpt: Just run: "git proj [pSubCmd]"
+ 	pComOpt: [-h] [-H pStyle] [-v] [-x]
  
 =head1 DESCRIPTION
 
@@ -99,8 +102,60 @@ no need to save every rendered version.
 
 =head1 OPTIONS
 
-=head2 pComOpt
+=head2 pSubCmd
 
+=over 4
+
+=item B<init - Initialize the git project repo>
+
+ git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
+
+=item B<clone - Clone a previously saved project>
+
+ git proj clone pExternalPath
+
+=item B<add - Add a large binary file to the "raw" remote>
+
+ git proj add pFilePath
+
+=item B<push - Push files to the "raw" remote>
+
+ git proj push [-b]
+
+=item B<pull - Pull files from the "raw" remote>
+
+ git proj pull [-b]
+
+=item B<config - Redefine config values>
+
+ git proj config [-l pExternalPath] [-e pRawPath]
+ 
+=item B<status - Show the staus of "raw" files, and more>
+
+ git proj status [-b] [-v]
+
+=back
+
+=head2 pSubCmdOpt
+
+=over 4
+
+=item B<git proj [pSubCmd]>
+
+This outputs short usage help for pSubCmd.
+
+=item B<git proj [pSubCmd -h]>
+
+This outputs full usage help for pSubCmd.
+
+=item B<git proj [pSubCmd -H pStyle]>
+
+See B<-H pStyle> in pComOpt section, for the output styles.
+
+=back
+
+=head2 pComOpt
+minimum
 =over 4
 
 =item B<-h>
@@ -139,39 +194,6 @@ See: fLog (Internal documentation)
 
 =back
 
-=head2 pSubCmd
-
-=over 4
-
-=item B<init - Initialize the git project repo>
-
- git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
-
-=item B<clone - Clone a previously saved project>
-
- git proj clone pExternalPath
-
-=item B<add - Add a large binary file to the "raw" remote>
-
- git proj add pFilePath
-
-=item B<push - Push files to the "raw" remote>
-
- git proj push [-b]
-
-=item B<pull - Pull files from the "raw" remote>
-
- git proj pull [-b]
-
-=item B<config - Redefine config values>
-
- git proj config [-l pExternalPath] [-e pRawPath]
- 
-=item B<status - Show the staus of "raw" files, and more>
-
- git proj status [-b] [-v]
-
-=back
 
 =head2 ~/.gitconfig
 
@@ -224,9 +246,13 @@ file.
 
 	[gitproj "config"]
 		# Expected version, only first N must be the same.
-		# Use backward compattable code, or exit.
+		# Use backward compatible code, or exit.
 		# Warn if second N is different
-		ver = 1.0.0
+		ver = 0.1
+
+		# States: not-installed, installed, config-errors
+		proj-status = not-installed
+
 		syslog = true
 		facility = user
 
@@ -238,30 +264,24 @@ file.
 
 	 	# See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
 	
-		# States: not-setup, setup-err, config-err, ok
-		proj-status = not-set-up
+		# States: not-defined, defined, config-errors
+		local-status = not-set-up
+
+		# States: not-defined, defined, multiple-defined
+		remote-status = not-defined
 	
-		# origin-url with path and .git removed
-		name = TBD
+		# origin-url with path and .git remote
+		proj-name = TBD
 	
 		# This should only be changed on the matching host
 		# git rev-parse --show-toplevel
-		top-dir = TBD
+		local-top-dir = TBD
 	
-			# If $t = $r, then set hardlink to true
+		# If $t = $r, then set hardlink to true
 		# t=$(df -BM top-dir --output=source | tail -n 1)
 		# r=$(df -BM raw-dir --output=source | tail -n 1)
 		hardlink = no
 	
-		# Local mount examples
-		remote-raw-dir = TBD
-		#remote.origin.url = /MOUNT-DIR/DIR/NAME.git
-
-		# Remote examples (not implemented. TBD)
-		#remove-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
-		#remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
-		#remote.origin-url=git@github.com:TurtleEngr/gitproj.git
-
 		# Set by init. Changing these will require manual repair.
 		# If no ~ or /, this is relative to top-dir, create:
                 #  dir/Name.raw
@@ -274,6 +294,17 @@ file.
 		# This should be in a git dir.
 		# Relative to top-dir
 		local-raw-symlink = raw
+
+		git-flow-pkg = TBD
+
+		# Local mount examples
+		remote-raw-dir = TBD
+		#remote.origin.url = /MOUNT-DIR/DIR/NAME.git
+
+		# Remote examples (not implemented. TBD)
+		#remote-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
+		#remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
+		#remote.origin-url=git@github.com:TurtleEngr/gitproj.git
 
 	[gitproj "hook"]
 		# If pre-commit-enabled = true, pre-commit hook script will be
@@ -442,8 +473,10 @@ EOF
 # ====================
 # Main
 
-export gpCmdName=${BASH_SOURCE##*/}
-export tSrc=${BASH_SOURCE##*/}
+export cCurDir gpBin gpCmdName tSrc
+
+gpCmdName=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -468,27 +501,33 @@ fi
 
 # -----
 . $gpBin/gitproj-com.inc
-
-#fSetGlobals
 fComSetGlobals
 
 if [ $# -eq 0 ]; then
+    echo "Version: $cGitProjVersion"
     fUsage usage
 fi
 
 # -------------------
 # Get Args Section
-if [ $# -eq 0 ]; then
-    fError -m "Missing options." -l $tSrc:$LINENO
-fi
-pShowVer=0
-while getopts :vVhH:lx tArg; do
+
+while getopts :vVhH:x-: tArg; do
     case $tArg in
-    	v|V) pShowVer=1;;
+    	v) echo "Version: $cGitProjVersion"
+	   exit 1
+	   ;;
+	V) echo "Version: $cGitProjVersion"
+	   exit 1
+	   ;;
+	-) if [ "$OPTARG" = "version" ]; then
+	       echo "Version: $cGitProjVersion"
+	       exit 1
+	   fi
+	   fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO
+	   ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-        l) gpSysLog=true ;;
         x) let gpDebug=gpDebug+1 ;;
         # Problem arguments
         :) fError -m "Value required for option: $OPTARG" -l $tSrc:$LINENO ;;
@@ -497,15 +536,10 @@ while getopts :vVhH:lx tArg; do
 done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
-    if [ "$1" = "version" ]; then
-        pShowVer=1
-    else
-        fError -m "Unexpected option: $*" -l $tSrc:$LINENO
-    fi
+    # TBD: actually expect a subcommand
+    fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO
 fi
 
-if [ $pShowVer -ne 0 ]; then
-    echo $cGitProjVersion
-fi
-
+echo "Version: $cGitProjVersion"
+fUsage usage
 exit 0

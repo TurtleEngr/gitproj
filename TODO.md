@@ -1,16 +1,21 @@
 # TODO
 
-* Code gitproj-com.test - on going with TDD
+* Code test-com.sh, gitproj-com.inc - mostly done
 
-* Code gitproj-com.inc - mostly done
+* Code test-gitproj.sh, git-proj - mostly done
 
-* Code git-proj - mostly done
+* Make a small test project for setup/teardown - done (see Makefile)
 
-* Make a small test project for setup/teardown (a short video, sort audio)
+* Code test-init.sh, git-proj-init, gitproj-init.inc  - mostly done
 
-* Code git-proj-init
+* Update status configs:
+  - proj-status = installed, install-errors (add)
+  - local-status = not-defined, defined (rename proj-status)
+  - remote-status = not-defined, defined, multiple-defined
 
-* Setup a mock for ~/.gitconfig
+* Setup defaults for for ~/.gitconfig, etc - mostly done
+
+* Code git-proj-remoe - split out from git-proj-init
 
 * Code git-proj-clone
 

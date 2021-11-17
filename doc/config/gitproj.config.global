@@ -4,12 +4,12 @@
 
 [gitproj "config"]
 	ver = 0.1.0
+	proj-status = installed
 	syslog = true
 	facility = user
 	bin = /usr/lib/git-core
 	doc = /usr/share/doc/git-proj
 	test = /usr/share/doc/git-proj/test
-	proj-status = not-set-up
 	proj-name = TBD
 	hardlink = false
 	local-top-dir = TBD

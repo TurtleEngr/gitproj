@@ -3,23 +3,13 @@
 # --------------------
 export cCurDir cGetOrigin cGetTopDir cTop
 
-export gpAction gpAuto gpAutoMove gpBin gpCheckFileNames \
-       gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
-       gpHardLink gpHookSource gpLocalRawDir gpLocalRawDirPat \
-       gpLocalRawSymLink gpLocalTopDir gpMaxSize gpRemoteMinSpace gpMountDir \
-       gpPath gpPreCommitEnabled gpProjName gpRemoteRawDir gpSysLog \
-       gpVar gpVerbose
+export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
+       gpCmdName gpDebug gpDoc gpFacility gpGitFlow gpHardLink \
+       gpHookSource gpLocalRawDir gpLocalRawDirPat gpLocalRawSymLink \
+       gpLocalStatus gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled \
+       gpProjName gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
-# --------------------
-fCheck()
-{
-    local tMsg=$1
-    local tSrc=${BASH_SOURCE##*/}
-
-    if [ ! -f $HOME/.gitconfig ]; then
-        fError -i -n -m "$tMsg. Missing: $HOME/.gitconfig" -l $tSrc:$LINENO
-    fi
-} # fCheck
+# ========================================
 
 # --------------------
 fInitFirstTimeSet()
@@ -95,10 +85,12 @@ fInitSetGlobals()
     gpAutoMove="true"
     gpGitFlow="false"
     gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
-    gpAction=""
 
-    gpProjStatus=$(fComGetConfig -k "gitproj.config.proj-status" -d "not-set-up")
-    # Uknown at this point, to coping files is the safest option.
+    gpProjStatus=$(fComGetConfig -k "gitproj.config.proj-status" -d "installed")
+    gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
+    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
+
+    # Uknown at this point, copy files is the safest option (i.e. false)
     gpHardLink=$(fComGetConfig -k "gitproj.config.hardlink" -d "false")
 
     gpCheckFileNames=true
@@ -110,9 +102,6 @@ fInitSetGlobals()
 
     return 0
 } # fInitSetGlobals
-
-# ========================================
-# fInitCreateLocalGit Section
 
 # --------------------
 fInitGettingStarted() {
@@ -539,7 +528,8 @@ Summary
   (git-flow init) = $gpGitFlow
 
 [gitproj "config"]
-      proj-status = $gpProjStatus
+       proj-status = $gpProjStatus
+      local-status = $gpLocalStatus
               ver = $gpVer
            syslog = $gpSysLog
          facility = $gpFacility
@@ -797,6 +787,7 @@ fInitSaveVarsToConfigs()
 
     tFile=~/.gitproj.config.global
     tS=gitproj.config
+    fInitSaveSingleConfig $tFile $tS.proj-status gpProjStatus
     fInitSaveSingleConfig $tFile $tS.bin gpBin
     fInitSaveSingleConfig $tFile $tS.doc gpDoc
     fInitSaveSingleConfig $tFile $tS.test gpTest
@@ -806,9 +797,10 @@ fInitSaveVarsToConfigs()
     for tFile in $gpLocalTopDir/.gitproj.config.local \
     	    $gpLocalTopDir/.gitproj.config.$cHostName; do
     	tS=gitproj.config
-    	fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
+    	fInitSaveSingleConfig $tFile $tS.local-status   gpLocalStatus
+    	fInitSaveSingleConfig $tFile $tS.remote-status   gpRemoteStatus
     	fInitSaveSingleConfig $tFile $tS.proj-name     gpProjName
-    	fInitSaveSingleConfig $tFile $tS.proj-status   gpProjStatus
+    	fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
     done
     
     for tFile in ~/.gitproj.config.global \
@@ -819,8 +811,6 @@ fInitSaveVarsToConfigs()
         fInitSaveSingleConfig $tFile $tS.hardlink          gpHardLink
         fInitSaveSingleConfig $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
         fInitSaveSingleConfig $tFile $tS.local-raw-symlink gpLocalRawSymLink
-        fInitSaveSingleConfig $tFile $tS.remote-raw-dir    gpRemoteRawDir
-        fInitSaveSingleConfig $tFile $tS.remote-min-space  gpRemoteMinSpace
         tS=gitproj.hook
         fInitSaveSingleConfig $tFile $tS.auto-move              gpAutoMove
         fInitSaveSingleConfig $tFile $tS.binary-file-size-limit gpMaxSize
@@ -837,12 +827,12 @@ fInitSaveVarsToConfigs()
     fi
 
     return $gErr
-} # fInitSaveCurrentVarsToConfigs
+} # fInitSaveVarsToConfigs
 
 # --------------------
 fInitCreateLocalGit()
 {
-    # Called by "git proj init local"
+    # Called by "git proj init"
     local tSrc=${BASH_SOURCE##*/}
 
     fInitGettingStarted
@@ -874,6 +864,8 @@ fInitCreateLocalGit()
     
     fInitMkGitDir
     fInitMkLocalConfig
+
+    gpLocalStatus=defined
     fInitSaveVarsToConfigs
 
     cat <<EOF | fmt
@@ -1039,6 +1031,8 @@ fInitCreateRemoteGit()
     if ! fComMustBeInGitRepo $PWD; then
        fUsage usage
     fi
+
+    # TBD: check for already defined    
 
     # -d pMountPath
     fInitGetMountDir $gpMountDir

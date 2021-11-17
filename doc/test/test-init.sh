@@ -995,11 +995,10 @@ checkConfigValue()
     local tStatus
     local tValue
 
-
     assertTrue "$LINENO $pFile" "[ -f $pFile ]"
     tResult=$(git config --file $pFile $pKey)
     tStatus=$?
-    assertTrue "$LINENO $pKey" "$tStatus"
+    assertTrue "$LINENO $pFile $pKey" "$tStatus"
     tValue=$(eval echo \$$pVarName)
     if [ -z "$tValue" ]; then
         tValue="${pVarName}-is-undefined"
@@ -1044,7 +1043,7 @@ testInitSaveVarsToConfigs()
     tResult=$(fInitSaveVarsToConfigs 2>&1)
     assertTrue $LINENO "$?"
 
-    # TBD refactor to use for loops with hash array maps
+    # TBD refactor to use for loops with hash array maps?
     # cMapConf[gpBin]=gitproj.config.bin
     # generated from cMapConf: cMapVar[gitproj.config.bin]=gpBin
     # cMapFile[gitproj.config.bin]=global
@@ -1053,20 +1052,22 @@ testInitSaveVarsToConfigs()
 
     tFile=~/.gitproj.config.global
     tS=gitproj.config
+    checkConfigValue $tFile $tS.proj-status gpProjStatus ${gpProjStatus}
     checkConfigValue $tFile $tS.bin      gpBin      ${gBin#$gpLocalTopDir/}
     checkConfigValue $tFile $tS.doc      gpDoc      ${gDoc#$gpLocalTopDir/}
     checkConfigValue $tFile $tS.test     gpTest     ${gTest#$gpLocalTopDir/}
     checkConfigValue $tFile $tS.facility gpFacility user
     checkConfigValue $tFile $tS.syslog   gpSysLog   true
 
-    tFile=$gpLocalTopDir/.gitproj.config.local
-    tS=gitproj.config
-    checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
-    checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
-    checkConfigValue $tFile $tS.proj-status   gpProjStatus  not-set-up
-    checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteRawDir    TBD
-    checkConfigValue $tFile $tS.remote-min-space  gpRemoteMinSpace  $gpRemoveMinSpace
-
+    for tFile in $gpLocalTopDir/.gitproj.config.local \
+    	    $gpLocalTopDir/.gitproj.config.$cHostName; do
+        tS=gitproj.config
+    	checkConfigValue $tFile $tS.local-status   gpLocalStatus  not-defined
+    	checkConfigValue $tFile $tS.remote-status  gpRemoteStatus not-defined
+    	checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
+    	checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
+    done
+    
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
         tS=gitproj.config
         checkConfigValue $tFile $tS.git-flow-pkg      gpGitFlow         true
