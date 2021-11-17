@@ -798,13 +798,13 @@ testInitMoveBinaryFiles_Move()
     gpUnitDebug=0
     fTestDebug "HardLink=true, and Size 10k: $tResult"
 
-    gpUnitDebug=1
-    if [ $gpUnitDebug -ne 0 ]; then
+    if [ ${gpSaveTestEnv:-0} -ne 0 ]; then
        echo -e "\tCapture state of project after files have been moved."
        echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
        cd $HOME >/dev/null 2>&1
        echo -en "\t"
-       tar -czf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 project/$gpProjName.raw
+       tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 project/$gpProjName.raw
+       echo
     fi
 
     return 0
@@ -922,12 +922,11 @@ testInitMkGitDir()
     assertContains "$LINENO $tResult" "$tResult" "develop"
     assertContains "$LINENO $tResult" "$tResult" "main"
 
-    gpUnitDebug=1
-    if [ $gpUnitDebug -ne 0 ]; then
+    if [ ${gpSaveTestEnv:-0} -ne 0 ]; then
        echo -e "\tCapture state of project after git init."
        echo -e "\tRestore test-env_ProjAfterGInit.tgz relative to cDatHome/project"
        cd $HOME/project >/dev/null 2>&1
-       tar -czf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
+       tar -cvzf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
     fi
 
     return 0
@@ -1237,7 +1236,7 @@ EOF
 # ====================
 # Main
 
-export gpTest cTestCurDir gpTestList gpCmdName
+export gpTest cTestCurDir gpTestList gpCmdName gpSaveTestEnv
 
 gpCmdName=${BASH_SOURCE##*/}
 
