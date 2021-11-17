@@ -14,18 +14,18 @@ fUsage()
 	-f $gpBin/git-proj-init \
 	"
     tFileList="$(echo $tFileList)"
-	
-    	#-f $gpBin/git-proj-remote \
-	#-f $gpBin/git-proj-clone \
-	#-f $gpBin/git-proj-add \
-	#-f $gpBin/git-proj-push \
-	#-f $gpBin/git-proj-pull \
-	#-f $gpBin/git-proj-add \
-	#-f $gpBin/git-proj-move \
-	#-f $gpBin/git-proj-rm \
-	#-f $gpBin/git-proj-config \
-	#-f $gpBin/git-proj-status \
-	#-f $gpBin/git-proj-check \
+
+    #-f $gpBin/git-proj-remote \
+    #-f $gpBin/git-proj-clone \
+    #-f $gpBin/git-proj-add \
+    #-f $gpBin/git-proj-push \
+    #-f $gpBin/git-proj-pull \
+    #-f $gpBin/git-proj-add \
+    #-f $gpBin/git-proj-move \
+    #-f $gpBin/git-proj-rm \
+    #-f $gpBin/git-proj-config \
+    #-f $gpBin/git-proj-status \
+    #-f $gpBin/git-proj-check \
 
     local tIntFileList="\
         $tFileList \
@@ -513,18 +513,21 @@ fi
 
 while getopts :vVhH:x-: tArg; do
     case $tArg in
-    	v) echo "Version: $cGitProjVersion"
-	   exit 1
-	   ;;
-	V) echo "Version: $cGitProjVersion"
-	   exit 1
-	   ;;
-	-) if [ "$OPTARG" = "version" ]; then
-	       echo "Version: $cGitProjVersion"
-	       exit 1
-	   fi
-	   fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO
-	   ;;
+        v)
+            echo "Version: $cGitProjVersion"
+            exit 1
+            ;;
+        V)
+            echo "Version: $cGitProjVersion"
+            exit 1
+            ;;
+        -)
+            if [ "$OPTARG" = "version" ]; then
+                echo "Version: $cGitProjVersion"
+                exit 1
+            fi
+            fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO
+            ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

@@ -4,7 +4,7 @@
 # Test globals
 
 export cCurDir cDatHome cHome cTestCurDir cTestDestDir cTestDestDir \
-       cTestFiles cTestFiles cTestSrcDir cTestSrcDir
+    cTestFiles cTestFiles cTestSrcDir cTestSrcDir
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
@@ -20,8 +20,8 @@ export cDatMount1 cDatMount2 cDatMount3
 
 # Probably experted by other inc files
 export gpAction gpAuto gpFacility gpGitFlow gpLocalRawDir \
-       gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
-       gpProjName gpSysLog gpTestList gpVer gpVerbose
+    gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+    gpProjName gpSysLog gpTestList gpVer gpVerbose
 
 # ========================================
 
@@ -57,7 +57,7 @@ EOF
 fTestSetupEnv()
 {
     local tSrc=${BASH_SOURCE##*/}
-    
+
     gpBin=$gpTest/../../git-core
     cd $gpBin >/dev/null 2>&1
     gpBin=$PWD
@@ -107,14 +107,14 @@ fTestRmEnv()
 fTestConfigSetup()
 {
     local tSrc=${BASH_SOURCE##*/}
-    
+
     if [ ! -d $cDatHome ]; then
         echo "Error: Test env is not setup. Missing $cDatHome [$tSrc:$LINENO]"
         exit 1
     fi
     if [ "$HOME" != "$cDatHome" ]; then
-	echo "Error: Test home is not setup. $cDatHome [$tSrc:$LINENO]"
-	exit 1
+        echo "Error: Test home is not setup. $cDatHome [$tSrc:$LINENO]"
+        exit 1
     fi
 
     return 0
@@ -124,13 +124,13 @@ fTestConfigSetup()
 fTestCreateEnv()
 {
     local tSrc=${BASH_SOURCE##*/}
-    
+
     fTestRmEnv
     cd $cTestDestDir >/dev/null 2>&1
-    
+
     if [ ! -f $cTestFiles ]; then
         echo "Missing $cTestFiles [$tSrc:$LINENO]"
-	exit 1
+        exit 1
     fi
 
     tar -xzf $cTestFiles

@@ -4,10 +4,10 @@
 export cCurDir cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
-       gpCmdName gpDebug gpDoc gpFacility gpGitFlow gpHardLink \
-       gpHookSource gpLocalRawDir gpLocalRawDirPat gpLocalRawSymLink \
-       gpLocalStatus gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled \
-       gpProjName gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
+    gpCmdName gpDebug gpDoc gpFacility gpGitFlow gpHardLink \
+    gpHookSource gpLocalRawDir gpLocalRawDirPat gpLocalRawSymLink \
+    gpLocalStatus gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled \
+    gpProjName gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
 # ========================================
 
@@ -20,7 +20,7 @@ fInitFirstTimeSet()
     local tUserEmail
 
     if [ ! -f $HOME/.gitconfig ]; then
-	fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
+        fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
         cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
     fi
 
@@ -31,12 +31,12 @@ fInitFirstTimeSet()
     fi
 
     if [ ! -f $cConfigGlobal ]; then
-	fLog -p info -m "Create: $cConfigGlobal" -l $tSrc:$LINENO
+        fLog -p info -m "Create: $cConfigGlobal" -l $tSrc:$LINENO
         cp $gpDoc/config/gitproj.config.global $cConfigGlobal
     fi
     tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
-	fLog -p info -m "include.path=.gitproj.config.global" -l $tSrc:$LINENO
+        fLog -p info -m "include.path=.gitproj.config.global" -l $tSrc:$LINENO
         fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
     fi
 } # fInitFirstTimeSet
@@ -71,7 +71,7 @@ fInitSetGlobals()
     if [ ! -d $gpLocalTopDir ]; then
         gpLocalTopDir="TBD"
     fi
-    
+
     gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "TBD")
     if [ "$gpProjName" = "TBD" ]; then
         gpProjName="${gpLocalTopDir##*/}"
@@ -104,7 +104,8 @@ fInitSetGlobals()
 } # fInitSetGlobals
 
 # --------------------
-fInitGettingStarted() {
+fInitGettingStarted()
+{
     local tSrc=${BASH_SOURCE##*/}
 
     cat <<EOF
@@ -252,7 +253,7 @@ fInitSetHardLink()
 fInitGetLocalRawDirPat()
 {
     local pLocalRawDirPat=$1
-    
+
     local tSrc=${BASH_SOURCE##*/}
     local tResult
 
@@ -315,7 +316,7 @@ fInitValidSymLink()
 fInitGetSymLink()
 {
     local pSymLinkName=$1
-    
+
     local tSrc=${BASH_SOURCE##*/}
     local tResult
 
@@ -628,7 +629,7 @@ fInitMoveBinaryFiles()
         else
             if [ ! -d $gpLocalRawSymLink/$tDir ]; then
                 tResult=$(mkdir -v -p $gpLocalRawSymLink/$tDir 2>&1)
-		fLog -p info -m "$tResult" -l $tSym:$LINENO
+                fLog -p info -m "$tResult" -l $tSym:$LINENO
             fi
             if [ ! -d $gpLocalRawSymLink/$tDir ]; then
                 fError -i -m "Could not create: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
@@ -637,10 +638,10 @@ fInitMoveBinaryFiles()
         fi
         if [ "$gpHardLink" = "true" ]; then
             tResult=$(mv -v $tFile $gpLocalRawSymLink/$tDir)
-	    fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
+            fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
         else
             tResult=$('rsync' -av --info=stats0,name2,flist0 $tFile $gpLocalRawSymLink/$tDir)
-	    fLog -p info -m "rsync: $tResult" -l $tSym:$LINENO
+            fLog -p info -m "rsync: $tResult" -l $tSym:$LINENO
         fi
         if [ ! -s $gpLocalRawSymLink/$tFile ]; then
             fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
@@ -761,7 +762,7 @@ fInitSaveSingleConfig()
     local pFile="$1"
     local pKey="$2"
     local pVarName="$3"
-    
+
     local tSrc=${BASH_SOURCE##*/}
     local tValue
 
@@ -772,7 +773,7 @@ fInitSaveSingleConfig()
     git config --file $pFile $pKey "$tValue"
     if [ $? -ne 0 ]; then
         fLog -i -p warning -m "There was problem saving $pVarName value to $pKey to file $pFile" -l $tSrc:$LINENO
-	gErr=1
+        gErr=1
     fi
 } # fInitSaveSingleConfig
 
@@ -795,35 +796,35 @@ fInitSaveVarsToConfigs()
     fInitSaveSingleConfig $tFile $tS.syslog gpSysLog
 
     for tFile in $gpLocalTopDir/.gitproj.config.local \
-    	    $gpLocalTopDir/.gitproj.config.$cHostName; do
-    	tS=gitproj.config
-    	fInitSaveSingleConfig $tFile $tS.local-status   gpLocalStatus
-    	fInitSaveSingleConfig $tFile $tS.remote-status   gpRemoteStatus
-    	fInitSaveSingleConfig $tFile $tS.proj-name     gpProjName
-    	fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
-    done
-    
-    for tFile in ~/.gitproj.config.global \
-    	    $gpLocalTopDir/.gitproj.config.local \
-    	    $gpLocalTopDir/.gitproj.config.$cHostName; do
+        $gpLocalTopDir/.gitproj.config.$cHostName; do
         tS=gitproj.config
-        fInitSaveSingleConfig $tFile $tS.git-flow-pkg      gpGitFlow
-        fInitSaveSingleConfig $tFile $tS.hardlink          gpHardLink
+        fInitSaveSingleConfig $tFile $tS.local-status gpLocalStatus
+        fInitSaveSingleConfig $tFile $tS.remote-status gpRemoteStatus
+        fInitSaveSingleConfig $tFile $tS.proj-name gpProjName
+        fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
+    done
+
+    for tFile in ~/.gitproj.config.global \
+        $gpLocalTopDir/.gitproj.config.local \
+        $gpLocalTopDir/.gitproj.config.$cHostName; do
+        tS=gitproj.config
+        fInitSaveSingleConfig $tFile $tS.git-flow-pkg gpGitFlow
+        fInitSaveSingleConfig $tFile $tS.hardlink gpHardLink
         fInitSaveSingleConfig $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
         fInitSaveSingleConfig $tFile $tS.local-raw-symlink gpLocalRawSymLink
         tS=gitproj.hook
-        fInitSaveSingleConfig $tFile $tS.auto-move              gpAutoMove
+        fInitSaveSingleConfig $tFile $tS.auto-move gpAutoMove
         fInitSaveSingleConfig $tFile $tS.binary-file-size-limit gpMaxSize
-        fInitSaveSingleConfig $tFile $tS.check-file-names       gpCheckFileNames
-        fInitSaveSingleConfig $tFile $tS.check-for-big-files    gpCheckForBigFiles
-       fInitSaveSingleConfig $tFile $tS.pre-commit-enabled     gpPreCommitEnabled
-        fInitSaveSingleConfig $tFile $tS.source                 gpHookSource
+        fInitSaveSingleConfig $tFile $tS.check-file-names gpCheckFileNames
+        fInitSaveSingleConfig $tFile $tS.check-for-big-files gpCheckForBigFiles
+        fInitSaveSingleConfig $tFile $tS.pre-commit-enabled gpPreCommitEnabled
+        fInitSaveSingleConfig $tFile $tS.source gpHookSource
     done
 
     if [ $gErr -eq 0 ]; then
-	fLog -p info -m "Save local configs" -l $tSrc:$LINENO
+        fLog -p info -m "Save local configs" -l $tSrc:$LINENO
         git add .gitproj.config.*
-    	git commit -am "Save gitproj.config"
+        git commit -am "Save gitproj.config"
     fi
 
     return $gErr
@@ -838,13 +839,13 @@ fInitCreateLocalGit()
     fInitGettingStarted
 
     # Prompt/Response or if -a, validate the options
-    
+
     # -l pLocalDir
     fInitGetLocalPath $gpLocalTopDir
-    
+
     # -k pSymLinkPat
     fInitGetLocalRawDirPat $gpLocalRawDirPat
-    
+
     # combine gpLocalTopDir,  pSymLinkPat, and gpProjName
     fInitGetSymLink $gpLocalRawSymLink
 
@@ -858,10 +859,10 @@ fInitCreateLocalGit()
     fInitGetGitFlow $gpGitFlow
 
     fInitSummary
-    
+
     fInitMkRaw
     fInitMoveBinaryFiles
-    
+
     fInitMkGitDir
     fInitMkLocalConfig
 
@@ -927,11 +928,11 @@ fInitGetMountDir()
     if [ $gpAuto -ne 0 ]; then
         if [ -z "$gpMountDir" ]; then
             fError -m "The -d option is required." -l $tSrc:$LINENO
-	fi
-    	if ! fInitCheckDir $gpMountDir; then
-	    return 1
-	fi
-	return 0
+        fi
+        if ! fInitCheckDir $gpMountDir; then
+            return 1
+        fi
+        return 0
     fi
 
 } # fInitGetMountDir
@@ -968,13 +969,13 @@ fInitCheckDirSpace()
 fInitGetMinSpace()
 {
     local tSrc=${BASH_SOURCE##*/}
-    
+
     if [ $gpAuto -ne 0 ]; then
         if ! fInitCheckDirSpace $gpMountDir $gpRemoteMinSpace; then
-	   echo TBD
-	   return 1
+            echo TBD
+            return 1
         fi
-	return 0
+        return 0
     fi
     return 0
 } # fInitGetMinSpace
@@ -1029,17 +1030,17 @@ fInitCreateRemoteGit()
     # Prompt/Response or if -a, validate the options
 
     if ! fComMustBeInGitRepo $PWD; then
-       fUsage usage
+        fUsage usage
     fi
 
-    # TBD: check for already defined    
+    # TBD: check for already defined
 
     # -d pMountPath
     fInitGetMountDir $gpMountDir
 
     # -s pMinSpace
     fInitGetMinSpace $gpRemoteMinSpace
-    
+
     # -r pRawRemotePath
     fGetRemoteRawDir $gpRemoteRawDir
 

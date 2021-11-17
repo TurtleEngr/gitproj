@@ -179,7 +179,6 @@ testComInitialConfig()
     assertNotNull "$LINENO $gpDoc" "$gpDoc"
     assertTrue "$LINENO -d $gpDoc" "[ -d $gpDoc ]"
 
-
     assertEquals "$LINENO" "0" "$gpDebug"
     assertEquals "$LINENO" "0" "$gpVerbose"
     assertEquals "$LINENO" "true" "$gpSysLog"
@@ -188,8 +187,11 @@ testComInitialConfig()
     assertNull "$LINENO" "$(echo $gpCmdVer | tr -d '.[:digit:]')"
 
     for tProg in logger pod2text pod2usage pod2html pod2man pod2markdown tidy awk tr rsync; do
-        
-        assertTrue "$LINENO missing: $tProg" "$(which $tProg >/dev/null 2>&1; echo $?)"
+
+        assertTrue "$LINENO missing: $tProg" "$(
+            which $tProg >/dev/null 2>&1
+            echo $?
+        )"
     done
     return 0
 
@@ -246,7 +248,7 @@ testComLog_MultiplePermutations()
                     if [ $gpVerbose -eq 2 ] && echo $tLevel | grep -Eq 'info'; then
                         assertNotNull "$LINENO tcl1-$tTestMsg info" "$tResult"
                         continue
-		    fi
+                    fi
                     if [ $gpDebug -eq 0 ] && [ "${tLevel%%-*}" = "debug" ]; then
                         assertNull "$LINENO tcl2-$tTestMsg not debug" "$tResult"
                         continue
@@ -496,7 +498,10 @@ testComSetConfigGlobal()
 
     # Note: more complete "git config" is done when a test env is setup.
 
-    assertFalse "$LINENO did tearDown run?" "$(grep -q '\[gitproj "testit"\]' $tGlobal; echo $?)"
+    assertFalse "$LINENO did tearDown run?" "$(
+        grep -q '\[gitproj "testit"\]' $tGlobal
+        echo $?
+    )"
 
     fComSetConfig -g -k gitproj.testit.test-str -v "test a string"
     assertTrue "$LINENO -g" "[ -r $tGlobal ]"
@@ -568,7 +573,7 @@ testCheckPkg()
 testComStackTrace()
 {
     local tResult
-    
+
     gpSysLog=true
     tResult=$(fComStackTrace 2>&1)
     assertTrue "$LINENO" "$?"
@@ -582,7 +587,7 @@ testComStackTrace()
     assertContains "$LINENO $tResult" "$tResult" "testComStackTrace"
     assertContains "$LINENO $tResult" "$tResult" "fTestRun"
     assertContains "$LINENO $tResult" "$tResult" "test-com.sh:"
-    
+
 } # testComStackTrace
 
 # --------------------------------

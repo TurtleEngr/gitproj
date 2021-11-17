@@ -2,9 +2,9 @@
 
 # --------------------------------
 export cConfigGlobal cHostName cConfigLocal cCurDir cGitProjVersion \
-      cGetOrigin cGetTopDir cPID
+    cGetOrigin cGetTopDir cPID
 export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
-       gpLocalRawDir gpSysLog gpVerbose
+    gpLocalRawDir gpSysLog gpVerbose
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -171,7 +171,7 @@ fComSetGlobals()
 
     # Use this, so unit tests can change this
     cHostName=${cHostName:-$HOSTNAME}
-    
+
     # This is put in cTop, project dir. (Use -L to set config vars to this)
     # This is included in .git/config
     # cConfigLocal also has an include to: .gitproj.config.local, which has
@@ -383,7 +383,7 @@ fComUsage()
             fError -i -m "fComUsage cannot read: $tFile" -l $tSrc:$LINENO
         fi
     done
-    
+
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
@@ -464,14 +464,14 @@ fComStackTrace()
     tLine=${BASH_LINENO[0]}
     tName="${FUNCNAME[1]}()"
     echo "Stack trace at: ${tSrc}:${tLine} ${tName}" | $tOutput
-    for ((i=1; i<${#FUNCNAME[@]}-1; i++)); do
-    	tSrc=${BASH_SOURCE[$i+1]}
-    	tSrc=${tSrc##*/}
-	tLine=${BASH_LINENO[$i]}
-	tName="${FUNCNAME[$i]}()"
+    for ((i = 1; i < ${#FUNCNAME[@]} - 1; i++)); do
+        tSrc=${BASH_SOURCE[$i + 1]}
+        tSrc=${tSrc##*/}
+        tLine=${BASH_LINENO[$i]}
+        tName="${FUNCNAME[$i]}()"
         echo " $i: ${tSrc}:${tLine} ${tName}" | $tOutput
     done
-    
+
     return 0
 } # fComStackTrace
 
@@ -515,7 +515,7 @@ fComFmtLog()
     fi
 
     # Check verbose
-    if [ $gpVerbose -eq 0 ] && ( [ "$pLevel" = "notice" ] || [ "$pLevel" = "info" ] ); then
+    if [ $gpVerbose -eq 0 ] && ([ "$pLevel" = "notice" ] || [ "$pLevel" = "info" ]); then
         return
     fi
     if [ $gpVerbose -eq 1 ] && [ "$pLevel" = "info" ]; then
@@ -642,7 +642,7 @@ fError()
             l) pLine="${OPTARG}" ;;
             e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
-	    n) pNoExit=1 ;;
+            n) pNoExit=1 ;;
             :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]" ;;
             \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]" ;;
         esac
@@ -657,10 +657,10 @@ fError()
 
     if [ $pInt -eq 1 ]; then
         pMsg="Internal: $pMsg"
-	fComStackTrace
+        fComStackTrace
     fi
     if [ $pInt -eq 1 ] || [ $gpDebug -ge 2 ]; then
-	fComStackTrace
+        fComStackTrace
     fi
     fLog -p crit -l $pLine -e $pErr -m "$pMsg"
     if [ $pInt -eq 0 ] && [ $pNoExit -eq 0 ]; then
@@ -714,35 +714,40 @@ fComSetConfig()
     local tArg
     while getopts :agG:lLH:f:ibk:v: tArg; do
         case $tArg in
-            G)  if [ ! -f $cConfigGlobal ]; then
-	    	    fError -n -m "Could not find $cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            l)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            L)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            H)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            f)  if [ ! -f ${OPTARG} ]; then
-	    	    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-	esac
+            G)
+                if [ ! -f $cConfigGlobal ]; then
+                    fError -n -m "Could not find $cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            l)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            L)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            H)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            f)
+                if [ ! -f ${OPTARG} ]; then
+                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+        esac
         case $tArg in
             a) pAdd="--add" ;;
             g) pScope="--global" ;;
@@ -755,21 +760,23 @@ fComSetConfig()
             b) pType="--bool" ;;
             k) pKey="${OPTARG}" ;;
             v) pValue="${OPTARG}" ;;
-            :) fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
-	       return 1
-	       ;;
-            \?) fError -n -i -m "fComSetConfig:: Unknown option: $OPTARG" -l $tSrc:$LINENO
-	    	return 1
-	    	;;
+            :)
+                fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+            \?)
+                fError -n -i -m "fComSetConfig:: Unknown option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
         esac
     done
     if [ -z "$pKey" ]; then
         fError -n -i -m "fComSetConfig: missing key" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     if [ -z "$pValue" ]; then
         fError -n -i -m "fComSetConfig: missing value" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
 
     git config $pScope $pAdd $pType $pKey "$pValue"
@@ -785,7 +792,7 @@ fComGetConfig()
     local pDefault=""
     local pAll=""
     local pFilter=""
-    
+
     local tSrc=${BASH_SOURCE##*/}
     local tValue=""
 
@@ -794,18 +801,20 @@ fComGetConfig()
     local tArg
     while getopts :glf:ibk:d:av: tArg; do
         case $tArg in
-            l)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            f)  if [ ! -f ${OPTARG} ]; then
-	    	    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-	esac
+            l)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            f)
+                if [ ! -f ${OPTARG} ]; then
+                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+        esac
         case $tArg in
             g) pScope=--global ;;
             l) pScope=--local ;;
@@ -815,18 +824,20 @@ fComGetConfig()
             k) pKey="${OPTARG}" ;;
             d) pDefault="${OPTARG}" ;;
             a) pAll="--all" ;;
-	    v) pFilter="${OPTARG}" ;;
-            :) fError -n -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
-	       return 1
-	       ;;
-            \?) fError -n -i -m "fComGetConfig: Unknown option: $OPTARG" -l $tSrc:LINENO
-	    	return 1
-	    	;;
+            v) pFilter="${OPTARG}" ;;
+            :)
+                fError -n -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+            \?)
+                fError -n -i -m "fComGetConfig: Unknown option: $OPTARG" -l $tSrc:LINENO
+                return 1
+                ;;
         esac
     done
     if [ -z "$pKey" ]; then
         fError -n -i -m "fComGetConfig: missing key" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
 
     tValue=$(git config --get --includes $pScope $pType $pKey $pFilter)
@@ -850,35 +861,40 @@ fComUnsetConfig()
     local tArg
     while getopts :gGlLHf:k:a tArg; do
         case $tArg in
-            G)  if [ ! -f $cConfigGlobal ]; then
-	    	    fError -n -m "Could not find $cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            L)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            H)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            l)  tTopDir="$($cGetTopDir 2>&1)"
-	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-            f)  if [ ! -f ${OPTARG} ]; then
-	    	    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
-		    return 1
-	    	fi
-		;;
-	esac
+            G)
+                if [ ! -f $cConfigGlobal ]; then
+                    fError -n -m "Could not find $cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            L)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            H)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            l)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+            f)
+                if [ ! -f ${OPTARG} ]; then
+                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
+        esac
         case $tArg in
             g) pScope=--global ;;
             G) pScope="---file $cConfigGlobal" ;;
@@ -888,18 +904,19 @@ fComUnsetConfig()
             f) pScope="--file ${OPTARG}" ;;
             k) pKey="${OPTARG}" ;;
             a) pAll="--unset-all" ;;
-            :) fError -n -i -m "Internal fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
-	       return 1
-	       ;;
-            \?) fError -n -i -m "Internal fComUnsetConfig: Unknown option: $OPTARG" -l $tSrc:$LINENO
-	    	return 1
-	    	;;
+            :)
+                fError -n -i -m "Internal fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+            \?)
+                fError -n -i -m "Internal fComUnsetConfig: Unknown option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
         esac
     done
 
     git config $pAll $pScope $pKey
 } # fComUnsetConfig
-
 
 fComCheckPkg()
 {
@@ -923,10 +940,10 @@ fComMustBeInGitRepo()
 
     if [ ! -d $pDir ]; then
         fError -n -m "$pDir does not exist." -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     cd $pDir >/dev/null 2>&1
-    
+
     if [ -d $PWD/.git ]; then
         cd - >/dev/null 2>&1
         return 0
@@ -952,7 +969,7 @@ fComMustNotBeInGit()
 
     if [ ! -d $pDir ]; then
         fError -n -m "$pDir does not exist." -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     cd $pDir >/dev/null 2>&1
     if $cGetTopDir >/dev/null 2>&1; then
@@ -968,7 +985,7 @@ fComMustNotBeInGit()
     cd - >/dev/null 2>&1
     if [ $tFound -ne 0 ]; then
         fError -n -m "$pDir must NOT be in a git repo, or a directory above a git repo" -l $tSrc:$LINENO
-    	return 1
+        return 1
     fi
     return 0
 } # fComMustNotBeInGit
@@ -984,13 +1001,13 @@ fComAllMustBeReadable()
     tFound=$(find $pDir \! -readable -print)
     if [ -n "$tFound" ]; then
         fError -n -m "All directories and files must be readable, under $pDir" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     tFound=$(find $pDir -type d \! -executable -print)
     if [ -n "$tFound" ]; then
         fError -n -m "All directories must be executable, under $pDir" -l $tSrc:$LINENO
-	return 1
-    fi    
+        return 1
+    fi
     return 0
 } # fComAllMustBeReadable
 

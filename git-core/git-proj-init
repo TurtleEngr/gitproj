@@ -214,7 +214,7 @@ while getopts :al:r:k:s:mfhH:vx tArg; do
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-	v) let ++gpVerbose ;;
+        v) let ++gpVerbose ;;
         x) let ++gpDebug ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;

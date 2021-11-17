@@ -108,12 +108,12 @@ setUp()
 {
     # Restore default global values, before each test
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-          cGitProjVersion cHostName cPID gErr
-          
+        cGitProjVersion cHostName cPID gErr
+
     unset gpAction gpAuto gpAutoMove gpBin \
-          gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
-          gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
-          gpPath gpProjName gpSysLog gpVar gpVerbose
+        gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
+        gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+        gpPath gpProjName gpSysLog gpVar gpVerbose
 
     fTestSetupEnv
     gpUnitDebug=0
@@ -133,7 +133,7 @@ EOF
 
 tearDown()
 {
-##    git config --global --remove-section gitproj.test >/dev/null 2>&1
+    ##    git config --global --remove-section gitproj.test >/dev/null 2>&1
     gpUnitDebug=0
     return 0
 } # tearDown
@@ -144,7 +144,7 @@ tearDown()
 testGitProj()
 {
     local tResult
-    
+
     tResult=$($gpBin/git-proj 2>&1)
     assertFalse "$LINENO" "[ $? -eq 0 ]"
     assertContains "$LINENO" "$tResult" 'Usage:'
