@@ -752,6 +752,7 @@ testInitMkRaw()
 testInitMoveBinaryFiles_Move()
 {
     local tResult
+    local tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitFirstTimeSet
@@ -777,7 +778,8 @@ testInitMoveBinaryFiles_Move()
     gpMaxSize="10k"
     gpHardLink="true"
     tResult=$(fInitMoveBinaryFiles 2>&1)
-    assertTrue $LINENO $?
+    tStatus=$?
+    assertTrue $LINENO "$tStatus"
     assertNotContains "$LINENO" "$tResult" "Binary files were found"
     assertNotContains "$LINENO" "$tResult" "Could not create:"
     assertNotContains "$LINENO" "$tResult" "Could not move:"
@@ -798,12 +800,12 @@ testInitMoveBinaryFiles_Move()
     gpUnitDebug=0
     fTestDebug "HardLink=true, and Size 10k: $tResult"
 
-    if [ ${gpSaveTestEnv:-0} -ne 0 ]; then
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
        echo -e "\tCapture state of project after files have been moved."
        echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
        cd $HOME >/dev/null 2>&1
        echo -en "\t"
-       tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 project/$gpProjName.raw
+       tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 $cDatProj1.raw
        echo
     fi
 
@@ -895,6 +897,7 @@ testInitMkGitFlow()
 testInitMkGitDir()
 {
     local tResult
+    local tStatus
     local tTop
 
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -910,6 +913,8 @@ testInitMkGitDir()
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkGitDir 2>&1)
+    tStatus=$?
+    assertTrue $LINENO "$tStatus"
     assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
     assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
     assertTrue $LINENO "$(grep -q core $gpLocalTopDir/.gitignore; echo $?)"
@@ -922,7 +927,7 @@ testInitMkGitDir()
     assertContains "$LINENO $tResult" "$tResult" "develop"
     assertContains "$LINENO $tResult" "$tResult" "main"
 
-    if [ ${gpSaveTestEnv:-0} -ne 0 ]; then
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
        echo -e "\tCapture state of project after git init."
        echo -e "\tRestore test-env_ProjAfterGInit.tgz relative to cDatHome/project"
        cd $HOME/project >/dev/null 2>&1
@@ -1091,6 +1096,7 @@ testInitCreateLocalGitAuto()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tResult
+    local tStatus
     local tFile
     local tS
 
@@ -1108,10 +1114,18 @@ testInitCreateLocalGitAuto()
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitCreateLocalGit 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    
+    tStatus=$?
+    assertTrue "$LINENO $tResult" "$tStatus"
+
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
+       echo -e "\tCapture state of project after git init."
+       echo -e "\tRestore test-env_ProjLocalDefined.tgz relative to HOME/project"
+       cd $HOME >/dev/null 2>&1
+       tar -cvzf $gpTest/test-env_ProjLocalDefined.tgz .gitconfig .gitproj.config.global $cDatProj1 $cDatProj1.raw
+       fi
+
     return 0
-} # testInitCreateLocalGit
+} # testInitCreateLocalGitAuto
 
 # --------------------------------
 testInitCreateLocalGitPrompted()
@@ -1142,64 +1156,6 @@ testGetProjInitLocalPromptedCLI()
     cd $HOME/$cDatProj1
     $gpBin/git-proj-init local -a
 } # testGetProjInitLocalPromptedCLI
-
-# ========================================
-
-# --------------------------------
-testInitGetMountPath()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitGetMountPath
-
-# --------------------------------
-testInitGetRawRemotePath()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitGetRawRemotePath
-
-# --------------------------------
-testInitCheckPath()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitCheckPath
-
-# --------------------------------
-testInitCheckSpace()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitCheckSpace
-
-# --------------------------------
-testInitMkRemote()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitMkRaw
-
-# --------------------------------
-testInitReport()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitReport
-
-# --------------------------------
-testInitCreateRemoteGit()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testInitCreateRemoteGit
 
 # ========================================
 # This should be the last defined function

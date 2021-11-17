@@ -27,6 +27,11 @@ mCmdToDo = \
 	status \
 	check
 
+mTestEnvFiles = \
+	test-env_HomeAfterBMove.tgz \
+	test-env_ProjAfterGInit.tgz \
+	test-env_ProjLocalDefined.tgz
+
 # --------------------
 test : $(mDepList) $(mBaseList) test-cmds
 
@@ -42,7 +47,7 @@ test-cmds : $(mDepList)
 	done
 
 # --------------------
-test-env : test-env_HomeAfterBMove.tgz test-env_ProjAfterGInit.tgz
+test-env : $(mTestEnvFiles)
 	@echo "To update the test-env files:"
 	@echo "$^"
 	@echo "move them out of the way, then run this make target again"
@@ -62,6 +67,9 @@ test-env_HomeAfterBMove.tgz :
 
 test-env_ProjAfterGInit.tgz :
 	export gpSaveTestEnv=1; ./test-init.sh testInitMkGitDir
+
+test-env_ProjLocalDefined.tgz :
+	export gpSaveTestEnv=1; ./test-init.sh testInitCreateLocalGitAuto
 
 # --------------------
 stats :
