@@ -480,7 +480,7 @@ testInitGetRawLocalDirPat()
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Set the location for large binary files."
 
-    tResult=$(fInitGetLocalRawDirPat 2>&1< <(echo -e ".."))
+    tResult=$(fInitGetLocalRawDirPat 2>&1 < <(echo -e ".."))
     tStatus=$?
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Set the location for large binary files."
