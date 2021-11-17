@@ -475,7 +475,7 @@ testInitGetRawLocalDirPat()
     gpLocalTopDir=$HOME/$cDatProj1
     gpProjName=${cDatProj1##*/}
 
-    tResult=$(fInitGetLocalRawDirPat 2>&1< <(echo -e "\n"))
+    tResult=$(fInitGetLocalRawDirPat 2>&1 < <(echo -e "\n"))
     tStatus=$?
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Set the location for large binary files."
