@@ -645,7 +645,6 @@ fInitMoveBinaryFiles()
             fi
             fLog -p info -m "Exists: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
         fi
-        echo "gpHardLink=$gpHardLink"
         if [ "$gpHardLink" = "true" ]; then
             tResult=$(mv -v $tFile $gpLocalRawSymLink/$tDir)
 	    fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
@@ -705,7 +704,7 @@ fInitMkGitFlow()
 fInitMkGitDir()
 {
     local tSrc=${BASH_SOURCE##*/}
-    locat tStatus
+    local tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO

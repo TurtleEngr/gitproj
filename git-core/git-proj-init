@@ -284,8 +284,8 @@ if [ $# -ne 1 ]; then
     fError -m "local or remote needs to be specified." -l $tSrc:$LINENO
 fi
 case $1 in
-    local) gpAction="fCreateLocalGit" ;;
-    remote) gpAction="fCreateRemoteGit" ;;
+    local) gpAction="fInitCreateLocalGit" ;;
+    remote) gpAction="fInitCreateRemoteGit" ;;
     *) fError -m "Invalid option: $1. Expeced 'local' or 'remote'." -l $tSrc:$LINENO ;;
 esac
 

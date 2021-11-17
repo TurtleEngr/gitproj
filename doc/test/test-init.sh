@@ -1087,7 +1087,7 @@ testInitSaveVarsToConfigs()
 } # testInitSaveVarsToConfigs
 
 # --------------------------------
-testInitCreateLocalGit()
+testInitCreateLocalGitAuto()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tResult
@@ -1112,6 +1112,36 @@ testInitCreateLocalGit()
     
     return 0
 } # testInitCreateLocalGit
+
+# --------------------------------
+testInitCreateLocalGitPrompted()
+{
+    startSkipping
+    fail "TBD"
+    return 0
+} # testInitCreateLocalGitPrompted
+
+# --------------------------------
+testGetProjInitLocalAutoCLI()
+{
+    startSkipping
+    fail "TBD"
+    return 0
+
+    cd $HOME/$cDatProj1
+    $gpBin/git-proj-init local -a
+} # testGetProjInitLocalAutoCLI
+
+# --------------------------------
+testGetProjInitLocalPromptedCLI()
+{
+    startSkipping
+    fail "TBD"
+    return 0
+
+    cd $HOME/$cDatProj1
+    $gpBin/git-proj-init local -a
+} # testGetProjInitLocalPromptedCLI
 
 # ========================================
 
