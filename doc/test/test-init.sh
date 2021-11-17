@@ -113,12 +113,12 @@ setUp()
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-          cGitProjVersion cHostName cPID gErr
-          
+        cGitProjVersion cHostName cPID gErr
+
     unset gpAction gpAuto gpAutoMove gpBin \
-          gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
-          gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
-          gpPath gpProjName gpSysLog gpVar gpVerbose
+        gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
+        gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+        gpPath gpProjName gpSysLog gpVar gpVerbose
 
     fTestSetupEnv
     fTestCreateEnv
@@ -144,7 +144,7 @@ tearDown()
     # fTestRmEnv
     gpUnitDebug=0
     cd $gpTest >/dev/null 2>&1
- return 0
+    return 0
 } # tearDown
 
 # ========================================
@@ -180,7 +180,10 @@ testFirstTimeSet()
     fInitFirstTimeSet
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
     assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-    assertTrue "$LINENO" "$(grep -q path $HOME/.gitconfig; echo $?)"
+    assertTrue "$LINENO" "$(
+        grep -q path $HOME/.gitconfig
+        echo $?
+    )"
     return 0
 } # testFirstTimeSet
 
@@ -197,12 +200,12 @@ testInitSetGlobals()
 
     tTrim=${cGitProjVersion#*.*.}
     tVer=${cGitProjVersion%.$tTrim}
-    assertEquals "$LINENO" "$tVer"  "$gpVer"
+    assertEquals "$LINENO" "$tVer" "$gpVer"
 
-    assertEquals "$LINENO" "true"  "$gpSysLog"
+    assertEquals "$LINENO" "true" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
-    assertEquals "$LINENO" "0"    "$gpAuto"
-    assertEquals "$LINENO" ".."   "$gpLocalRawDirPat"
+    assertEquals "$LINENO" "0" "$gpAuto"
+    assertEquals "$LINENO" ".." "$gpLocalRawDirPat"
     assertEquals "$LINENO" "raw" "$gpLocalRawSymLink"
     assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
     assertEquals "$LINENO" "${gpLocalRawDirPat}/${gpProjName}.raw" "$gpLocalRawDir"
@@ -353,7 +356,7 @@ testInitValidLocalPath()
     checkComMustNotBeInGit fInitValidLocalPath
     checkComAllMustBeReadable fInitValidLocalPath
 
-    tResult=$(fInitValidLocalPath  $HOME/$cDatProj1 2>&1)
+    tResult=$(fInitValidLocalPath $HOME/$cDatProj1 2>&1)
     tStatus=$?
     gpUnitDebug=0
     fTestDebug "Check: $HOME/$cDatProj1"
@@ -362,7 +365,7 @@ testInitValidLocalPath()
     assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
 
     # Called again, so that the global vars will be defined.
-    fInitValidLocalPath  $HOME/$cDatProj1 >/dev/null 2>&1
+    fInitValidLocalPath $HOME/$cDatProj1 >/dev/null 2>&1
     assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalTopDir"
     assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
     return 0
@@ -391,14 +394,13 @@ testInitGetLocalPath()
 
     gpAuto=0
     # No auto, prompt/response
-    
+
     # Just Enter, i.e. defaultt. Look for success
     tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "\n"))
     tStatus=$?
     assertTrue $LINENO $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Define the existing project directory"
     assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
-
 
     # Enter "quit". Look for quit
     tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "quit"))
@@ -491,10 +493,10 @@ testInitGetRawLocalDirPat()
     assertContains "$LINENO $tResult" "$tResult" "does not exist"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-#    gpAuto=1
-#    fInitGetLocalRawDirPat ".." >/dev/null 2>&1
-#    assertTrue "$LINENO" $?
-#    assertEquals "$LINENO" "true" "$gpHardLink"
+    #    gpAuto=1
+    #    fInitGetLocalRawDirPat ".." >/dev/null 2>&1
+    #    assertTrue "$LINENO" $?
+    #    assertEquals "$LINENO" "true" "$gpHardLink"
 
     return 0
 } # testInitGetRawLocalDirPat
@@ -586,7 +588,7 @@ testInitGetSize()
     tStatus=$?
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Define the size for large binary files"
-    
+
     fInitGetSize >/dev/null 2>&1 < <(echo -e "12K")
     assertTrue $LINENO $?
     assertEquals "$LINENO" "12k" "$gpMaxSize"
@@ -594,7 +596,7 @@ testInitGetSize()
     tResult=$(fInitGetSize 2>&1 < <(echo -e "42\n66x\nq"))
     tStatus=$?
     assertFalse "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"    
+    assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     return 0
@@ -664,11 +666,11 @@ testInitGetGitFlow()
     tResult=$(fInitGetGitFlow 2>&1 < <(echo -e "\nquit"))
     assertFalse "$LINENO" $?
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
-    
+
     fInitGetGitFlow >/dev/null 2>&1 < <(echo -e "yes")
     assertTrue "$LINENO" $?
     assertEquals "$LINENO" "true" "$gpGitFlow"
-    
+
     fInitGetGitFlow >/dev/null 2>&1 < <(echo -e "No")
     assertTrue "$LINENO" $?
     assertEquals "$LINENO" "false" "$gpGitFlow"
@@ -738,7 +740,10 @@ testInitMkRaw()
     assertTrue $LINENO "[ -d $gpLocalRawDir ]"
     assertTrue $LINENO "[ -L $gpLocalRawSymLink ]"
     assertTrue $LINENO "[ -f $gpLocalRawDir/README.txt ]"
-    assertTrue $LINENO "$(grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt; echo $?)"
+    assertTrue $LINENO "$(
+        grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt
+        echo $?
+    )"
     assertContains "$LINENO $tResult" "$tResult" "Create:"
     assertContains "$LINENO $tResult" "$tResult" "to access the files in"
 
@@ -772,7 +777,7 @@ testInitMoveBinaryFiles_Move()
     fInitMkRaw >/dev/null 2>&1
     cd $gpLocalTopDir >/dev/null 2>&1
     assertTrue $LINENO "[ -d $gpLocalRawDir ]"
-    assertTrue "$LINENO $gpLocalRawSymLink"  "[ -L $gpLocalRawSymLink ]"
+    assertTrue "$LINENO $gpLocalRawSymLink" "[ -L $gpLocalRawSymLink ]"
 
     cd $gpLocalTopDir >/dev/null 2>&1
     gpMaxSize="10k"
@@ -801,12 +806,12 @@ testInitMoveBinaryFiles_Move()
     fTestDebug "HardLink=true, and Size 10k: $tResult"
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-       echo -e "\tCapture state of project after files have been moved."
-       echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
-       cd $HOME >/dev/null 2>&1
-       echo -en "\t"
-       tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 $cDatProj1.raw
-       echo
+        echo -e "\tCapture state of project after files have been moved."
+        echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
+        cd $HOME >/dev/null 2>&1
+        echo -en "\t"
+        tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global $cDatProj1 $cDatProj1.raw
+        echo
     fi
 
     return 0
@@ -834,7 +839,7 @@ testInitMoveBinaryFiles_Copy()
     fInitMkRaw >/dev/null 2>&1
     cd $gpLocalTopDir >/dev/null 2>&1
     assertTrue $LINENO "[ -d $gpLocalRawDir ]"
-    assertTrue "$LINENO $gpLocalRawSymLink"  "[ -L $gpLocalRawSymLink ]"
+    assertTrue "$LINENO $gpLocalRawSymLink" "[ -L $gpLocalRawSymLink ]"
 
     cd $gpLocalTopDir >/dev/null 2>&1
     gpMaxSize="200k"
@@ -917,7 +922,10 @@ testInitMkGitDir()
     assertTrue $LINENO "$tStatus"
     assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
     assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
-    assertTrue $LINENO "$(grep -q core $gpLocalTopDir/.gitignore; echo $?)"
+    assertTrue $LINENO "$(
+        grep -q core $gpLocalTopDir/.gitignore
+        echo $?
+    )"
 
     tTop=$($cGetTopDir)
     assertContains $LINENO "$tTop" "$gpLocalTopDir"
@@ -928,10 +936,10 @@ testInitMkGitDir()
     assertContains "$LINENO $tResult" "$tResult" "main"
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-       echo -e "\tCapture state of project after git init."
-       echo -e "\tRestore test-env_ProjAfterGInit.tgz relative to cDatHome/project"
-       cd $HOME/project >/dev/null 2>&1
-       tar -cvzf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
+        echo -e "\tCapture state of project after git init."
+        echo -e "\tRestore test-env_ProjAfterGInit.tgz relative to cDatHome/project"
+        cd $HOME/project >/dev/null 2>&1
+        tar -cvzf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
     fi
 
     return 0
@@ -951,15 +959,15 @@ testInitMkLocalConfig()
         fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
         return 1
     fi
-    
+
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitFirstTimeSet
-    
+
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
     cd $gpTest
-    
+
     cd $HOME/project >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjAfterGInit.tgz
     cd $gpTest
@@ -984,7 +992,7 @@ testInitMkLocalConfig()
     tResult=$(git config --local --list --show-origin --includes 2>&1)
     assertTrue $LINENO "$?"
     assertContains "$LINENO $tResult" "include.path=../.gitproj.config.$cHostName"
-    
+
 } # testInitMkLocalConfig
 
 # --------------------------------
@@ -994,7 +1002,7 @@ checkConfigValue()
     local pKey="$2"
     local pVarName="$3"
     local pExpect="$4"
-    
+
     local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tStatus
@@ -1029,14 +1037,14 @@ testInitSaveVarsToConfigs()
     cd $HOME/project >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjAfterGInit.tgz
     cd $gpTest
-    
+
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue $LINENO "[ -f .gitproj.config.local ]"
     assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
-    
+
     gpProjName=${cDatProj1##*/}
     gpHardLink="true"
     gpGitFlow="true"
@@ -1058,36 +1066,36 @@ testInitSaveVarsToConfigs()
     tFile=~/.gitproj.config.global
     tS=gitproj.config
     checkConfigValue $tFile $tS.proj-status gpProjStatus ${gpProjStatus}
-    checkConfigValue $tFile $tS.bin      gpBin      ${gBin#$gpLocalTopDir/}
-    checkConfigValue $tFile $tS.doc      gpDoc      ${gDoc#$gpLocalTopDir/}
-    checkConfigValue $tFile $tS.test     gpTest     ${gTest#$gpLocalTopDir/}
+    checkConfigValue $tFile $tS.bin gpBin ${gBin#$gpLocalTopDir/}
+    checkConfigValue $tFile $tS.doc gpDoc ${gDoc#$gpLocalTopDir/}
+    checkConfigValue $tFile $tS.test gpTest ${gTest#$gpLocalTopDir/}
     checkConfigValue $tFile $tS.facility gpFacility user
-    checkConfigValue $tFile $tS.syslog   gpSysLog   true
+    checkConfigValue $tFile $tS.syslog gpSysLog true
 
     for tFile in $gpLocalTopDir/.gitproj.config.local \
-    	    $gpLocalTopDir/.gitproj.config.$cHostName; do
+        $gpLocalTopDir/.gitproj.config.$cHostName; do
         tS=gitproj.config
-    	checkConfigValue $tFile $tS.local-status   gpLocalStatus  not-defined
-    	checkConfigValue $tFile $tS.remote-status  gpRemoteStatus not-defined
-    	checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
-    	checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
+        checkConfigValue $tFile $tS.local-status gpLocalStatus not-defined
+        checkConfigValue $tFile $tS.remote-status gpRemoteStatus not-defined
+        checkConfigValue $tFile $tS.proj-name gpProjName $gpProjName
+        checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
     done
-    
+
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
         tS=gitproj.config
-        checkConfigValue $tFile $tS.git-flow-pkg      gpGitFlow         true
-        checkConfigValue $tFile $tS.hardlink          gpHardLink        $gpHardLink
-        checkConfigValue $tFile $tS.local-raw-dir-pat gpLocalRawDirPat  ..
+        checkConfigValue $tFile $tS.git-flow-pkg gpGitFlow true
+        checkConfigValue $tFile $tS.hardlink gpHardLink $gpHardLink
+        checkConfigValue $tFile $tS.local-raw-dir-pat gpLocalRawDirPat ..
         checkConfigValue $tFile $tS.local-raw-symlink gpLocalRawSymLink raw
         tS=gitproj.hook
-        checkConfigValue $tFile $tS.auto-move              gpAutoMove         true
-        checkConfigValue $tFile $tS.binary-file-size-limit gpMaxSize          10k
-        checkConfigValue $tFile $tS.check-file-names       gpCheckFileNames   true
-        checkConfigValue $tFile $tS.check-for-big-files    gpCheckForBigFiles true
-        checkConfigValue $tFile $tS.pre-commit-enabled     gpPreCommitEnabled true
-        checkConfigValue $tFile $tS.source                 gpHookSource       hooks/pre-commit
+        checkConfigValue $tFile $tS.auto-move gpAutoMove true
+        checkConfigValue $tFile $tS.binary-file-size-limit gpMaxSize 10k
+        checkConfigValue $tFile $tS.check-file-names gpCheckFileNames true
+        checkConfigValue $tFile $tS.check-for-big-files gpCheckForBigFiles true
+        checkConfigValue $tFile $tS.pre-commit-enabled gpPreCommitEnabled true
+        checkConfigValue $tFile $tS.source gpHookSource hooks/pre-commit
     done
-    
+
     return 0
 } # testInitSaveVarsToConfigs
 
@@ -1118,11 +1126,11 @@ testInitCreateLocalGitAuto()
     assertTrue "$LINENO $tResult" "$tStatus"
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-       echo -e "\tCapture state of project after git init."
-       echo -e "\tRestore test-env_ProjLocalDefined.tgz relative to HOME/project"
-       cd $HOME >/dev/null 2>&1
-       tar -cvzf $gpTest/test-env_ProjLocalDefined.tgz .gitconfig .gitproj.config.global $cDatProj1 $cDatProj1.raw
-       fi
+        echo -e "\tCapture state of project after git init."
+        echo -e "\tRestore test-env_ProjLocalDefined.tgz relative to HOME/project"
+        cd $HOME >/dev/null 2>&1
+        tar -cvzf $gpTest/test-env_ProjLocalDefined.tgz .gitconfig .gitproj.config.global $cDatProj1 $cDatProj1.raw
+    fi
 
     return 0
 } # testInitCreateLocalGitAuto
