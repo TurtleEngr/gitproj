@@ -107,7 +107,7 @@ oneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset gpBin cCurDir cPID gpCmdVer gErr gpDebug gpFacility gpSysLog gpVerbose
+    unset gpBin cCurDir cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
     fTestSetupEnv
     gpUnitDebug=0
     return 0
@@ -182,7 +182,7 @@ testComInitialConfig()
 
     assertEquals "$LINENO" "0" "$gpDebug"
     assertEquals "$LINENO" "0" "$gpVerbose"
-    assertEquals "$LINENO" "false" "$gpSysLog"
+    assertEquals "$LINENO" "true" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" "$gErr"
     assertNull "$LINENO" "$(echo $gpCmdVer | tr -d '.[:digit:]')"
@@ -553,6 +553,39 @@ testComUnsetConfigGlobal()
 } # testComUnsetConfigGlobal
 
 # --------------------------------
+testCheckPkg()
+{
+    local tResult
+
+    tResult=$(fComCheckPkg less 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
+    tResult=$(fComCheckPkg foobar 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+} # testCheckPkg
+
+# --------------------------------
+testComStackTrace()
+{
+    local tResult
+    
+    gpSysLog=true
+    tResult=$(fComStackTrace 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Stack trace at: gitproj-com.inc"
+    assertContains "$LINENO $tResult" "$tResult" "testComStackTrace"
+    assertContains "$LINENO $tResult" "$tResult" "fTestRun"
+
+    tResult=$(tail -n 5 /var/log/user.log)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Stack trace at: gitproj-com.inc"
+    assertContains "$LINENO $tResult" "$tResult" "testComStackTrace"
+    assertContains "$LINENO $tResult" "$tResult" "fTestRun"
+    assertContains "$LINENO $tResult" "$tResult" "test-com.sh:"
+    
+} # testComStackTrace
+
+# --------------------------------
 testComSetConfigMore()
 {
     startSkipping
@@ -576,14 +609,7 @@ testComUnsetConfigMore()
     # untar a git env., test in and out of git dir
 } #testComUnsetConfigMore
 
-# --------------------------------
-testCheckPkg()
-{
-    assertTrue "$LINENO" $(fComCheckPkg less; echo $?)
-    assertFalse "$LINENO" $(fComCheckPkg foobar; echo $?)
-} # testCheckPkg
-
-# ====================
+# ========================================
 # This should be the last defined function
 fTestRun()
 {

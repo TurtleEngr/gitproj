@@ -4,11 +4,22 @@
 export cCurDir cGetOrigin cGetTopDir cTop
 
 export gpAction gpAuto gpAutoMove gpBin gpCheckFileNames \
-       gpCheckForBigFilesgpCmdName gpDebug gpDoc gpFacility gpGitFlow \
+       gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
        gpHardLink gpHookSource gpLocalRawDir gpLocalRawDirPat \
        gpLocalRawSymLink gpLocalTopDir gpMaxSize gpRemoteMinSpace gpMountDir \
        gpPath gpPreCommitEnabled gpProjName gpRemoteRawDir gpSysLog \
        gpVar gpVerbose
+
+# --------------------
+fCheck()
+{
+    local tMsg=$1
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ ! -f $HOME/.gitconfig ]; then
+        fError -i -n -m "$tMsg. Missing: $HOME/.gitconfig" -l $tSrc:$LINENO
+    fi
+} # fCheck
 
 # --------------------
 fInitFirstTimeSet()
@@ -19,6 +30,7 @@ fInitFirstTimeSet()
     local tUserEmail
 
     if [ ! -f $HOME/.gitconfig ]; then
+	fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
         cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
     fi
 
@@ -29,10 +41,12 @@ fInitFirstTimeSet()
     fi
 
     if [ ! -f $cConfigGlobal ]; then
+	fLog -p info -m "Create: $cConfigGlobal" -l $tSrc:$LINENO
         cp $gpDoc/config/gitproj.config.global $cConfigGlobal
     fi
     tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
+	fLog -p info -m "include.path=.gitproj.config.global" -l $tSrc:$LINENO
         fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
     fi
 } # fInitFirstTimeSet
@@ -76,8 +90,8 @@ fInitSetGlobals()
     # Path is relative to top-dir
     gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
 
-    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "1k")
-    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "1k")
+    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
+    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
     gpAutoMove="true"
     gpGitFlow="false"
     gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
@@ -114,6 +128,7 @@ and files need to be readable by your user.
 
 EOF
     if [ $gpAuto -ne 0 ]; then
+        fLog -p debug-2 -m "fInitGettingStarted in $PWD" -l $tSrc:$LINENO
         return 0
     fi
     while true; do
@@ -491,7 +506,7 @@ fInitGetGitFlow()
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
         if [ "$tResult" = "q" ]; then
-            fLog -p warnint -m "Quitting" -l $tSrc:$LINENO
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi
         if [ "$tResult" = "y" ]; then
@@ -515,9 +530,14 @@ fInitSummary()
     cat <<EOF
 
 Summary
-           "auto" = $gpAuto
-          "exits"   HOME/.gitconfig
-        "created"   HOME/.gitproj.config.global
+           (auto) = $gpAuto
+        (verbose) = $gpVerbose
+          (debug) = $gpDebug
+          (exits)   HOME/.gitconfig
+        (created)   HOME/.gitproj.config.global
+ (local-raw-dir)  = $gpLocalRawDirPat/$gpProjName.raw
+  (git-flow init) = $gpGitFlow
+
 [gitproj "config"]
       proj-status = $gpProjStatus
               ver = $gpVer
@@ -529,14 +549,17 @@ Summary
     local-top-dir = $gpLocalTopDir
         proj-name = $gpProjName
 local-raw-dir-pat = $gpLocalRawDirPat
- "local-raw-dir"  = $gpLocalRawDirPat/$gpProjName.raw
 local-raw-symlink = $gpLocalRawSymLink
          hardlink = $gpHardLink
      git-flow-pkg = $gpGitFlowPkg
-  "git-flow init" = $gpGitFlow
+
 [gitproj "hook"]
-    binary-file-size-limit = $gpMaxSize
-                 auto-move = $gpAutoMove
+                source = $gpHookSource
+    pre-commit-enabled = $gpPreCommitEnabled=true
+      check-file-names = $gpCheckFileNames=true
+   check-for-big-files = $gpCheckForBigFiles=true
+binary-file-size-limit = $gpMaxSize
+             auto-move = $gpAutoMove
 
 EOF
     if [ $gpAuto -eq 0 ]; then
@@ -563,11 +586,14 @@ fInitMkRaw()
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
+    fLog -p info -m "mkdir $gpLocalRawDir" -l $tSym:$LINENO
     mkdir $gpLocalRawDir
 
+    fLog -p notice -m "Create: TOP_DIR/$gpLocalRawSymLink -> $gpLocalRawDir" -l $tSrc:$LINENO
     ln -s $gpLocalRawDir $gpLocalRawSymLink
 
     cd $gpLocalTopDir/$gpLocalRawSymLink >/dev/null 2>&1
+    fLog -p info -m "Create: raw/README.txt" -l $tSym:$LINENO
     cat <<EOF | fmt >README.txt
     
 Do NOT remove these files or this directory.
@@ -582,8 +608,6 @@ The initial working directory was created at $cHostName:$gpLocalTopDir
 For help with the "git proj" subcommand, just cd into the working directory
 and type "git proj".
 EOF
-
-    fLog -p notice -m "Created: TOP_DIR/$gpLocalRawSymLink -> $gpLocalRawDir" -l $tSrc:$LINENO
     fLog -p notice -m "Use $gpLocalRawSymLink to access the files in $gpLocalRawDir  That way, if $gpLocalRawDir moves, only one place needs to be fixed up." -l $tSrc:$LINENO
     return 0
 } # fInitMkRaw
@@ -595,6 +619,7 @@ fInitMoveBinaryFiles()
     local tFileList
     local tFile
     local tDir
+    local tResult
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tFileList=$(fInitGetBinaryFiles)
@@ -612,7 +637,8 @@ fInitMoveBinaryFiles()
             tDir=""
         else
             if [ ! -d $gpLocalRawSymLink/$tDir ]; then
-                mkdir -p $gpLocalRawSymLink/$tDir >/dev/null 2>&1
+                tResult=$(mkdir -v -p $gpLocalRawSymLink/$tDir 2>&1)
+		fLog -p info -m "$tResult" -l $tSym:$LINENO
             fi
             if [ ! -d $gpLocalRawSymLink/$tDir ]; then
                 fError -i -m "Could not create: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
@@ -621,9 +647,11 @@ fInitMoveBinaryFiles()
         fi
         echo "gpHardLink=$gpHardLink"
         if [ "$gpHardLink" = "true" ]; then
-            mv -v $tFile $gpLocalRawSymLink/$tDir
+            tResult=$(mv -v $tFile $gpLocalRawSymLink/$tDir)
+	    fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
         else
-            'rsync' -vP $tFile $gpLocalRawSymLink/$tDir
+            tResult=$('rsync' -av --info=stats0,name2,flist0 $tFile $gpLocalRawSymLink/$tDir)
+	    fLog -p info -m "rsync: $tResult" -l $tSym:$LINENO
         fi
         if [ ! -s $gpLocalRawSymLink/$tFile ]; then
             fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
@@ -639,7 +667,7 @@ fInitMoveBinaryFiles()
         fLog -p notice -m "Created link: $tLink" -l $tSrc:$LINENO
     done
 
-    fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files through project's $gpLocalRawSymLink symlink." -l $tSrc:$LINENO
+    fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files through the project's $gpLocalRawSymLink symlink." -l $tSrc:$LINENO
 
     return 0
 } # fInitMoveBinaryFiles
@@ -656,9 +684,8 @@ fInitMkGitFlow()
         fLog -p err -m "git-flow is not installed" -l $tSrc:$LINENO
         return 1
     fi
-    set -x >/dev/null 2>&1
+    fLog -p info -m "git flow init" -l $tSrc:$LINENO
     git flow init -d
-    set +x >/dev/null 2>&1
 
     # Define the default prefixes
 
@@ -681,6 +708,7 @@ fInitMkGitDir()
     locat tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
+    fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
     cat <<EOF >.gitignore
 *.tmp
 *~
@@ -693,25 +721,24 @@ proxy/
 thumbs/
 tmp/
 EOF
-    set -x >/dev/null 2>&1
+    fLog -p info -m "git init" -l $tSrc:$LINENO
     git init
+    fLog -p info -m "git add FILES" -l $tSrc:$LINENO
     git add .gitignore *
+    fLog -p info -m "git commit" -l $tSrc:$LINENO
     git commit -am "Initial commit"
     tStatus=$?
-    set +x >/dev/null 2>&1
     if [ $tStatus -ne 0 ]; then
         fError -i "Initial git commit failed." -l $tSrc:$LINENO
     fi
-    set -x >/dev/null 2>&1
+    fLog -p info -m "Rename master to main" -l $tSrc:$LINENO
     git branch --move master main
+    fLog -p info -m "Create develop branch" -l $tSrc:$LINENO
     git branch develop
     git checkout develop
-    set +x >/dev/null 2>&1
     fInitMkGitFlow
-    set -x >/dev/null 2>&1
     git branch
     git status
-    set +x >/dev/null 2>&1
 
     return 0
 } # fInitMkGitDir
@@ -722,7 +749,9 @@ fInitMkLocalConfig()
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    cp $gpDoc/config/gitproj.config.local .gitproj.config.local 
+    fLog -p info -m "Create: .gitproj.config.local" -l $tSrc:$LINENO
+    cp $gpDoc/config/gitproj.config.local .gitproj.config.local
+    fLog -p info -m "Create: .gitproj.config.$cHostName" -l $tSrc:$LINENO
     cp $gpDoc/config/gitproj.config.HOSTNAME .gitproj.config.$cHostName
 
     tInclude=$(fComGetConfig -l -k "include.path" -v .gitproj.config.$cHostName)
@@ -731,6 +760,7 @@ fInitMkLocalConfig()
         return 0
     fi
 
+    fLog -p info -m "Include: ../.gitproj.config.$cHostName in .git/config" -l $tSrc:$LINENO
     fComSetConfig -a -l -k "include.path" -v ../.gitproj.config.$cHostName
 
     return 0
@@ -774,28 +804,39 @@ fInitSaveVarsToConfigs()
     fInitSaveSingleConfig $tFile $tS.facility gpFacility
     fInitSaveSingleConfig $tFile $tS.syslog gpSysLog
 
-    tFile=$gpLocalTopDir/.gitproj.config.local
-    tS=gitproj.config
-    fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
-    fInitSaveSingleConfig $tFile $tS.proj-name     gpProjName
-    fInitSaveSingleConfig $tFile $tS.proj-status   gpProjStatus
-
-    for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
+    for tFile in $gpLocalTopDir/.gitproj.config.local \
+    	    $gpLocalTopDir/.gitproj.config.$cHostName; do
+    	tS=gitproj.config
+    	fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
+    	fInitSaveSingleConfig $tFile $tS.proj-name     gpProjName
+    	fInitSaveSingleConfig $tFile $tS.proj-status   gpProjStatus
+    done
+    
+    for tFile in ~/.gitproj.config.global \
+    	    $gpLocalTopDir/.gitproj.config.local \
+    	    $gpLocalTopDir/.gitproj.config.$cHostName; do
         tS=gitproj.config
         fInitSaveSingleConfig $tFile $tS.git-flow-pkg      gpGitFlow
         fInitSaveSingleConfig $tFile $tS.hardlink          gpHardLink
         fInitSaveSingleConfig $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
         fInitSaveSingleConfig $tFile $tS.local-raw-symlink gpLocalRawSymLink
         fInitSaveSingleConfig $tFile $tS.remote-raw-dir    gpRemoteRawDir
-        fInitSaveSingleConfig $tFile $tS.remote-raw-dir    gpRemoteMinSpace
+        fInitSaveSingleConfig $tFile $tS.remote-min-space  gpRemoteMinSpace
         tS=gitproj.hook
         fInitSaveSingleConfig $tFile $tS.auto-move              gpAutoMove
         fInitSaveSingleConfig $tFile $tS.binary-file-size-limit gpMaxSize
         fInitSaveSingleConfig $tFile $tS.check-file-names       gpCheckFileNames
         fInitSaveSingleConfig $tFile $tS.check-for-big-files    gpCheckForBigFiles
-        fInitSaveSingleConfig $tFile $tS.pre-commit-enabled     gpPreCommitEnabled
+       fInitSaveSingleConfig $tFile $tS.pre-commit-enabled     gpPreCommitEnabled
         fInitSaveSingleConfig $tFile $tS.source                 gpHookSource
     done
+
+    if [ $gErr -eq 0 ]; then
+	fLog -p info -m "Save local configs" -l $tSrc:$LINENO
+        git add .gitproj.config.*
+    	git commit -am "Save gitproj.config"
+    fi
+
     return $gErr
 } # fInitSaveCurrentVarsToConfigs
 
@@ -956,7 +997,6 @@ fInitGetRemoteRawDir()
     #$gpRemoteRawDir
 } # fInitGetRawRemotePath
 
-
 # --------------------
 fInitMkRemote()
 {
@@ -968,6 +1008,7 @@ fInitMkRemote()
 
     set -x >/dev/null 2>&1
     cd $pPath >/dev/null 2>&1
+    fLog -p info -m "git clone" -l $tSrc:$LINENO
     git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
     cd - >/dev/null 2>&1
     git remote add origin $pPath/$tProjName.git

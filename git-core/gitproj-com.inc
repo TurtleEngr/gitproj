@@ -198,7 +198,7 @@ fComSetGlobals()
     # -v
     gpVerbose=${gpVerbose:-0}
     # -l
-    gpSysLog=${gpSysLog:-false}
+    gpSysLog=${gpSysLog:-true}
     gpFacility=${gpFacility:-user}
     gErr=0
 
@@ -440,6 +440,42 @@ EOF
 } # fComUsage
 
 # ------------------
+fComStackTrace()
+{
+    local i
+    local tSrc
+    local tLine
+    local tName
+    local tOutput
+
+    # Credit: https://gist.github.com/ahendrix/7030300
+    if [ ${#FUNCNAME[@]} -le 2 ]; then
+        return 0
+    fi
+
+    if [ "${gpSysLog:-true}" = "true" ]; then
+        tOutput="logger -s -t ${gpCmdName:-fComStackTrace} -p ${gpFacility:-user}.debug"
+    else
+        tOutput="cat"
+    fi
+
+    tSrc=${BASH_SOURCE[0]}
+    tSrc=${tSrc##*/}
+    tLine=${BASH_LINENO[0]}
+    tName="${FUNCNAME[1]}()"
+    echo "Stack trace at: ${tSrc}:${tLine} ${tName}" | $tOutput
+    for ((i=1; i<${#FUNCNAME[@]}-1; i++)); do
+    	tSrc=${BASH_SOURCE[$i+1]}
+    	tSrc=${tSrc##*/}
+	tLine=${BASH_LINENO[$i]}
+	tName="${FUNCNAME[$i]}()"
+        echo " $i: ${tSrc}:${tLine} ${tName}" | $tOutput
+    done
+    
+    return 0
+} # fComStackTrace
+
+# ------------------
 fComFmtLog()
 {
     local pLevel=$1
@@ -459,7 +495,7 @@ fComFmtLog()
     local tPID_Opt=""
 
     # Set any missing globals
-    gpSysLog=${gpSysLog:-false}
+    gpSysLog=${gpSysLog:-true}
     gpFacility=${gpFacility:-user}
     gpVerbose=${gpVerbose:-0}
     gpDebug=${gpDebug:-0}
@@ -621,6 +657,10 @@ fError()
 
     if [ $pInt -eq 1 ]; then
         pMsg="Internal: $pMsg"
+	fComStackTrace
+    fi
+    if [ $pInt -eq 1 ] || [ $gpDebug -ge 2 ]; then
+	fComStackTrace
     fi
     fLog -p crit -l $pLine -e $pErr -m "$pMsg"
     if [ $pInt -eq 0 ] && [ $pNoExit -eq 0 ]; then
@@ -681,19 +721,19 @@ fComSetConfig()
 		;;
             l)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
             L)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
             H)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
@@ -756,7 +796,7 @@ fComGetConfig()
         case $tArg in
             l)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
@@ -817,19 +857,19 @@ fComUnsetConfig()
 		;;
             L)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
             H)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
             l)  tTopDir="$($cGetTopDir 2>&1)"
 	    	if [ $? -ne 0 ]; then
-	    	    fError -n -m "You are not in a git dir" -l "$tSrc:$LINENO"
+	    	    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
 		    return 1
 	    	fi
 		;;
@@ -866,9 +906,12 @@ fComCheckPkg()
     local pPkg=$1
 
     local tSrc=${BASH_SOURCE##*/}
+    local tStatus
 
     dpkg -l $pPkg 2>/dev/null | grep -q "^ii *$pPkg"
-    return $?
+    tStatus=$?
+    fLog -p debug-2 -m "fComCheckPkg $pPkg $tStatus" -l $tSrc:$LINENO
+    return $tStatus
 } # fComCheckPkg
 
 # --------------------

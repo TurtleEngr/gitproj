@@ -115,14 +115,14 @@ setUp()
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
           cGitProjVersion cHostName cPID gErr
           
-    unset gpAction gpAuto gpAutoMove gpBin gpCmdName gpDebug \
+    unset gpAction gpAuto gpAutoMove gpBin \
           gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
           gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
           gpPath gpProjName gpSysLog gpVar gpVerbose
 
     fTestSetupEnv
-    fInitSetGlobals
     fTestCreateEnv
+    fInitSetGlobals
     gpUnitDebug=0
     return 0
 
@@ -171,8 +171,11 @@ testGitProjInit()
 # --------------------------------
 testFirstTimeSet()
 {
-    assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
-    assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+
+    # source gitproj-init.inc calls fInitSetGlobals, which calls
+    # fInitFirstTimeSet, which creates these files.
+    #assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
+    #assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
 
     fInitFirstTimeSet
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
@@ -688,7 +691,7 @@ testInitSummary()
     gpProjName=${cDatProj1##*/}
     gpHardLink="true"
     gpGitFlow="true"
-    gpMaxSize="1k"
+    gpMaxSize="10k"
 
     tResult=$(fInitSummary 2>&1 < <(echo -e "foo\nn"))
     assertFalse $LINENO $?
@@ -736,7 +739,7 @@ testInitMkRaw()
     assertTrue $LINENO "[ -L $gpLocalRawSymLink ]"
     assertTrue $LINENO "[ -f $gpLocalRawDir/README.txt ]"
     assertTrue $LINENO "$(grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt; echo $?)"
-    assertContains "$LINENO $tResult" "$tResult" "Created:"
+    assertContains "$LINENO $tResult" "$tResult" "Create:"
     assertContains "$LINENO $tResult" "$tResult" "to access the files in"
 
     gpUnitDebug=0
@@ -1008,8 +1011,6 @@ checkConfigValue()
     return $tStatus
 } # checkConfigValue
 
-# TBD Thu Nov 11 23:53:05 PST 2021 more work is needed to get config saved
-
 # --------------------------------
 testInitSaveVarsToConfigs()
 {
@@ -1065,7 +1066,7 @@ testInitSaveVarsToConfigs()
     checkConfigValue $tFile $tS.proj-name     gpProjName    $gpProjName
     checkConfigValue $tFile $tS.proj-status   gpProjStatus  not-set-up
     checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteRawDir    TBD
-    checkConfigValue $tFile $tS.remote-raw-dir    gpRemoteMinSpace  20g
+    checkConfigValue $tFile $tS.remote-min-space  gpRemoteMinSpace  $gpRemoveMinSpace
 
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
         tS=gitproj.config
@@ -1083,7 +1084,7 @@ testInitSaveVarsToConfigs()
     done
     
     return 0
-}
+} # testInitSaveVarsToConfigs
 
 # --------------------------------
 testInitCreateLocalGit()
@@ -1093,31 +1094,19 @@ testInitCreateLocalGit()
     local tFile
     local tS
 
-    if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
-        fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
-        return 1
-    fi
-    
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fInitMkLocalConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue $LINENO "[ -f .gitproj.config.local ]"
-    assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
-    
-    gpProjName=${cDatProj1##*/}
     gpHardLink="true"
     gpGitFlow="true"
     gpMaxSize="10k"
     gpAutoMove=true
-    gpAuto=1
 
-    cd $gpLocalTopDir >/dev/null 2>&1
+    gpAuto=1
     gpSysLog=true
-    tResult=$(fInitSaveVarsToConfigs 2>&1)
-    assertTrue $LINENO "$?"
+    gpVerbose=3
+    gpDebug=10
 
     # Create local git and local raw
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitCreateLocalGit 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     

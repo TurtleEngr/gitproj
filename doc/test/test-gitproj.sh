@@ -107,7 +107,14 @@ oneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset gpBin cCurDir gpCmdName cPID gpCmdVer gErr gpDebug gpFacility gpSysLog gpVerbose
+    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
+          cGitProjVersion cHostName cPID gErr
+          
+    unset gpAction gpAuto gpAutoMove gpBin \
+          gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
+          gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
+          gpPath gpProjName gpSysLog gpVar gpVerbose
+
     fTestSetupEnv
     gpUnitDebug=0
     return 0
@@ -188,7 +195,9 @@ EOF
 # ====================
 # Main
 
-export gpTest cTestCurDir gpTestList
+export gpTest cTestCurDir gpTestList gpCmdName
+
+gpCmdName=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir
