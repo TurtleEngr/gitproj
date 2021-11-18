@@ -26,7 +26,6 @@ fUsage()
 
     git proj remote [-a] -d pMountDir [-r pRawRemoteDir ]
     	            [-s pMinSpace] [-h]
-
         Defaults: [-r pMountDir/NAME.raw]
 
 =head1 DESCRIPTION
@@ -128,10 +127,10 @@ EOF
 # ========================================
 # Main
 
-export cCurDir gpBin gpCmdName
+export cCurDir gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
-export tSrc=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -161,11 +160,16 @@ fi
 . $gpBin/gitproj-remote.inc
 # Calls: fRemoteSetGlobals
 
+#    git proj remote [-a] [-d pMountDir] [-r pRawRemoteDir ]
+#    	            [-s pMinSpace] [-h]
+#        Defaults: [-r pMountDir/NAME.raw]
+
+gpMountDir=""
 while getopts :al:r:s:hH:vx tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
-        l) gpLocalRawDir=../${gpLocal##*/} ;;
+	d) gpMountDir="$OPTARG" ;;
         r) gpRawRemoteDir="$OPTARG" ;;
         s) gpRemoteMinSpace="$OPTARG" ;;
         # Common arguments
@@ -181,6 +185,9 @@ done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
+fi
+if [ $gpAuto -ne 0 ] && [ -z "$gpMountDir" ]; then
+    fError -m "If -a, -d pMountDir is required." -l $tSrc:$LINENO ;;
 fi
 
 # ----------

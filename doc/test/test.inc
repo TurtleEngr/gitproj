@@ -4,7 +4,7 @@
 # Test globals
 
 export cCurDir cDatHome cHome cTestCurDir cTestDestDir cTestDestDir \
-    cTestFiles cTestFiles cTestSrcDir cTestSrcDir
+    cTestFiles cTestFiles cTestSrcDir cTestSrcDir HOSTNAME
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
@@ -74,6 +74,8 @@ fTestSetupEnv()
         exit 1
     fi
 
+    HOSTNAME=testserver
+    
     cTestDestDir=$gpTest/../../..
     cd $cTestDestDir >/dev/null 2>&1
     cTestDestDir=$PWD
@@ -127,22 +129,23 @@ fTestCheckConfig2Var()
     local pKey="$2"
     local pVarName="$3"
     local pExpect="$4"
+    local pLine="$5"
 
     local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tStatus
     local tValue
 
-    assertTrue "$LINENO $pFile" "[ -f $pFile ]"
+    assertTrue "$pLine:$LINENO $pFile" "[ -f $pFile ]"
     tResult=$(git config --file $pFile $pKey)
     tStatus=$?
-    assertTrue "$LINENO $pFile $pKey" "$tStatus"
+    assertTrue "$pLine:$LINENO $pFile $pKey" "$tStatus"
     tValue=$(eval echo \$$pVarName)
     if [ -z "$tValue" ]; then
         tValue="${pVarName}-is-undefined"
     fi
-    assertContains "$LINENO $pVarName $tResult" "$tResult" "$tValue"
-    assertContains "$LINENO $pVarName $tResult" "$tResult" "$pExpect"
+    assertContains "$pLine:$LINENO $pFile $pVarName $tResult" "$tResult" "$tValue"
+    assertContains "$pLine:$LINENO $pFile $pVarName $tResult" "$tResult" "$pExpect"
 
     return $tStatus
 } # fTestCheckConfig2Var

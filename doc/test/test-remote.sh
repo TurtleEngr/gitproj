@@ -112,8 +112,8 @@ setUp()
 {
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cHostName cPID gErr
+    unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
+        cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -223,8 +223,10 @@ return 0
 # --------------------------------
 testRemoteGetMountDir()
 {
-    startSkipping
-    fail "TBD"
+    gpAuto=1
+    gpMountDir=exists
+    gpMountDir=not-exists
+
     return 0
 } # testRemoteGetMountDir
 

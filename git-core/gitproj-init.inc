@@ -34,10 +34,10 @@ fInitFirstTimeSet()
         fLog -p info -m "Create: ~/$cConfigGlobal" -l $tSrc:$LINENO
         cp $gpDoc/config/gitproj.config.global $HOME/$cConfigGlobal
     fi
-    tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
+    tInclude=$(fComGetConfig -g -k "include.path" -v $cConfigGlobal)
     if [ -z "$tInclude" ]; then
-        fLog -p info -m "include.path=.gitproj.config.global" -l $tSrc:$LINENO
-        fComSetConfig -a -g -k "include.path" -v .gitproj.config.global
+        fLog -p info -m "include.path=$cConfigGlobal" -l $tSrc:$LINENO
+        fComSetConfig -a -g -k "include.path" -v $cConfigGlobal
     fi
 } # fInitFirstTimeSet
 
@@ -524,7 +524,7 @@ Summary
         (verbose) = $gpVerbose
           (debug) = $gpDebug
           (exits)   HOME/.gitconfig
-        (created)   HOME/.gitproj.config.global
+        (created)   HOME/$cConfigGlobal
  (local-raw-dir)  = $gpLocalRawDirPat/$gpProjName.raw
   (git-flow init) = $gpGitFlow
 
@@ -594,7 +594,7 @@ to keep large binary files out of git repositories. Large files are
 put in this directory and symlinks in the git managed area will point
 to the files.
 
-The initial working directory was created at $cHostName:$gpLocalTopDir
+The initial working directory was created at $HOSTNAME:$gpLocalTopDir
 
 For help with the "git proj" subcommand, just cd into the working directory
 and type "git proj".
@@ -739,19 +739,19 @@ fInitMkLocalConfig()
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    fLog -p info -m "Create: .gitproj.config.local" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.local .gitproj.config.local
-    fLog -p info -m "Create: .gitproj.config.$cHostName" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.HOSTNAME .gitproj.config.$cHostName
+    fLog -p info -m "Create: $cConfigLocal" -l $tSrc:$LINENO
+    cp $gpDoc/config/gitproj.config.local $cConfigLocal
+    fLog -p info -m "Create: $cConfigHost" -l $tSrc:$LINENO
+    cp $gpDoc/config/gitproj.config.HOSTNAME $cConfigHost
 
-    tInclude=$(fComGetConfig -l -k "include.path" -v .gitproj.config.$cHostName)
+    tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
     if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, .gitproj.config.$cHostName is already included" -l $tSrc:$LINENO
+        fLog -i -p warning -m "Weird, $cConfigHost is already included" -l $tSrc:$LINENO
         return 0
     fi
 
-    fLog -p info -m "Include: ../.gitproj.config.$cHostName in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../.gitproj.config.$cHostName
+    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
+    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
 
     return 0
 } # fInitMkLocalConfig
@@ -765,7 +765,7 @@ fInitSaveVarsToConfigs()
 
     gErr=0
 
-    tFile=~/.gitproj.config.global
+    tFile=$HOME/$cConfigGlobal
     tS=gitproj.config
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
     fComSaveVar2Config $tFile $tS.bin gpBin
@@ -774,21 +774,21 @@ fInitSaveVarsToConfigs()
     fComSaveVar2Config $tFile $tS.facility gpFacility
     fComSaveVar2Config $tFile $tS.syslog gpSysLog
 
-    for tFile in $gpLocalTopDir/.gitproj.config.local \
-        $gpLocalTopDir/.gitproj.config.$cHostName; do
+    for tFile in $gpLocalTopDir/$cConfigLocal \
+        $gpLocalTopDir/$cConfigHost; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
         fComSaveVar2Config $tFile $tS.remote-status gpRemoteStatus
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
         fComSaveVar2Config $tFile $tS.local-top-dir gpLocalTopDir
+        fComSaveVar2Config $tFile $tS.hardlink gpHardLink
     done
 
-    for tFile in ~/.gitproj.config.global \
-        $gpLocalTopDir/.gitproj.config.local \
-        $gpLocalTopDir/.gitproj.config.$cHostName; do
+    for tFile in $HOME/$cConfigGlobal \
+        $gpLocalTopDir/$cConfigLocal \
+        $gpLocalTopDir/$cConfigHost; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
-        fComSaveVar2Config $tFile $tS.hardlink gpHardLink
         fComSaveVar2Config $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
         fComSaveVar2Config $tFile $tS.local-raw-symlink gpLocalRawSymLink
         tS=gitproj.hook
@@ -857,7 +857,7 @@ than $gpMaxSize).
 ~/gitconfig will include the ~/gitproj.config.global file, which will
 be used for defaults when you create other "git proj" projects on your
 system.  The variables will also be used, if are not overridden by the
-project's config definitions found at: .gitproj.config.local and
+project's config definitions found at: $cConfigLocal and
 .gitproj.config.\$HOSTNAME You should version these files with your
 project.
 

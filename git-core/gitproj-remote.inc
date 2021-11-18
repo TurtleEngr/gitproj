@@ -16,7 +16,7 @@ fRemoteSetGlobals()
     local tSrc=${BASH_SOURCE##*/}
     local tTrim
 
-    # TBD, first are we in git dir?
+    # Assumes we in git dir, and one that is managed by gitproj.
 
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
@@ -33,13 +33,12 @@ fRemoteSetGlobals()
 
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
 
-    # TBD: should be "not-defined". If defined. see if they want:
-    # multiple-defined?
+    # TBD: should be "not-defined". If defined, problem
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
 
     gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
-    gpMountDir=TBD
+    gpMountDir=""
 
     return 0
 } # fRemoteSetGlobals
@@ -168,7 +167,7 @@ fRemoteReport()
     $cGetOrigin
     cat <<EOF
 Be sure the disk is mounted and $gpPath exists.
-Then you can use: "git push origin develop"
+Then you can use: "git push origin BRANCH" and "git pull origin BRANCH"
 If the mount path is changed, use "git proj set -e" to update the origin.
 EOF
     return 0

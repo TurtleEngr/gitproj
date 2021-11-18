@@ -147,7 +147,7 @@ testSetup()
     assertTrue "$LINENO" "[ -d $cTestSrcDirg ]"
     assertTrue "$LINENO" "[ -d $cTestDestDir ]"
     assertNotEquals "$LINENO" "$cHome" "$HOME"
-    assertTrue "$LINENO" "[ -r $HOME/.gitproj.config ]"
+    assertTrue "$LINENO" "[ -r $HOME/$cConfigGlobal ]"
     assertTrue "$LINENO" "[ -r $HOME/.gitproj-test.config ]"
 
     for i in $cDatMount1 $cDatMount2 $cDatMount3; do

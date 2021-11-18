@@ -112,7 +112,7 @@ NAoneTimeTearDown()
 setUp()
 {
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cHostName cPID gErr
+        cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -178,8 +178,8 @@ testComSetConfigMore()
     # Relative to $HOME/$cDatProj1 ($cDatHome/$cDatProj1)
     #     3) -l .git/config (include.path = ../.gitproj.config.HOSTNAME)
     #	  4) -L .gitproj.config.local ($cConfigLocal)
-    #	  5) -H $cConfigLocal (.gitproj.config.HOSTNAME,
-    #	  	 	    include-path=.gitproj.config.local)
+    #	  5) -H $cConfigLocal ($cConfigHost,
+    #	  	 	    include-path=$cConfigLocal)
 
     gpVerbose=2
 
@@ -209,7 +209,7 @@ testComSetConfigMore()
     cd $HOME/$cDatProj1
     tResult=$(fComSetConfig -L -k com.test.Lvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Lvar .gitproj.config.local"
+    assertTrue "$LINENO" "fLookFor Lvar $cConfigLocal"
     
     # ----------
     cd $HOME
@@ -221,7 +221,7 @@ testComSetConfigMore()
     cd $HOME/$cDatProj1
     tResult=$(fComSetConfig -H -k com.test.Hvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Hvar $cConfigLocal"
+    assertTrue "$LINENO" "fLookFor Hvar $cConfigHost"
 
     # ----------
     cd $HOME
@@ -273,7 +273,7 @@ testComSetConfigMore()
     # ----------
     rm $HOME/$cConfigGlobal
     tResult=$(fComSetConfig -G -k com.test.Gvar -v "defined" 2>&1)
-    assertfalse "$LINENO $tResult" "$?"
+    assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Could not find"
     
     return 0    

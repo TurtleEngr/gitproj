@@ -113,7 +113,7 @@ setUp()
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cHostName cPID gErr
+        cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -983,18 +983,18 @@ testInitMkLocalConfig()
     gpAuto=0
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    assertFalse $LINENO "[ -f .gitproj.config.local ]"
-    assertFalse $LINENO "[ -f .gitproj.config.$cHostName ]"
+    assertFalse $LINENO "[ -f $cConfigLocal ]"
+    assertFalse $LINENO "[ -f $cConfigHost ]"
     assertFalse $LINENO "$(grep -q gitproj.config .git/config >/dev/null 2>&1); echo $?)"
 
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue $LINENO "$?"
-    assertTrue $LINENO "[ -f .gitproj.config.local ]"
-    assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
+    assertTrue $LINENO "[ -f $cConfigLocal ]"
+    assertTrue $LINENO "[ -f $cConfigHost ]"
 
     tResult=$(git config --local --list --show-origin --includes 2>&1)
     assertTrue $LINENO "$?"
-    assertContains "$LINENO $tResult" "include.path=../.gitproj.config.$cHostName"
+    assertContains "$LINENO $tResult" "include.path=../$cConfigHost"
 
 } # testInitMkLocalConfig
 
@@ -1018,8 +1018,8 @@ testInitSaveVarsToConfigs()
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue $LINENO "[ -f .gitproj.config.local ]"
-    assertTrue $LINENO "[ -f .gitproj.config.$cHostName ]"
+    assertTrue $LINENO "[ -f $cConfigLocal ]"
+    assertTrue $LINENO "[ -f $cConfigHost ]"
 
     gpProjName=${cDatProj1##*/}
     gpHardLink="true"
@@ -1030,7 +1030,7 @@ testInitSaveVarsToConfigs()
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitSaveVarsToConfigs 2>&1)
-    assertTrue $LINENO "$?"
+    assertTrue "$LINENO $tResult" "$?"
 
     # TBD refactor to use for loops with hash array maps?
     # cMapConf[gpBin]=gitproj.config.bin
@@ -1041,35 +1041,35 @@ testInitSaveVarsToConfigs()
 
     tFile=~/.gitproj.config.global
     tS=gitproj.config
-    fTestCheckConfig2Var $tFile $tS.proj-status gpProjStatus ${gpProjStatus}
-    fTestCheckConfig2Var $tFile $tS.bin gpBin ${gBin#$gpLocalTopDir/}
-    fTestCheckConfig2Var $tFile $tS.doc gpDoc ${gDoc#$gpLocalTopDir/}
-    fTestCheckConfig2Var $tFile $tS.test gpTest ${gTest#$gpLocalTopDir/}
-    fTestCheckConfig2Var $tFile $tS.facility gpFacility user
-    fTestCheckConfig2Var $tFile $tS.syslog gpSysLog true
+    fTestCheckConfig2Var $tFile $tS.proj-status gpProjStatus ${gpProjStatus} $LINENO
+    fTestCheckConfig2Var $tFile $tS.bin gpBin "${gBin#$gpLocalTopDir/}" $LINENO
+    fTestCheckConfig2Var $tFile $tS.doc gpDoc "${gDoc#$gpLocalTopDir/}" $LINENO
+    fTestCheckConfig2Var $tFile $tS.test gpTest "${gTest#$gpLocalTopDir/}" $LINENO
+    fTestCheckConfig2Var $tFile $tS.facility gpFacility user $LINENO
+    fTestCheckConfig2Var $tFile $tS.syslog gpSysLog true $LINENO
 
-    for tFile in $gpLocalTopDir/.gitproj.config.local \
-        $gpLocalTopDir/.gitproj.config.$cHostName; do
+    for tFile in $gpLocalTopDir/$cConfigLocal \
+        $gpLocalTopDir/$cConfigHost; do
         tS=gitproj.config
-        fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined
-        fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined
-        fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName
-        fTestCheckConfig2Var $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
+        fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined $LINENO
+        fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined $LINENO
+        fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName $LINENO
+        fTestCheckConfig2Var $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir $LINENO
+        fTestCheckConfig2Var $tFile $tS.hardlink gpHardLink $gpHardLink $LINENO
     done
 
-    for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
+    for tFile in ~/.gitproj.config.global $gpLocalTopDir/$cConfigLocal; do
         tS=gitproj.config
-        fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true
-        fTestCheckConfig2Var $tFile $tS.hardlink gpHardLink $gpHardLink
-        fTestCheckConfig2Var $tFile $tS.local-raw-dir-pat gpLocalRawDirPat ..
-        fTestCheckConfig2Var $tFile $tS.local-raw-symlink gpLocalRawSymLink raw
+        fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true $LINENO
+        fTestCheckConfig2Var $tFile $tS.local-raw-dir-pat gpLocalRawDirPat .. $LINENO
+        fTestCheckConfig2Var $tFile $tS.local-raw-symlink gpLocalRawSymLink raw $LINENO
         tS=gitproj.hook
-        fTestCheckConfig2Var $tFile $tS.auto-move gpAutoMove true
-        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k
-        fTestCheckConfig2Var $tFile $tS.check-file-names gpCheckFileNames true
-        fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true
-        fTestCheckConfig2Var $tFile $tS.pre-commit-enabled gpPreCommitEnabled true
-        fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit
+        fTestCheckConfig2Var $tFile $tS.auto-move gpAutoMove true $LINENO
+        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
+        fTestCheckConfig2Var $tFile $tS.check-file-names gpCheckFileNames true $LINENO
+        fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
+        fTestCheckConfig2Var $tFile $tS.pre-commit-enabled gpPreCommitEnabled true $LINENO
+        fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit $LINENO
     done
 
     return 0

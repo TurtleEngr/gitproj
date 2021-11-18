@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------------------
-export cConfigGlobal cHostName cConfigLocal cCurDir cGitProjVersion \
+export cConfigGlobal cConfigLocal cConfigHost cCurDir cGitProjVersion \
     cGetOrigin cGetTopDir cPID
 export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
     gpLocalRawDir gpSysLog gpVerbose PWD \
@@ -220,17 +220,15 @@ fComSetGlobals()
     # shellcheck disable=SC2088
     cConfigGlobal='.gitproj.config.global'
 
-    # Use this, so unit tests can change this
-    cHostName=${cHostName:-$HOSTNAME}
-
     # This is put in cTop, project dir. (Use -L to set config vars to this)
-    # This is included in .git/config
-    # cConfigLocal also has an include to: .gitproj.config.local, which has
-    # starting values for the host specific configs.
-    # shellcheck disable=SC2088
-    cConfigLocal=".gitproj.config.$cHostName"
+    cConfigLocal='.gitproj.config.local'
+    
+    # This is put in cTop, project dir. (Use -H to set config vars to this)
+    # This is included by .git/config
+    # This first includes: cConfigLocal
+    cConfigHost=".gitproj.config.$HOSTNAME"
 
-    # cConfigGlobal, cConfigLocal, and .gitproj.config.local should be
+    # cConfigGlobal, cConfigLocal, and $cConfigLocal should be
     # versioned.
 
     # Use:
@@ -742,10 +740,10 @@ fComMkHostConfig()
 
     tTop=$(git rev-parse --show-toplevel)
     mkdir -p $tTop/gitproj 2>&1
-    touch $tTop/gitproj/config.$cHostName
-    git config --local include.path $tTop/gitproj/config.$cHostName
+    touch $tTop/gitproj/config.$HOSTNAME
+    git config --local include.path $tTop/gitproj/config.$HOSTNAME
     cd $tTop >/dev/null 2>&1
-    git add gitproj/config.$cHostName
+    git add gitproj/config.$HOSTNAME
 } # fComMkHostConfig
 
 # --------------------------------
@@ -809,12 +807,12 @@ fComSetConfig()
             b) pType="--bool" ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope="--global" ;;
-            G) pScope="--file $HOME/.gitproj.config.global" ;;
-            H) pScope="--file $tTopDir/.gitproj.config.$cHostName" ;;
+            G) pScope="--file $HOME/$cConfigGlobal" ;;
+            H) pScope="--file $tTopDir/$cConfigHost" ;;
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
-            L) pScope="--file $tTopDir/.gitproj.config.local" ;;
+            L) pScope="--file $tTopDir/$cConfigLocal" ;;
             v) pValue="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -881,11 +879,11 @@ Write to GIT_DIR/.git/config
 
 =internal-item B<-L>
 
-Write to GIT_DIR/.gitproj.config.local
+Write to GIT_DIR/$cConfigLocal
 
 =internal-item B<-H>
 
-Write to GIT_DIR/.gitproj.config.$HOSTNAME
+Write to GIT_DIR/$cConfigHost
 
 =internal-item B<-f pFile>
 
@@ -1049,8 +1047,8 @@ will be included.
 You must be in a git workspace for this option to work.
 
 Look in GIT_DIR/.git/config Includes are followed so these files will
-be included: GIT_DIR/.gitproj.config.local and
-GIT_DIR/.gitproj.config.$HOSTNAME
+be included: GIT_DIR/$cConfigLocal and
+GIT_DIR/$cConfigHost
 
 =internal-item B<-f pFile>
 
@@ -1139,10 +1137,10 @@ fComUnsetConfig()
             f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
             G) pScope="--file $HOME/$cConfigGlobal" ;;
-            H) pScope="--file $tTopDir/.gitproj.config.$cHostName" ;;
+            H) pScope="--file $tTopDir/$cConfigHost" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
-            L) pScope="--file $tTopDir/.gitproj.config.local" ;;
+            L) pScope="--file $tTopDir/$cConfigLocal" ;;
             :)
                 fError -n -i -m "Internal fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
@@ -1176,9 +1174,9 @@ fComSaveVar2Config()
     if [ -z "$tValue" ]; then
         tValue="Undefined"
     fi
-    # TBD: Use fComSetConfig because it has more error handling.
+    # TBD: Use fComSetConfig? because it has more error handling.
     ##fComSetConfig -f $pFile -k $pKey -v "$tValue"
-    git config --file $pFile $pKey "$tValue"
+    git config --replace-all --file $pFile $pKey "$tValue"
     if [ $? -ne 0 ]; then
         fLog -i -p warning -m "There was problem saving $pVarName value to $pKey to file $pFile" -l $tSrc:$LINENO
         gErr=1
@@ -1209,8 +1207,8 @@ fComMustBeInGitRepo()
         fError -n -m "$pDir does not exist." -l $tSrc:$LINENO
         return 1
     fi
+    
     cd $pDir >/dev/null 2>&1
-
     if [ -d $PWD/.git ]; then
         cd - >/dev/null 2>&1
         return 0
@@ -1220,9 +1218,7 @@ fComMustBeInGitRepo()
         return 0
     fi
     cd - >/dev/null 2>&1
-    fError -n -m "$pDir must be in a git repo for this command." -l $tSrc:$LINENO
-    cd - >/dev/null 2>&1
-    return 1
+    fError -m "$pDir must be in a git repo for this command." -l $tSrc:$LINENO
 } # fComMustBeInGitRepo
 
 # --------------------
@@ -1256,6 +1252,32 @@ fComMustNotBeInGit()
     fi
     return 0
 } # fComMustNotBeInGit
+
+# --------------------
+fComMustBeInProjRepo()
+{
+    local pDir=$1
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tTopDir
+
+    if ! fComMustBeInGitRepo $pDir; then
+        return 1
+    fi
+    
+    if [ ! -f $HOME/$cConfigGlobal ]; then
+        fError -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
+    fi
+
+    tTopDir=$($cGetTopDir)
+    if [ ! -f $tTopDir/$cConfigLocal ]; then
+        fLog -p warning -m "Missing $cConfigLocal, run 'git proj config'" -l $tSrc:$LINENO
+    fi
+    if [ ! -f $tTopDir/$cConfigHost ]; then
+        fLog -p warning -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
+    fi
+    
+} # fComMustBeInProjRepo
 
 fComAllMustBeReadable()
 {

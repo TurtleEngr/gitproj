@@ -29,6 +29,8 @@
 
 * Code git-proj-config
 
+* Remove the need for cCurDir ?
+
 * Refactor the test setup so it is simpler
 
 * Get travis-ci working. Run tests.
