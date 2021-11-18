@@ -121,6 +121,33 @@ fTestConfigSetup()
 } # fTestConfigSetup
 
 # --------------------------------
+fTestCheckConfig2Var()
+{
+    local pFile="$1"
+    local pKey="$2"
+    local pVarName="$3"
+    local pExpect="$4"
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tResult
+    local tStatus
+    local tValue
+
+    assertTrue "$LINENO $pFile" "[ -f $pFile ]"
+    tResult=$(git config --file $pFile $pKey)
+    tStatus=$?
+    assertTrue "$LINENO $pFile $pKey" "$tStatus"
+    tValue=$(eval echo \$$pVarName)
+    if [ -z "$tValue" ]; then
+        tValue="${pVarName}-is-undefined"
+    fi
+    assertContains "$LINENO $pVarName $tResult" "$tResult" "$tValue"
+    assertContains "$LINENO $pVarName $tResult" "$tResult" "$pExpect"
+
+    return $tStatus
+} # fTestCheckConfig2Var
+
+# --------------------------------
 fTestCreateEnv()
 {
     local tSrc=${BASH_SOURCE##*/}

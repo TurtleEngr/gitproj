@@ -67,7 +67,7 @@ EOF
 # ========================================
 
 # --------------------------------
-oneTimeSetUp()
+NAoneTimeSetUp()
 {
     return 0
 
@@ -96,7 +96,7 @@ Calls:
 EOF
 } # oneTimeSetUp
 
-oneTimeTearDown()
+NAoneTimeTearDown()
 {
     if [ -n "$cHome" ]; then
         HOME=$cHome
@@ -128,6 +128,9 @@ tearDown()
 {
     git config --global --remove-section gitproj.testit >/dev/null 2>&1
     gpUnitDebug=0
+    if [ -n "$cHome" ]; then
+        HOME=$cHome
+    fi
     return 0
 } # tearDown
 
@@ -661,7 +664,7 @@ cTestCurDir=$PWD
 # -------------------
 # Define the location of this script
 gpTest=${0%/*}
-if [ "$cTest" = "." ]; then
+if [ "$gpTest" = "." ]; then
     gpTest=$PWD
 fi
 cd $gpTest

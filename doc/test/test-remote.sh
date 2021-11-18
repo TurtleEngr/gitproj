@@ -124,7 +124,7 @@ setUp()
     fTestCreateEnv
 
     cd $HOME >/dev/null 2>&1
-    tar xzf $gpTest/test-env_test-env_ProjLocalDefined.tgz
+    tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
     cd - >/dev/null 2>&1
 
     fRemoteSetGlobals
@@ -172,28 +172,77 @@ testGitProjRemote()
 } # testGitProjInit
 
 # --------------------------------
-testRemoteGetMountPath()
+testComGetVer()
 {
-    startSkipping
-    fail "TBD"
-    return 0
-} # testRemoteGetMountPath
+    local tResult
+    local tVer
+
+    tResult=$(fComGetVer 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
+
+    cGitProjVersion="0.1.8"
+    tResult=$(fComGetVer 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
+
+    cGitProjVersion="0.2.0"
+    tResult=$(fComGetVer 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO" "$tResult" "warning"
+    assertContains "$LINENO" "$tResult" "but installed version is"
+ 
+    cGitProjVersion="1.3.0"
+    tResult=$(fComGetVer 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "crit: "
+    assertContains "$LINENO $tResult" "$tResult" "project needs to be upgraded"
+
+    gpDebug=2
+    gpVerbose=2
+
+    cGitProjVersion="0.2.0"
+    tVer=1.3
+    fComSetConfig -G -k "gitproj.config.ver" -v "$tVer"
+    tResult=$(fComGetVer 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "crit: "
+    assertContains "$LINENO $tResult" "$tResult" "installed version $cGitProjVersion needs to be upgraded to $tVer or greater"
+return 0
+
+    fComUnsetConfig -G -k "gitproj.config.ver"
+    tResult=$(fComGetVer 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO" "$tResult" "warning"
+    assertContains "$LINENO" "$tResult" "Internal"
+    assertContains "$LINENO" "$tResult" "gitproj.config.ver was not found"
+    assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
+
+} # testComGetVer
 
 # --------------------------------
-testRemoteGetRawRemotePath()
+testRemoteGetMountDir()
 {
     startSkipping
     fail "TBD"
     return 0
-} # testRemoteGetRawRemotePath
+} # testRemoteGetMountDir
 
 # --------------------------------
-testRemoteCheckPath()
+testRemoteGetRawRemoteDir()
 {
     startSkipping
     fail "TBD"
     return 0
-} # testRemoteCheckPath
+} # testRemoteGetRawRemoteDir
+
+# --------------------------------
+testRemoteCheckDir()
+{
+    startSkipping
+    fail "TBD"
+    return 0
+} # testRemoteCheckDir
 
 # --------------------------------
 testRemoteCheckSpace()
@@ -291,7 +340,7 @@ gpTestList="$*"
 # -----
 . $gpTest/test.inc
 fTestCreateEnv
-. $gpBin/gitproj-init.inc
+. $gpBin/gitproj-remote.inc
 
 # Look for serious setup errors
 fTestConfigSetup

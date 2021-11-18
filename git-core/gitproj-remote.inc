@@ -18,13 +18,10 @@ fRemoteSetGlobals()
 
     # TBD, first are we in git dir?
 
-    gpVer=$(fComGetConfig -k "gitproj.config.ver")
-    # Only the first two # are important
-    tTrim=${gpVer#*.*.}
-    gpVer=${gpVer%.$tTrim}
-
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
+
+    fComGetVer
 
     gpAuto=0
 
@@ -50,20 +47,20 @@ fRemoteSetGlobals()
 # --------------------
 fRemoteCheckDir()
 {
-    local pPath=$1
+    local pDir=$1
 
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ ! -d $pPath ]; then
-        fError -n -m "Could not find: $pPath" -l $tSrc:$LINENO
+    if [ ! -d $pDir ]; then
+        fError -n -m "Could not find: $pDir" -l $tSrc:$LINENO
         return 1
     fi
-    if [ ! -w $pPath ]; then
-        fError -n -m "$pPath is not writable for you." -l $tSrc:$LINENO
+    if [ ! -w $pDir ]; then
+        fError -n -m "$pDir is not writable for you." -l $tSrc:$LINENO
         return 1
     fi
-    if [ -e $pPath/$gpProjName.git ]; then
-        fError -n -m "$pPath/$gpProjName.git already exists." -l $tSrc:$LINENO
+    if [ -e $pDir/$gpProjName.git ]; then
+        fError -n -m "$pDir/$gpProjName.git already exists." -l $tSrc:$LINENO
         return 1
     fi
     return 0
@@ -90,7 +87,7 @@ fRemoteGetMountDir()
 # --------------------
 fRemoteCheckDirSpace()
 {
-    local pPath=$1
+    local pDir=$1
     local pMinSpace=$2
 
     local tSrc=${BASH_SOURCE##*/}
@@ -99,7 +96,7 @@ fRemoteCheckDirSpace()
     local tRawSize
     local tDesiredSize
 
-    tAvail=$(df -BM $pPath --output=avail | tail -n1)
+    tAvail=$(df -BM $pDir --output=avail | tail -n1)
     tAvail=${tAvail%M}
 
     tGitSize=$(du -sm .git | awk '{print $1}')
@@ -111,7 +108,7 @@ fRemoteCheckDirSpace()
     let tDesiredSize=tGitSize+tRawSize
 
     if [ $tDesiredSize -gt $tAvail ]; then
-        fError -m "There is not enough space at $pPath. $pPath has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
+        fError -m "There is not enough space at $pDir. $pDir has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
     fi
     return 0
 } # fRemoteCheckDirSpace
@@ -145,19 +142,19 @@ fRemoteGetRemoteRawDir()
 # --------------------
 fRemoteMkRemote()
 {
-    local pPath=$1
+    local pDir=$1
 
     local tSrc=${BASH_SOURCE##*/}
     local tSrcPath=$PWD
     local tProjName=${PWD##*/}
 
     fLog -p info -m "git clone" -l $tSrc:$LINENO
-    cd $pPath >/dev/null 2>&1
+    cd $pDir >/dev/null 2>&1
     git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
     cd - >/dev/null 2>&1
 
     fLog -p info -m "Set remote origin" -l $tSrc:$LINENO
-    git remote add origin $pPath/$tProjName.git
+    git remote add origin $pDir/$tProjName.git
 
     return 0
 } # fRemoteMkRemote

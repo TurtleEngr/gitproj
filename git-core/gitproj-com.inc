@@ -4,7 +4,8 @@
 export cConfigGlobal cHostName cConfigLocal cCurDir cGitProjVersion \
     cGetOrigin cGetTopDir cPID
 export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
-    gpLocalRawDir gpSysLog gpVerbose
+    gpLocalRawDir gpSysLog gpVerbose PWD \
+    gGetConfigValue gGetConfigOrigin
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -124,6 +125,50 @@ EOF
 # ========================================
 # Common Functions
 
+fComGetVer()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tIVer
+    local tIMajor
+    local tIMinor
+    local tLMajor
+    local tLMinor
+    local tTrim
+
+    # Get the Installed Version
+    tIVer=$cGitProjVersion
+    # Only the first two # are important
+    tTrim=${tIVer#*.*.}
+    tIVer=${tIVer%.$tTrim}
+    tIMajor=${tIVer%.*}
+    tIMinor=${tIVer#*.}
+
+    # Get the expected Local Version
+    gpVer=$(fComGetConfig -k "gitproj.config.ver")
+    if [ -z "$gpVer" ];then
+        gpVer=$cGitProjVersion
+	fLog -i -p warning -m "gitproj.config.ver was not found" -l $tSrc:$LINENO
+	return 0
+    fi
+    # Only the first two # are important
+    tTrim=${gpVer#*.*.}
+    gpVer=${gpVer%.$tTrim}
+    tLMajor=${gpVer%.*}
+    tLMinor=${gpVer#*.}
+
+    if [ $tLMajor -gt $tIMajor ]; then
+        fError -m "Expected version $gpVer The installed version $cGitProjVersion needs to be upgraded to $gpVer or greater." -l $tSrc:$LINENO
+    fi
+    if [ $tLMajor -lt $tIMajor ]; then
+        fError -m "Expected version $gpVer  The project needs to be upgraded to the installed version $cGitProjVersion" -l $tSrc:$LINENO
+    fi
+    if [ $tLMinor -ne $tIMinor ]; then
+        fLog -p warning -m "Expected version $gpVer, but installed version is $cGitProjVersion" -l $tSrc:$LINENO
+    fi
+
+    return 0
+} # fComGetVer
+
 # -------------------
 fComSetGlobals()
 {
@@ -153,6 +198,7 @@ fComSetGlobals()
 
     # -------------------
     # Constants
+
     if [ -z "$gpDoc" ]; then
         gpDoc=/usr/share/doc/gitproj
     fi
@@ -162,12 +208,17 @@ fComSetGlobals()
     if [ ! -d $gpDoc ]; then
         fError -m "Error: Cannot find gitproj doc directory: $gpDoc" -l $tSrc:$LINENO
     fi
+    cd $gpDoc >/dev/null 2>&1
+    gpDoc=$PWD
+    cd - >/dev/null 2>&1
 
     cGitProjVersion=$(cat $gpDoc/VERSION)
 
     # Included in ~/.gitproj.config (Use -G to set config vars to this)
+    # Note: ~/$cConfigGlobal does not work all the time, so use:
+    # $HOME/$cConfigGlobal  However ~ is OK for use in literals.
     # shellcheck disable=SC2088
-    cConfigGlobal="$HOME/.gitproj.config.global"
+    cConfigGlobal='.gitproj.config.global'
 
     # Use this, so unit tests can change this
     cHostName=${cHostName:-$HOSTNAME}
@@ -657,12 +708,11 @@ fError()
 
     if [ $pInt -eq 1 ]; then
         pMsg="Internal: $pMsg"
-        fComStackTrace
     fi
+    fLog -p crit -l $pLine -e $pErr -m "$pMsg"
     if [ $pInt -eq 1 ] || [ $gpDebug -ge 2 ]; then
         fComStackTrace
     fi
-    fLog -p crit -l $pLine -e $pErr -m "$pMsg"
     if [ $pInt -eq 0 ] && [ $pNoExit -eq 0 ]; then
         fUsage usage
     fi
@@ -692,16 +742,16 @@ fComMkHostConfig()
 
     tTop=$(git rev-parse --show-toplevel)
     mkdir -p $tTop/gitproj 2>&1
-    touch $tTop/gitproj/config.$HOSTNAME
-    git config --local include.path $tTop/gitproj/config.$HOSTNAME
+    touch $tTop/gitproj/config.$cHostName
+    git config --local include.path $tTop/gitproj/config.$cHostName
     cd $tTop >/dev/null 2>&1
-    git add gitproj/config.$HOSTNAME
+    git add gitproj/config.$cHostName
 } # fComMkHostConfig
 
 # --------------------------------
 fComSetConfig()
 {
-    local pScope="--local"
+    local pScope=""
     local pType=""
     local pKey=""
     local pValue=""
@@ -712,11 +762,30 @@ fComSetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :agG:lLH:f:ibk:v: tArg; do
+    while getopts :abf:gGHik:lLv: tArg; do
         case $tArg in
+            f)
+                if [ ! -f ${OPTARG} ]; then
+                    fLog -p warning -m "Could not find ${OPTARG}, it will be created" -l "$tSrc:$LINENO"
+		    touch ${OPTARG}
+		    if [ ! -f ${OPTARG} ]; then
+		        fError -n -m "Could not create ${OPTARG} in $PWD" -l "$tSrc:$LINENO"
+			return 1
+		    fi
+                fi
+                ;;
             G)
-                if [ ! -f $cConfigGlobal ]; then
-                    fError -n -m "Could not find $cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+                if [ ! -f $HOME/$cConfigGlobal ]; then
+		    set +x
+                    fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+		    set +x
+                ;;
+            H)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
@@ -734,31 +803,18 @@ fComSetConfig()
                     return 1
                 fi
                 ;;
-            H)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-                    return 1
-                fi
-                ;;
-            f)
-                if [ ! -f ${OPTARG} ]; then
-                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
-                    return 1
-                fi
-                ;;
         esac
         case $tArg in
             a) pAdd="--add" ;;
+            b) pType="--bool" ;;
+            f) pScope="--file ${OPTARG}" ;;
             g) pScope="--global" ;;
-            G) pScope="---file $cConfigGlobal" ;;
+            G) pScope="--file $HOME/.gitproj.config.global" ;;
+            H) pScope="--file $tTopDir/.gitproj.config.$cHostName" ;;
+            i) pType="--int" ;;
+            k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
             L) pScope="--file $tTopDir/.gitproj.config.local" ;;
-            H) pScope="--file $tTopDir/.gitproj.config.$HOSTNAME" ;;
-            f) pScope="--file ${OPTARG}" ;;
-            i) pType="--int" ;;
-            b) pType="--bool" ;;
-            k) pKey="${OPTARG}" ;;
             v) pValue="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -781,6 +837,83 @@ fComSetConfig()
 
     git config $pScope $pAdd $pType $pKey "$pValue"
     return $?
+    
+# ----------------------
+    cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head2 fComGetConfig 
+
+=internal-head3 Synopsis
+
+    fComSetConfig -k pKey -v pValue [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-a]
+
+=internal-head3 Description
+
+=internal-head3 Options
+
+Only one of these will be used: -g, -l, -L, -H -f. The last one in the
+list of options will be used if there is more than one.  If none, then
+-l is the default.
+
+Only one or none of these can be specified: -b, -i. If more than one,
+then the last one will be used.
+
+=internal-over 4
+
+=internal-item B<-k pKey>
+
+This option is required.
+
+=internal-item B<-v pValue>
+
+This option is required.
+
+=internal-item B<-g>
+
+Write to ~/.gitconfig
+
+=internal-item B<-l>
+
+You must be in a git workspace for this option to work.
+
+Write to GIT_DIR/.git/config
+
+=internal-item B<-L>
+
+Write to GIT_DIR/.gitproj.config.local
+
+=internal-item B<-H>
+
+Write to GIT_DIR/.gitproj.config.$HOSTNAME
+
+=internal-item B<-f pFile>
+
+Write to pFile.
+
+=internal-item B<-b>
+
+The value will be normalized to "true" or "false".
+
+=internal-item B<-i>
+
+The value will be converted to a single "byte" value, based on
+its suffix.
+
+Valid suffixes: k, K, m, M, g, G
+
+These will be converted to lowercase before being sent to "git config".
+
+=internal-item B<-a>
+
+Use this option if you need to specify a key with multiple values.
+If not specified, then any matching key in the file, being written to,
+will replace the value.
+
+=internal-back
+
+=internal-cut
+EOF
 } # fComSetConfig
 
 # --------------------------------
@@ -790,17 +923,26 @@ fComGetConfig()
     local pType=""
     local pKey=""
     local pDefault=""
-    local pAll=""
     local pFilter=""
 
     local tSrc=${BASH_SOURCE##*/}
     local tValue=""
 
+    # Globals set by fComGetConfig
+    gGetConfigValue=""
+    gGetConfigOrigin="not-found"
+
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :glf:ibk:d:av: tArg; do
+    while getopts :bd:f:gik:lv: tArg; do
         case $tArg in
+            f)
+                if [ ! -f ${OPTARG} ]; then
+                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                ;;
             l)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
@@ -808,22 +950,15 @@ fComGetConfig()
                     return 1
                 fi
                 ;;
-            f)
-                if [ ! -f ${OPTARG} ]; then
-                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
-                    return 1
-                fi
-                ;;
         esac
         case $tArg in
-            g) pScope=--global ;;
-            l) pScope=--local ;;
-            f) pScope="--file ${OPTARG}" ;;
-            i) pType="--int" ;;
             b) pType="--bool" ;;
-            k) pKey="${OPTARG}" ;;
             d) pDefault="${OPTARG}" ;;
-            a) pAll="--all" ;;
+            f) pScope="--file ${OPTARG}" ;;
+            g) pScope=--global ;;
+            i) pType="--int" ;;
+            k) pKey="${OPTARG}" ;;
+            l) pScope=--local ;;
             v) pFilter="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -839,19 +974,123 @@ fComGetConfig()
         fError -n -i -m "fComGetConfig: missing key" -l $tSrc:$LINENO
         return 1
     fi
+    
+    gGetConfigValue=$(git config --get --includes $pScope $pType $pKey $pFilter)
 
-    tValue=$(git config --get --includes $pScope $pType $pKey $pFilter)
-    if [ -z "$tValue" ] && [ -n "$pDefault" ]; then
-        tValue=$pDefault
+    if [ -z "$gGetConfigValue" ] && [ -n "$pDefault" ]; then
+	gGetConfigOrigin=default
+        gGetConfigValue=$pDefault
+    	echo "$gGetConfigValue"
+    	return 0
     fi
-    echo $tValue
+    
+    if [ -z "$gGetConfigValue" ]; then
+        gGetConfigOrigin=not-found
+        echo ""
+    	return 0
+    fi
+
+    gGetConfigOrigin=$(git config --show-origin --get --includes $pScope $pType $pKey $pFilter)
+    gGetConfigOrigin=${gGetConfigOrigin% *}
+    echo "$gGetConfigValue"
     return 0
+
+# ----------------------
+    cat <<EOF >/dev/null
+=internal-pod
+
+=internal-head2 fComGetConfig 
+
+=internal-head3 Synopsis
+
+    fComGetConfig -k pKey [-g|-l|-f pFile] [-b|-i] [-d pDefault] [-v pFilter]
+
+=internal-head3 Description
+
+If pKey is found, the last defined value is echoed. And the value is
+saved in global gGetConfigValue. And the file location of the value is
+saved in gGetConfigOrigin.
+
+If the key is not found, and -d pDefault is set then gGetConfigValue
+is set to pDefault, and gGetConfigOrigin is set to "default".
+
+If the key is not found, and there is no -d option, then
+gGetConfigValue is set to "", and gGetConfigOrigin is set to
+"not-found", and "" is returned.
+
+Command Returns
+
+    0 - OK (even for no value found)
+    1 - Errors
+
+=internal-head3 Options
+
+Only one of these will be used: -g, -l, -f. The last one in the list
+of options will be if there is more than one.  If none, then all the
+config files will be used.
+
+Only one or none of these can be specified: -b, -i. If more than one,
+then the last one will be used.
+
+=internal-over 4
+
+=internal-item B<-k pKey>
+
+This option is required. The last file were this key is found will be
+used to set the value returned.
+
+=internal-item B<-g>
+
+Look in ~/.gitconfig Includes are followed so ~/gitproj.config.global
+will be included.
+
+=internal-item B<-l>
+
+You must be in a git workspace for this option to work.
+
+Look in GIT_DIR/.git/config Includes are followed so these files will
+be included: GIT_DIR/.gitproj.config.local and
+GIT_DIR/.gitproj.config.$HOSTNAME
+
+=internal-item B<-f pFile>
+
+This will look in pFile for pKey. Includes will be followed.
+
+=internal-item B<-b>
+
+The value will be normalized to "true" or "false".
+
+Valid values in the files: 
+
+=internal-item B<-i>
+
+The value will be converted to a single "byte" value, based on
+its suffix.
+
+Valid suffixes: k, m, g
+
+Note: fComSetConf with -i will allow: [kKmMgG]. It will convert the
+values to lower-case, when saving them in the config files.
+
+=internal-item B<-d pDefault>
+
+If pKey is not found, then pDefault will be returned, and gGetConfigOrigin
+will be set to "default".
+
+=internal-item B<-v pFilter>
+
+pFilter is used as a pattern match for the value found.
+
+=internal-back
+
+=internal-cut
+EOF
 } # fComGetConfig
 
 # --------------------------------
 fComUnsetConfig()
 {
-    local pScope="--local"
+    local pScope=""
     local pKey=""
     local pAll="--unset"
 
@@ -859,18 +1098,17 @@ fComUnsetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :gGlLHf:k:a tArg; do
+    while getopts :af:gGHk:lL tArg; do
         case $tArg in
-            G)
-                if [ ! -f $cConfigGlobal ]; then
-                    fError -n -m "Could not find $cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+            f)
+                if [ ! -f ${OPTARG} ]; then
+                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
-            L)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+            G)
+                if [ ! -f $HOME/$cConfigGlobal ]; then
+                    fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
@@ -888,22 +1126,23 @@ fComUnsetConfig()
                     return 1
                 fi
                 ;;
-            f)
-                if [ ! -f ${OPTARG} ]; then
-                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
+            L)
+                tTopDir="$($cGetTopDir 2>&1)"
+                if [ $? -ne 0 ]; then
+                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
         esac
         case $tArg in
+            a) pAll="--unset-all" ;;
+            f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
-            G) pScope="---file $cConfigGlobal" ;;
+            G) pScope="--file $HOME/$cConfigGlobal" ;;
+            H) pScope="--file $tTopDir/.gitproj.config.$cHostName" ;;
+            k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
             L) pScope="--file $tTopDir/.gitproj.config.local" ;;
-            H) pScope="--file $tTopDir/.gitproj.config.$HOSTNAME" ;;
-            f) pScope="--file ${OPTARG}" ;;
-            k) pKey="${OPTARG}" ;;
-            a) pAll="--unset-all" ;;
             :)
                 fError -n -i -m "Internal fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
@@ -915,8 +1154,36 @@ fComUnsetConfig()
         esac
     done
 
+    if [ -z "$pKey" ]; then
+        fError -n -i -m "fComUnsetConfig: missing key" -l $tSrc:$LINENO
+        return 1
+    fi
+
     git config $pAll $pScope $pKey
 } # fComUnsetConfig
+
+# --------------------
+fComSaveVar2Config()
+{
+    local pFile="$1"
+    local pKey="$2"
+    local pVarName="$3"
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tValue
+
+    tValue=$(eval echo \$$pVarName)
+    if [ -z "$tValue" ]; then
+        tValue="Undefined"
+    fi
+    # TBD: Use fComSetConfig because it has more error handling.
+    ##fComSetConfig -f $pFile -k $pKey -v "$tValue"
+    git config --file $pFile $pKey "$tValue"
+    if [ $? -ne 0 ]; then
+        fLog -i -p warning -m "There was problem saving $pVarName value to $pKey to file $pFile" -l $tSrc:$LINENO
+        gErr=1
+    fi
+} # fComSaveVar2Config
 
 fComCheckPkg()
 {

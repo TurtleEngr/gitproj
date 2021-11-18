@@ -30,9 +30,9 @@ fInitFirstTimeSet()
         fError -m "user.name and user.email must be in your ~/.gitconfig file. See $cgDoc/config/gitconfig.default for some other useful settings." -l $tSrc:$LINENO
     fi
 
-    if [ ! -f $cConfigGlobal ]; then
-        fLog -p info -m "Create: $cConfigGlobal" -l $tSrc:$LINENO
-        cp $gpDoc/config/gitproj.config.global $cConfigGlobal
+    if [ ! -f $HOME/cConfigGlobal ]; then
+        fLog -p info -m "Create: ~/$cConfigGlobal" -l $tSrc:$LINENO
+        cp $gpDoc/config/gitproj.config.global $HOME/$cConfigGlobal
     fi
     tInclude=$(fComGetConfig -g -k "include.path" -v .gitproj.config.global)
     if [ -z "$tInclude" ]; then
@@ -757,27 +757,6 @@ fInitMkLocalConfig()
 } # fInitMkLocalConfig
 
 # --------------------
-fInitSaveSingleConfig()
-{
-    local pFile="$1"
-    local pKey="$2"
-    local pVarName="$3"
-
-    local tSrc=${BASH_SOURCE##*/}
-    local tValue
-
-    tValue=$(eval echo \$$pVarName)
-    if [ -z "$tValue" ]; then
-        tValue="Undefined"
-    fi
-    git config --file $pFile $pKey "$tValue"
-    if [ $? -ne 0 ]; then
-        fLog -i -p warning -m "There was problem saving $pVarName value to $pKey to file $pFile" -l $tSrc:$LINENO
-        gErr=1
-    fi
-} # fInitSaveSingleConfig
-
-# --------------------
 fInitSaveVarsToConfigs()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -788,37 +767,37 @@ fInitSaveVarsToConfigs()
 
     tFile=~/.gitproj.config.global
     tS=gitproj.config
-    fInitSaveSingleConfig $tFile $tS.proj-status gpProjStatus
-    fInitSaveSingleConfig $tFile $tS.bin gpBin
-    fInitSaveSingleConfig $tFile $tS.doc gpDoc
-    fInitSaveSingleConfig $tFile $tS.test gpTest
-    fInitSaveSingleConfig $tFile $tS.facility gpFacility
-    fInitSaveSingleConfig $tFile $tS.syslog gpSysLog
+    fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
+    fComSaveVar2Config $tFile $tS.bin gpBin
+    fComSaveVar2Config $tFile $tS.doc gpDoc
+    fComSaveVar2Config $tFile $tS.test gpTest
+    fComSaveVar2Config $tFile $tS.facility gpFacility
+    fComSaveVar2Config $tFile $tS.syslog gpSysLog
 
     for tFile in $gpLocalTopDir/.gitproj.config.local \
         $gpLocalTopDir/.gitproj.config.$cHostName; do
         tS=gitproj.config
-        fInitSaveSingleConfig $tFile $tS.local-status gpLocalStatus
-        fInitSaveSingleConfig $tFile $tS.remote-status gpRemoteStatus
-        fInitSaveSingleConfig $tFile $tS.proj-name gpProjName
-        fInitSaveSingleConfig $tFile $tS.local-top-dir gpLocalTopDir
+        fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
+        fComSaveVar2Config $tFile $tS.remote-status gpRemoteStatus
+        fComSaveVar2Config $tFile $tS.proj-name gpProjName
+        fComSaveVar2Config $tFile $tS.local-top-dir gpLocalTopDir
     done
 
     for tFile in ~/.gitproj.config.global \
         $gpLocalTopDir/.gitproj.config.local \
         $gpLocalTopDir/.gitproj.config.$cHostName; do
         tS=gitproj.config
-        fInitSaveSingleConfig $tFile $tS.git-flow-pkg gpGitFlow
-        fInitSaveSingleConfig $tFile $tS.hardlink gpHardLink
-        fInitSaveSingleConfig $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
-        fInitSaveSingleConfig $tFile $tS.local-raw-symlink gpLocalRawSymLink
+        fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
+        fComSaveVar2Config $tFile $tS.hardlink gpHardLink
+        fComSaveVar2Config $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
+        fComSaveVar2Config $tFile $tS.local-raw-symlink gpLocalRawSymLink
         tS=gitproj.hook
-        fInitSaveSingleConfig $tFile $tS.auto-move gpAutoMove
-        fInitSaveSingleConfig $tFile $tS.binary-file-size-limit gpMaxSize
-        fInitSaveSingleConfig $tFile $tS.check-file-names gpCheckFileNames
-        fInitSaveSingleConfig $tFile $tS.check-for-big-files gpCheckForBigFiles
-        fInitSaveSingleConfig $tFile $tS.pre-commit-enabled gpPreCommitEnabled
-        fInitSaveSingleConfig $tFile $tS.source gpHookSource
+        fComSaveVar2Config $tFile $tS.auto-move gpAutoMove
+        fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
+        fComSaveVar2Config $tFile $tS.check-file-names gpCheckFileNames
+        fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
+        fComSaveVar2Config $tFile $tS.pre-commit-enabled gpPreCommitEnabled
+        fComSaveVar2Config $tFile $tS.source gpHookSource
     done
 
     if [ $gErr -eq 0 ]; then

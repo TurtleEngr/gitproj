@@ -209,7 +209,7 @@ cTestCurDir=$PWD
 # -------------------
 # Define the location of this script
 gpTest=${0%/*}
-if [ "$cTest" = "." ]; then
+if [ "$gpTest" = "." ]; then
     gpTest=$PWD
 fi
 cd $gpTest

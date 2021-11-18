@@ -143,6 +143,9 @@ tearDown()
 {
     # fTestRmEnv
     gpUnitDebug=0
+    if [ -n "$cHome" ]; then
+        HOME=$cHome
+    fi
     cd $gpTest >/dev/null 2>&1
     return 0
 } # tearDown
@@ -996,33 +999,6 @@ testInitMkLocalConfig()
 } # testInitMkLocalConfig
 
 # --------------------------------
-checkConfigValue()
-{
-    local pFile="$1"
-    local pKey="$2"
-    local pVarName="$3"
-    local pExpect="$4"
-
-    local tSrc=${BASH_SOURCE##*/}
-    local tResult
-    local tStatus
-    local tValue
-
-    assertTrue "$LINENO $pFile" "[ -f $pFile ]"
-    tResult=$(git config --file $pFile $pKey)
-    tStatus=$?
-    assertTrue "$LINENO $pFile $pKey" "$tStatus"
-    tValue=$(eval echo \$$pVarName)
-    if [ -z "$tValue" ]; then
-        tValue="${pVarName}-is-undefined"
-    fi
-    assertContains "$LINENO $pVarName $tResult" "$tResult" "$tValue"
-    assertContains "$LINENO $pVarName $tResult" "$tResult" "$pExpect"
-
-    return $tStatus
-} # checkConfigValue
-
-# --------------------------------
 testInitSaveVarsToConfigs()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -1065,35 +1041,35 @@ testInitSaveVarsToConfigs()
 
     tFile=~/.gitproj.config.global
     tS=gitproj.config
-    checkConfigValue $tFile $tS.proj-status gpProjStatus ${gpProjStatus}
-    checkConfigValue $tFile $tS.bin gpBin ${gBin#$gpLocalTopDir/}
-    checkConfigValue $tFile $tS.doc gpDoc ${gDoc#$gpLocalTopDir/}
-    checkConfigValue $tFile $tS.test gpTest ${gTest#$gpLocalTopDir/}
-    checkConfigValue $tFile $tS.facility gpFacility user
-    checkConfigValue $tFile $tS.syslog gpSysLog true
+    fTestCheckConfig2Var $tFile $tS.proj-status gpProjStatus ${gpProjStatus}
+    fTestCheckConfig2Var $tFile $tS.bin gpBin ${gBin#$gpLocalTopDir/}
+    fTestCheckConfig2Var $tFile $tS.doc gpDoc ${gDoc#$gpLocalTopDir/}
+    fTestCheckConfig2Var $tFile $tS.test gpTest ${gTest#$gpLocalTopDir/}
+    fTestCheckConfig2Var $tFile $tS.facility gpFacility user
+    fTestCheckConfig2Var $tFile $tS.syslog gpSysLog true
 
     for tFile in $gpLocalTopDir/.gitproj.config.local \
         $gpLocalTopDir/.gitproj.config.$cHostName; do
         tS=gitproj.config
-        checkConfigValue $tFile $tS.local-status gpLocalStatus not-defined
-        checkConfigValue $tFile $tS.remote-status gpRemoteStatus not-defined
-        checkConfigValue $tFile $tS.proj-name gpProjName $gpProjName
-        checkConfigValue $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
+        fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined
+        fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined
+        fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName
+        fTestCheckConfig2Var $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir
     done
 
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj.config.local; do
         tS=gitproj.config
-        checkConfigValue $tFile $tS.git-flow-pkg gpGitFlow true
-        checkConfigValue $tFile $tS.hardlink gpHardLink $gpHardLink
-        checkConfigValue $tFile $tS.local-raw-dir-pat gpLocalRawDirPat ..
-        checkConfigValue $tFile $tS.local-raw-symlink gpLocalRawSymLink raw
+        fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true
+        fTestCheckConfig2Var $tFile $tS.hardlink gpHardLink $gpHardLink
+        fTestCheckConfig2Var $tFile $tS.local-raw-dir-pat gpLocalRawDirPat ..
+        fTestCheckConfig2Var $tFile $tS.local-raw-symlink gpLocalRawSymLink raw
         tS=gitproj.hook
-        checkConfigValue $tFile $tS.auto-move gpAutoMove true
-        checkConfigValue $tFile $tS.binary-file-size-limit gpMaxSize 10k
-        checkConfigValue $tFile $tS.check-file-names gpCheckFileNames true
-        checkConfigValue $tFile $tS.check-for-big-files gpCheckForBigFiles true
-        checkConfigValue $tFile $tS.pre-commit-enabled gpPreCommitEnabled true
-        checkConfigValue $tFile $tS.source gpHookSource hooks/pre-commit
+        fTestCheckConfig2Var $tFile $tS.auto-move gpAutoMove true
+        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k
+        fTestCheckConfig2Var $tFile $tS.check-file-names gpCheckFileNames true
+        fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true
+        fTestCheckConfig2Var $tFile $tS.pre-commit-enabled gpPreCommitEnabled true
+        fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit
     done
 
     return 0
