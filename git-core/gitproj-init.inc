@@ -4,8 +4,8 @@
 export cCurDir cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
-    gpCmdName gpDebug gpDoc gpFacility gpGitFlow gpHardLink \
-    gpHookSource gpLocalRawDir gpLocalRawDirPat gpLocalRawSymLink \
+    gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
+    gpHookSource gpLocalRawDir \
     gpLocalStatus gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled \
     gpProjName gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
@@ -59,11 +59,6 @@ fInitSetGlobals()
 
     gpAuto=0
 
-    # Relative to top-dir
-    gpLocalRawDirPat=$(fComGetConfig -k "gitproj.config.local-raw-dir-pat" -d "..")
-
-    gpLocalRawSymLink=$(fComGetConfig -k "gitproj.config.local-raw-symlink" -d raw)
-
     gpLocalTopDir=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
     if [ "$gpLocalTopDir" = "TBD" ]; then
         gpLocalTopDir=$PWD
@@ -77,8 +72,7 @@ fInitSetGlobals()
         gpProjName="${gpLocalTopDir##*/}"
     fi
 
-    # Path is relative to top-dir
-    gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
+    gpLocalRawDir=$gpLocalTopDir/raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
     gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
@@ -89,9 +83,6 @@ fInitSetGlobals()
     gpProjStatus=$(fComGetConfig -k "gitproj.config.proj-status" -d "installed")
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
-
-    # Uknown at this point, copy files is the safest option (i.e. false)
-    gpHardLink=$(fComGetConfig -k "gitproj.config.hardlink" -d "false")
 
     gpCheckFileNames=true
     gpCheckForBigFiles=true
@@ -190,167 +181,6 @@ EOF
     done
     return 0
 } # fInitGetLocalPath
-
-# --------------------
-fInitValidLocalRawDirPat()
-{
-    local pLocalRawDirPat=$1
-
-    local tSrc=${BASH_SOURCE##*/}
-
-    if [ "${pLocalRawDirPat#..}" = "$pLocalRawDirPat" ]; then
-        fLog -p warning -m "RawLocalPathPat works best if it is relative to top-dir: $gpLocalTopDir" -l $tSrc:$LINENO
-    fi
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    if [ ! -d $pLocalRawDirPat ]; then
-        fLog -p err -m "Raw directory $pLocalRawDirPat not found relative to $gpLocalTopDir" -l $tSrc:$LINENO
-        cd - >/dev/null 2>&1
-        return 1
-    fi
-    cd - >/dev/null 2>&1
-
-    cd $gpLocalTopDir/$pLocalRawDirPat >/dev/null 2>&1
-    echo $PWD | grep -q "/$gpProjName/"
-    # shellcheck disable=SC2181
-    if [ $? -eq 0 ]; then
-        fLog -p err -m "Raw directory cannot be in $gpLocalTopDir" -l $tSrc:$LINENO
-        cd - >/dev/null 2>&1
-        return 1
-    fi
-    cd - >/dev/null 2>&1
-
-    # TBD: error for gpLocalRawDirPat to be "in" a raw dir.
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    gpLocalRawDir=${gpLocalRawDirPat}/${gpProjName}.raw
-    if [ -d $gpLocalRawDir ]; then
-        fLog -p warn -m "Raw directory already exists: $gpLocalRawDir" -l $tSrc:$LINENO
-    fi
-    cd - >/dev/null 2>&1
-    return 0
-} # fInitValidLocalRawDirPat
-
-# --------------------
-fInitSetHardLink()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tDevTopDir
-    local tDevRawDir
-
-    # If on same filesystem, hardlinks can be used to move files quickly
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tDevTopDir=$(df -BM $gpLocalTopDir --output=source | tail -n 1)
-    tDevRawDir=$(df -BM $gpLocalRawDirPat --output=source | tail -n 1)
-    gpHardLink=false
-    if [ "$tDevTopDir" = "$tDevRawDir" ]; then
-        gpHardLink=true
-    fi
-    return 0
-} # fInitSetHardLink
-
-# --------------------
-fInitGetLocalRawDirPat()
-{
-    local pLocalRawDirPat=$1
-
-    local tSrc=${BASH_SOURCE##*/}
-    local tResult
-
-    if [ $gpAuto -ne 0 ]; then
-        if ! fInitValidLocalRawDirPat $pLocalRawDirPat; then
-            fError -m "Invalid -l pLocalRawDirPat: $pLocalRawDirPat" -l $tSrc:$LINENO
-        fi
-        fInitSetHardLink
-        return 0
-    fi
-
-    while true; do
-        cat <<EOF | fmt
-        
-Set the location for large binary files. It cannot be *in* any of the
-project directories. It will be created, if it does not exist. The
-path should be relative to the project dir. The files in the raw
-directory will NOT be versioned--only the latest copy will be
-saved. Default: ..
-
-EOF
-        echo -n "Raw dir (-r) [$gpLocalRawDirPat/quit]? "
-        read -r tResult
-        if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
-        if [ -z "$tResult" ]; then
-            tResult=$gpLocalRawDirPat
-        fi
-        if fInitValidLocalRawDirPat $tResult; then
-            break
-        fi
-    done
-
-    fInitSetHardLink
-    return 0
-} # fInitGetLocalRawDirPat
-
-# --------------------
-fInitValidSymLink()
-{
-    export pSymLinkName=$1
-
-    local tSrc=${BASH_SOURCE##*/}
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    if [ -e $pSymLinkName ]; then
-        fLog -p err -m "Symlink or file: $pSymLinkName, already exists. Pick another name or quit and remove it." -l $tSrc:$LINENO
-        cd - >/dev/null 2>&1
-        return 1
-    fi
-    cd - >/dev/null 2>&1
-
-    gpLocalRawSymLink=$pSymLinkName
-    return 0
-} # fInitValidSymLink
-
-# --------------------
-fInitGetSymLink()
-{
-    local pSymLinkName=$1
-
-    local tSrc=${BASH_SOURCE##*/}
-    local tResult
-
-    if [ $gpAuto -ne 0 ]; then
-        if ! fInitValidSymLink $pSymLinkName; then
-            fError -m "Invalid -k pSymLinkName: $pSymLinkName" -l $tSrc:$LINENO
-        fi
-        return 0
-    fi
-
-    while true; do
-        cat <<EOF | fmt
-        
-Define the symlink name that will point to the Raw dir. It will be
-created in the project's top dir. If the Raw dir is moved, this link
-will need to be updated. Symlink in the git directories will point to
-this dir and the symlinks will be versioned. Default: raw
-
-EOF
-        echo -n "Symlink (-k) [$pSymLinkName/quit]? "
-        read -r tResult
-        if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
-        if [ -z "$tResult" ]; then
-            tResult=$pSymLinkName
-        fi
-        if fInitValidSymLink $tResult; then
-            break
-        fi
-    done
-    return 0
-} # fInitGetSymLink
 
 # --------------------
 fInitValidSize()
@@ -525,7 +355,6 @@ Summary
           (debug) = $gpDebug
           (exits)   HOME/.gitconfig
         (created)   HOME/$cConfigGlobal
- (local-raw-dir)  = $gpLocalRawDirPat/$gpProjName.raw
   (git-flow init) = $gpGitFlow
 
 [gitproj "config"]
@@ -539,9 +368,6 @@ Summary
              test = $gpTest
     local-top-dir = $gpLocalTopDir
         proj-name = $gpProjName
-local-raw-dir-pat = $gpLocalRawDirPat
-local-raw-symlink = $gpLocalRawSymLink
-         hardlink = $gpHardLink
      git-flow-pkg = $gpGitFlowPkg
 
 [gitproj "hook"]
@@ -580,12 +406,8 @@ fInitMkRaw()
     fLog -p info -m "mkdir $gpLocalRawDir" -l $tSym:$LINENO
     mkdir $gpLocalRawDir
 
-    fLog -p notice -m "Create: TOP_DIR/$gpLocalRawSymLink -> $gpLocalRawDir" -l $tSrc:$LINENO
-    ln -s $gpLocalRawDir $gpLocalRawSymLink
-
-    cd $gpLocalTopDir/$gpLocalRawSymLink >/dev/null 2>&1
     fLog -p info -m "Create: raw/README.txt" -l $tSym:$LINENO
-    cat <<EOF | fmt >README.txt
+    cat <<EOF | fmt >raw/README.txt
     
 Do NOT remove these files or this directory.
 
@@ -600,6 +422,8 @@ For help with the "git proj" subcommand, just cd into the working directory
 and type "git proj".
 EOF
     fLog -p notice -m "Use $gpLocalRawSymLink to access the files in $gpLocalRawDir  That way, if $gpLocalRawDir moves, only one place needs to be fixed up." -l $tSrc:$LINENO
+
+    cd - >/dev/null 2>&1
     return 0
 } # fInitMkRaw
 
@@ -627,29 +451,24 @@ fInitMoveBinaryFiles()
         if [ "$tDir" = "$tFile" ]; then
             tDir=""
         else
-            if [ ! -d $gpLocalRawSymLink/$tDir ]; then
-                tResult=$(mkdir -v -p $gpLocalRawSymLink/$tDir 2>&1)
+            if [ ! -d $gpLocalRawDir/$tDir ]; then
+                tResult=$(mkdir -v -p $gpLocalRawDir/$tDir 2>&1)
                 fLog -p info -m "$tResult" -l $tSym:$LINENO
             fi
-            if [ ! -d $gpLocalRawSymLink/$tDir ]; then
-                fError -i -m "Could not create: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
+            if [ ! -d $gpLocalRawDir/$tDir ]; then
+                fError -i -m "Could not create: $gpLocalRawDir/$tDir" -l $tSrc:$LINENO
             fi
-            fLog -p info -m "Exists: $gpLocalRawSymLink/$tDir" -l $tSrc:$LINENO
+            fLog -p info -m "Exists: $gpLocalRawDir/$tDir" -l $tSrc:$LINENO
         fi
-        if [ "$gpHardLink" = "true" ]; then
-            tResult=$(mv -v $tFile $gpLocalRawSymLink/$tDir)
-            fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
-        else
-            tResult=$('rsync' -av --info=stats0,name2,flist0 $tFile $gpLocalRawSymLink/$tDir)
-            fLog -p info -m "rsync: $tResult" -l $tSym:$LINENO
-        fi
-        if [ ! -s $gpLocalRawSymLink/$tFile ]; then
+        tResult=$(mv -v $tFile gpLocalRawDir/$tDir)
+        fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
+        if [ ! -s $gpLocalRawDir/$tFile ]; then
             fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
         fi
         if [ -f $tFile ]; then
             rm $tFile
         fi
-        ln -s $gpLocalRawSymLink/$tFile $tFile
+        ln -s $gpLocalRawDir/$tFile $tFile
         if [ ! -L $tFile ]; then
             fError -i -m "Could not create symlink for: $tFile" -l $tSrc:$LINENO
         fi
@@ -657,7 +476,7 @@ fInitMoveBinaryFiles()
         fLog -p notice -m "Created link: $tLink" -l $tSrc:$LINENO
     done
 
-    fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files through the project's $gpLocalRawSymLink symlink." -l $tSrc:$LINENO
+    fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files from the project's $gpLocalRawDir." -l $tSrc:$LINENO
 
     return 0
 } # fInitMoveBinaryFiles
@@ -700,6 +519,7 @@ fInitMkGitDir()
     cd $gpLocalTopDir >/dev/null 2>&1
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
     cat <<EOF >.gitignore
+/raw/
 *.tmp
 *~
 .cache/
@@ -781,7 +601,6 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.remote-status gpRemoteStatus
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
         fComSaveVar2Config $tFile $tS.local-top-dir gpLocalTopDir
-        fComSaveVar2Config $tFile $tS.hardlink gpHardLink
     done
 
     for tFile in $HOME/$cConfigGlobal \
@@ -789,8 +608,6 @@ fInitSaveVarsToConfigs()
         $gpLocalTopDir/$cConfigHost; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
-        fComSaveVar2Config $tFile $tS.local-raw-dir-pat gpLocalRawDirPat
-        fComSaveVar2Config $tFile $tS.local-raw-symlink gpLocalRawSymLink
         tS=gitproj.hook
         fComSaveVar2Config $tFile $tS.auto-move gpAutoMove
         fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
@@ -821,12 +638,6 @@ fInitCreateLocalGit()
 
     # -l pLocalDir
     fInitGetLocalPath $gpLocalTopDir
-
-    # -k pSymLinkPat
-    fInitGetLocalRawDirPat $gpLocalRawDirPat
-
-    # combine gpLocalTopDir,  pSymLinkPat, and gpProjName
-    fInitGetSymLink $gpLocalRawSymLink
 
     # -s pSize
     fInitGetSize $gpMaxSize

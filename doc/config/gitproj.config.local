@@ -7,13 +7,8 @@
 	local-status = not-defined
 	remote-status = not-defined
 	proj-name = TBD
-	hardlink = TBD
 	local-top-dir = TBD
-	local-raw-dir-pat = TBD
-	local-raw-symlink = TBD
 	git-flow-pkg = TBD
-	hardlink = false
-	remote-raw-dir = TBD
 	remote-min-size = 20g
 [gitproj "hook"]
 	pre-commit-enabled = true
