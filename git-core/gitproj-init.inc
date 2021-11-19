@@ -768,11 +768,11 @@ fInitSaveVarsToConfigs()
     tFile=$HOME/$cConfigGlobal
     tS=gitproj.config
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
-    fComSaveVar2Config $tFile $tS.bin gpBin
-    fComSaveVar2Config $tFile $tS.doc gpDoc
-    fComSaveVar2Config $tFile $tS.test gpTest
-    fComSaveVar2Config $tFile $tS.facility gpFacility
-    fComSaveVar2Config $tFile $tS.syslog gpSysLog
+    fComSaveVar2Config $tFile $tS.bin         gpBin
+    fComSaveVar2Config $tFile $tS.doc         gpDoc
+    fComSaveVar2Config $tFile $tS.test        gpTest
+    fComSaveVar2Config $tFile $tS.facility    gpFacility
+    fComSaveVar2Config $tFile $tS.syslog      gpSysLog
 
     for tFile in $gpLocalTopDir/$cConfigLocal \
         $gpLocalTopDir/$cConfigHost; do

@@ -17,7 +17,7 @@
 	local-raw-symlink = raw
 	git-flow-pkg = git-flow
 	remote-raw-dir = TBD
-	remove-min-size = 20g
+	remote-min-size = 20g
 [gitproj "hook"]
 	source = hooks/pre-commit
 	pre-commit-enabled = true
