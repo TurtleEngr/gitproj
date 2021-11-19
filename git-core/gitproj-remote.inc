@@ -14,31 +14,23 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 fRemoteSetGlobals()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tTrim
 
     # Assumes we in git dir, and one that is managed by gitproj.
+    if ! fComMustBeInProjRepo $PWD; then
+        fUsage usage
+        exit 1
+    fi
 
+    gpAuto=${gpAuto:-0}
+    gpMountDir=""
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
-
-    fComGetVer
-
-    gpAuto=0
-
     gpLocalTopDir=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
-    # TBD, could different, if on another system, fix up and save in
-    # host config. Use cGetOrigin
-
     gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "Error")
-
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
-
-    # TBD: should be "not-defined". If defined, problem
-    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
-
-    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
-    gpMountDir=""
+    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
+    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
 
     return 0
 } # fRemoteSetGlobals
@@ -62,18 +54,46 @@ fRemoteCheckDir()
         fError -n -m "$pDir/$gpProjName.git already exists." -l $tSrc:$LINENO
         return 1
     fi
+    if [ -e $pDir/$gpProjName.raw ]; then
+        fError -n -m "$pDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
+        return 1
+    fi
     return 0
 } # fRemoteCheckDir
 
 # --------------------
 fRemoteGetMountDir()
 {
+    local pMountDir
+    
     local tSrc=${BASH_SOURCE##*/}
+    local tTopDirf
+
+    fComGetVer
+    tTopDir=$($cGetTopDir)
+    
+    if [ "$gpLocalStatus" != "defined" ]; then
+        fError -m "It looks like 'git proj init' did not finish. local-status should be 'defined' " -l $tSrc:$LINENO
+    fi
+
+    if [ "$gpLocalTopDir" != "$tTopDir" ]; then
+        fError -m "This repo appears to be configured for $gpLocalTopDir, not $tTopDir. Run 'git proj config' to reconfigure." -l $tSrc:$LINENO
+    fi
+
+    if [ "$gpRemoteStatus" = "defined" ]; then
+        # if auto error
+        fLog -p warning "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
+	if [ $gpAuto -ne 0 ]; then
+	    fError -m "You in in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
+	fi
+    fi
 
     if [ $gpAuto -ne 0 ]; then
         if [ -z "$gpMountDir" ]; then
-            fError -m "The -d option is required." -l $tSrc:$LINENO
+            fError -m "With the -a option the -d option is required." -l $tSrc:$LINENO
         fi
+# TBD Stopped here, for "raw" refactor Thu Nov 18 21:47:59 PST 2021 
+	gpRemoteRawDir=$gpMountDir/$gpProjName.raw
         if ! fRemoteCheckDir $gpMountDir; then
             return 1
         fi
@@ -181,11 +201,7 @@ fRemoteCreateRemoteGit()
 
     # Prompt/Response or if -a, validate the options
 
-    if ! fComMustBeInGitRepo $PWD; then
-        fUsage usage
-    fi
-
-    # TBD: check for if already defined
+    # fRemoteSetGlobals() has verified we are in a git proj repo
 
     # -d pMountPath
     fRemoteGetMountDir $gpMountDir
@@ -196,7 +212,7 @@ fRemoteCreateRemoteGit()
     # -r pRawRemotePath
     fGetRemoteRawDir $gpRemoteRawDir
 
-    fRemoteMkRemote $gpPath
+    fRemoteMkRemote $gpPath?
     fRemoteReport
 
     return 0

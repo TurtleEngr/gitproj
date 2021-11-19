@@ -1266,17 +1266,23 @@ fComMustBeInProjRepo()
     fi
     
     if [ ! -f $HOME/$cConfigGlobal ]; then
-        fError -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
+        fError -n -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
+	return 1
     fi
 
     tTopDir=$($cGetTopDir)
+    
     if [ ! -f $tTopDir/$cConfigLocal ]; then
-        fLog -p warning -m "Missing $cConfigLocal, run 'git proj config'" -l $tSrc:$LINENO
-    fi
-    if [ ! -f $tTopDir/$cConfigHost ]; then
-        fLog -p warning -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
+        fError -n -p warning -m "Missing $cConfigLocal, run 'git proj config'" -l $tSrc:$LINENO
+	return 1
     fi
     
+    if [ ! -f $tTopDir/$cConfigHost ]; then
+        fError -n -p warning -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
+	return 1
+    fi
+    
+    return 0    
 } # fComMustBeInProjRepo
 
 fComAllMustBeReadable()

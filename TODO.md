@@ -15,7 +15,16 @@
 
 * Setup defaults for for ~/.gitconfig, etc - mostly done
 
-* Code git-proj-remoe - split out from git-proj-init
+* Code git-proj-remote - split out from git-proj-init - done
+
+* Refactor where the binary files live. Managing the raw symlink and
+the file outside of the GIT_DIR is messy. Simplify: create "raw" dir
+under GIT_DIR, add "raw" to .gitignore, and put all binary files in
+"raw". Now it is easily found; no indirection or other area to manage.
+
+The user is also free to make "raw" a symlink, to balance disk space
+(the gitproj code just needs to "follow" symlinks when copying files
+from raw to/from the "remote" location.)
 
 * Code git-proj-clone
 
