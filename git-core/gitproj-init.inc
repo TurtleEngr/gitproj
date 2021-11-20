@@ -355,6 +355,7 @@ Summary
           (debug) = $gpDebug
           (exits)   HOME/.gitconfig
         (created)   HOME/$cConfigGlobal
+  (local-raw-dir) = $gpLocalRawDir
   (git-flow init) = $gpGitFlow
 
 [gitproj "config"]
@@ -402,6 +403,8 @@ fInitMkRaw()
 {
     local tSrc=${BASH_SOURCE##*/}
 
+    gpLocalRawDir=$gpLocalTopDir/raw
+
     cd $gpLocalTopDir >/dev/null 2>&1
     fLog -p info -m "mkdir $gpLocalRawDir" -l $tSym:$LINENO
     mkdir $gpLocalRawDir
@@ -413,16 +416,14 @@ Do NOT remove these files or this directory.
 
 These files are managed by the "git proj" subcommand. It's purpose is
 to keep large binary files out of git repositories. Large files are
-put in this directory and symlinks in the git managed area will point
-to the files.
+put in this directory and symlinks may be put in the git managed
+directories to point to the files.
 
 The initial working directory was created at $HOSTNAME:$gpLocalTopDir
 
 For help with the "git proj" subcommand, just cd into the working directory
 and type "git proj".
 EOF
-    fLog -p notice -m "Use $gpLocalRawSymLink to access the files in $gpLocalRawDir  That way, if $gpLocalRawDir moves, only one place needs to be fixed up." -l $tSrc:$LINENO
-
     cd - >/dev/null 2>&1
     return 0
 } # fInitMkRaw
@@ -460,7 +461,7 @@ fInitMoveBinaryFiles()
             fi
             fLog -p info -m "Exists: $gpLocalRawDir/$tDir" -l $tSrc:$LINENO
         fi
-        tResult=$(mv -v $tFile gpLocalRawDir/$tDir)
+        tResult=$(mv -v $tFile $gpLocalRawDir/$tDir)
         fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
         if [ ! -s $gpLocalRawDir/$tFile ]; then
             fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
@@ -490,7 +491,7 @@ fInitMkGitFlow()
         return 0
     fi
     if ! fComCheckPkg git-flow; then
-        fLog -p err -m "git-flow is not installed" -l $tSrc:$LINENO
+        fError -n -m "git-flow is not installed" -l $tSrc:$LINENO
         return 1
     fi
     fLog -p info -m "git flow init" -l $tSrc:$LINENO
@@ -687,6 +688,7 @@ EOF
 
 # ========================================
 # fInitCreateRemoteGit Section
+# TBD Moved to gitproj-remote.inc
 
 # --------------------
 fInitCheckDir()

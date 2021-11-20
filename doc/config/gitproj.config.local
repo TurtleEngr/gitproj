@@ -11,8 +11,9 @@
 	git-flow-pkg = TBD
 	remote-min-size = 20g
 [gitproj "hook"]
-	pre-commit-enabled = true
+	auto-move = true
+	binary-file-size-limit = 2M
 	check-file-names = true
 	check-for-big-files = true
-	binary-file-size-limit = 2M
-	auto-move = true
+	pre-commit-enabled = true
+	source = hooks/pre-commit

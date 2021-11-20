@@ -15,12 +15,12 @@
 	git-flow-pkg = git-flow
 	remote-min-size = 20g
 [gitproj "hook"]
-	source = hooks/pre-commit
-	pre-commit-enabled = true
+	auto-move = true
+	binary-file-size-limit = 10k
 	check-file-names = true
 	check-for-big-files = true
-	binary-file-size-limit = 10k
-	auto-move = true
+	pre-commit-enabled = true
+	source = hooks/pre-commit
 [gitflow "branch"]
         master = main
         main = main

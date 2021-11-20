@@ -63,7 +63,7 @@ test-env.tgz :
 	@echo "Now you should update the other test-env tar files."
 
 test-env_HomeAfterBMove.tgz :
-	export gpSaveTestEnv=1; ./test-init.sh testInitMoveBinaryFiles_Move
+	export gpSaveTestEnv=1; ./test-init.sh testInitMoveBinaryFiles
 
 test-env_ProjAfterGInit.tgz :
 	export gpSaveTestEnv=1; ./test-init.sh testInitMkGitDir
