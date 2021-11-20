@@ -11,20 +11,16 @@
 	doc = /usr/share/doc/git-proj
 	test = /usr/share/doc/git-proj/test
 	proj-name = TBD
-	hardlink = false
 	local-top-dir = TBD
-	local-raw-dir-pat = ..
-	local-raw-symlink = raw
 	git-flow-pkg = git-flow
-	remote-raw-dir = TBD
-	remove-min-size = 20g
+	remote-min-size = 20g
 [gitproj "hook"]
-	source = hooks/pre-commit
-	pre-commit-enabled = true
+	auto-move = true
+	binary-file-size-limit = 10k
 	check-file-names = true
 	check-for-big-files = true
-	binary-file-size-limit = 10k
-	auto-move = true
+	pre-commit-enabled = true
+	source = hooks/pre-commit
 [gitflow "branch"]
         master = main
         main = main

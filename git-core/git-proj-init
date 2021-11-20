@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export gpCmdName gpBin cCurDir
-
 #--------------------
 fUsage()
 {
@@ -24,12 +22,9 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj init local [-a]
-    	     	  	[-l pLocalDir]
-    	     	  	[-r pLocalRawDirPat]
-			[-k pSymLink] [-s pMaxSize] [-m] [-f] [-h]
+    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [-h]
 
-        Defaults: [-l $PWD] [-r ../[NAME].raw] [-k raw] [-s 10K] [-m] [-f]
+        Defaults: [-l $PWD] [-s 10K] [-m] [-f]
 
 =head1 DESCRIPTION
 
@@ -66,27 +61,6 @@ for the name of the project. Default: current directory
     Dir (-l) [$PWD]? $gpLocalTopDir
         So the project Name will be: ${gpLocalTopDir##*/}
 
-=item B<-r pLocalRawDirPat>
-
-Set the location for large binary files. It cannot be *in* any of the
-project directories. It will be created, if it does not existi. The
-path must be relative to the project dir (and not too far away or
-cloning the project may not work). The files in the raw directory will
-NOT be versioned--only the latest copy will be saved. Default: ".."
-
-    Raw dir (-r) [..]?
-        The README.txt file will point to the raw dir.
-
-=item B<-k pSymLink>
-
-Define the symlink name that will point to the Raw dir. It will be
-created in the project's top dir. If the Raw dir is moved, this link
-will need to be updated. Symlink in the git directories will point to
-this dir and the symlinks will be versioned. Default: raw
-
-    Symlink (-k) [raw]?
-        (update the README.txt)
-
 =item B<-s pMaxSize>
 
 Define the "size" for large binary files. Default 10K
@@ -99,10 +73,14 @@ These binary files greater than [pSize]  were found in your project dir:
 
     [file list]
 
-The listed files can be moved to the project's raw directory. Dirs
+The listed files can be moved to the project's "raw" directory. Dirs
 will be created in the raw directory that correspond to the project's
 directory. A symlink will replace the moved file. The symlink will
-point to [raw]
+point to [raw].
+
+The symlinks are only provided for backward compatability; it would be
+best to remove those links and modifiy your code and apps to access
+the file directly from the raw directories.
 
     Move the files (-m) [y/n]?
 
@@ -201,13 +179,11 @@ fi
 . $gpBin/gitproj-init.inc
 # Calls: fInitSetGlobals
 
-while getopts :al:r:k:s:mfhH:vx tArg; do
+while getopts :al:s:mfhH:vx tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
         l) gpLocalTopDir="$OPTARG" ;;
-        r) gpLocalRawDir="$OPTARG" ;;
-        k) gpLocalRawSymLink="$OPTARG" ;;
         s) gpMaxSize=="$OPTARG" ;;
         m) gpMove=1 ;;
         f) gpGitFlow=1 ;;
