@@ -122,12 +122,13 @@ setUp()
 
     fTestSetupEnv
     fTestCreateEnv
-
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
     cd - >/dev/null 2>&1
 
-    fRemoteSetGlobals
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    . $gpBin/gitproj-remote.inc
+    gpDebug=0
     gpUnitDebug=0
     return 0
 
@@ -168,6 +169,7 @@ testGitProjRemote()
     cd $HOME/$cDatProj1 >/dev/null 2>&1
     assertTrue "$LINENO" "[ -d .git ]"
     cd - >/dev/null 2>&1
+    
     return 0
 } # testGitProjInit
 
@@ -218,20 +220,57 @@ return 0
     assertContains "$LINENO" "$tResult" "gitproj.config.ver was not found"
     assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
 
+    return 0
 } # testComGetVer
 
 # --------------------------------
-testRemoteGetMountDir()
+testInGitProjDir()
+{
+    local tResult
+
+    gpDebug=2
+    
+    cd $HOME >/dev/null 2>&1
+    tResult=$(fRemoteSetGlobals 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "You must be in a git workspace for this command"
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    mv .gitproj.config.testserver .gitproj.config.testserver.sav
+    tResult=$(fRemoteSetGlobals 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Missing .gitproj.config.$HOSTNAME, run"
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    mv .gitproj.config.testserver.sav .gitproj.config.testserver
+    rm .gitproj.config.local
+    tResult=$(fRemoteSetGlobals 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "git workspace is not setup for gitproj"
+
+    return 0
+} # testInGitProjDir
+
+# --------------------------------
+TBDtestRemoteGetMountDir()
 {
     gpAuto=1
     gpMountDir=exists
     gpMountDir=not-exists
 
+#    cDatMount1=$cTestDestDir/test/root/mnt/disk-2
+#    cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
+#    cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
+#    /media/$USER/xxxx
+#    df -h | grep -E '^/dev/|/mnt'
+
+    startSkipping
+    fail "TBD"
     return 0
 } # testRemoteGetMountDir
 
 # --------------------------------
-testRemoteGetRawRemoteDir()
+TBDtestRemoteGetRawRemoteDir()
 {
     startSkipping
     fail "TBD"
@@ -239,7 +278,7 @@ testRemoteGetRawRemoteDir()
 } # testRemoteGetRawRemoteDir
 
 # --------------------------------
-testRemoteCheckDir()
+TBDtestRemoteCheckDir()
 {
     startSkipping
     fail "TBD"
@@ -247,7 +286,7 @@ testRemoteCheckDir()
 } # testRemoteCheckDir
 
 # --------------------------------
-testRemoteCheckSpace()
+TBDtestRemoteCheckSpace()
 {
     startSkipping
     fail "TBD"
@@ -255,7 +294,7 @@ testRemoteCheckSpace()
 } # testRemoteCheckSpace
 
 # --------------------------------
-testRemoteMkRemote()
+TBDtestRemoteMkRemote()
 {
     startSkipping
     fail "TBD"
@@ -263,7 +302,7 @@ testRemoteMkRemote()
 } # testRemoteMkRaw
 
 # --------------------------------
-testRemoteReport()
+TBDtestRemoteReport()
 {
     startSkipping
     fail "TBD"
@@ -271,7 +310,7 @@ testRemoteReport()
 } # testRemoteReport
 
 # --------------------------------
-testRemoteCreateRemoteGit()
+TBDtestRemoteCreateRemoteGit()
 {
     startSkipping
     fail "TBD"
@@ -341,8 +380,11 @@ gpTestList="$*"
 
 # -----
 . $gpTest/test.inc
+fTestSetupEnv
 fTestCreateEnv
-. $gpBin/gitproj-remote.inc
+cd $HOME >/dev/null 2>&1
+tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
+cd - >/dev/null 2>&1
 
 # Look for serious setup errors
 fTestConfigSetup

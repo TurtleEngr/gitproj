@@ -692,8 +692,12 @@ fError()
             e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
             n) pNoExit=1 ;;
-            :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]" ;;
-            \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]" ;;
+            :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]"
+	       fComStackTrace
+	       ;;
+            \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]"
+	        fComStackTrace
+		;;
         esac
     done
     shift $((OPTIND - 1))
@@ -1218,7 +1222,8 @@ fComMustBeInGitRepo()
         return 0
     fi
     cd - >/dev/null 2>&1
-    fError -m "$pDir must be in a git repo for this command." -l $tSrc:$LINENO
+    fError -n -m "You must be in a git workspace for this command." -l $tSrc:$LINENO
+    return 1
 } # fComMustBeInGitRepo
 
 # --------------------
@@ -1267,18 +1272,24 @@ fComMustBeInProjRepo()
     
     if [ ! -f $HOME/$cConfigGlobal ]; then
         fError -n -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
+	if [ $gpDebug -ge 2 ]; then
+	    fComStackTrace
+	fi
 	return 1
     fi
 
     tTopDir=$($cGetTopDir)
     
     if [ ! -f $tTopDir/$cConfigLocal ]; then
-        fError -n -p warning -m "Missing $cConfigLocal, run 'git proj config'" -l $tSrc:$LINENO
+        fError -n -m "This git workspace is not setup for gitproj, run 'git proj init'" -l $tSrc:$LINENO
+	if [ $gpDebug -ge 2 ]; then
+	    fComStackTrace
+	fi
 	return 1
     fi
     
     if [ ! -f $tTopDir/$cConfigHost ]; then
-        fError -n -p warning -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
+        fError -n -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
 	return 1
     fi
     

@@ -100,6 +100,11 @@ fRemoteGetMountDir()
         return 0
     fi
 
+#    cDatMount1=$cTestDestDir/test/root/mnt/disk-2
+#    cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
+#    cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
+#    df -h | grep -E '^/dev/|/mnt'
+
     return 0
 } # fRemoteGetMountDir
 
