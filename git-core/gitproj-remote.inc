@@ -64,7 +64,7 @@ fRemoteCheckDir()
 # --------------------
 fRemoteGetMountDir()
 {
-    local pMountDir
+    local pMountDir=$1
     
     local tSrc=${BASH_SOURCE##*/}
     local tTopDirf
@@ -179,6 +179,10 @@ fRemoteMkRemote()
 
     fLog -p info -m "Set remote origin" -l $tSrc:$LINENO
     git remote add origin $pDir/$tProjName.git
+    git config branch.main.remote origin
+    git config branch.main.merge refs/heads/main
+    git config branch.develop.remote origin
+    git config branch.develop.merge refs/heads/main
 
     return 0
 } # fRemoteMkRemote

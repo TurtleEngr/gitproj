@@ -254,6 +254,8 @@ testInGitProjDir()
 # --------------------------------
 TBDtestRemoteGetMountDir()
 {
+    local tResult
+    
     gpAuto=1
     gpMountDir=exists
     gpMountDir=not-exists
@@ -263,6 +265,11 @@ TBDtestRemoteGetMountDir()
 #    cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
 #    /media/$USER/xxxx
 #    df -h | grep -E '^/dev/|/mnt'
+
+    
+    tResult=$(fRemoteGetMountDir "" 2>&1)
+    assertFalse "$LINENO" "$?"
+    tResult=$(fRemoteGetMountDir $gpMountDir 2>&1)
 
     startSkipping
     fail "TBD"

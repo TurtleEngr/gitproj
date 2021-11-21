@@ -1,0 +1,50 @@
+# Large binary files are put in this "top" dir
+# This is managed by the "git proj" subcommand
+/raw/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+tmp/
+
+# Cache files
+.cache/
+proxy/
+thumbs/
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.tgz
+*.zip
+
+# Logs
+*.log
+
+# OS or app
+.DS_Store*
+.vscode
+Icon?
+Thumbs.db
+core
+ehthumbs.db
+nohup.out
+
+# Misc
+.cvsignore
+CVS/

@@ -19,7 +19,6 @@
 	ci = commit
 	co = checkout
 	df = diff
-	merge = merge --no-ff
 	origin = config --get remote.origin.url
 	push-tags = push --tags origin
 	revert-all = reset --hard HEAD

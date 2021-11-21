@@ -519,19 +519,8 @@ fInitMkGitDir()
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
-    cat <<EOF >.gitignore
-/raw/
-*.tmp
-*~
-.cache/
-.cvsignore
-CVS/
-core
-nohup.out
-proxy/
-thumbs/
-tmp/
-EOF
+    cp $gpDoc/config/gitignore.default .gitignore
+
     fLog -p info -m "git init" -l $tSrc:$LINENO
     git init
     fLog -p info -m "git add FILES" -l $tSrc:$LINENO
