@@ -15,6 +15,8 @@ fRemoteSetGlobals()
 {
     local tSrc=${BASH_SOURCE##*/}
 
+##    gpCmdName=git-proj-remote
+    
     # Assumes we in git dir, and one that is managed by gitproj.
     if ! fComMustBeInProjRepo $PWD; then
         fUsage usage
@@ -34,6 +36,39 @@ fRemoteSetGlobals()
 
     return 0
 } # fRemoteSetGlobals
+
+# --------------------
+fRemoteVerifyState()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tTopDir
+
+    fComGetVer
+
+    if [ "$gpLocalStatus" != "defined" ]; then
+        fError -m "It looks like 'git proj init' did not finish. Config local-status should be 'defined' " -l $tSrc:$LINENO
+    fi
+
+    tTopDir=$($cGetTopDir)
+    if [ "$gpLocalTopDir" != "$tTopDir" ]; then
+        fError -m "This repo appears to be configured for $gpLocalTopDir, not $tTopDir. Run 'git proj config' to reconfigure for a different host." -l $tSrc:$LINENO
+    fi
+    
+    if [ "$gpRemoteStatus" = "defined" ]; then
+        fLog -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
+	if [ $gpAuto -ne 0 ]; then
+	    fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
+	fi
+    fi
+
+    if [ "$gpRemoteStatus" = "not-defined" ] && \
+       [ "$gpRemoteRawDir" != "TBD" ] && \
+       [ -n "$gpRemoteRawDir" ]; then
+        fError -i -m "Config problem remote-status=not-defined, but remote-raw-dir is set to $gpRemoteRawDir. It should be undefined or set to TBD" -l $tSrc:$LINENO
+    fi
+
+    return 0
+} # fRemoteVerifyState
 
 # --------------------
 fRemoteCheckDir()
@@ -67,43 +102,18 @@ fRemoteGetMountDir()
     local pMountDir=$1
     
     local tSrc=${BASH_SOURCE##*/}
-    local tTopDirf
-
-    fComGetVer
-    tTopDir=$($cGetTopDir)
-    
-    if [ "$gpLocalStatus" != "defined" ]; then
-        fError -m "It looks like 'git proj init' did not finish. local-status should be 'defined' " -l $tSrc:$LINENO
-    fi
-
-    if [ "$gpLocalTopDir" != "$tTopDir" ]; then
-        fError -m "This repo appears to be configured for $gpLocalTopDir, not $tTopDir. Run 'git proj config' to reconfigure." -l $tSrc:$LINENO
-    fi
-
-    if [ "$gpRemoteStatus" = "defined" ]; then
-        # if auto error
-        fLog -p warning "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
-	if [ $gpAuto -ne 0 ]; then
-	    fError -m "You in in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
-	fi
-    fi
 
     if [ $gpAuto -ne 0 ]; then
-        if [ -z "$gpMountDir" ]; then
+        if [ -z "$pMountDir" ]; then
             fError -m "With the -a option the -d option is required." -l $tSrc:$LINENO
         fi
-# TBD Stopped here, for "raw" refactor Thu Nov 18 21:47:59 PST 2021 
-	gpRemoteRawDir=$gpMountDir/$gpProjName.raw
-        if ! fRemoteCheckDir $gpMountDir; then
-            return 1
+
+        if ! fRemoteCheckDir $pMountDir; then
+            fError -m "Cannot continue with -a mode."
         fi
+	gpMountDir=$pMountDir
         return 0
     fi
-
-#    cDatMount1=$cTestDestDir/test/root/mnt/disk-2
-#    cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
-#    cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
-#    df -h | grep -E '^/dev/|/mnt'
 
     return 0
 } # fRemoteGetMountDir
@@ -205,15 +215,19 @@ EOF
 # --------------------
 fRemoteCreateRemoteGit()
 {
-    # Called by: "git proj remote -d pMountPath"
+    local pMountPath="$1"
+
     local tSrc=${BASH_SOURCE##*/}
 
+    # Called by: "git-proj-remote -d pMountPath"
     # Prompt/Response or if -a, validate the options
-
     # fRemoteSetGlobals() has verified we are in a git proj repo
 
-    # -d pMountPath
-    fRemoteGetMountDir $gpMountDir
+    fRemoteVerfiyState
+
+    # -d pMountPath (set with prompt/responnse, or required if -a)
+    fRemoteGetMountDir "$gpMountDir"
+    # gpMountDir has now been validated for use
 
     # -s pMinSpace
     fRemoteGetMinSpace $gpRemoteMinSpace

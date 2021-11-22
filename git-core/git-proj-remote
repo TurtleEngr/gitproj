@@ -191,5 +191,5 @@ if [ $gpAuto -ne 0 ] && [ -z "$gpMountDir" ]; then
 fi
 
 # ----------
-fRemoteCreateRemoteGit
+fRemoteCreateRemoteGit $gpMountDir
 exit 0

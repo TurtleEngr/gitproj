@@ -252,7 +252,93 @@ testInGitProjDir()
 } # testInGitProjDir
 
 # --------------------------------
-TBDtestRemoteGetMountDir()
+testRemoteVerifyState()
+{
+    local tResult
+    local tLocalTopDir
+
+    gpLocalStatus=not-defined
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "It looks like 'git proj init' did not finish"
+    
+    gpLocalStatus=defined
+    tLocalTopDir=$gpLocalTopDir
+    gpLocalTopDir=$gpTest
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "This repo appears to be configured for"
+    # rest for next test
+    gpLocalTopDir=$tLocalTopDir
+
+    gpRemoteStatus=defined
+    gpAuto=0
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "warning"
+    assertContains "$LINENO $tResult" "$tResult" "It looks like a remote has already been setup with"
+
+    gpRemoteStatus=defined
+    gpAuto=1
+    tResult=$(fRemoteVerifyState 2>&1)
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "warning"
+    assertContains "$LINENO $tResult" "$tResult" "It looks like a remote has already been setup with"
+    assertContains "$LINENO $tResult" "$tResult" "You are in 'automatic' mode, so exiting"
+
+    gpRemoteStatus=not-defined
+    gpRemoteRawDir=foo
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Config problem remote-status=not-defined, but remote-raw-dir is set to"
+
+    gpRemoteStatus=not-defined
+    gpRemoteRawDir="TBD"
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertTrue "$LINENO" "$?"
+    
+    gpRemoteStatus=not-defined
+    gpRemoteRawDir=""
+    tResult=$(fRemoteVerifyState 2>&1)
+    assertTrue "$LINENO" "$?"
+
+    return 0
+} # testRemoteValidateState
+
+# --------------------------------
+testRemoteCheckDir()
+{
+    local tResult
+
+    tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Could not find"
+
+    mkdir /tmp/foo
+    chmod a-w /tmp/foo
+    tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "is not writable for you"
+
+    chmod a+w /tmp/foo
+    touch /tmp/foo/$gpProjName.git
+    tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" ".git already exists"
+
+    rm /tmp/foo/$gpProjName.git
+    touch /tmp/foo/$gpProjName.raw
+    tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" ".raw already exists"
+
+    rm -rf /tmp/foo
+    return 0
+} # testRemoteCheckDir
+
+# --------------------------------
+NAtestRemoteGetMountDir()
 {
     local tResult
     
@@ -361,8 +447,7 @@ EOF
 # Main
 
 export gpTest cTestCurDir gpTestList gpCmdName gpSaveTestEnv
-
-gpCmdName=${BASH_SOURCE##*/}
+gpCmdName=git-proj-remote
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir
