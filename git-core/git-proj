@@ -194,7 +194,6 @@ See: fLog (Internal documentation)
 
 =back
 
-
 =head2 ~/.gitconfig
 
 Source: gpDoc/config/gitconfig.default
@@ -210,7 +209,18 @@ This will be put in ~/.gitconfig
 
 Source: gpDoc/config/gitproj.config.global
 
-git proj init local, will create the initial ~/.gitproj.config.
+git proj init, will create the initial ~/.gitproj.config.global
+
+    remote-min-size = 20g
+
+This is the minium space that should be available on the external
+drive.  The command will not continue if there is not enough space.
+The available space must also be twice the size of the space used by
+ProjName.raw.
+
+    remote-raw-dir
+
+Default: -d pMountDir/ProjName.raw
 
 =head2 top-dir/.git/config
 
@@ -277,23 +287,8 @@ file.
 		# git rev-parse --show-toplevel
 		local-top-dir = TBD
 	
-		# If $t = $r, then set hardlink to true
-		# t=$(df -BM top-dir --output=source | tail -n 1)
-		# r=$(df -BM raw-dir --output=source | tail -n 1)
-		hardlink = no
-	
 		# Set by init. Changing these will require manual repair.
-		# If no ~ or /, this is relative to top-dir, create:
-                #  dir/Name.raw
-		# This should NOT be in a git dir.
-		# Relative to top-dir
-		local-raw-dir-pat = ..
-
-		# Relative to top-dir; cd top-dir; ln -s
-                # raw-dir/name.raw symlink
-		# This should be in a git dir.
-		# Relative to top-dir
-		local-raw-symlink = raw
+		# If no ~ or /, this is relative to top-dir
 
 		git-flow-pkg = TBD
 

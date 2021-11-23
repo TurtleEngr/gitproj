@@ -393,10 +393,56 @@ testRemoteGetDirList()
 # --------------------------------
 testRemoteSelect()
 {
+    local tResult
+    local tDirList
+    local tPrompt
+    local tHelp
+    
+    gpAuto=0
+    tDirList=$(fRemoteGetDirList "$cDatMount3")
+    tPrompt="Select a mount point: "
+    tHelp="Just select by number."
+    tResult=$(fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "1\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "QUIT"
+    assertContains "$LINENO $tResult" "$tResult" "warning"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "2\n1\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "QUIT"
+    assertContains "$LINENO $tResult" "$tResult" "Just select by number"
+
+    fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "7\n") >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $gSelectResponse" "$gSelectResponse" "/mnt/usb-video/video-2019-11-26/dev"
+    
+    return 0
+} # testRemoteSelect
+
+TBDtestRemoteGetAnotherMountDir()
+{
+    # The mount dir check for valid
+    # The mount dir check for space
+    # Use "q" to quit
     startSkipping
     fail "TBD"
     return 0
-} # testRemoteSelect
+} # testRemoteGetAnotherMountDir
+
+TBDtestRemoteGetMountDirManual()
+{
+    # The selected mount dir checked for valid
+    # The selected mount dir checked for space
+    # Select 1 to Quit, return 1, echo QUIT
+    # Select 2 for Help, loop again
+    # Select 3 to define another dir, return 1, echo OTHER
+    # Select 20 for no selection, loop again
+    # Select 6 to return /mnt/usb-video/video-2020-04-02
+    startSkipping
+    fail "TBD"
+    return 0
+} # testRemoteGetMountDirManual
 
 # --------------------------------
 TBDtestRemoteGetRawRemoteDir()
@@ -405,14 +451,6 @@ TBDtestRemoteGetRawRemoteDir()
     fail "TBD"
     return 0
 } # testRemoteGetRawRemoteDir
-
-# --------------------------------
-TBDtestRemoteCheckDir()
-{
-    startSkipping
-    fail "TBD"
-    return 0
-} # testRemoteCheckDir
 
 # --------------------------------
 TBDtestRemoteCheckSpace()

@@ -6,7 +6,7 @@ export cCurDir cGetOrigin cGetTopDir cTop
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
     gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
-    gpVer gpVerbose
+    gpVer gpVerbose gSelectResponse
 
 # ========================================
 
@@ -97,6 +97,36 @@ fRemoteCheckDir()
 } # fRemoteCheckDir
 
 # --------------------
+fRemoteCheckDirSpace()
+{
+    local pMountDir=$1
+    local pMinSpace=$2
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tAvail
+    local tGitSize
+    local tRawSize
+    local tDesiredSize
+
+    tAvail=$(df -BM $pMountDir --output=avail | tail -n1)
+    tAvail=${tAvail%M}
+
+    tGitSize=$(du -sm $gpLocalTopDir/.git | awk '{print $1}')
+    let tGitSize*=2
+
+    tRawSize=$(du -sm $gpLocalTopDir/raw | awk '{print $1}')
+    let tRawSize*=2
+
+    let tDesiredSize=tGitSize+tRawSize
+
+    if [ $tDesiredSize -gt $tAvail ]; then
+        fError -m "There is not enough space at $pMountDir. $pMountDir has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
+    fi
+
+    return 0
+} # fRemoteCheckDirSpace
+
+# --------------------
 fRemoteGetDirList()
 {
     local pMountDir="$1"
@@ -122,33 +152,69 @@ fRemoteGetDirList()
 fRemoteSelect()
 {
     PS3="$1"
-    local tDirList="$2"
-    local tHelp="$3"
+    local pDirList="$2"
+    local pHelp="$3"
 
     local tSrc=${BASH_SOURCE##*/}
     local tResponse
+    export gSelectResponse
 
-    select tResponse in QUIT HELP $tDirList; do
+    # Loop until a valid selection, or QUIT or OTHER
+    select tResponse in QUIT HELP OTHER $pDirList; do
         case $tResponse in
 	    QUIT)
 	        fLog -p warning -m "Quitting." -l $tSrc:$LINENO
-		echo "QUIT"
-		return 1
+	        tStatus=1
+		break
 	        ;;
 	    HELP)
-	        echo "$tHelp" 1>&2
+		echo  1>&2
+	        echo "$pHelp" 1>&2
+		echo  1>&2
 		continue
+	        ;;
+	    OTHER)
+	        tStatus=1
+		break
 	        ;;
 	esac
 	if [ -n "$tResponse" ]; then
+	    tStatus=0
 	    break
 	fi
     done
 
     PS3=""
-    echo $tResponse
-    return 0
+    gSelectResponse=$tResponse
+    return $tStatus
 } # fRemoteSelect
+
+# --------------------
+fRemoteGetAnotherMountDir()
+{
+    local pMountDir=$1
+    
+    local tSrc=${BASH_SOURCE##*/}
+
+    # Loop until the selection is OK, or quit
+    while true; do
+        echo -n "Mount Path [$pMountDir | q]? "
+        read -r pMountDir
+	if [ "$pMountDir" = "quit" ] || [ "$pMountDir" = "q" ]; then
+      	    fLog -p warning -m "Quitting" -l $tSrc:$LINENO
+	    exit 1
+	fi
+        if [ ! fRemoteCheckDir $pMountDir ]; then
+	    continue
+        fi
+        if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
+	    continue
+	fi
+	break
+    done
+    echo $pMountDir
+    return 0
+} # fRemoteGetAnotherMountDir
 
 # --------------------
 fRemoteGetMountDir()
@@ -158,7 +224,9 @@ fRemoteGetMountDir()
     local tSrc=${BASH_SOURCE##*/}
     local tDirList
     local tResponse
+    export gSelectResponse
 
+    # ----------
     if [ $gpAuto -ne 0 ]; then
         if [ -z "$pMountDir" ]; then
             fError -m "The -d option is required with -a auto option." -l $tSrc:$LINENO
@@ -166,74 +234,56 @@ fRemoteGetMountDir()
         if ! fRemoteCheckDir $pMountDir; then
             fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
         fi
+        if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
+            fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
+	fi
 	gpMountDir="$pMountDir"
         return 0
     fi
 
+    # ----------
     # Prompt/response
-    # Offer choices, offer two dir levels (remove dirs with spaces in them)
+    # Offer choices, with two dir levels (remove dirs with spaces in names)
     tDirList=$(fRemoteGetDirList $pMountDir)
     tPrompt="Select by number, the location for the remote git and raw files? "
     tHelp=$(cat <<EOF
 This is a list of dirs under the -d pMountDir, if you gave that option.
-And might lists other possible mounted directories to choose from.
+Other mounted directories might be listed too.
+Select OTHER, to give another pMountDir.
 EOF
 )
-    tMountDir=$(fResponseSelect "$tPrompt" "$tDirList" "$tHelp")
+    # Loop until the selection is OK, or Quit
+    while true; do
+        fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
+	tMountDir=$gSelectResponse
+	if [ "$tMountDir" = "QUIT" ]; then
+	    exit 1
+	fi
+	if [ "$tMountDir" = "OTHER" ]; then
+	    tMountDir=$(fRemoteGetAnotherMountDir $pMountDir)
+    	    tDirList=$(fRemoteGetDirList $tMountDir)
+	    continue
+	fi
+        if [ ! fRemoteCheckDir $tMountDir ]; then
+	    continue
+        fi
+        if ! fRemoteCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
+	    continue
+	fi
+    done
+
+    gpMountDir="$tMountDir"
     return 0
 } # fRemoteGetMountDir
 
-# --------------------
-fRemoteCheckDirSpace()
-{
-    local pDir=$1
-    local pMinSpace=$2
-
-    local tSrc=${BASH_SOURCE##*/}
-    local tAvail
-    local tGitSize
-    local tRawSize
-    local tDesiredSize
-
-    tAvail=$(df -BM $pDir --output=avail | tail -n1)
-    tAvail=${tAvail%M}
-
-    tGitSize=$(du -sm .git | awk '{print $1}')
-    let tGitSize*=2
-
-    tRawSize=$(du -sm raw | awk '{print $1}')
-    let tRawSize*=2
-
-    let tDesiredSize=tGitSize+tRawSize
-
-    if [ $tDesiredSize -gt $tAvail ]; then
-        fError -m "There is not enough space at $pDir. $pDir has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
-    fi
-    return 0
-} # fRemoteCheckDirSpace
-
-# --------------------
-fRemoteGetMinSpace()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-    if [ $gpAuto -ne 0 ]; then
-        if ! fRemoteCheckDirSpace $gpMountDir $gpRemoteMinSpace; then
-            echo TBD
-            return 1
-        fi
-        return 0
-    fi
-    return 0
-} # fRemoteGetMinSpace
-
-# --------------------
 fRemoteGetRemoteRawDir()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    echo TBD
-    #$gpRemoteRawDir
+    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+    if [ ! -d $gpRemoteRawDir ]; then
+        fError -m "pMountDir/ProjName.raw already exists."
+    fi
 
     return 0
 } # fRemoteGetRawRemotePath
@@ -241,23 +291,36 @@ fRemoteGetRemoteRawDir()
 # --------------------
 fRemoteMkRemote()
 {
-    local pDir=$1
+    local pMountDir=$1
 
     local tSrc=${BASH_SOURCE##*/}
-    local tSrcPath=$PWD
     local tProjName=${PWD##*/}
+    local tVerbose
 
-    fLog -p info -m "git clone" -l $tSrc:$LINENO
-    cd $pDir >/dev/null 2>&1
-    git clone --bare --local --no-hardlinks --progress -v $tSrcPath/.git
+    cd $pMountDir >/dev/null 2>&1
+    fLog -p notice -m "git clone" -l $tSrc:$LINENO
+    git clone --bare --local --no-hardlinks --progress -v $gpLocalTopDir/.git
     cd - >/dev/null 2>&1
 
     fLog -p info -m "Set remote origin" -l $tSrc:$LINENO
-    git remote add origin $pDir/$tProjName.git
+    git remote add origin $pMountDir/$tProjName.git
     git config branch.main.remote origin
     git config branch.main.merge refs/heads/main
     git config branch.develop.remote origin
     git config branch.develop.merge refs/heads/main
+
+    mkdir -p $gpRemoteRawDir
+    if [ $gpVerbose -ge 1 ]; then
+        tVervose=-v
+    fi
+    if [ $gpVerbose -ge 2 ]; then
+        tVervose=-vP
+    fi
+    rLog -p notice -m "'rsync'-rlptz $tVerbose $gpLocalTopDir $gpLocalTopDir/raw/* $gpRemoteRawDir/"
+    'rsync'-rlptz $tVerbose $gpLocalTopDir/raw/* $gpRemoteRawDir/
+    if [ $? -ne 0 ]; then
+        fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
+    fi
 
     return 0
 } # fRemoteMkRemote
@@ -272,7 +335,7 @@ fRemoteReport()
     cat <<EOF
 Be sure the disk is mounted and $gpPath exists.
 Then you can use: "git push origin BRANCH" and "git pull origin BRANCH"
-If the mount path is changed, use "git proj set -e" to update the origin.
+If the mount path is changed, use "git proj config" to update the origin.
 EOF
     return 0
 } # fRemoteReport
@@ -293,9 +356,6 @@ fRemoteCreateRemoteGit()
     # -d pMountPath (set with prompt/responnse, or required if -a)
     fRemoteGetMountDir "$gpMountDir"
     # gpMountDir has now been validated for use
-
-    # -s pMinSpace
-    fRemoteGetMinSpace $gpRemoteMinSpace
 
     # -r pRawRemotePath
     fGetRemoteRawDir $gpRemoteRawDir

@@ -24,9 +24,7 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj remote [-a] -d pMountDir [-r pRawRemoteDir ]
-    	            [-s pMinSpace] [-h]
-        Defaults: [-r pMountDir/NAME.raw]
+    git proj remote [-a] [-d pMountDir] [-h]
 
 =head1 DESCRIPTION
 
@@ -57,19 +55,6 @@ For example, with a mount point: /mnt/usb-video create the remote git
 at the top directory video-2019-04-01, with:
 
  git proj init -e /mnt/usb-video/video-2019-04-01
-
-=item B<-r pRawRemoteDir>
-
-        Default: [-r pMountDir/ProjName.raw]
-
-=item B<-s pMinSpace>
-
-This is the minium space that should be available on the external
-drive.  The command will not continue if there is not enough space.
-The available space must also be twice the size of the space used by
-ProjName.raw.
-
-Default: 20g
 
 =item B<-h>
 
@@ -160,7 +145,7 @@ fi
 . $gpBin/gitproj-remote.inc
 fRemoteSetGlobals
 
-#    git proj remote [-a] [-d pMountDir] [-r pRawRemoteDir ]
+#    git proj remote [-a] [-d pMountDir] [-r pRemoteRawDir ]
 #    	            [-s pMinSpace] [-h]
 #        Defaults: [-r pMountDir/NAME.raw]
 
@@ -170,7 +155,7 @@ while getopts :al:r:s:hH:vx tArg; do
         # Script arguments
         a) gpAuto=1 ;;
 	d) gpMountDir="$OPTARG" ;;
-        r) gpRawRemoteDir="$OPTARG" ;;
+        r) gpRemoteRawDir="$OPTARG" ;;
         s) gpRemoteMinSpace="$OPTARG" ;;
         # Common arguments
         h) fUsage long ;;
