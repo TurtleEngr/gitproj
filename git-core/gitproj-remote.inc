@@ -97,24 +97,89 @@ fRemoteCheckDir()
 } # fRemoteCheckDir
 
 # --------------------
+fRemoteGetDirList()
+{
+    local pMountDir="$1"
+
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ -n "$pMountDir" ]; then
+        find $pMountDir $pMountDir/* $pMountDir/*/* -prune -type d 2>/dev/null | grep -v ' '
+    fi
+    for i in $(
+	    df -h | \
+	    grep -E '^/dev/|/mnt|/media' | \
+	    grep -Ev '/$|/boot' | \
+	    awk '{print $6}'
+	); do
+	find $i $i/* $i/*/* -prune -type d 2>/dev/null | grep -v ' '
+    done | sort -f
+    echo
+    return 0
+} # fRemoteGetDirList
+
+# --------------------
+fRemoteSelect()
+{
+    PS3="$1"
+    local tDirList="$2"
+    local tHelp="$3"
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tResponse
+
+    select tResponse in QUIT HELP $tDirList; do
+        case $tResponse in
+	    QUIT)
+	        fLog -p warning -m "Quitting." -l $tSrc:$LINENO
+		echo "QUIT"
+		return 1
+	        ;;
+	    HELP)
+	        echo "$tHelp" 1>&2
+		continue
+	        ;;
+	esac
+	if [ -n "$tResponse" ]; then
+	    break
+	fi
+    done
+
+    PS3=""
+    echo $tResponse
+    return 0
+} # fRemoteSelect
+
+# --------------------
 fRemoteGetMountDir()
 {
     local pMountDir=$1
     
     local tSrc=${BASH_SOURCE##*/}
+    local tDirList
+    local tResponse
 
     if [ $gpAuto -ne 0 ]; then
         if [ -z "$pMountDir" ]; then
-            fError -m "With the -a option the -d option is required." -l $tSrc:$LINENO
+            fError -m "The -d option is required with -a auto option." -l $tSrc:$LINENO
         fi
-
         if ! fRemoteCheckDir $pMountDir; then
-            fError -m "Cannot continue with -a mode."
+            fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
         fi
-	gpMountDir=$pMountDir
+	gpMountDir="$pMountDir"
         return 0
     fi
 
+    # Prompt/response
+    # Offer choices, offer two dir levels (remove dirs with spaces in them)
+    tDirList=$(fRemoteGetDirList $pMountDir)
+    tPrompt="Select by number, the location for the remote git and raw files? "
+    tHelp=$(cat <<EOF
+This is a list of dirs under the -d pMountDir, if you gave that option.
+And might lists other possible mounted directories to choose from.
+EOF
+)
+    tMountDir=$(fResponseSelect "$tPrompt" "$tDirList" "$tHelp")
     return 0
 } # fRemoteGetMountDir
 
@@ -242,5 +307,5 @@ fRemoteCreateRemoteGit()
 } # fRemoteCreateRemoteGit
 
 # ========================================
-export tSrc=${BASH_SOURCE##*/}
-fRemoteSetGlobals
+# Don't forget to call fRemoteSetGlobals
+# Not done here, so some functions can be tested "stand-alone"

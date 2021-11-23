@@ -704,9 +704,7 @@ fError()
     if [ $# -ne 0 ]; then
         pMsg="$pMsg $*"
     fi
-    while [ $# -ne 0 ]; do
-        shift
-    done
+    shift $#
 
     if [ $pInt -eq 1 ]; then
         pMsg="Internal: $pMsg"

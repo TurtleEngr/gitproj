@@ -158,7 +158,7 @@ if [ $# -eq 0 ]; then
 fi
 
 . $gpBin/gitproj-remote.inc
-# Calls: fRemoteSetGlobals
+fRemoteSetGlobals
 
 #    git proj remote [-a] [-d pMountDir] [-r pRawRemoteDir ]
 #    	            [-s pMinSpace] [-h]

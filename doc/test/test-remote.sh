@@ -128,6 +128,7 @@ setUp()
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     . $gpBin/gitproj-remote.inc
+    fRemoteSetGlobals
     gpDebug=0
     gpUnitDebug=0
     return 0
@@ -338,13 +339,9 @@ testRemoteCheckDir()
 } # testRemoteCheckDir
 
 # --------------------------------
-NAtestRemoteGetMountDir()
+testRemoteGetMountDirAuto()
 {
     local tResult
-    
-    gpAuto=1
-    gpMountDir=exists
-    gpMountDir=not-exists
 
 #    cDatMount1=$cTestDestDir/test/root/mnt/disk-2
 #    cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
@@ -352,15 +349,54 @@ NAtestRemoteGetMountDir()
 #    /media/$USER/xxxx
 #    df -h | grep -E '^/dev/|/mnt'
 
-    
+    gpAuto=1
     tResult=$(fRemoteGetMountDir "" 2>&1)
     assertFalse "$LINENO" "$?"
-    tResult=$(fRemoteGetMountDir $gpMountDir 2>&1)
+    assertContains "$LINENO $tResult" "$tResult" "The -d option is required with -a auto option"
+    
+    gpAuto=1
+    tResult=$(fRemoteGetMountDir "/tmp/foo" 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/foo"
+    assertContains "$LINENO $tResult" "$tResult" "Cannot continue with -a mode"
 
+    gpAuto=1
+    gpRemoteRawDir=TBD
+    if [ -n "$gpMountDir" ]; then
+        fail "$LINENO gpMountDir is not empty: ${gpMountDir}"
+    fi
+    fRemoteGetMountDir "$cDatMount1"
+    assertTrue $LINENO "$?"
+    assertEquals "$LINENO" "$cDatMount1" "$gpMountDir"
+    
+    return 0
+} # testRemoteGetMountDirAuto
+
+# --------------------------------
+testRemoteGetDirList()
+{
+    local tResult
+
+    gpAuto=0
+    tResult=$(fRemoteGetDirList "$cDatMount1")
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "$cDatMount1"
+
+    tResult=$(fRemoteGetDirList "$cDatMount3")
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "$cDatMount3"
+    assertContains "$LINENO $tResult" "$tResult" "src"
+
+    return 0
+} # testRemoteGetDirList
+
+# --------------------------------
+testRemoteSelect()
+{
     startSkipping
     fail "TBD"
     return 0
-} # testRemoteGetMountDir
+} # testRemoteSelect
 
 # --------------------------------
 TBDtestRemoteGetRawRemoteDir()
