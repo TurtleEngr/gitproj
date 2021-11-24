@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#    cDatMount1=$cTestDestDir/test/root/mnt/disk-2
+#    cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
+#    cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+#	video-2019-11-26
+#	video-2020-04-02
+#    /media/$USER/xxxx
+#    df -h | grep -E '^/dev/|/mnt'
+
 # ========================================
 fUsage()
 {
@@ -19,7 +27,6 @@ fUsage()
 =head1 test-com.inc
 
 test-com.inc - Common functions used in the test scripts
-
 =head1 SYNOPSIS
 
     ./test-remote.sh [all] [test,test,...]
@@ -343,12 +350,6 @@ testRemoteGetMountDirAuto()
 {
     local tResult
 
-#    cDatMount1=$cTestDestDir/test/root/mnt/disk-2
-#    cDatMount2=$cTestDestDir/test/root/mnt/usb-misc/files-2021-08-12
-#    cDatMount3=$cTestDestDir/test/root/mnt/usb-video/video-2020-04-02
-#    /media/$USER/xxxx
-#    df -h | grep -E '^/dev/|/mnt'
-
     gpAuto=1
     tResult=$(fRemoteGetMountDir "" 2>&1)
     assertFalse "$LINENO" "$?"
@@ -367,7 +368,7 @@ testRemoteGetMountDirAuto()
     fi
     fRemoteGetMountDir "$cDatMount1"
     assertTrue $LINENO "$?"
-    assertEquals "$LINENO" "$cDatMount1" "$gpMountDir"
+    assertEquals "$LINENO" "$cDatMount1" "$gResponse"
     
     return 0
 } # testRemoteGetMountDirAuto
@@ -375,17 +376,15 @@ testRemoteGetMountDirAuto()
 # --------------------------------
 testRemoteGetDirList()
 {
-    local tResult
-
     gpAuto=0
-    tResult=$(fRemoteGetDirList "$cDatMount1")
+    fRemoteGetDirList "$cDatMount1"
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "$cDatMount1"
+    assertContains "$LINENO $tResult" "$gResponse" "$cDatMount1"
 
-    tResult=$(fRemoteGetDirList "$cDatMount3")
+    fRemoteGetDirList "$cDatMount3"
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "$cDatMount3"
-    assertContains "$LINENO $tResult" "$tResult" "src"
+    assertContains "$LINENO $tResult" "$gResponse" "$cDatMount3"
+    assertContains "$LINENO $tResult" "$gResponse" "src"
 
     return 0
 } # testRemoteGetDirList
@@ -399,7 +398,8 @@ testRemoteSelect()
     local tHelp
     
     gpAuto=0
-    tDirList=$(fRemoteGetDirList "$cDatMount3")
+    fRemoteGetDirList "$cDatMount3"
+    tDirList=$gResponse
     tPrompt="Select a mount point: "
     tHelp="Just select by number."
     tResult=$(fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "1\n"))
@@ -413,20 +413,43 @@ testRemoteSelect()
     assertContains "$LINENO $tResult" "$tResult" "QUIT"
     assertContains "$LINENO $tResult" "$tResult" "Just select by number"
 
-    fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "7\n") >/dev/null 2>&1
+    fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "6\n") >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
-    assertContains "$LINENO $gSelectResponse" "$gSelectResponse" "/mnt/usb-video/video-2019-11-26/dev"
+    assertContains "$LINENO $gResponse" "$gResponse" "/mnt/usb-video/video-2019-11-26/dev"
     
     return 0
 } # testRemoteSelect
 
-TBDtestRemoteGetAnotherMountDir()
+testRemoteGetAnotherMountDir()
 {
+    local tMountDir
+    local tResult
+
+    tMountDir=$cDatMount1
+    tResult=$(fRemoteGetAnotherMountDir $tMountDir 2>&1 < <(echo -e "\nq\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO tResult" "$tResult" "Quitting"
+
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "/tmp/foo\n/tmp/bar\nquit\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/foo"
+    assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/bar"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    gpProjName=example
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "$cDatMount3/video-2019-11-26\nquit\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "$gpProjName.git already exists"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "$cDatMount3/video-2020-04-02\nq\n") >/dev/null
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02" "$gResponse"
+
     # The mount dir check for valid
     # The mount dir check for space
     # Use "q" to quit
-    startSkipping
-    fail "TBD"
+
     return 0
 } # testRemoteGetAnotherMountDir
 
@@ -445,12 +468,27 @@ TBDtestRemoteGetMountDirManual()
 } # testRemoteGetMountDirManual
 
 # --------------------------------
-TBDtestRemoteGetRawRemoteDir()
+testRemoteGetRemoteRawDir()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+
+    gpMountDir=/tmp/foo
+    gpProjName=bar
+    mkdir $gpMountDir
+    touch $gpMountDir/$gpProjName.raw
+    tResult=$(fRemoteGetRemoteRawDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "raw already exists"
+    assertContains "$LINENO $tResult" "$tResult" "Internal"
+
+    rm $gpMountDir/$gpProjName.raw
+    fRemoteGetRemoteRawDir
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "$gpMountDir/$gpProjName.raw" "$gResponse"
+    rmdir $gpMountDir
+
     return 0
-} # testRemoteGetRawRemoteDir
+} # testRemoteGetRemoteRawDir
 
 # --------------------------------
 TBDtestRemoteCheckSpace()

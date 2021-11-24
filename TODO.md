@@ -26,6 +26,14 @@ The user is also free to make "raw" a symlink, to balance disk space
 (the gitproj code just needs to "follow" symlinks when copying files
 from raw to/from the "remote" location.)
 
+Done
+
+* Refactor how values are "returned". Rather than echoing the value to
+be "caught", or setting the actual (external) variable, it would be
+better to see a "temporary" external variable, then set the "actual"
+variable to the temp variable. The advantage: testing is easier, and
+independent of "special" variables.
+
 * Code git-proj-clone
 
 * Code git-proj-add (support adding whole directory trees)

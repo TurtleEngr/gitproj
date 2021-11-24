@@ -6,7 +6,7 @@ export cCurDir cGetOrigin cGetTopDir cTop
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
     gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
-    gpVer gpVerbose gSelectResponse
+    gpVer gpVerbose gResponse
 
 # ========================================
 
@@ -93,6 +93,7 @@ fRemoteCheckDir()
         fError -n -m "$pDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
         return 1
     fi
+
     return 0
 } # fRemoteCheckDir
 
@@ -132,19 +133,25 @@ fRemoteGetDirList()
     local pMountDir="$1"
 
     local tSrc=${BASH_SOURCE##*/}
+    local tLiist
+    export gResponse=""
 
     if [ -n "$pMountDir" ]; then
-        find $pMountDir $pMountDir/* $pMountDir/*/* -prune -type d 2>/dev/null | grep -v ' '
+        tList=$(find $pMountDir $pMountDir/* $pMountDir/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
+	gResponse="$gResponse $tList"
     fi
-    for i in $(
+
+    tList=$(for i in $(
 	    df -h | \
 	    grep -E '^/dev/|/mnt|/media' | \
 	    grep -Ev '/$|/boot' | \
 	    awk '{print $6}'
 	); do
 	find $i $i/* $i/*/* -prune -type d 2>/dev/null | grep -v ' '
-    done | sort -f
-    echo
+    done | sort -uf
+    )
+    gResponse="$gResponse $tList"
+
     return 0
 } # fRemoteGetDirList
 
@@ -157,7 +164,7 @@ fRemoteSelect()
 
     local tSrc=${BASH_SOURCE##*/}
     local tResponse
-    export gSelectResponse
+    export gResponse
 
     # Loop until a valid selection, or QUIT or OTHER
     select tResponse in QUIT HELP OTHER $pDirList; do
@@ -185,7 +192,7 @@ fRemoteSelect()
     done
 
     PS3=""
-    gSelectResponse=$tResponse
+    gResponse=$tResponse
     return $tStatus
 } # fRemoteSelect
 
@@ -193,26 +200,32 @@ fRemoteSelect()
 fRemoteGetAnotherMountDir()
 {
     local pMountDir=$1
-    
+
     local tSrc=${BASH_SOURCE##*/}
+    local tReply
+    gResponse=""
 
     # Loop until the selection is OK, or quit
     while true; do
         echo -n "Mount Path [$pMountDir | q]? "
-        read -r pMountDir
-	if [ "$pMountDir" = "quit" ] || [ "$pMountDir" = "q" ]; then
+        read -r tReply
+	if [ "$tReply" = "quit" ] || [ "$tReply" = "q" ]; then
       	    fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-	    exit 1
+	    return 1
 	fi
-        if [ ! fRemoteCheckDir $pMountDir ]; then
+	if [ -z "$tReply" ]; then
+	    continue
+	fi
+        if ! fRemoteCheckDir $tReply; then
 	    continue
         fi
-        if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
+        if ! fRemoteCheckDirSpace "$tReply" "$gpRemoteMinSpace"; then
 	    continue
 	fi
 	break
     done
-    echo $pMountDir
+
+    gResponse=$tReply
     return 0
 } # fRemoteGetAnotherMountDir
 
@@ -224,7 +237,7 @@ fRemoteGetMountDir()
     local tSrc=${BASH_SOURCE##*/}
     local tDirList
     local tResponse
-    export gSelectResponse
+    export gResponse=""
 
     # ----------
     if [ $gpAuto -ne 0 ]; then
@@ -237,14 +250,15 @@ fRemoteGetMountDir()
         if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
             fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
 	fi
-	gpMountDir="$pMountDir"
+	gResponse="$pMountDir"
         return 0
     fi
 
     # ----------
     # Prompt/response
     # Offer choices, with two dir levels (remove dirs with spaces in names)
-    tDirList=$(fRemoteGetDirList $pMountDir)
+    fRemoteGetDirList $pMountDir
+    tDirList=$gResponse
     tPrompt="Select by number, the location for the remote git and raw files? "
     tHelp=$(cat <<EOF
 This is a list of dirs under the -d pMountDir, if you gave that option.
@@ -255,13 +269,14 @@ EOF
     # Loop until the selection is OK, or Quit
     while true; do
         fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
-	tMountDir=$gSelectResponse
+	tMountDir=$gResponse
 	if [ "$tMountDir" = "QUIT" ]; then
 	    exit 1
 	fi
 	if [ "$tMountDir" = "OTHER" ]; then
 	    tMountDir=$(fRemoteGetAnotherMountDir $pMountDir)
-    	    tDirList=$(fRemoteGetDirList $tMountDir)
+    	    fRemoteGetDirList $tMountDir
+	    tDirList=$gResponse
 	    continue
 	fi
         if [ ! fRemoteCheckDir $tMountDir ]; then
@@ -272,21 +287,25 @@ EOF
 	fi
     done
 
-    gpMountDir="$tMountDir"
+    gResponse="$tMountDir"
     return 0
 } # fRemoteGetMountDir
 
+# --------------------
 fRemoteGetRemoteRawDir()
 {
     local tSrc=${BASH_SOURCE##*/}
+    # gpMountDir has already been validated
+    # gpProjName has already been validated
+    # $gpMountDir/$gpProjName.raw should have be verified to not exist
 
-    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
-    if [ ! -d $gpRemoteRawDir ]; then
-        fError -m "pMountDir/ProjName.raw already exists."
+    gResponse=$gpMountDir/$gpProjName.raw
+    if [ -e $gResponse ]; then
+        fError -i -m "pMountDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
     fi
 
     return 0
-} # fRemoteGetRawRemotePath
+} # fRemoteGetRemoteRawDir
 
 # --------------------
 fRemoteMkRemote()
@@ -294,7 +313,7 @@ fRemoteMkRemote()
     local pMountDir=$1
 
     local tSrc=${BASH_SOURCE##*/}
-    local tProjName=${PWD##*/}
+???    local tProjName=${PWD##*/}
     local tVerbose
 
     cd $pMountDir >/dev/null 2>&1
@@ -354,13 +373,15 @@ fRemoteCreateRemoteGit()
     fRemoteVerfiyState
 
     # -d pMountPath (set with prompt/responnse, or required if -a)
+    #  gpMountDir is required with -a, othherwise it is optional
     fRemoteGetMountDir "$gpMountDir"
-    # gpMountDir has now been validated for use
+    gpMountDir=$gResponse
 
-    # -r pRawRemotePath
-    fGetRemoteRawDir $gpRemoteRawDir
+    # Define the remote raw dir name (currenly hardcoded)
+    fRemoteGetRemoteRawDir
+    gpRemoteRawDir=$gResponse
 
-    fRemoteMkRemote $gpPath?
+    fRemoteMkRemote $gpMountDir
     fRemoteReport
 
     return 0
