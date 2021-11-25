@@ -58,15 +58,7 @@ fInitSetGlobals()
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
     gpAuto=0
-
-    gpLocalTopDir=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
-    if [ "$gpLocalTopDir" = "TBD" ]; then
-        gpLocalTopDir=$PWD
-    fi
-    if [ ! -d $gpLocalTopDir ]; then
-        gpLocalTopDir="TBD"
-    fi
-
+    gpLocalTopDir=$PWD
     gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "TBD")
     if [ "$gpProjName" = "TBD" ]; then
         gpProjName="${gpLocalTopDir##*/}"
@@ -367,7 +359,6 @@ Summary
               bin = $gpBin
               doc = $gpDoc
              test = $gpTest
-    local-top-dir = $gpLocalTopDir
         proj-name = $gpProjName
      git-flow-pkg = $gpGitFlowPkg
 
@@ -590,7 +581,6 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
         fComSaveVar2Config $tFile $tS.remote-status gpRemoteStatus
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
-        fComSaveVar2Config $tFile $tS.local-top-dir gpLocalTopDir
     done
 
     for tFile in $HOME/$cConfigGlobal \

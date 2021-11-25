@@ -871,7 +871,6 @@ testInitSaveVarsToConfigs()
         fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined $LINENO
         fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined $LINENO
         fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName $LINENO
-        fTestCheckConfig2Var $tFile $tS.local-top-dir gpLocalTopDir $gpLocalTopDir $LINENO
     done
 
     for tFile in ~/.gitproj.config.global $gpLocalTopDir/$cConfigLocal; do

@@ -27,7 +27,10 @@ fRemoteSetGlobals()
     gpMountDir=""
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
-    gpLocalTopDir=$(fComGetConfig -k "gitproj.config.top-dir" -d "$PWD")
+    gpLocalTopDir=$($cGetTopDir 2>/dev/null)
+    if [ -z "$gpLocalTopDir" ]; then
+        gpLocalTopDir=$PWD
+    fi
     gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "Error")
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
@@ -142,7 +145,7 @@ fRemoteGetDirList()
     fi
 
     tList=$(for i in $(
-	    df -h | \
+	    df -h 2>/dev/null | \
 	    grep -E '^/dev/|/mnt|/media' | \
 	    grep -Ev '/$|/boot' | \
 	    awk '{print $6}'
@@ -313,7 +316,7 @@ fRemoteMkRemote()
     local pMountDir=$1
 
     local tSrc=${BASH_SOURCE##*/}
-???    local tProjName=${PWD##*/}
+    local tProjName=${PWD##*/}
     local tVerbose
 
     cd $pMountDir >/dev/null 2>&1

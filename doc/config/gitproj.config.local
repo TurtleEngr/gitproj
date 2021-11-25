@@ -7,7 +7,6 @@
 	local-status = not-defined
 	remote-status = not-defined
 	proj-name = TBD
-	local-top-dir = TBD
 	git-flow-pkg = TBD
 	remote-min-size = 20g
 [gitproj "hook"]

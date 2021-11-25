@@ -4,19 +4,22 @@ mCore = ../../git-core
 
 mDepList = \
 	shunit2.1 \
+	$(mCore)/gitproj-com.inc \
 	test.inc \
 	test-env.tgz \
-	$(mCore)/gitproj-com.inc
+	test-env_HomeAfterBMove.tgz \
+	test-env_ProjAfterGInit.tgz \
+	test-env_ProjLocalDefined.tgz
 
 mBaseList = \
 	test-com \
 	test-gitproj \
 
 mCmdList = \
-	init
+	init \
+	remote
 
 mCmdToDo = \
-	remote \
 	clone \
 	push \
 	pull \
@@ -33,7 +36,7 @@ mTestEnvFiles = \
 	test-env_ProjLocalDefined.tgz
 
 # --------------------
-test : $(mDepList) $(mBaseList) test-cmds
+test-all : $(mDepList) $(mBaseList) test-cmds
 
 test-com : $(mDepList) test-com.sh
 	./$@.sh
@@ -43,6 +46,7 @@ test-gitproj : $(mDepList) test-gitproj.sh $(mCore)/git-proj
 
 test-cmds : $(mDepList)
 	for tCmd in $(mCmdList); do \
+		echo ./test-$${tCmd}.sh; \
 		./test-$${tCmd}.sh; \
 	done
 
