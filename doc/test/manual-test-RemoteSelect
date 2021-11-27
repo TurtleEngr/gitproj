@@ -31,7 +31,8 @@ cd - >/dev/null 2>&1
 tPrompt="Select by number, the location for the remote git and raw files? "
 fRemoteGetDirList $cDatMount3
 tDirList=$gResponse
-tHelp=$(cat <<EOF
+tHelp=$(
+    cat <<EOF
 This is a list of dirs under the -d pMountDir, if you gave that option.
 And might lists other possible mounted directories to choose from.
 EOF

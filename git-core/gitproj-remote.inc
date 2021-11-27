@@ -54,17 +54,17 @@ fRemoteVerifyState()
     if [ "$gpLocalTopDir" != "$tTopDir" ]; then
         fError -m "This repo appears to be configured for $gpLocalTopDir, not $tTopDir. Run 'git proj config' to reconfigure for a different host." -l $tSrc:$LINENO
     fi
-    
+
     if [ "$gpRemoteStatus" = "defined" ]; then
         fLog -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
-	if [ $gpAuto -ne 0 ]; then
-	    fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
-	fi
+        if [ $gpAuto -ne 0 ]; then
+            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
+        fi
     fi
 
-    if [ "$gpRemoteStatus" = "not-defined" ] && \
-       [ "$gpRemoteRawDir" != "TBD" ] && \
-       [ -n "$gpRemoteRawDir" ]; then
+    if [ "$gpRemoteStatus" = "not-defined" ] &&
+        [ "$gpRemoteRawDir" != "TBD" ] &&
+        [ -n "$gpRemoteRawDir" ]; then
         fError -i -m "Config problem remote-status=not-defined, but remote-raw-dir is set to $gpRemoteRawDir. It should be undefined or set to TBD" -l $tSrc:$LINENO
     fi
 
@@ -141,17 +141,18 @@ fRemoteGetDirList()
 
     if [ -n "$pMountDir" ]; then
         tList=$(find $pMountDir $pMountDir/* $pMountDir/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
-	gResponse="$gResponse $tList"
+        gResponse="$gResponse $tList"
     fi
 
-    tList=$(for i in $(
-	    df -h 2>/dev/null | \
-	    grep -E '^/dev/|/mnt|/media' | \
-	    grep -Ev '/$|/boot' | \
-	    awk '{print $6}'
-	); do
-	find $i $i/* $i/*/* -prune -type d 2>/dev/null | grep -v ' '
-    done | sort -uf
+    tList=$(
+        for i in $(
+            df -h 2>/dev/null |
+                grep -E '^/dev/|/mnt|/media' |
+                grep -Ev '/$|/boot' |
+                awk '{print $6}'
+        ); do
+            find $i $i/* $i/*/* -prune -type d 2>/dev/null | grep -v ' '
+        done | sort -uf
     )
     gResponse="$gResponse $tList"
 
@@ -173,26 +174,26 @@ fRemoteSelect()
     select tResponse in QUIT HELP OTHER $pDirList; do
         echo
         case $tResponse in
-	    QUIT)
-	        fLog -p warning -m "Quitting." -l $tSrc:$LINENO
-	        tStatus=1
-		break
-	        ;;
-	    HELP)
-		echo  1>&2
-	        echo "$pHelp" 1>&2
-		echo  1>&2
-		continue
-	        ;;
-	    OTHER)
-	        tStatus=1
-		break
-	        ;;
-	esac
-	if [ -n "$tResponse" ]; then
-	    tStatus=0
-	    break
-	fi
+            QUIT)
+                fLog -p warning -m "Quitting." -l $tSrc:$LINENO
+                tStatus=1
+                break
+                ;;
+            HELP)
+                echo 1>&2
+                echo "$pHelp" 1>&2
+                echo 1>&2
+                continue
+                ;;
+            OTHER)
+                tStatus=1
+                break
+                ;;
+        esac
+        if [ -n "$tResponse" ]; then
+            tStatus=0
+            break
+        fi
     done
 
     PS3=""
@@ -215,21 +216,21 @@ fRemoteGetAnotherMountDir()
         let --tMaxLoop
         echo -ne "\nMount Dir [$pMountDir | q]? "
         read -r tReply
-	if [ "$tReply" = "quit" ] || [ "$tReply" = "q" ]; then
-      	    fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-    	    gResponse=$pMountDir
-	    return 1
-	fi
-	if [ -z "$tReply" ]; then
-	    continue
-	fi
+        if [ "$tReply" = "quit" ] || [ "$tReply" = "q" ]; then
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
+            gResponse=$pMountDir
+            return 1
+        fi
+        if [ -z "$tReply" ]; then
+            continue
+        fi
         if ! fRemoteCheckDir $tReply; then
-	    continue
+            continue
         fi
         if ! fRemoteCheckDirSpace "$tReply" "$gpRemoteMinSpace"; then
-	    continue
-	fi
-	break
+            continue
+        fi
+        break
     done
     if [ $tMaxLoop -eq 0 ]; then
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
@@ -243,7 +244,7 @@ fRemoteGetAnotherMountDir()
 fRemoteGetMountDir()
 {
     local pMountDir="$1"
-    
+
     local tSrc=${BASH_SOURCE##*/}
     export gResponse=""
     local tDirList
@@ -261,8 +262,8 @@ fRemoteGetMountDir()
         fi
         if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
             fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
-	fi
-	gResponse="$pMountDir"
+        fi
+        gResponse="$pMountDir"
         return 0
     fi
 
@@ -272,34 +273,35 @@ fRemoteGetMountDir()
     fRemoteGetDirList $pMountDir
     tDirList=$gResponse
     tPrompt="Select by number, the location for the remote git and raw files? "
-    tHelp=$(cat <<EOF
+    tHelp=$(
+        cat <<EOF
 This is a list of dirs under the -d pMountDir, if you gave that option.
 Other mounted directories might be listed too.
 Select OTHER, to give another pMountDir.
 EOF
-)
+    )
     # Loop until the selection is OK, or Quit
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
         fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
-	tMountDir=$gResponse
-	if [ "$tMountDir" = "QUIT" ]; then
-	    exit 1
-	fi
-	if [ "$tMountDir" = "OTHER" ]; then
-	    fRemoteGetAnotherMountDir $pMountDir
-	    tMountDir=$gResponse
-    	    fRemoteGetDirList $tMountDir
-	    tDirList=$gResponse
-	    continue
-	fi
+        tMountDir=$gResponse
+        if [ "$tMountDir" = "QUIT" ]; then
+            exit 1
+        fi
+        if [ "$tMountDir" = "OTHER" ]; then
+            fRemoteGetAnotherMountDir $pMountDir
+            tMountDir=$gResponse
+            fRemoteGetDirList $tMountDir
+            tDirList=$gResponse
+            continue
+        fi
         if ! fRemoteCheckDir $tMountDir; then
-	    continue
+            continue
         fi
         if ! fRemoteCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
-	    continue
-	fi
-	break
+            continue
+        fi
+        break
     done
     if [ $tMaxLoop -eq 0 ]; then
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
@@ -340,7 +342,7 @@ fRemoteMkRemote()
     cd - >/dev/null 2>&1
 
     fLog -p info -m "Set remote origin" -l $tSrc:$LINENO
-    
+
     git remote add origin $pMountDir/$tProjName.git
     fComSetConfig -l -k "branch.main.remote" -v "origin"
     fComSetConfig -l -k "branch.main.remote" -v "origin"
@@ -383,7 +385,7 @@ fRemoteReport()
     if [ -z "$tGitOrigin" ]; then
         fError -i -n -m "Git origin is not set." -l $tSrc:$LINENO
     fi
-    
+
     tProjName=${tGitOrigin##*/}
     if [ "$tProjName" != "$gpProjName" ]; then
         fError -i -n -m "Origin does not match project name." -l $tSrc:$LINENO

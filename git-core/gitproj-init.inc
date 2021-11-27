@@ -425,9 +425,9 @@ EOF
             fi
             fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
         done
-    	if [ $tMaxLoop -eq 0 ]; then
+        if [ $tMaxLoop -eq 0 ]; then
             fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
-    	fi
+        fi
     fi
     return 0
 } # fInitSummary
@@ -551,29 +551,29 @@ fInitMkGitDir()
     local tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    
+
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
     cp $gpDoc/config/gitignore.default .gitignore
 
     fLog -p info -m "git init" -l $tSrc:$LINENO
     git init
-    
+
     fLog -p info -m "git add FILES" -l $tSrc:$LINENO
     git add .gitignore *
-    
+
     fLog -p info -m "git commit" -l $tSrc:$LINENO
     git commit -am "Initial commit"
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
         fError -i "Initial git commit failed." -l $tSrc:$LINENO
     fi
-    
+
     fLog -p info -m "Rename master to main" -l $tSrc:$LINENO
     git branch --move master main
     fLog -p info -m "Create develop branch" -l $tSrc:$LINENO
     git branch develop
     git checkout develop
-    
+
     fInitMkGitFlow
     git branch
     git status
@@ -618,11 +618,11 @@ fInitSaveVarsToConfigs()
     tFile=$HOME/$cConfigGlobal
     tS=gitproj.config
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
-    fComSaveVar2Config $tFile $tS.bin         gpBin
-    fComSaveVar2Config $tFile $tS.doc         gpDoc
-    fComSaveVar2Config $tFile $tS.test        gpTest
-    fComSaveVar2Config $tFile $tS.facility    gpFacility
-    fComSaveVar2Config $tFile $tS.syslog      gpSysLog
+    fComSaveVar2Config $tFile $tS.bin gpBin
+    fComSaveVar2Config $tFile $tS.doc gpDoc
+    fComSaveVar2Config $tFile $tS.test gpTest
+    fComSaveVar2Config $tFile $tS.facility gpFacility
+    fComSaveVar2Config $tFile $tS.syslog gpSysLog
 
     for tFile in $gpLocalTopDir/$cConfigLocal \
         $gpLocalTopDir/$cConfigHost; do

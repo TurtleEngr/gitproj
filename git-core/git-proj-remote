@@ -154,7 +154,7 @@ while getopts :al:r:s:hH:vx tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
-	d) gpMountDir="$OPTARG" ;;
+        d) gpMountDir="$OPTARG" ;;
         r) gpRemoteRawDir="$OPTARG" ;;
         s) gpRemoteMinSpace="$OPTARG" ;;
         # Common arguments

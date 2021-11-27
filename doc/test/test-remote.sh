@@ -177,7 +177,7 @@ testGitProjRemote()
     cd $HOME/$cDatProj1 >/dev/null 2>&1
     assertTrue "$LINENO" "[ -d .git ]"
     cd - >/dev/null 2>&1
-    
+
     return 0
 } # testGitProjInit
 
@@ -201,7 +201,7 @@ testComGetVer()
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO" "$tResult" "warning"
     assertContains "$LINENO" "$tResult" "but installed version is"
- 
+
     cGitProjVersion="1.3.0"
     tResult=$(fComGetVer 2>&1)
     assertFalse "$LINENO" "$?"
@@ -218,7 +218,7 @@ testComGetVer()
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "crit: "
     assertContains "$LINENO $tResult" "$tResult" "installed version $cGitProjVersion needs to be upgraded to $tVer or greater"
-return 0
+    return 0
 
     fComUnsetConfig -G -k "gitproj.config.ver"
     tResult=$(fComGetVer 2>&1)
@@ -237,7 +237,7 @@ testInGitProjDir()
     local tResult
 
     gpDebug=2
-    
+
     cd $HOME >/dev/null 2>&1
     tResult=$(fRemoteSetGlobals 2>&1)
     assertFalse "$LINENO $tResult" "$?"
@@ -269,7 +269,7 @@ testRemoteVerifyState()
     tResult=$(fRemoteVerifyState 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "It looks like 'git proj init' did not finish"
-    
+
     gpLocalStatus=defined
     tLocalTopDir=$gpLocalTopDir
     gpLocalTopDir=$gpTest
@@ -305,7 +305,7 @@ testRemoteVerifyState()
     gpRemoteRawDir="TBD"
     tResult=$(fRemoteVerifyState 2>&1)
     assertTrue "$LINENO" "$?"
-    
+
     gpRemoteStatus=not-defined
     gpRemoteRawDir=""
     tResult=$(fRemoteVerifyState 2>&1)
@@ -354,7 +354,7 @@ testRemoteGetMountDirAuto()
     tResult=$(fRemoteGetMountDir "" 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "The -d option is required with -a auto option"
-    
+
     gpAuto=1
     tResult=$(fRemoteGetMountDir "/tmp/foo" 2>&1)
     assertFalse "$LINENO" "$?"
@@ -369,7 +369,7 @@ testRemoteGetMountDirAuto()
     fRemoteGetMountDir "$cDatMount1"
     assertTrue $LINENO "$?"
     assertEquals "$LINENO" "$cDatMount1" "$gResponse"
-    
+
     return 0
 } # testRemoteGetMountDirAuto
 
@@ -396,7 +396,7 @@ testRemoteSelect()
     local tDirList
     local tPrompt
     local tHelp
-    
+
     gpAuto=0
     fRemoteGetDirList "$cDatMount3"
     tDirList=$gResponse
@@ -416,7 +416,7 @@ testRemoteSelect()
     fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "6\n") >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $gResponse" "$gResponse" "/mnt/usb-video/video-2019-11-26/dev"
-    
+
     return 0
 } # testRemoteSelect
 
@@ -424,7 +424,7 @@ testRemoteGetAnotherMountDir()
 {
     local tMountDir
     local tResult
-    
+
     # 2GB
     gpRemoteMinSpace=2147483648
 
@@ -479,7 +479,7 @@ testRemoteGetMountDirManual()
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "This is a list of dirs under the -d pMountDir"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
-    
+
     # Select 3 to define another dir, return 1, echo OTHER
     fRemoteGetMountDir "$cDatMount3" < <(echo -e "3\n$cDatMount2\nq\n4\n") >/dev/null 2>&1
     assertTrue "$LINENO" "$?"

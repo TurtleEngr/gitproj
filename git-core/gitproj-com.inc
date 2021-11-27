@@ -145,10 +145,10 @@ fComGetVer()
 
     # Get the expected Local Version
     gpVer=$(fComGetConfig -k "gitproj.config.ver")
-    if [ -z "$gpVer" ];then
+    if [ -z "$gpVer" ]; then
         gpVer=$cGitProjVersion
-	fLog -i -p warning -m "gitproj.config.ver was not found" -l $tSrc:$LINENO
-	return 0
+        fLog -i -p warning -m "gitproj.config.ver was not found" -l $tSrc:$LINENO
+        return 0
     fi
     # Only the first two # are important
     tTrim=${gpVer#*.*.}
@@ -222,7 +222,7 @@ fComSetGlobals()
 
     # This is put in cTop, project dir. (Use -L to set config vars to this)
     cConfigLocal='.gitproj.config.local'
-    
+
     # This is put in cTop, project dir. (Use -H to set config vars to this)
     # This is included by .git/config
     # This first includes: cConfigLocal
@@ -692,12 +692,14 @@ fError()
             e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
             n) pNoExit=1 ;;
-            :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]"
-	       fComStackTrace
-	       ;;
-            \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]"
-	        fComStackTrace
-		;;
+            :)
+                echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]"
+                fComStackTrace
+                ;;
+            \?)
+                echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]"
+                fComStackTrace
+                ;;
         esac
     done
     shift $((OPTIND - 1))
@@ -767,20 +769,20 @@ fComSetConfig()
             f)
                 if [ ! -f ${OPTARG} ]; then
                     fLog -p warning -m "Could not find ${OPTARG}, it will be created" -l "$tSrc:$LINENO"
-		    touch ${OPTARG}
-		    if [ ! -f ${OPTARG} ]; then
-		        fError -n -m "Could not create ${OPTARG} in $PWD" -l "$tSrc:$LINENO"
-			return 1
-		    fi
+                    touch ${OPTARG}
+                    if [ ! -f ${OPTARG} ]; then
+                        fError -n -m "Could not create ${OPTARG} in $PWD" -l "$tSrc:$LINENO"
+                        return 1
+                    fi
                 fi
                 ;;
             G)
                 if [ ! -f $HOME/$cConfigGlobal ]; then
-		    set +x
+                    set +x
                     fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
                     return 1
                 fi
-		    set +x
+                set +x
                 ;;
             H)
                 tTopDir="$($cGetTopDir 2>&1)"
@@ -837,8 +839,8 @@ fComSetConfig()
 
     git config $pScope $pAdd $pType $pKey "$pValue"
     return $?
-    
-# ----------------------
+
+    # ----------------------
     cat <<EOF >/dev/null
 =internal-pod
 
@@ -974,20 +976,20 @@ fComGetConfig()
         fError -n -i -m "fComGetConfig: missing key" -l $tSrc:$LINENO
         return 1
     fi
-    
+
     gGetConfigValue=$(git config --get --includes $pScope $pType $pKey $pFilter)
 
     if [ -z "$gGetConfigValue" ] && [ -n "$pDefault" ]; then
-	gGetConfigOrigin=default
+        gGetConfigOrigin=default
         gGetConfigValue=$pDefault
-    	echo "$gGetConfigValue"
-    	return 0
+        echo "$gGetConfigValue"
+        return 0
     fi
-    
+
     if [ -z "$gGetConfigValue" ]; then
         gGetConfigOrigin=not-found
         echo ""
-    	return 0
+        return 0
     fi
 
     gGetConfigOrigin=$(git config --show-origin --get --includes $pScope $pType $pKey $pFilter)
@@ -995,7 +997,7 @@ fComGetConfig()
     echo "$gGetConfigValue"
     return 0
 
-# ----------------------
+    # ----------------------
     cat <<EOF >/dev/null
 =internal-pod
 
@@ -1209,7 +1211,7 @@ fComMustBeInGitRepo()
         fError -n -m "$pDir does not exist." -l $tSrc:$LINENO
         return 1
     fi
-    
+
     cd $pDir >/dev/null 2>&1
     if [ -d $PWD/.git ]; then
         cd - >/dev/null 2>&1
@@ -1267,31 +1269,31 @@ fComMustBeInProjRepo()
     if ! fComMustBeInGitRepo $pDir; then
         return 1
     fi
-    
+
     if [ ! -f $HOME/$cConfigGlobal ]; then
         fError -n -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
-	if [ $gpDebug -ge 2 ]; then
-	    fComStackTrace
-	fi
-	return 1
+        if [ $gpDebug -ge 2 ]; then
+            fComStackTrace
+        fi
+        return 1
     fi
 
     tTopDir=$($cGetTopDir)
-    
+
     if [ ! -f $tTopDir/$cConfigLocal ]; then
         fError -n -m "This git workspace is not setup for gitproj, run 'git proj init'" -l $tSrc:$LINENO
-	if [ $gpDebug -ge 2 ]; then
-	    fComStackTrace
-	fi
-	return 1
+        if [ $gpDebug -ge 2 ]; then
+            fComStackTrace
+        fi
+        return 1
     fi
-    
+
     if [ ! -f $tTopDir/$cConfigHost ]; then
         fError -n -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
-    
-    return 0    
+
+    return 0
 } # fComMustBeInProjRepo
 
 fComAllMustBeReadable()

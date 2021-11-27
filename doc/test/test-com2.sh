@@ -165,7 +165,6 @@ fLookFor()
     return $?
 } # fLookFor
 
-
 # --------------------------------
 testComSetConfigMore()
 {
@@ -192,7 +191,7 @@ testComSetConfigMore()
     tResult=$(fComSetConfig -G -k com.test.Gvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO" "fLookFor Gvar $HOME/$cConfigGlobal"
-    
+
     # ----------
     cd $HOME/$cDatProj1
     tResult=$(fComSetConfig -l -k com.test.lvar -v "defined" 2>&1)
@@ -210,7 +209,7 @@ testComSetConfigMore()
     tResult=$(fComSetConfig -L -k com.test.Lvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO" "fLookFor Lvar $cConfigLocal"
-    
+
     # ----------
     cd $HOME
     tResult=$(fComSetConfig -L -k com.test.Lvar -v "defined" 2>&1)
@@ -275,8 +274,8 @@ testComSetConfigMore()
     tResult=$(fComSetConfig -G -k com.test.Gvar -v "defined" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Could not find"
-    
-    return 0    
+
+    return 0
 } # testComSetConfigMore
 
 # --------------------------------

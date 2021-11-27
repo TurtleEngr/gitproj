@@ -639,11 +639,10 @@ testInitMoveBinaryFiles()
     local tResult
     local tStatus
 
-
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitFirstTimeSet
-    
+
     gpProjName=${cDatProj1##*/}
     gpLocalRawDir=$gpLocalTopDir/raw
     gpGitFlow="true"

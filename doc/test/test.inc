@@ -75,7 +75,7 @@ fTestSetupEnv()
     fi
 
     HOSTNAME=testserver
-    
+
     cTestDestDir=$gpTest/../../..
     cd $cTestDestDir >/dev/null 2>&1
     cTestDestDir=$PWD
@@ -90,16 +90,16 @@ fTestSetupEnv()
     cDatProj2Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/paulb.mp4"
     cDatMount1=$cTestDestDir/test/root/mnt/disk-2
     cDatMount2=$cTestDestDir/test/root/mnt/usb-misc
-        # files-2021-08-12/archive/video/
-    	# files-2021-08-12/development/
+    # files-2021-08-12/archive/video/
+    # files-2021-08-12/development/
     cDatMount3=$cTestDestDir/test/root/mnt/usb-video
-	# video-2019-11-26/example.git
-    	# video-2019-11-26/example.raw
-    	# video-2019-11-26/dev/
-    	# video-2019-11-26/release/
-    	# video-2019-11-26/src/
-    	# video-2020-04-02
-    
+    # video-2019-11-26/example.git
+    # video-2019-11-26/example.raw
+    # video-2019-11-26/dev/
+    # video-2019-11-26/release/
+    # video-2019-11-26/src/
+    # video-2020-04-02
+
     return
 } # fTestSetupEnv
 
