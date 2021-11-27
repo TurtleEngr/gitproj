@@ -15,8 +15,6 @@ fRemoteSetGlobals()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-##    gpCmdName=git-proj-remote
-    
     # Assumes we in git dir, and one that is managed by gitproj.
     if ! fComMustBeInProjRepo $PWD; then
         fUsage usage
@@ -35,7 +33,7 @@ fRemoteSetGlobals()
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
-    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
 
     return 0
 } # fRemoteSetGlobals
@@ -122,9 +120,11 @@ fRemoteCheckDirSpace()
     let tRawSize*=2
 
     let tDesiredSize=tGitSize+tRawSize
+    let pMinSpace=pMinSpace/1024/1024
 
-    if [ $tDesiredSize -gt $tAvail ]; then
-        fError -m "There is not enough space at $pMountDir. $pMountDir has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB" -l $tSrc:$LINENO
+    if [ $tAvail -lt $tDesiredSize ] || [ $tAvail -lt $pMinSpace ]; then
+        fError -n -m "There is not enough space at $pMountDir, which has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB (or ${pMinSpace}MB)" -l $tSrc:$LINENO
+        return 1
     fi
 
     return 0
@@ -171,6 +171,7 @@ fRemoteSelect()
 
     # Loop until a valid selection, or QUIT or OTHER
     select tResponse in QUIT HELP OTHER $pDirList; do
+        echo
         case $tResponse in
 	    QUIT)
 	        fLog -p warning -m "Quitting." -l $tSrc:$LINENO
@@ -206,14 +207,17 @@ fRemoteGetAnotherMountDir()
 
     local tSrc=${BASH_SOURCE##*/}
     local tReply
+    local tMaxLoop=30
     gResponse=""
 
     # Loop until the selection is OK, or quit
-    while true; do
-        echo -n "Mount Path [$pMountDir | q]? "
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+        echo -ne "\nMount Dir [$pMountDir | q]? "
         read -r tReply
 	if [ "$tReply" = "quit" ] || [ "$tReply" = "q" ]; then
       	    fLog -p warning -m "Quitting" -l $tSrc:$LINENO
+    	    gResponse=$pMountDir
 	    return 1
 	fi
 	if [ -z "$tReply" ]; then
@@ -227,6 +231,9 @@ fRemoteGetAnotherMountDir()
 	fi
 	break
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
 
     gResponse=$tReply
     return 0
@@ -235,15 +242,17 @@ fRemoteGetAnotherMountDir()
 # --------------------
 fRemoteGetMountDir()
 {
-    local pMountDir=$1
+    local pMountDir="$1"
     
     local tSrc=${BASH_SOURCE##*/}
-    local tDirList
-    local tResponse
     export gResponse=""
+    local tDirList
+    local tMaxLoop=20
+    local tMountDir
+    local tResponse
 
     # ----------
-    if [ $gpAuto -ne 0 ]; then
+    if [ ${gpAuto:0} -ne 0 ]; then
         if [ -z "$pMountDir" ]; then
             fError -m "The -d option is required with -a auto option." -l $tSrc:$LINENO
         fi
@@ -270,25 +279,31 @@ Select OTHER, to give another pMountDir.
 EOF
 )
     # Loop until the selection is OK, or Quit
-    while true; do
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
         fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
 	tMountDir=$gResponse
 	if [ "$tMountDir" = "QUIT" ]; then
 	    exit 1
 	fi
 	if [ "$tMountDir" = "OTHER" ]; then
-	    tMountDir=$(fRemoteGetAnotherMountDir $pMountDir)
+	    fRemoteGetAnotherMountDir $pMountDir
+	    tMountDir=$gResponse
     	    fRemoteGetDirList $tMountDir
 	    tDirList=$gResponse
 	    continue
 	fi
-        if [ ! fRemoteCheckDir $tMountDir ]; then
+        if ! fRemoteCheckDir $tMountDir; then
 	    continue
         fi
         if ! fRemoteCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
 	    continue
 	fi
+	break
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
 
     gResponse="$tMountDir"
     return 0
@@ -365,7 +380,7 @@ EOF
 # --------------------
 fRemoteCreateRemoteGit()
 {
-    local pMountPath="$1"
+    local pMountDir="$1"
 
     local tSrc=${BASH_SOURCE##*/}
 

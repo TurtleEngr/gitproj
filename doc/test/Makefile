@@ -77,6 +77,7 @@ test-env_ProjLocalDefined.tgz :
 
 # --------------------
 stats :
+	@echo "Tests"
 	@echo -n "Number of tests: "
 	@grep '^test' test-*.sh |grep '()' | wc -l
 	@echo -n "Number of asserts: "
@@ -85,12 +86,19 @@ stats :
 	@cat \
 		Makefile *.md *.sh *.inc \
 	| wc -l
+	@echo -n "Lines of doc. in test code: "
+	@awk '/=pod/,/=cut/ {print /bin/bash}; /=internal-pod/,/=internal-cut/ {print /bin/bash}' * | wc -l
+	@echo
+	@echo "Code"
 	@echo -n "Total lines of code: "
 	@cat \
 		../VERSION \
 		../config/* ../hooks/* \
 		../../git-core/* \
 	| wc -l
+	@echo -n "Lines of doc. in code: "
+	@awk '/=pod/,/=cut/ {print /bin/bash}; /=internal-pod/,/=internal-cut/ {print /bin/bash}' ../../git-core/* | wc -l
+	@echo
 	@echo -n "Total for all: "
 	@cat \
 		Makefile *.md *.sh *.inc \
@@ -98,3 +106,5 @@ stats :
 		../config/* ../hooks/* \
 		../../git-core/* \
 	| wc -l
+	@echo -n "Total lines of doc: "
+	@awk '/=pod/,/=cut/ {print /bin/bash}; /=internal-pod/,/=internal-cut/ {print /bin/bash}' * ../../git-core/* | wc -l

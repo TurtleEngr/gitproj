@@ -12,7 +12,7 @@
 	test = /usr/share/doc/git-proj/test
 	proj-name = TBD
 	git-flow-pkg = git-flow
-	remote-min-size = 20g
+	remote-min-size = 2g
 [gitproj "hook"]
 	auto-move = true
 	binary-file-size-limit = 10k

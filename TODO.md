@@ -1,38 +1,11 @@
 # TODO
 
-* Code test-com.sh, gitproj-com.inc - mostly done
-
-* Code test-gitproj.sh, git-proj - mostly done
-
-* Make a small test project for setup/teardown - done (see Makefile)
-
-* Code test-init.sh, git-proj-init, gitproj-init.inc  - mostly done
-
 * Update status configs:
   - proj-status = installed, install-errors (add)
   - local-status = not-defined, defined (rename proj-status)
   - remote-status = not-defined, defined, multiple-defined
 
-* Setup defaults for for ~/.gitconfig, etc - mostly done
-
-* Code git-proj-remote - split out from git-proj-init - done
-
-* Refactor where the binary files live. Managing the raw symlink and
-the file outside of the GIT_DIR is messy. Simplify: create "raw" dir
-under GIT_DIR, add "raw" to .gitignore, and put all binary files in
-"raw". Now it is easily found; no indirection or other area to manage.
-
-The user is also free to make "raw" a symlink, to balance disk space
-(the gitproj code just needs to "follow" symlinks when copying files
-from raw to/from the "remote" location.)
-
-Done
-
-* Refactor how values are "returned". Rather than echoing the value to
-be "caught", or setting the actual (external) variable, it would be
-better to see a "temporary" external variable, then set the "actual"
-variable to the temp variable. The advantage: testing is easier, and
-independent of "special" variables.
+* Code git-proj-remote
 
 * Code git-proj-clone
 
@@ -75,14 +48,7 @@ independent of "special" variables.
          0 if ver = FILE
          1 if ver > FILE
          2 if ver > FILE if Major part is >
-
-* Version management. If installed Major number is different from
-  expected "ver" in config. then exit with error. Ask user to install
-  the older version, or they should make changes to be compatable,
-  then set the "ver" number in the config. Or better supply an option
-  to automatically upgrade, and it will set "ver" in the configs.  If
-  the Minor number is different, just warn the user(?) and continue.
-
+  
 * Cleanup the user docs. (bump the "patch" number for doc-only changes)
 
 * Make and cleanup the internal docs.
@@ -92,7 +58,60 @@ independent of "special" variables.
 * Verify install with gitproj-com.test
 
 * Fixup gitproj-com.test so it can be run from /usr/share/doc/git-proj
-or from gitproj working dir.
+  or from gitproj working dir.
 
 * More travis-ci. Run tests with changes to develop or main
-branches. Build the package. Install the package. Verify the install.
+  branches. Build the package. Install the package. Verify the
+  install.
+
+----
+
+## Future
+
+* Future feature: manage different versions of binary files with a
+  process similar to rsapshot. Use rsync's 3-way link feature, when
+  there are differences. A datestamped dir can be used for the
+  different version "snapshots". Requires Linux formatted filesystems
+  that support hardlinks. May only work well with "mounted" disks.
+
+* Future feature: support remote large files across the network. Also
+  support alternate remote sources, not just "origin".
+
+----
+
+## Done
+
+* Code test-com.sh, gitproj-com.inc - mostly done
+
+* Code test-gitproj.sh, git-proj - mostly done
+
+* Make a small test project for setup/teardown - done (see Makefile)
+
+* Code test-init.sh, git-proj-init, gitproj-init.inc  - mostly done
+
+* Setup defaults for for ~/.gitconfig, etc - mostly done
+
+* Code git-proj-remote - split out from git-proj-init - done
+
+* Refactor where the binary files live. Managing the raw symlink and
+  the file outside of the GIT_DIR is messy. Simplify: create "raw" dir
+  under GIT_DIR, add "raw" to .gitignore, and put all binary files in
+  "raw". Now it is easily found; no indirection or other area to
+  manage.
+  The user is also free to make "raw" a symlink, to balance disk space
+  (the gitproj code just needs to "follow" symlinks when copying files
+  from raw to/from the "remote" location.)  Done
+
+* Refactor how values are "returned". Rather than echoing the value to
+  be "caught", or setting the actual (external) variable, it would be
+  better to see a "temporary" external variable, then set the "actual"
+  variable to the temp variable. The advantage: testing is easier, and
+  independent of "special" variables.
+
+* Version management. If installed Major number is different from
+  expected "ver" in config. then exit with error. Ask user to install
+  the older version, or they should make changes to be compatable,
+  then set the "ver" number in the config. Or better supply an option
+  to automatically upgrade, and it will set "ver" in the configs.  If
+  the Minor number is different, just warn the user(?) and continue.
+  Mostly done

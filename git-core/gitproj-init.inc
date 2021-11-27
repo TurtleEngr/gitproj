@@ -67,7 +67,8 @@ fInitSetGlobals()
     gpLocalRawDir=$gpLocalTopDir/raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
-    gpRemoteMinSpace=$(fComGetConfig -k "gitproj.config.remote-min-space" -d "20g")
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #20g
+
     gpAutoMove="true"
     gpGitFlow="false"
     gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
@@ -90,6 +91,7 @@ fInitSetGlobals()
 fInitGettingStarted()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
 
     cat <<EOF
 
@@ -104,7 +106,9 @@ EOF
         fLog -p debug-2 -m "fInitGettingStarted in $PWD" -l $tSrc:$LINENO
         return 0
     fi
-    while true; do
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+
         echo -n "Continue [y/n]? "
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
@@ -116,6 +120,10 @@ EOF
         fi
         echo "$tResult is not valid."
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
+
     return 0
 } #fInitGettingStarted
 
@@ -145,6 +153,7 @@ fInitGetLocalPath()
     local pLocalPath=$1
 
     local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
@@ -153,7 +162,9 @@ fInitGetLocalPath()
         fi
         return 0
     fi
-    while true; do
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+
         cat <<EOF | fmt
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
@@ -171,6 +182,10 @@ EOF
             break
         fi
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
+
     return 0
 } # fInitGetLocalPath
 
@@ -197,6 +212,7 @@ fInitGetSize()
     local pMaxSize=$1
 
     local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
@@ -206,7 +222,9 @@ fInitGetSize()
         return 0
     fi
 
-    while true; do
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+
         cat <<EOF | fmt
 Define the size for large binary files. Format: Nb, Nk, Nm, or Ng
 EOF
@@ -223,6 +241,11 @@ EOF
             break
         fi
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
+
+    return 0
 } # fInitGetSize
 
 # --------------------
@@ -256,6 +279,7 @@ fInitGetBinaryFiles()
 fInitGetMoveFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
     declare -l tResult
 
     fLog -p info -m "These binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
@@ -269,7 +293,9 @@ fInitGetMoveFiles()
         return 0
     fi
 
-    while true; do
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+
         cat <<EOF | fmt
 
 The listed files can be moved to the project's raw directory. Paths
@@ -294,6 +320,10 @@ EOF
             break
         fi
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
+
     return 0
 } # fInitGetMoveFiles
 
@@ -301,6 +331,7 @@ EOF
 fInitGetGitFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
     declare -l tResult
 
     fComCheckPkg $gpGitFlowPkg
@@ -313,7 +344,9 @@ fInitGetGitFlow()
         return 0
     fi
 
-    while true; do
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+
         echo -n "Setup git-flow (-f) [y/n/quit]? "
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
@@ -330,6 +363,10 @@ fInitGetGitFlow()
             break
         fi
     done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
+
     return 0
 } # fInitGetGitFlow
 
@@ -337,6 +374,7 @@ fInitGetGitFlow()
 fInitSummary()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
     declare -l tResult
 
     cat <<EOF
@@ -372,7 +410,9 @@ binary-file-size-limit = $gpMaxSize
 
 EOF
     if [ $gpAuto -eq 0 ]; then
-        while true; do
+        while [ $tMaxLoop -gt 0 ]; do
+            let --tMaxLoop
+
             echo -n "Continue with creating a local git repo [y/n]? "
             read -r tResult
             tResult=${tResult%${tResult#[a-z]}}
@@ -385,6 +425,9 @@ EOF
             fi
             fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
         done
+    	if [ $tMaxLoop -eq 0 ]; then
+            fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    	fi
     fi
     return 0
 } # fInitSummary

@@ -424,46 +424,74 @@ testRemoteGetAnotherMountDir()
 {
     local tMountDir
     local tResult
+    
+    # 2GB
+    gpRemoteMinSpace=2147483648
 
     tMountDir=$cDatMount1
-    tResult=$(fRemoteGetAnotherMountDir $tMountDir 2>&1 < <(echo -e "\nq\n"))
+    tResult=$(fRemoteGetAnotherMountDir "$tMountDir" "2024" 2>&1 < <(echo -e "\nq\n"))
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO tResult" "$tResult" "Quitting"
 
-    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "/tmp/foo\n/tmp/bar\nquit\n"))
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" "2024" 2>&1 < <(echo -e "/tmp/foo\n/tmp/bar\nquit\n"))
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/foo"
     assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/bar"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     gpProjName=example
-    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "$cDatMount3/video-2019-11-26\nquit\n"))
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" "2024" 2>&1 < <(echo -e "$cDatMount3/video-2019-11-26\nquit\n"))
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "$gpProjName.git already exists"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-    fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "$cDatMount3/video-2020-04-02\nq\n") >/dev/null
+    fRemoteGetAnotherMountDir "/tmp/foo" "2024" 2>&1 < <(echo -e "$cDatMount2\n4\n") >/dev/null
     assertTrue "$LINENO" "$?"
-    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02" "$gResponse"
+    assertEquals "$LINENO $gResponse" "$cDatMount2" "$gResponse"
 
-    # The mount dir check for valid
-    # The mount dir check for space
-    # Use "q" to quit
+    # 1000 terabytes 1,073,741,824,000,000
+    gpRemoteMinSpace=1073741824000000
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" "$gpRemoteMinSpace" 2>&1 < <(echo -e "$cDatMount3/video-2020-04-02\n\n"))
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There is not enough space"
 
     return 0
 } # testRemoteGetAnotherMountDir
 
-TBDtestRemoteGetMountDirManual()
+testRemoteGetMountDirManual()
 {
-    # The selected mount dir checked for valid
-    # The selected mount dir checked for space
-    # Select 1 to Quit, return 1, echo QUIT
-    # Select 2 for Help, loop again
+    local tResult
+    local tMountDir
+
+    tAuto=0
+
+    tResult=$(fRemoteGetMountDir "$cDatMount3" < <(echo -e "1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    gpProjName=example
+    tResult=$(fRemoteGetMountDir "$cDatMount3" < <(echo -e "5\n1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "example.git already exists"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fRemoteGetMountDir "$cDatMount3" < <(echo -e "2\n1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "This is a list of dirs under the -d pMountDir"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    
     # Select 3 to define another dir, return 1, echo OTHER
+    fRemoteGetMountDir "$cDatMount3" < <(echo -e "3\n$cDatMount2\nq\n4\n") >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "$cDatMount2" "$gResponse"
+
     # Select 20 for no selection, loop again
     # Select 6 to return /mnt/usb-video/video-2020-04-02
-    startSkipping
-    fail "TBD"
+
+    # The selected mount dir checked space: enough/not-enough
+    # 1000 terabytes 1,073,741,824,000,000
+    gpRemoteMinSpace=1073741824000000
+
     return 0
 } # testRemoteGetMountDirManual
 

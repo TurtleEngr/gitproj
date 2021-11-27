@@ -26,6 +26,12 @@ gpBin=$PWD
 cd - >/dev/null 2>&1
 
 . $gpTest/test.inc
+fTestSetupEnv
+fTestCreateEnv
+cd $HOME >/dev/null 2>&1
+tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
+cd - >/dev/null 2>&1
+
 . $gpBin/gitproj-remote.inc
 
 tPrompt="Select by number, the location for the remote git and raw files? "
@@ -37,9 +43,16 @@ And might lists other possible mounted directories to choose from.
 EOF
 )
 
-tResult=$(fRemoteSelect "$tPrompt" "$tDirList" "$tHelp")
-tStatus=$?
+gpAuto=0
+#echo "cDatMount3=$cDatMount3"
+#echo "tDirList=$tDirList"
 
+gpProjName=example
+gpLocalTopDir=$cDatHome/$cDatProj1
+
+fRemoteGetMountDir $cDatMount3
+tStatus=$?
+echo
 echo '======================='
-echo "Selected: $tResult"
+echo "Selected: gResponse=$gResponse"
 echo "Status=$tStatus"
