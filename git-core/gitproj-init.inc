@@ -455,8 +455,7 @@ directories to point to the files.
 
 The initial working directory was created at $HOSTNAME:$gpLocalTopDir
 
-For help with the "git proj" subcommand, just cd into the working directory
-and type "git proj".
+For help with the "git proj" subcommand, just type "git proj -h".
 EOF
     cd - >/dev/null 2>&1
     return 0
@@ -552,27 +551,34 @@ fInitMkGitDir()
     local tStatus
 
     cd $gpLocalTopDir >/dev/null 2>&1
+    
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
     cp $gpDoc/config/gitignore.default .gitignore
 
     fLog -p info -m "git init" -l $tSrc:$LINENO
     git init
+    
     fLog -p info -m "git add FILES" -l $tSrc:$LINENO
     git add .gitignore *
+    
     fLog -p info -m "git commit" -l $tSrc:$LINENO
     git commit -am "Initial commit"
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
         fError -i "Initial git commit failed." -l $tSrc:$LINENO
     fi
+    
     fLog -p info -m "Rename master to main" -l $tSrc:$LINENO
     git branch --move master main
     fLog -p info -m "Create develop branch" -l $tSrc:$LINENO
     git branch develop
     git checkout develop
+    
     fInitMkGitFlow
     git branch
     git status
+
+    cp $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
 
     return 0
 } # fInitMkGitDir

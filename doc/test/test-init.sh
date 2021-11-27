@@ -764,6 +764,8 @@ testInitMkGitDir()
         tar -cvzf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
     fi
 
+    assertTrue "$LINENO" "[ -x $tTop/.git/hooks/pre-commit ]"
+
     return 0
 } # testInitMkGitDir
 

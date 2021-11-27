@@ -485,9 +485,6 @@ testRemoteGetMountDirManual()
     assertTrue "$LINENO" "$?"
     assertEquals "$LINENO" "$cDatMount2" "$gResponse"
 
-    # Select 20 for no selection, loop again
-    # Select 6 to return /mnt/usb-video/video-2020-04-02
-
     # The selected mount dir checked space: enough/not-enough
     # 1000 terabytes 1,073,741,824,000,000
     gpRemoteMinSpace=1073741824000000
@@ -519,26 +516,45 @@ testRemoteGetRemoteRawDir()
 } # testRemoteGetRemoteRawDir
 
 # --------------------------------
-TBDtestRemoteCheckSpace()
+testRemoteMkRemoteAuto()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+
+    gpAuto=1
+    gpVerbose=2
+
+    gpLocalTopDir=$cDatHome/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    gpProjName=george
+    gpMountDir=$cDatMount3/video-2020-04-02
+    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+
+    # Mount dir has already been valided
+    tResult=$(fRemoteMkRemote $cDatMount3/video-2020-04-02 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "git clone to $gpMountDir"
+    assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
+    assertContains "$LINENO $tResult" "$tResult" "'rsync' -rlptz"
+    assertContains "$LINENO $tResult" "$tResult" "/$gpProjName.raw"
+
     return 0
-} # testRemoteCheckSpace
+} # testRemoteMkRemoteAuto
 
 # --------------------------------
-TBDtestRemoteMkRemote()
+TBDtestRemoteMkRemoteManual()
 {
-    startSkipping
-    fail "TBD"
+    gpAuto=0
+
     return 0
-} # testRemoteMkRaw
+} # testRemoteMkRawManual
 
 # --------------------------------
 TBDtestRemoteReport()
 {
-    startSkipping
-    fail "TBD"
+
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and"
+
     return 0
 } # testRemoteReport
 

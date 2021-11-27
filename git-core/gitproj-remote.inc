@@ -335,16 +335,18 @@ fRemoteMkRemote()
     local tVerbose
 
     cd $pMountDir >/dev/null 2>&1
-    fLog -p notice -m "git clone" -l $tSrc:$LINENO
+    fLog -p notice -m "git clone to $pMountDir" -l $tSrc:$LINENO
     git clone --bare --local --no-hardlinks --progress -v $gpLocalTopDir/.git
     cd - >/dev/null 2>&1
 
     fLog -p info -m "Set remote origin" -l $tSrc:$LINENO
+    
     git remote add origin $pMountDir/$tProjName.git
-    git config branch.main.remote origin
-    git config branch.main.merge refs/heads/main
-    git config branch.develop.remote origin
-    git config branch.develop.merge refs/heads/main
+    fComSetConfig -l -k "branch.main.remote" -v "origin"
+    fComSetConfig -l -k "branch.main.remote" -v "origin"
+    fComSetConfig -l -k "branch.main.merge" -v "refs/heads/main"
+    fComSetConfig -l -k "branch.develop.remote" -v "origin"
+    fComSetConfig -l -k "branch.develop.merge" -v "refs/heads/main"
 
     mkdir -p $gpRemoteRawDir
     if [ $gpVerbose -ge 1 ]; then
@@ -353,11 +355,14 @@ fRemoteMkRemote()
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-vP
     fi
-    rLog -p notice -m "'rsync'-rlptz $tVerbose $gpLocalTopDir $gpLocalTopDir/raw/* $gpRemoteRawDir/"
-    'rsync'-rlptz $tVerbose $gpLocalTopDir/raw/* $gpRemoteRawDir/
+    fLog -p notice -m "'rsync' -rlptz $tVerbose $gpLocalTopDir/raw/* $gpLocalTopDir/raw/* $gpRemoteRawDir/"
+    'rsync' -rlptz $tVerbose $gpLocalTopDir/raw/* $gpRemoteRawDir/
     if [ $? -ne 0 ]; then
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
     fi
+
+    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
+    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
 
     return 0
 } # fRemoteMkRemote
@@ -366,13 +371,58 @@ fRemoteMkRemote()
 fRemoteReport()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tGitOrigin
+    local tRawOrigin
+    local tProjName
+
+    # Double check the settings
+
+    gErr=0
+
+    tGitOrigin=$($cGetOrigin)
+    if [ -z "$tGitOrigin" ]; then
+        fError -i -n -m "Git origin is not set." -l $tSrc:$LINENO
+    fi
+    
+    tProjName=${tGitOrigin##*/}
+    if [ "$tProjName" != "$gpProjName" ]; then
+        fError -i -n -m "Origin does not match project name." -l $tSrc:$LINENO
+    fi
+
+    tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
+    if [ "$tRawOrigin" = "TBD" ]; then
+        fError -i -n -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+    fi
+    if [ -z "$gpRemoteRawDir" ]; then
+        fError -i -n -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+    fi
+    if [ ! -d $gpRemoteRawDir ]; then
+        fError -i -n -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO
+    fi
+    if [ "${gpRemoteRawDir##*/}" != "$gpProjName.raw" ]; then
+        fError -i -n -m "$gpRemoteRawDir does not match $gpProjName.raw" -l $tSrc:$LINENO
+    fi
+    if [ "$tRawOrigin" != "$gpRemoteRawDir" ]; then
+        fError -i -n -m "$tRawOrigin != $gpRemoteRawDir" -l $tSrc:$LINENO
+    fi
+
+    if [ $gErr -ne 0 ]; then
+        fError -i -m "The above errors need to be fixed." -l $tSrc:$LINENO
+    fi
+
+    # All looks OK, so set remote-status to "defined"
+    gpRemoteStatus="defined"
+    fComSetConfig -H -k "config gitproj.config.remote-status" -v "$gpRemoteStatus"
 
     echo 'Remote origin is now set to:'
     $cGetOrigin
-    cat <<EOF
-Be sure the disk is mounted and $gpPath exists.
-Then you can use: "git push origin BRANCH" and "git pull origin BRANCH"
-If the mount path is changed, use "git proj config" to update the origin.
+    cat <<EOF | fmt
+
+Be sure the disk is mounted and $tGitOrigin and $gpRemoteRawDir exist.
+Then you can use: "git push origin BRANCH" and "git pull origin
+BRANCH" If the mount path is changed or you are on a different system,
+use "git proj config" to update the git and raw origin paths.
+
 EOF
     return 0
 } # fRemoteReport

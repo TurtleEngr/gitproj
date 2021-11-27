@@ -1,5 +1,15 @@
 #!/bin/bash
-# To enable this hook, rename this file to "pre-commit".
+# This file is copied from gitproj doc/hooks/pre-commit to .git/hooks
+# These gitproj config hook vars control this script:
+# pre-commit-enabled = if true, this script is enabled
+# check-file-names = if true, "abnormal" file names will not be allowed
+# check-for-big-files = if true, files bigger than
+#     binary-file-size-limit cannot be committed.
+# binary-file-size-limit = defines the max size. # of bytes if no suffix.
+#     Suffixes: k,m,g
+# auto-move = if true, then binary files > binary-file-size-limit will
+#     be moved to the GIT_DIR/raw/ directory. See 'git proj move', if this
+#     is set to false.
 
 local tAgainst
 local tCheckBigFiles
