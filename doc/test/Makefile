@@ -34,7 +34,7 @@ mTestEnvFiles = \
 	test-env_HomeAfterBMove.tgz \
 	test-env_ProjAfterGInit.tgz \
 	test-env_ProjLocalDefined.tgz \
-	test-env_HomeAfterMkRemote.tgz
+	test-env_TestDestDirAfterMkRemote.tgz
 
 # --------------------
 test-all : $(mDepList) $(mBaseList) test-cmds
