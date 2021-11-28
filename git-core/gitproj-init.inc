@@ -624,9 +624,11 @@ fInitSaveVarsToConfigs()
     fComSaveVar2Config $tFile $tS.facility gpFacility
     fComSaveVar2Config $tFile $tS.syslog gpSysLog
 
-    for tFile in $gpLocalTopDir/$cConfigLocal \
+    for tFile in \
+        $gpLocalTopDir/$cConfigLocal \
         $gpLocalTopDir/$cConfigHost; do
         tS=gitproj.config
+        fComSaveVar2Config $tFile $tS.ver gpVer
         fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
         fComSaveVar2Config $tFile $tS.remote-status gpRemoteStatus
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
