@@ -1317,6 +1317,27 @@ fComAllMustBeReadable()
     return 0
 } # fComAllMustBeReadable
 
+fComFmt()
+{
+    # Call fmt, setting the width based on the the terminal COLUMNS
+    # width.  Set to COLUMNS - 5, but no less than 30 and no more than
+    # 130 characters wide.
+    
+    local tWidth
+
+    if [ -z "$COLUMNS" ]; then
+        COLUMNS=80
+    fi
+    let tWidth=COLUMNS-5
+    if [ $tWidth -lt 30 ]; then
+        tWidth=30
+    fi
+    if [ $tWidth -gt 130 ]; then
+        tWidth=130
+    fi
+    fmt -w $tWidth
+} # fComFmt
+
 # ========================================
 export tSrc=${BASH_SOURCE##*/}
 fComSetGlobals

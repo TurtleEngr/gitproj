@@ -594,6 +594,46 @@ testComStackTrace()
 } # testComStackTrace
 
 # --------------------------------
+testComFmt()
+{
+    local tText
+    local tResult
+    local tExpect
+
+    tText=$(for i in $(seq 1 300); do echo -n "x "; done)
+
+    COLUMNS=50
+    tExpect=45
+    tResult=$(echo "$tText" | fComFmt | head -n 1)
+    assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
+
+    COLUMNS=20
+    tExpect=30
+    tResult=$(echo "$tText" | fComFmt | head -n 1)
+    assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
+    
+    COLUMNS=35
+    tExpect=30
+    tResult=$(echo "$tText" | fComFmt | head -n 1)
+    assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
+  
+    COLUMNS=120
+    tExpect=115
+    tResult=$(echo "$tText" | fComFmt | head -n 1)
+    assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
+
+    COLUMNS=145
+    tExpect=130
+    tResult=$(echo "$tText" | fComFmt | head -n 1)
+    assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
+
+    COLUMNS=""
+    tExpect=75
+    tResult=$(echo "$tText" | fComFmt | head -n 1)
+    assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
+} # testComFmt
+
+# --------------------------------
 testComSetConfigMore()
 {
     startSkipping

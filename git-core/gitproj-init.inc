@@ -165,7 +165,7 @@ fInitGetLocalPath()
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
 
-        cat <<EOF | fmt
+        cat <<EOF | fComFmt
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 EOF
@@ -225,7 +225,7 @@ fInitGetSize()
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
 
-        cat <<EOF | fmt
+        cat <<EOF | fComFmt
 Define the size for large binary files. Format: Nb, Nk, Nm, or Ng
 EOF
         echo "Size (-s) [$pMaxSize/quit]? "
@@ -269,7 +269,7 @@ fInitGetBinaryFiles()
         fi
     done
     if [ -n "$tFileList" ]; then
-        echo $tFileList | fmt
+        echo $tFileList | fComFmt
         return 0
     fi
     return 1
@@ -296,7 +296,7 @@ fInitGetMoveFiles()
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
 
-        cat <<EOF | fmt
+        cat <<EOF | fComFmt
 
 The listed files can be moved to the project's raw directory. Paths
 will be created in the raw directory that correspond to the project's
@@ -688,7 +688,7 @@ fInitCreateLocalGit()
     gpLocalStatus=defined
     fInitSaveVarsToConfigs
 
-    cat <<EOF | fmt
+    cat <<EOF | fComFmt
 
 You now have a local git repository project (${gpProjName}) setup at
 ${gpLocalTopDir} with support for managing large binary files (larger

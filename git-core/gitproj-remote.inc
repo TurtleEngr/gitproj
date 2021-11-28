@@ -381,14 +381,16 @@ fRemoteReport()
 
     gErr=0
 
+    cd $gpLocalTopDir >/dev/null 2>&1
     tGitOrigin=$($cGetOrigin)
     if [ -z "$tGitOrigin" ]; then
         fError -i -n -m "Git origin is not set." -l $tSrc:$LINENO
     fi
 
     tProjName=${tGitOrigin##*/}
+    tProjName=${tProjName%.git}
     if [ "$tProjName" != "$gpProjName" ]; then
-        fError -i -n -m "Origin does not match project name." -l $tSrc:$LINENO
+        fError -i -n -m "Origin name ($tProjName) does not match project name ($gpProjName)." -l $tSrc:$LINENO
     fi
 
     tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
@@ -414,16 +416,17 @@ fRemoteReport()
 
     # All looks OK, so set remote-status to "defined"
     gpRemoteStatus="defined"
-    fComSetConfig -H -k "config gitproj.config.remote-status" -v "$gpRemoteStatus"
+    fComSetConfig -H -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
+    fComSetConfig -L -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
 
     echo 'Remote origin is now set to:'
     $cGetOrigin
-    cat <<EOF | fmt
+    cat <<EOF | fComFmt
 
-Be sure the disk is mounted and $tGitOrigin and $gpRemoteRawDir exist.
-Then you can use: "git push origin BRANCH" and "git pull origin
-BRANCH" If the mount path is changed or you are on a different system,
-use "git proj config" to update the git and raw origin paths.
+Be sure the disk is mounted and that $tGitOrigin and $gpRemoteRawDir
+exists.  Then you can use: "git push origin BRANCH" and "git pull
+origin BRANCH" If the mount path is changed or you are on a different
+system, use "git proj config" to update the git and raw origin paths.
 
 EOF
     return 0

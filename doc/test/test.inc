@@ -3,8 +3,8 @@
 # --------------------------------
 # Test globals
 
-export cCurDir cDatHome cHome cTestCurDir cTestDestDir cTestDestDir \
-    cTestFiles cTestFiles cTestSrcDir cTestSrcDir HOSTNAME
+export cCurDir cDatHome cHome cTestCurDir cTestDestDir \
+    cTestFiles cTestSrcDir  HOSTNAME
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer

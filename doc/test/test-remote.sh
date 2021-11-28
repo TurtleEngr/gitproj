@@ -560,9 +560,22 @@ TBDtestRemoteMkRemoteManual()
 } # testRemoteMkRawManual
 
 # --------------------------------
-TBDtestRemoteReport()
+testRemoteReport()
 {
+    local tResult
 
+    cd $cTestDestDir >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz
+
+    gpAuto=1
+    gpVerbose=2
+    gpLocalTopDir=$cDatHome/$cDatProj1
+    gpProjName=george
+    gpMountDir=$cDatMount3/video-2020-04-02
+    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fRemoteReport 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and"
 
