@@ -28,6 +28,7 @@
 * Build: make a script to inc version tag "major.minor.fix-rc.N+build" parts
   See: https://semver.org/ for a RegEx pattern matcher (so imp. with Perl)
   This supports a proper sub-set of semver.
+
     sem-ver [-M] [-m] [-p] [-b] [-d ver] FILE[:key]
       -M inc major, set minor, see -m (if rc, inc it, set all others to 0)
       -m inc minor, set patch to 0, see -p (if rc, inc it, set all others to 0)
@@ -49,7 +50,7 @@
          1 if ver > FILE if patch part is >
          2 if ver > FILE if minor part is >
          3 if ver > FILE if Major part is >
-	 
+         
   Rather than FILE, support reporting and updating the version number
   in a git variable. That means the git config file and variable key
   needs to be defined. Maybe use: FILE:KEY For example:
