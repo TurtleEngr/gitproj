@@ -28,13 +28,12 @@
 * Build: make a script to inc version tag "major.minor.fix-rc.N+build" parts
   See: https://semver.org/ for a RegEx pattern matcher (so imp. with Perl)
   This supports a proper sub-set of semver.
-    sem-ver [-M] [-m] [-p] [-b] FILE
-      -M inc major, set minor, see -m (if rc, inc it)
-      -m inc minor, set patch to 0, see -p (if rc, inc it)
-      -p inc patch, if "rc", set it to 1, if build, set it to 0, (if
-         rc, inc it)
-      -r inc the release number, if none, inc with -m option, then insert
-         "-rc.1" after "fix" and before +, if build set it to 1
+    sem-ver [-M] [-m] [-p] [-b] [-d ver] FILE[:key]
+      -M inc major, set minor, see -m (if rc, inc it, set all others to 0)
+      -m inc minor, set patch to 0, see -p (if rc, inc it, set all others to 0)
+      -p inc patch (if rc, inc it, set build to 0)
+      -r inc the release number, if none, inc patch, then insert
+         "-rc.1" after "patch" and before +, if build set it to 0
       -b inc build, if none, append "+1"
       -c clear release and build parts (do this afer a "release")
       If file does not exist, create file with 0.1.0
@@ -42,13 +41,20 @@
       -v output with no build part
       -V output just the major.minor.fix parts
       Difference compare with expected "ver"
-      -d "ver" - Build numbers are ignored. Return
-         -2 if ver < FILE if Major part is <
-         -1 if ver < FILE
+      -d "ver" - only compare major, minor, and patch parts. Ignore the rest.
+         -3 if ver < FILE if Major part is <
+         -2 if ver < FILE if minor part is <
+         -1 if ver < FILE if patch part is <
          0 if ver = FILE
-         1 if ver > FILE
-         2 if ver > FILE if Major part is >
-  
+         1 if ver > FILE if patch part is >
+         2 if ver > FILE if minor part is >
+         3 if ver > FILE if Major part is >
+	 
+  Rather than FILE, support reporting and updating the version number
+  in a git variable. That means the git config file and variable key
+  needs to be defined. Maybe use: FILE:KEY For example:
+  .gitproj.config.local:gitproj.config.proj-ver
+
 * Cleanup the user docs. (bump the "patch" number for doc-only changes)
 
 * Make and cleanup the internal docs.
