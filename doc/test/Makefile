@@ -33,7 +33,8 @@ mCmdToDo = \
 mTestEnvFiles = \
 	test-env_HomeAfterBMove.tgz \
 	test-env_ProjAfterGInit.tgz \
-	test-env_ProjLocalDefined.tgz
+	test-env_ProjLocalDefined.tgz \
+	test-env_HomeAfterMkRemote.tgz
 
 # --------------------
 test-all : $(mDepList) $(mBaseList) test-cmds
@@ -74,6 +75,9 @@ test-env_ProjAfterGInit.tgz :
 
 test-env_ProjLocalDefined.tgz :
 	export gpSaveTestEnv=1; ./test-init.sh testInitCreateLocalGitAuto
+
+test-env_TestDestDirAfterMkRemote.tgz :
+	export gpSaveTestEnv=1; ./test-remote.sh testRemoteMkRemoteAuto
 
 # --------------------
 stats :

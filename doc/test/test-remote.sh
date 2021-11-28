@@ -531,11 +531,22 @@ testRemoteMkRemoteAuto()
 
     # Mount dir has already been valided
     tResult=$(fRemoteMkRemote $cDatMount3/video-2020-04-02 2>&1)
-    assertTrue "$LINENO" "$?"
+    tStatus=$?
+    assertTrue "$LINENO" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "git clone to $gpMountDir"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "'rsync' -rlptz"
     assertContains "$LINENO $tResult" "$tResult" "/$gpProjName.raw"
+
+    # ----------
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
+        echo -e "\tCapture state of test env after fRemoteMkRemote is run."
+        echo -e "\tRestore test-env_HomeAfterMkRemote.tgz relative to env cTestDestDir"
+        cd $cTestDestDir >/dev/null 2>&1
+        echo -en "\t"
+        tar -cvzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz test
+        echo
+    fi
 
     return 0
 } # testRemoteMkRemoteAuto
