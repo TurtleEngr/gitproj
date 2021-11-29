@@ -185,48 +185,64 @@ testGitProjRemote()
 testComGetVer()
 {
     local tResult
-    local tVer
 
+    gpDebug=2
+    gpVerbose=2
+
+    cd $cDatHome >/dev/null 2>&1
     tResult=$(fComGetVer 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "You must be in a git workspace for this command"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    
+    cGitProjVersion="0.1.0"
+    fComSetConfig -H -k "gitproj.config.ver" -v "0.1.0"
+    fComGetVer 2>&1
     assertTrue "$LINENO" "$?"
-    assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
+    assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
 
     cGitProjVersion="0.1.8"
+    fComSetConfig -H -k "gitproj.config.ver" -v "0.1.0"
     tResult=$(fComGetVer 2>&1)
     assertTrue "$LINENO" "$?"
-    assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
+    assertContains "$LINENO" "$cGitProjVersion" "${gpVer%.*}"
 
-    cGitProjVersion="0.2.0"
+    cGitProjVersion="1.1.4+120"
+    fComSetConfig -H -k "gitproj.config.ver" -v "2.3.1-rc+28"
     tResult=$(fComGetVer 2>&1)
-    assertTrue "$LINENO" "$?"
-    assertContains "$LINENO" "$tResult" "warning"
-    assertContains "$LINENO" "$tResult" "but installed version is"
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "crit: "
+    assertContains "$LINENO" "$tResult" "The installed version $cGitProjVersion needs to be upgraded"
 
-    cGitProjVersion="1.3.0"
+    cGitProjVersion="2.3.1-rc+28"
+    fComSetConfig -H -k "gitproj.config.ver" -v "1.1.4+120"
     tResult=$(fComGetVer 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "crit: "
     assertContains "$LINENO $tResult" "$tResult" "project needs to be upgraded"
 
-    gpDebug=2
-    gpVerbose=2
-
-    cGitProjVersion="0.2.0"
-    tVer=1.3
-    fComSetConfig -G -k "gitproj.config.ver" -v "$tVer"
+    cGitProjVersion="1.2.7-rc.3+5"
+    fComSetConfig -H -k "gitproj.config.ver" -v "1.3.0"
     tResult=$(fComGetVer 2>&1)
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: "
-    assertContains "$LINENO $tResult" "$tResult" "installed version $cGitProjVersion needs to be upgraded to $tVer or greater"
-    return 0
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "warning: "
+    assertContains "$LINENO $tResult" "$tResult" "Minor version difference. Expected version"
 
-    fComUnsetConfig -G -k "gitproj.config.ver"
+    cGitProjVersion="1.3.0"
+    fComSetConfig -H -k "gitproj.config.ver" -v "1.2.7-rc.3+5"
     tResult=$(fComGetVer 2>&1)
-    assertTrue "$LINENO" "$?"
-    assertContains "$LINENO" "$tResult" "warning"
-    assertContains "$LINENO" "$tResult" "Internal"
-    assertContains "$LINENO" "$tResult" "gitproj.config.ver was not found"
-    assertContains "$LINENO" "$cGitProjVersion" "$gpVer"
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "warning: "
+    assertContains "$LINENO $tResult" "$tResult" "Minor version difference. Expected version"
+
+    fComUnsetConfig -L -k "gitproj.config.ver"
+    fComUnsetConfig -H -k "gitproj.config.ver"
+    tResult=$(fComGetVer 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "warning: "
+    assertContains "$LINENO $tResult" "$tResult" "gitproj.config.ver was not found"
 
     return 0
 } # testComGetVer

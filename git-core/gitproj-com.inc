@@ -125,50 +125,6 @@ EOF
 # ========================================
 # Common Functions
 
-fComGetVer()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tIVer
-    local tIMajor
-    local tIMinor
-    local tLMajor
-    local tLMinor
-    local tTrim
-
-    # Get the Installed Version
-    tIVer=$cGitProjVersion
-    # Only the first two # are important
-    tTrim=${tIVer#*.*.}
-    tIVer=${tIVer%.$tTrim}
-    tIMajor=${tIVer%.*}
-    tIMinor=${tIVer#*.}
-
-    # Get the expected Local Version
-    gpVer=$(fComGetConfig -k "gitproj.config.ver")
-    if [ -z "$gpVer" ]; then
-        gpVer=$cGitProjVersion
-        fLog -i -p warning -m "gitproj.config.ver was not found" -l $tSrc:$LINENO
-        return 0
-    fi
-    # Only the first two # are important
-    tTrim=${gpVer#*.*.}
-    gpVer=${gpVer%.$tTrim}
-    tLMajor=${gpVer%.*}
-    tLMinor=${gpVer#*.}
-
-    if [ $tLMajor -gt $tIMajor ]; then
-        fError -m "Expected version $gpVer The installed version $cGitProjVersion needs to be upgraded to $gpVer or greater." -l $tSrc:$LINENO
-    fi
-    if [ $tLMajor -lt $tIMajor ]; then
-        fError -m "Expected version $gpVer  The project needs to be upgraded to the installed version $cGitProjVersion" -l $tSrc:$LINENO
-    fi
-    if [ $tLMinor -ne $tIMinor ]; then
-        fLog -p warning -m "Expected version $gpVer, but installed version is $cGitProjVersion" -l $tSrc:$LINENO
-    fi
-
-    return 0
-} # fComGetVer
-
 # -------------------
 fComSetGlobals()
 {
@@ -937,7 +893,7 @@ fComGetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :bd:f:gik:lv: tArg; do
+    while getopts :bd:f:gGHik:lv: tArg; do
         case $tArg in
             f)
                 if [ ! -f ${OPTARG} ]; then
@@ -945,7 +901,15 @@ fComGetConfig()
                     return 1
                 fi
                 ;;
-            l)
+            G)
+                if [ ! -f $HOME/$cConfigGlobal ]; then
+                    set +x
+                    fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+                    return 1
+                fi
+                set +x
+                ;;
+            H|l)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
                     fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
@@ -958,6 +922,8 @@ fComGetConfig()
             d) pDefault="${OPTARG}" ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
+            G) pScope="--file $HOME/$cConfigGlobal" ;;
+            H) pScope="--file $tTopDir/$cConfigHost" ;;
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
@@ -1005,7 +971,7 @@ fComGetConfig()
 
 =internal-head3 Synopsis
 
-    fComGetConfig -k pKey [-g|-l|-f pFile] [-b|-i] [-d pDefault] [-v pFilter]
+    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-d pDefault] [-v pFilter]
 
 =internal-head3 Description
 
@@ -1316,6 +1282,63 @@ fComAllMustBeReadable()
     fi
     return 0
 } # fComAllMustBeReadable
+
+fComGetVer()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tInsVer
+    local tInsMajor
+    local tInsMinor
+    local tLocVer
+    local tLocMajor
+    local tLocMinor
+    local tTrim
+
+    if ! fComMustBeInProjRepo $PWD; then
+        fError -m "Quitting" -l $tSrc:$LINENO
+    fi
+
+    # Get the expected Version for the "current" project
+    gpVer=$(fComGetConfig -k "gitproj.config.ver")
+    if [ -z "$gpVer" ]; then
+        gpVer=$cGitProjVersion
+        fLog -i -p warning -m "gitproj.config.ver was not found" -l $tSrc:$LINENO
+        return 1
+    fi
+
+    if [ "$gpVer" = "$cGitProjVersion" ]; then
+        return 0
+    fi
+
+    # Prep: tInsVer. Only the first two # are important
+    tTrim=${cGitProjVersion#*.*.}
+    tInsVer=${cGitProjVersion%.$tTrim}
+    tInsMajor=${tInsVer%.*}
+    tInsMinor=${tInsVer#*.}
+
+    # Prep: tLocVer. Only the first two # are important
+    tTrim=${gpVer#*.*.}
+    tLocVer=${gpVer%.$tTrim}
+    tLocMajor=${tLocVer%.*}
+    tLocMinor=${tLocVer#*.}
+
+    if [ $tLocMajor -gt $tInsMajor ]; then
+        fError -n -m "Expected version $tLocVer The installed version $cGitProjVersion needs to be upgraded to $tLocVer or greater." -l $tSrc:$LINENO
+	return 1
+    fi
+
+    if [ $tLocMajor -lt $tInsMajor ]; then
+        fError -n -m "Expected version $tLocVer  The project needs to be upgraded to the installed version $cGitProjVersion" -l $tSrc:$LINENO
+	return 1
+    fi
+
+    if [ $tLocMinor -ne $tInsMinor ]; then
+        fLog -p warning -m "Minor version difference. Expected version $tLocVer, but installed version is $tInsVer" -l $tSrc:$LINENO
+        return 0
+    fi
+
+    return 0
+} # fComGetVer
 
 fComFmt()
 {

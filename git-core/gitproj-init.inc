@@ -49,10 +49,7 @@ fInitSetGlobals()
 
     fInitFirstTimeSet
 
-    gpVer=$(fComGetConfig -k "gitproj.config.ver")
-    # Only the first two # are important
-    tTrim=${gpVer#*.*.}
-    gpVer=${gpVer%.$tTrim}
+    gpVer=$cGitProjVersion
 
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)

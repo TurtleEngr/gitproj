@@ -3,7 +3,6 @@
 # From: /usr/share/doc/gitproj/config/gitproj.config.global
 
 [gitproj "config"]
-	ver = 0.1.0
 	proj-status = installed
 	syslog = true
 	facility = user
