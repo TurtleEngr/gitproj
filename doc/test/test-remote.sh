@@ -178,7 +178,7 @@ testComGetVer()
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    
+
     cGitProjVersion="0.1.0"
     fComSetConfig -H -k "gitproj.config.ver" -v "0.1.0"
     fComGetVer 2>&1
@@ -576,7 +576,7 @@ testRemoteReport()
 
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz
-    
+
     gpAuto=1
     gpVerbose=2
     gpLocalTopDir=$cDatHome/$cDatProj1
@@ -646,7 +646,7 @@ testGitProjRemoteCLIAuto()
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "crit: You must be in a git workspace for this command"
     assertContains "$LINENO $tResult" "$tResult" "Usage:"
-    
+
     # Not in a proj dir
     cd $cDatHome/$cDatProj3 >/dev/null 2>&1
     tResult=$($gpBin/git-proj-remote -a -d $PWD 2>&1)

@@ -611,12 +611,12 @@ testComFmt()
     tExpect=30
     tResult=$(echo "$tText" | fComFmt | head -n 1)
     assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
-    
+
     COLUMNS=35
     tExpect=30
     tResult=$(echo "$tText" | fComFmt | head -n 1)
     assertTrue "$LINENO $tExpect got ${#tResult}" "[ ${#tResult} -le $tExpect ]"
-  
+
     COLUMNS=120
     tExpect=115
     tResult=$(echo "$tText" | fComFmt | head -n 1)

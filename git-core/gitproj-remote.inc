@@ -189,10 +189,10 @@ fRemoteSelect()
                 break
                 ;;
         esac
-	if [ -z "$tResponse" ]; then
+        if [ -z "$tResponse" ]; then
             fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
-	    continue
-	fi
+            continue
+        fi
         if [ -n "$tResponse" ]; then
             tStatus=0
             break
@@ -288,7 +288,7 @@ EOF
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
         fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
-	tStatus=$?
+        tStatus=$?
         tMountDir=$gResponse
         if [ "$tMountDir" = "QUIT" ]; then
             exit 1
@@ -300,9 +300,9 @@ EOF
             tDirList=$gResponse
             continue
         fi
-	if [ $tStatus -ne 0 ]; then
-	    continue
-	fi
+        if [ $tStatus -ne 0 ]; then
+            continue
+        fi
         if ! fRemoteCheckDir $tMountDir; then
             continue
         fi

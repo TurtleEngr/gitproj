@@ -4,7 +4,7 @@
 # Test globals
 
 export cCurDir cDatHome cHome cTestCurDir cTestDestDir \
-    cTestFiles cTestSrcDir  HOSTNAME
+    cTestFiles cTestSrcDir HOSTNAME
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer

@@ -503,29 +503,29 @@ fComFmtLog()
     gpDebug=${gpDebug:-0}
 
     case $pLevel in
-        emerg|emergency)
-	    pLevel=emerg
-	    ;;
-	alert)
-	    :
-	    ;;
-	crit|critical)
-	    pLevel=crit
-	    ;;
-	err|error)
-	    pLevel=err
-	    ;;
-	warning|warn)
-	    pLevel=warning
-	    ;;
-	notice|info|debug|debug-*)
-	    :
-	    ;;
-	*)
+        emerg | emergency)
+            pLevel=emerg
+            ;;
+        alert)
+            :
+            ;;
+        crit | critical)
+            pLevel=crit
+            ;;
+        err | error)
+            pLevel=err
+            ;;
+        warning | warn)
+            pLevel=warning
+            ;;
+        notice | info | debug | debug-*)
+            :
+            ;;
+        *)
             pMsg="Internal: (Unknown: $pLevel [$tSrc:$LINENO]) $pMsg"
-	    pLevel=err
-	    ;;
-    esac    
+            pLevel=err
+            ;;
+    esac
     tLevel=$pLevel
 
     # Check debug
@@ -931,7 +931,7 @@ fComGetConfig()
                 fi
                 set +x
                 ;;
-            H|l)
+            H | l)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
                     fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
@@ -1326,8 +1326,8 @@ fComGetVer()
         gpVer=$cGitProjVersion
         fLog -i -p warning -m 'gitproj.config.ver was not found. Setting it to: $gpVer' -l "$tSrc:$LINENO"
         return 1
-	fComSetConfig -L -k "gitproj.config.ver" -v "$gpVer"
-	fComSetConfig -H -k "gitproj.config.ver" -v "$gpVer"
+        fComSetConfig -L -k "gitproj.config.ver" -v "$gpVer"
+        fComSetConfig -H -k "gitproj.config.ver" -v "$gpVer"
     fi
     gpVer=$tLocVer
 
@@ -1349,12 +1349,12 @@ fComGetVer()
 
     if [ $tLocMajor -gt $tInsMajor ]; then
         fError -n -m "Expected version $tLocVer The installed version $cGitProjVersion needs to be upgraded to $tLocVer or greater." -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
 
     if [ $tLocMajor -lt $tInsMajor ]; then
         fError -n -m "Expected version $tLocVer  The project needs to be upgraded to the installed version $cGitProjVersion" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
 
     if [ $tLocMinor -ne $tInsMinor ]; then
@@ -1370,7 +1370,7 @@ fComFmt()
     # Call fmt, setting the width based on the the terminal COLUMNS
     # width.  Set to COLUMNS - 5, but no less than 30 and no more than
     # 130 characters wide.
-    
+
     local tWidth
 
     if [ -z "$COLUMNS" ]; then
