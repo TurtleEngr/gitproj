@@ -41,7 +41,7 @@
             -r inc the release number, if none, inc patch, then insert
                "-rc.1" after "patch" and before +, if build set it to 0
             -b inc build, if none, append "+1"
-            -c clear release and build parts (do this afer a "release")
+            -c clear release and build parts (do this after a "release")
             -v output with no build part
             -V output just the major.minor.fix parts
             -d "ver" - only compare major, minor, and patch parts. Ignore the rest.
@@ -68,7 +68,7 @@
 
 * Verify install with gitproj-com.test
 
-* Fixup gitproj-com.test so it can be run from /usr/share/doc/git-proj
+* Fix-up gitproj-com.test so it can be run from /usr/share/doc/git-proj
   or from gitproj working dir.
 
 * More travis-ci.
@@ -82,10 +82,17 @@
 ## Future
 
 * Future feature: manage different versions of binary files with a
-  process similar to rsapshot. Use rsync's 3-way link feature, when
-  there are differences. A datestamped dir can be used for the
-  different version "snapshots". Requires Linux formatted filesystems
-  that support hardlinks. May only work well with "mounted" disks.
+  process similar to rsnapshot. Use rsync's 3-way link feature, when
+  there are differences. A date-stamped dir can be used for the
+  different version "snapshots". Requires Linux formatted file-systems
+  that support hard-links. May only work well with "mounted" disks.
+
+* Or manage different versions of large binary files with "cvs". cvs
+  will track different versions of binary files as needed. If you want
+  to reduce the size of a versioned binary file, cvs has a very easy
+  way of removing the older versions. (A process that is very hard
+  with git.) This script shows one way that I am already using:e
+  https://github.com/TurtleEngr/my-utility-scripts/blob/develop/bin/vid-rm-ver
 
 * Future feature: support remote large files across the network. Also
   support alternate remote sources, not just "origin".
@@ -123,7 +130,7 @@
 
 * Version management. If installed Major number is different from
   expected "ver" in config. then exit with error. Ask user to install
-  the older version, or they should make changes to be compatable,
+  the older version, or they should make changes to be compatible,
   then set the "ver" number in the config. Or better supply an option
   to automatically upgrade, and it will set "ver" in the configs.  If
   the Minor number is different, just warn the user(?) and continue.
