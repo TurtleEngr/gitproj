@@ -1,19 +1,20 @@
 # TODO
 
 * Update status configs:
-  - proj-status = installed, install-errors (add)
-  - local-status = not-defined, defined (rename proj-status)
-  - remote-status = not-defined, defined, multiple-defined
 
-* Code git-proj-remote
+    * proj-status = installed, install-errors (add)
 
-* Code git-proj-clone
+    * local-status = not-defined, defined (rename proj-status)
 
-* Code git-proj-add (support adding whole directory trees)
+    * remote-status = not-defined, defined, multiple-defined
 
 * Code git-proj-push
 
 * Code git-proj-pull
+
+* Code git-proj-clone
+
+* Code git-proj-add (support adding whole directory trees)
 
 * Code git-proj-status
 
@@ -23,9 +24,11 @@
 
 * Refactor the test setup so it is simpler
 
+* Copy the test-env tar files to a "public" place.
+
 * Get travis-ci working. Run tests.
 
-* Build: make a script to inc version tag "major.minor.fix-rc.N+build" parts
+* Make a script to inc version tag "major.minor.fix-rc.N+build" parts
   See: https://semver.org/ for a RegEx pattern matcher (so imp. with Perl)
   This supports a proper sub-set of semver.
 
@@ -51,25 +54,28 @@
                  2 if ver > FILE if minor part is >
                  3 if ver > FILE if Major part is >
          
-  Rather than FILE, support reporting and updating the version number
-  in a git variable. That means the git config file and variable key
-  needs to be defined. Use: FILE:KEY For example:
-  .gitproj.config.local:gitproj.config.proj-ver
+    Rather than FILE, support reporting and updating the version
+    number in a git variable. That means the git config file and
+    variable key needs to be defined. Use: FILE:KEY For example:
+    .gitproj.config.local:gitproj.config.proj-ver
 
 * Cleanup the user docs. (bump the "patch" number for doc-only changes)
 
 * Make and cleanup the internal docs.
 
-* Make installer. Use epm to make portable installer and native deb installer.
+* Make installer. Use epm to make a portable installer and a native
+  deb installer.
 
 * Verify install with gitproj-com.test
 
 * Fixup gitproj-com.test so it can be run from /usr/share/doc/git-proj
   or from gitproj working dir.
 
-* More travis-ci. Run tests with changes to develop or main
-  branches. Build the package. Install the package. Verify the
-  install.
+* More travis-ci.
+    * Run tests with changes to develop or main branches.
+    * Build the package.
+    * Install the package.
+    * Verify the install.
 
 ----
 
@@ -122,3 +128,5 @@
   to automatically upgrade, and it will set "ver" in the configs.  If
   the Minor number is different, just warn the user(?) and continue.
   Mostly done
+
+* Code git-proj-remote - mostly done
