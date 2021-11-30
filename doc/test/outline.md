@@ -177,15 +177,32 @@ The last definition 'wins".
 7. Env. var. will override corresponding .git config vars.
 8. Command line options will override env. var. and corresponding .git config vars.
 
-Naming conventions for the config vars:
+## Variable Naming Convention
 
-* gpVAR - if not already defined before script (#7), set the initial
+* Globals that came from command line, config files, or external to
+the scripts, begin with "gp" (global paramater). For example: gpVAR
+(if they are not already defined before script (#7), set the initial
 value to files #1 through #6. The command line option can always set
 the value (#8)
 
-git config vars are usually all lower case with words separated by hyphens
-(-).  Bash variables usually use CamelCase, with each word beginning
-with an upper case letter (no hyphens or underscores).
+* Global variables should begin with a "g"
+
+* Global constants should begin with a "c"
+
+* Local variables should begin with a "t" (temporary)
+
+* git config vars are usually all lower case with words separated by
+hyphens (-).
+
+* Bash variables usually use CamelCase, with each word beginning with
+an upper case letter (no hyphens or underscores).
+
+## Function Naming Convention
+
+* All gitproj functions begin with a "f"
+
+* Functions in the include files, begin with command base. For example:
+functions in gitproj-init.inc begin with "fInit".
 
 ## Coding patterns
 
