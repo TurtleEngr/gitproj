@@ -29,7 +29,7 @@ fRemoteSetGlobals()
     if [ -z "$gpLocalTopDir" ]; then
         gpLocalTopDir=$PWD
     fi
-    gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "Error")
+    gpProjName=$(fComGetConfig -k "gitproj.config.proj-name" -d "Error")
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
@@ -168,6 +168,7 @@ fRemoteSelect()
 
     local tSrc=${BASH_SOURCE##*/}
     local tResponse
+    local tStatus=1
     export gResponse
 
     # Loop until a valid selection, or QUIT or OTHER
@@ -176,7 +177,6 @@ fRemoteSelect()
         case $tResponse in
             QUIT)
                 fLog -p warning -m "Quitting." -l $tSrc:$LINENO
-                tStatus=1
                 break
                 ;;
             HELP)
@@ -186,10 +186,13 @@ fRemoteSelect()
                 continue
                 ;;
             OTHER)
-                tStatus=1
                 break
                 ;;
         esac
+	if [ -z "$tResponse" ]; then
+            fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
+	    continue
+	fi
         if [ -n "$tResponse" ]; then
             tStatus=0
             break
@@ -251,6 +254,7 @@ fRemoteGetMountDir()
     local tMaxLoop=20
     local tMountDir
     local tResponse
+    local tStatus
 
     # ----------
     if [ ${gpAuto:0} -ne 0 ]; then
@@ -277,13 +281,14 @@ fRemoteGetMountDir()
         cat <<EOF
 This is a list of dirs under the -d pMountDir, if you gave that option.
 Other mounted directories might be listed too.
-Select OTHER, to give another pMountDir.
+Select OTHER, to define another MountDir.
 EOF
     )
     # Loop until the selection is OK, or Quit
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
         fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
+	tStatus=$?
         tMountDir=$gResponse
         if [ "$tMountDir" = "QUIT" ]; then
             exit 1
@@ -295,6 +300,9 @@ EOF
             tDirList=$gResponse
             continue
         fi
+	if [ $tStatus -ne 0 ]; then
+	    continue
+	fi
         if ! fRemoteCheckDir $tMountDir; then
             continue
         fi
@@ -443,7 +451,7 @@ fRemoteCreateRemoteGit()
     # Prompt/Response or if -a, validate the options
     # fRemoteSetGlobals() has verified we are in a git proj repo
 
-    fRemoteVerfiyState
+    fRemoteVerifyState
 
     # -d pMountPath (set with prompt/responnse, or required if -a)
     #  gpMountDir is required with -a, othherwise it is optional

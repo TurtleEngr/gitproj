@@ -193,17 +193,12 @@ testFirstTimeSet()
 # --------------------------------
 testInitSetGlobals()
 {
-    local tTrim
-    local tVer
-
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
     cd $HOME/$cDatProj1
 
     fInitSetGlobals
 
-    tTrim=${cGitProjVersion#*.*.}
-    tVer=${cGitProjVersion%.$tTrim}
-    assertEquals "$LINENO" "$tVer" "$gpVer"
+    assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
 
     assertEquals "$LINENO" "true" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"

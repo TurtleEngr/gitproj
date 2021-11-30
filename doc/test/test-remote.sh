@@ -164,24 +164,6 @@ tearDown()
 # ========================================
 
 # --------------------------------
-testGitProjRemote()
-{
-    local tResult
-
-    tResult=$($gpBin/git-proj-remote 2>&1)
-    assertContains "$LINENO $tResult" "$tResult" 'Usage'
-
-    tResult=$($gpBin/git-proj-remote -h)
-    assertContains "$LINENO $tResult" "$tResult" 'DESCRIPTION'
-
-    cd $HOME/$cDatProj1 >/dev/null 2>&1
-    assertTrue "$LINENO" "[ -d .git ]"
-    cd - >/dev/null 2>&1
-
-    return 0
-} # testGitProjInit
-
-# --------------------------------
 testComGetVer()
 {
     local tResult
@@ -240,9 +222,14 @@ testComGetVer()
     fComUnsetConfig -L -k "gitproj.config.ver"
     fComUnsetConfig -H -k "gitproj.config.ver"
     tResult=$(fComGetVer 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
+    assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "warning: "
     assertContains "$LINENO $tResult" "$tResult" "gitproj.config.ver was not found"
+
+    cGitProjVersion=1.0.0
+    fComGetVer >/dev/null 2>&1
+    assertFalse "$LINENO" "$?"
+    assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
 
     return 0
 } # testComGetVer
@@ -485,6 +472,21 @@ testRemoteGetMountDirManual()
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
+    tResult=$(fRemoteGetMountDir "" < <(echo -e "1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fRemoteGetMountDir "" < <(echo -e "2\n1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Select by number, the location for the remote git and raw files"
+    assertContains "$LINENO $tResult" "$tResult" "This is a list of dirs under the -d pMountDir"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fRemoteGetMountDir "" < <(echo -e "xx\n10\n1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Invalid selection"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
     gpProjName=example
     tResult=$(fRemoteGetMountDir "$cDatMount3" < <(echo -e "5\n1\n") 2>&1)
     assertFalse "$LINENO" "$?"
@@ -532,7 +534,7 @@ testRemoteGetRemoteRawDir()
 } # testRemoteGetRemoteRawDir
 
 # --------------------------------
-testRemoteMkRemoteAuto()
+testRemoteMkRemote()
 {
     local tResult
 
@@ -565,15 +567,7 @@ testRemoteMkRemoteAuto()
     fi
 
     return 0
-} # testRemoteMkRemoteAuto
-
-# --------------------------------
-TBDtestRemoteMkRemoteManual()
-{
-    gpAuto=0
-
-    return 0
-} # testRemoteMkRawManual
+} # testRemoteMkRemote
 
 # --------------------------------
 testRemoteReport()
@@ -582,7 +576,7 @@ testRemoteReport()
 
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz
-
+    
     gpAuto=1
     gpVerbose=2
     gpLocalTopDir=$cDatHome/$cDatProj1
@@ -599,12 +593,137 @@ testRemoteReport()
 } # testRemoteReport
 
 # --------------------------------
-TBDtestRemoteCreateRemoteGit()
+testRemoteCreateRemoteGit()
 {
-    startSkipping
-    fail "TBD"
+    local tResult
+    local tTopDir
+
+    gpAuto=1
+    gpMountDir=""
+    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "The -d option is required with -a auto option"
+
+    gpMountDir=$cDatMount3/video-2020-04-02
+
+    cd $cTestDestDir >/dev/null 2>&1
+    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "crit: You must be in a git workspace for this command"
+
+    tTopDir=$cDatHome/$cDatProj1
+    cd $tTopDir >/dev/null 2>&1
+    fComSetGlobals
+    fRemoteSetGlobals
+    assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
+
+    gpMountDir=$cDatMount3/video-2020-04-02
+    chmod a-w $gpMountDir
+    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "video-2020-04-02 is not writable for you"
+
+    chmod ug+w $gpMountDir
+    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
+    assertContains "$LINENO $tResult" "$tResult" "$gpMountDir/$gpProjName.git"
+    assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and that"
+
     return 0
 } # testRemoteCreateRemoteGit
+
+# --------------------------------
+testGitProjRemoteCLIAuto()
+{
+    local tResult
+    local tTopDir
+    local tMountDir=""
+
+    # Not in a git dir
+    cd $cTestDestDir >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-remote -a -d $PWD 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "crit: You must be in a git workspace for this command"
+    assertContains "$LINENO $tResult" "$tResult" "Usage:"
+    
+    # Not in a proj dir
+    cd $cDatHome/$cDatProj3 >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-remote -a -d $PWD 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "crit: This git workspace is not setup for gitproj, run"
+    assertContains "$LINENO $tResult" "$tResult" "Usage:"
+
+    # -d required
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-remote -a 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "git-proj-remote: crit: The -d option is required with -a auto option"
+    assertContains "$LINENO $tResult" "$tResult" "Usage:"
+
+    # Works
+    tMountDir=$cDatMount3/video-2020-04-02
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-remote -a -d $tMountDir 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
+    assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
+    assertContains "$LINENO $tResult" "$tResult" "$tMountDir/george.git"
+    assertContains "$LINENO $tResult" "$tResult" "If the mount path is changed or you are on a different system"
+
+    return 0
+} # testGitProjRemoteCLIAuto
+
+# --------------------------------
+testGitProjRemoteCLIManual()
+{
+    local tResult
+    local tTopDir
+    local tMountDir=""
+
+    # Usage
+    tResult=$($gpBin/git-proj-remote -h 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "NAME git proj remote"
+    assertContains "$LINENO $tResult" "$tResult" "SYNOPSIS"
+    assertContains "$LINENO $tResult" "$tResult" "DESCRIPTION"
+
+    # Start manual mode, then quit
+    tResult=$($gpBin/git-proj-remote 2>&1 < <(echo -e "1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Select by number, the location for the remote git and raw files"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    # Start manual mode, then HELP, then QUIT
+    tResult=$($gpBin/git-proj-remote 2>&1 < <(echo -e "2\n1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "This is a list of dirs under the"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    # Problem george.git is aleady there
+    tMountDir=$cDatMount3
+    # video-2019-11-26 is item #5
+    mkdir $tMountDir/video-2019-11-26/george.git $tMountDir/video-2019-11-26/george.raw
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "5\n1\n") 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "george.git already exists"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    # Works
+    tMountDir=$cDatMount3
+    # video-2020-04-02 was item #9, before the two dirs were add above
+    # video-2020-04-02 is item #11
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "11\n") 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
+    assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
+    assertContains "$LINENO $tResult" "$tResult" "$tMountDir/video-2020-04-02/george.git"
+    assertContains "$LINENO $tResult" "$tResult" "If the mount path is changed or you are on a different system"
+
+    return 0
+} # testGitProjRemoteCLIManual
 
 # ========================================
 # This should be the last defined function

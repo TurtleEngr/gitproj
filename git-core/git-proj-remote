@@ -115,7 +115,6 @@ EOF
 export cCurDir gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
-tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -138,25 +137,21 @@ cd - >/dev/null 2>&1
 . $gpBin/gitproj-com.inc
 # Calls: fComSetGlobals
 
-if [ $# -eq 0 ]; then
-    fError -m "Missing options." -l $tSrc:$LINENO
+tSrc=${BASH_SOURCE##*/}
+if ! fComMustBeInProjRepo $PWD; then
+    fError -m "Quitting" -l $tSrc:$LINENO
 fi
 
 . $gpBin/gitproj-remote.inc
 fRemoteSetGlobals
 
-#    git proj remote [-a] [-d pMountDir] [-r pRemoteRawDir ]
-#    	            [-s pMinSpace] [-h]
-#        Defaults: [-r pMountDir/NAME.raw]
-
+tSrc=${BASH_SOURCE##*/}
 gpMountDir=""
-while getopts :al:r:s:hH:vx tArg; do
+while getopts :ad:hH:vx tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
         d) gpMountDir="$OPTARG" ;;
-        r) gpRemoteRawDir="$OPTARG" ;;
-        s) gpRemoteMinSpace="$OPTARG" ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -170,9 +165,6 @@ done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
-fi
-if [ $gpAuto -ne 0 ] && [ -z "$gpMountDir" ]; then
-    fError -m "If -a, -d pMountDir is required." -l $tSrc:$LINENO
 fi
 
 # ----------

@@ -344,9 +344,6 @@ fComUsage()
     if [ $# -ne 0 ]; then
         fError -i -m "fComUsage: Unknown option: $*" -l $tSrc:$LINENO
     fi
-    while [ $# -ne 0 ]; do
-        shift
-    done
 
     case $pStyle in
         short | usage)
@@ -505,6 +502,30 @@ fComFmtLog()
     gpVerbose=${gpVerbose:-0}
     gpDebug=${gpDebug:-0}
 
+    case $pLevel in
+        emerg|emergency)
+	    pLevel=emerg
+	    ;;
+	alert)
+	    :
+	    ;;
+	crit|critical)
+	    pLevel=crit
+	    ;;
+	err|error)
+	    pLevel=err
+	    ;;
+	warning|warn)
+	    pLevel=warning
+	    ;;
+	notice|info|debug|debug-*)
+	    :
+	    ;;
+	*)
+            pMsg="Internal: (Unknown: $pLevel [$tSrc:$LINENO]) $pMsg"
+	    pLevel=err
+	    ;;
+    esac    
     tLevel=$pLevel
 
     # Check debug
@@ -577,23 +598,22 @@ fLog()
     local OPTARG=1
     local OPTIND
     local tArg
-    while getopts :m:p:l:e:i: tArg; do
+
+    while getopts :m:p:l:e:i tArg; do
         case $tArg in
             m) pMsg="${OPTARG}" ;;
             l) pLine="${OPTARG}" ;;
             p) pLevel="${OPTARG}" ;;
-            e)
-                pErr="${OPTARG}"
-                ;;
+            e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
             :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]" ;;
             \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]" ;;
         esac
     done
     shift $((OPTIND - 1))
-    while [ $# -ne 0 ]; do
-        shift
-    done
+    if [ $# -ne 0 ]; then
+        shift $#
+    fi
 
     if [ $pInt -eq 1 ]; then
         pMsg="Internal: $pMsg"
@@ -662,7 +682,9 @@ fError()
     if [ $# -ne 0 ]; then
         pMsg="$pMsg $*"
     fi
-    shift $#
+    if [ $# -ne 0 ]; then
+        shift $#
+    fi
 
     if [ $pInt -eq 1 ]; then
         pMsg="Internal: $pMsg"
@@ -1299,12 +1321,15 @@ fComGetVer()
     fi
 
     # Get the expected Version for the "current" project
-    gpVer=$(fComGetConfig -k "gitproj.config.ver")
-    if [ -z "$gpVer" ]; then
+    tLocVer=$(fComGetConfig -k "gitproj.config.ver")
+    if [ -z "$tLocVer" ]; then
         gpVer=$cGitProjVersion
-        fLog -i -p warning -m "gitproj.config.ver was not found" -l $tSrc:$LINENO
+        fLog -i -p warning -m 'gitproj.config.ver was not found. Setting it to: $gpVer' -l "$tSrc:$LINENO"
         return 1
+	fComSetConfig -L -k "gitproj.config.ver" -v "$gpVer"
+	fComSetConfig -H -k "gitproj.config.ver" -v "$gpVer"
     fi
+    gpVer=$tLocVer
 
     if [ "$gpVer" = "$cGitProjVersion" ]; then
         return 0
