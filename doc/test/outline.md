@@ -72,7 +72,7 @@
 
 ## gitproj Installed Files - prod
 
-Note: The tests will only check for a vailded installation. Unit test
+Note: The tests will only check for a valid installation. Unit test
 will only be supported in a dev env. Running unit test on the
 installed files would be tricky, and of low value.
 
@@ -128,6 +128,14 @@ installed files would be tricky, and of low value.
     
 ## After running git-proj-init local, or git-proj-clone
 
+    cd ~/ANY-DIR/PROJECT
+    git proj init
+
+    or
+
+    cd ~/ANY-DIR
+    git proj clone -d /MOUNT-DIR/ANY-DIR/PROJ.git
+
     /home/
     |   |USER/
     |   |   |.git.config - see "include.path" .gitproj.config.global
@@ -146,7 +154,10 @@ installed files would be tricky, and of low value.
     |   |   |   |   |   |DIR2/    
     |   |   |   |   |   |   |LARGE-FILE.MP4 -> ../../raw/DIRS/LARGE-FILE.MP4 
     
-## After running git-proj-init remote
+## After running git-proj-remote
+
+    cd ~/ANY-DIR/PROJECT
+    git proj remote -a -d /MOUNT-DIR/ANY-DIR
 
     /MOUNT-DIR/
     |   |   |ANY-DIR/
@@ -157,40 +168,40 @@ installed files would be tricky, and of low value.
 
 The last definition 'wins".
 
-1. /etc/gitproj.config.system - optional
-2. /etc/gitconfig - optional
-3. /home/USER/.gitconfig
-4. /home/USER/.gitproj.config.global (include.path at end of .gitconfig)
-5. GIT_DIR/.git/config
-6. GIT_DIR/.gitproj.config.local  (include.path at beginning of GIT_DIR/.gitproj.config.$HOSTNAME)
-7. GIT_DIR/.gitproj.config.$HOSTNAME (include.path at end of GIT_DIR/.git/config)
-8. Env. var. will override corresponding .git config vars.
-9. Command line options will override env. var. and corresponding .git config vars.
+1. /etc/gitconfig - optional
+2. /home/USER/.gitconfig
+3. /home/USER/.gitproj.config.global (include.path at end of .gitconfig)
+4. GIT_DIR/.git/config
+5. GIT_DIR/.gitproj.config.local (include.path at beginning of GIT_DIR/.gitproj.config.$HOSTNAME)
+6. GIT_DIR/.gitproj.config.$HOSTNAME (include.path at end of GIT_DIR/.git/config)
+7. Env. var. will override corresponding .git config vars.
+8. Command line options will override env. var. and corresponding .git config vars.
 
 Naming conventions for the config vars:
 
-* gpVar - if not already defined before script (#8), set the initial
-value to filse #1 through #7.  The command line option can always set
-the value (#9)
+* gpVAR - if not already defined before script (#7), set the initial
+value to files #1 through #6. The command line option can always set
+the value (#8)
 
 git config vars are usually all lower case with words separated by hyphens
 (-).  Bash variables usually use CamelCase, with each word beginning
-with an upper case letter (no hypens or underscores).
+with an upper case letter (no hyphens or underscores).
 
 ## Coding patterns
 
-* At the top off include files define exports for all the globals that
+* At the top of include files define exports for all the globals that
 the include file reads writes to.
 
 * At the end of an include file, call a function that will define
 defaults for the important globals used by the include file.
 
-* For user callable scripts, do minimal setup, include files with common
-functions and functions specific to the script. Put as much as
-possible into function in script's include file, so that the fucntions
-can be directly tested with unit test scripts found in doc/test.
+* For user callable scripts, do minimal setup, include files with
+common functions and functions specific to the script. Put as much as
+possible into functions in the commands include file, so that the
+functions can be directly tested with unit test scripts found in
+doc/test.
 
-* Minimal vars: gpBin, cCurDIr, gpDoc, gpTest if a test script.
+* Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test script.
 All other vars can be defined from include files or from git config vars.
 
 * Define gpCmdName at the top of each each script, that is a main script
@@ -202,14 +213,17 @@ prompts before the read command.
 
 * fLog and fError messages
 
-    # Put this at the beginning or end of each file
-    export tSrc=${BASH_SOURCE##*/}
+    * Put this at the beginning or end of each file
 
-    # Put this in each function that calls fError or fLog
-    local tSrc=${BASH_SOURCE##*/}
+        export tSrc=${BASH_SOURCE##*/}
 
-    # in Error and Log pass this argument:
-    -l $tSrc:$LINENO
+    * Put this in each function that calls fError or fLog
+
+        local tSrc=${BASH_SOURCE##*/}
+
+    * in Error and Log pass this argument:
+
+        -l $tSrc:$LINENO
 
 ## File include pattern - prod
 

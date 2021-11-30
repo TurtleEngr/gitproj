@@ -6,10 +6,12 @@ This is still under development.
 
 ## Outline
 
-The Usage help text in the main subcommand files have the most up-to-date
+The Usage help text in the main sub-command files have the most up-to-date
 descriptions.
 
-### Main subcommands, in git-core/
+For a more complete outline, see: doc/test/outline.md
+
+### Main sub-commands, in git-core/
 
 * git-proj - general help - mostly implemented
 * git-proj-init - initialize a local git-proj repo - mostly implemented
