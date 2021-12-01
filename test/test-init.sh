@@ -118,7 +118,7 @@ setUp()
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpLocalRawDir \
         gpLocalTopDir gpMaxSize \
-        gpPath gpProjName gpSysLog gpVar gpVerbose
+        gpPath gpProjName gpSysLog gpVer gpVerbose
 
     fTestSetupEnv
     fTestCreateEnv

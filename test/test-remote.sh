@@ -117,7 +117,7 @@ setUp()
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
         gpLocalTopDir gpMaxSize \
-        gpPath gpProjName gpSysLog gpVar gpVerbose
+        gpPath gpProjName gpSysLog gpVer gpVerbose
 
     fTestSetupEnv
     fTestCreateEnv
@@ -551,7 +551,7 @@ testRemoteMkRemote()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteMkRemote is run."
-        echo -e "\tRestore test-env_HomeAfterMkRemote.tgz relative to env cTestDestDir"
+        echo -e "\tRestore test-env_TestDestDirAfterMkRemote.tgz relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
         tar -cvzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz test
@@ -565,6 +565,7 @@ testRemoteMkRemote()
 testRemoteReport()
 {
     local tResult
+    local tStatus
 
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz
@@ -578,8 +579,31 @@ testRemoteReport()
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fRemoteReport 2>&1)
-    assertTrue "$LINENO" "$?"
+    tStatus=$?
+    assertTrue "$LINENO" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and"
+
+    tResult=$(fComGetConfig -k "gitproj.config.remote-status" 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "defined" "$tResult"
+
+    tResult=$(fComGetConfig -H -k "gitproj.config.remote-status" 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "defined" "$tResult"
+
+    tResult=$(fComGetConfig -L -k "gitproj.config.remote-status" 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "defined" "$tResult"
+
+    # ----------
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
+        echo -e "\tCapture state of test env after fRemoteReport is run."
+        echo -e "\tRestore test-env_HomeAfterRemoteReport.tgz relative to env cTestDestDir"
+        cd $cTestDestDir >/dev/null 2>&1
+        echo -en "\t"
+        tar -cvzf $gpTest/test-env_TestDestDirAfterRemoteReport.tgz test
+        echo
+    fi
 
     return 0
 } # testRemoteReport

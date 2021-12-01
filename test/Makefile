@@ -34,7 +34,8 @@ mTestEnvFiles = \
 	test-env_HomeAfterBMove.tgz \
 	test-env_ProjAfterGInit.tgz \
 	test-env_ProjLocalDefined.tgz \
-	test-env_TestDestDirAfterMkRemote.tgz
+	test-env_TestDestDirAfterMkRemote.tgz \
+	test-env_TestDestDirAfterRemoteReport.tgz
 
 # --------------------
 test-all : $(mDepList) $(mBaseList) test-cmds
@@ -78,6 +79,9 @@ test-env_ProjLocalDefined.tgz :
 
 test-env_TestDestDirAfterMkRemote.tgz :
 	export gpSaveTestEnv=1; ./test-remote.sh testRemoteMkRemoteAuto
+
+test-env_TestDestDirAfterRemoteReport.tgz :
+	export gpSaveTestEnv=1; ./test-remote.sh testRemoteReport
 
 # --------------------
 stats :

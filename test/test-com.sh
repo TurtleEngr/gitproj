@@ -523,6 +523,7 @@ testComSetConfigGlobal()
 } # testComSetConfigGlobal
 
 # --------------------------------
+
 testComGetConfigGlobal()
 {
     local tResult
@@ -531,6 +532,8 @@ testComGetConfigGlobal()
     fComSetConfig -g -k gitproj.testit.test-str-get -v "test a string"
     fComSetConfig -g -k gitproj.testit.test-int-get -v "2K"
     fComSetConfig -g -k gitproj.testit.test-bool-get -v "true"
+    fComSetConfig -g -k gitproj.testit.test-tbd-get -v "TBD"
+    fComSetConfig -g -k gitproj.testit.test-not-get -v "not-defined"
 
     tResult=$(fComGetConfig -g -k gitproj.testit.test-str-get)
     assertEquals "$LINENO -g" "test a string" "$tResult"
@@ -540,6 +543,32 @@ testComGetConfigGlobal()
 
     tResult=$(fComGetConfig -g -b -k gitproj.testit.test-bool-get)
     assertEquals "$LINENO -g" "true" "$tResult"
+
+    fComGetConfig -g -k gitproj.testit.foobar >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+    assertEquals "$LINENO" "not-found" "$gGetConfigOrigin"
+    
+    tResult=$(fComGetConfig -g -k gitproj.testit.foobar -d TBD -e 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "gitproj.testit.foobar is not defined"
+
+    tResult=$(fComGetConfig -g -k gitproj.testit.foobar -e 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "gitproj.testit.foobar is not defined"
+
+    tResult=$(fComGetConfig -g -k gitproj.testit.test-tbd-get -d TBD -e 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "should not be set to"
+
+    tResult=$(fComGetConfig -g -k gitproj.testit.test-tbd-get -e 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "gitproj.testit.test-tbd-get should not be set to: TBD"
+
+    tResult=$(fComGetConfig -g -k gitproj.testit.test-not-get -d not-defined -e 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "should not be set to"
+
+    return 0
 } # testComGetConfigGlobal
 
 # --------------------------------

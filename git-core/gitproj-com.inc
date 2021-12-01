@@ -762,21 +762,7 @@ fComSetConfig()
                 fi
                 set +x
                 ;;
-            H)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-                    return 1
-                fi
-                ;;
-            l)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-                    return 1
-                fi
-                ;;
-            L)
+            H | l | L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
                     fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
@@ -904,9 +890,11 @@ fComGetConfig()
     local pKey=""
     local pDefault=""
     local pFilter=""
+    local pExitOnError=0
 
     local tSrc=${BASH_SOURCE##*/}
     local tValue=""
+    local tExit="-n"
 
     # Globals set by fComGetConfig
     gGetConfigValue=""
@@ -915,26 +903,24 @@ fComGetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :bd:f:gGHik:lv: tArg; do
+    while getopts :bd:ef:gGHik:lLv: tArg; do
         case $tArg in
             f)
                 if [ ! -f ${OPTARG} ]; then
-                    fError -n -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
+                    fError $tExit -m "Could not find ${OPTARG}" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
             G)
                 if [ ! -f $HOME/$cConfigGlobal ]; then
-                    set +x
-                    fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
+                    fError $tExit -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
                     return 1
                 fi
-                set +x
                 ;;
-            H | l)
+            H | l | L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    fError $tExit -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
@@ -942,6 +928,9 @@ fComGetConfig()
         case $tArg in
             b) pType="--bool" ;;
             d) pDefault="${OPTARG}" ;;
+	    e) pExitOnError=1
+	       tExit=""
+	       ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
             G) pScope="--file $HOME/$cConfigGlobal" ;;
@@ -949,23 +938,38 @@ fComGetConfig()
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
+            L) pScope="--file $tTopDir/$cConfigLocal" ;;
             v) pFilter="${OPTARG}" ;;
             :)
-                fError -n -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                fError $tExit -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
                 ;;
             \?)
-                fError -n -i -m "fComGetConfig: Unknown option: $OPTARG" -l $tSrc:LINENO
+                fError $tExit -i -m "fComGetConfig: Unknown option: $OPTARG" -l $tSrc:LINENO
                 return 1
                 ;;
         esac
     done
     if [ -z "$pKey" ]; then
-        fError -n -i -m "fComGetConfig: missing key" -l $tSrc:$LINENO
+        fError $tExit -i -m "fComGetConfig: missing key" -l $tSrc:$LINENO
         return 1
     fi
 
     gGetConfigValue=$(git config --get --includes $pScope $pType $pKey $pFilter)
+
+    if [ $pExitOnError -ne 0 ]; then
+        if [ -z "$gGetConfigValue" ]; then
+	    fError -m "Unexpected: $pKey is not defined!" -l $tSrc:$LINENO
+	fi
+	
+	if [ -n "$pDefault" ] && [ "$gGetConfigValue" = "$pDefault" ]; then
+	    fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
+	fi
+	
+	if [ "$gGetConfigValue" = "TBD" ] || [ "$gGetConfigValue" = "not-defined" ]; then
+	    fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
+	fi
+    fi
 
     if [ -z "$gGetConfigValue" ] && [ -n "$pDefault" ]; then
         gGetConfigOrigin=default
@@ -993,7 +997,8 @@ fComGetConfig()
 
 =internal-head3 Synopsis
 
-    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-d pDefault] [-v pFilter]
+    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
+    		  [-d pDefault] [-e] [-v pFilter]
 
 =internal-head3 Description
 
@@ -1067,9 +1072,29 @@ values to lower-case, when saving them in the config files.
 If pKey is not found, then pDefault will be returned, and gGetConfigOrigin
 will be set to "default".
 
+=internal-item B<-e>
+
+If -e, then do some simple validation checks:
+
+* if the pKey is not found, then fError will be called and the script
+will terminate. I.e. the config var is required.
+
+* or if the value for pKey is equal to pDefault, fError will be called
+and the script will terminate. I.e. the config var is still set to
+it's intitial "undefined" value.
+
+* or if the value for pKey is equal to "TBD" or "not-defined", fError
+will be called and the script will terminate. I.e. the config var is
+still set to it's intitial "undefined" value.
+
+Note: -e will only exit the whole script if it is not in a subshell.
+I.e. don't use var=\$(cmd) style.
+
 =internal-item B<-v pFilter>
 
-pFilter is used as a pattern match for the value found.
+pFilter is used as a pattern match for the value found. This is useful
+for times when there could be duplicate pKeys with different
+values. For example there could be multiple "include.path" keys.
 
 =internal-back
 
@@ -1258,6 +1283,10 @@ fComMustBeInProjRepo()
         return 1
     fi
 
+    if [ ! -f $HOME/.gitconfig ]; then
+        fError -n -m "Missing ~/.gitconfig, run 'git proj init'" -l $tSrc:$LINENO
+        return 1
+    fi
     if [ ! -f $HOME/$cConfigGlobal ]; then
         fError -n -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
         if [ $gpDebug -ge 2 ]; then

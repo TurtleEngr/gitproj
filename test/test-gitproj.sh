@@ -113,7 +113,7 @@ setUp()
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
         gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
-        gpPath gpProjName gpSysLog gpVar gpVerbose
+        gpPath gpProjName gpSysLog gpVer gpVerbose
 
     fTestSetupEnv
     gpUnitDebug=0

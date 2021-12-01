@@ -21,19 +21,24 @@ fPushSetGlobals()
         exit 1
     fi
 
-    gpAuto=${gpAuto:-0}
-    gpMountDir=""
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
     gpLocalTopDir=$($cGetTopDir 2>/dev/null)
-    if [ -z "$gpLocalTopDir" ]; then
-        gpLocalTopDir=$PWD
-    fi
-    gpProjName=$(fComGetConfig -k "gitproj.config.proj-name" -d "Error")
-    gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
-    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
+
+    # Called this way, so that the -e option will exit script if errors
+    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e
+    gpProjName=$gGetConfigValue
+
+    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e 
+    gpRemoteRawDir=$gGetConfigValue
+    
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648")  # 2g
+
+    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e
+    gpLocalStatus=$gGetConfigValue
+
+    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e
+    gpRemoteStatus=$gGetConfigValue
 
     return 0
 } # fPushSetGlobals
