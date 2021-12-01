@@ -1,8 +1,16 @@
 #!/bin/bash
 
+export gpCmdName gpBin cCurDir
+
 #--------------------
 fUsage()
 {
+    # Quick help, run this:
+    # git-proj-push -h | less
+
+    local pStyle="${1:-usage}"
+
+    fComUsage -s $pStyle -f $gpBin/$gpCmdName
     exit 1
 
     cat <<EOF >/dev/null
@@ -12,13 +20,143 @@ fUsage()
 
 =for html <hr/>
 
- git proj push [-b]
+=head1 NAME git proj push
 
-    rsync will be used top copy the ../[git_dir_name].raw files to
-    ../"origin". If the -b option is given then run:
-    "git push origin [current-branch]"
+=head1 SYNOPSIS
+
+    git proj push [-b] [common-options]
+
+=head1 DESCRIPTION
+
+rsync will be used top copy the ../[ProjName].raw files to [remote-raw-dir].
+
+If the -b option is given then run:
+
+ "git push origin [current-branch]"
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-b>
+
+=item B<[common-options]>
+
+ -h
+ -H pStyle
+ -v, -vv
+ -x, -xx
+
+Run "git proj -h"  for details.
+
+=back
+
+=head1 RETURN VALUE
+
+ 0 - if OK
+ !0 - if errors
+
+=for comment =head1 ERRORS
+
+=for comment =head1 EXAMPLES
+
+=for comment=head1 ENVIRONMENT
+
+=for comment=head1 FILES
+
+=head1 SEE ALSO
+
+ git proj
+ git proj init
+ git proj remote
+ git proj clone
+ git proj add
+ git proj push
+ git proj pull
+ git proj config
+ git proj status
+ git flow
+
+=for comment =head1 NOTES
+
+=for comment =head1 CAVEATS
+
+=for comment =head1 DIAGNOSTICS
+
+=for comment =head1 BUGS
+
+=for comment =head1 RESTRICTIONS
+
+=head1 AUTHOR
+
+TurtleEngr
+
+=head1 HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
 
 =cut
 
 EOF
-}
+} # fUsage
+
+# ========================================
+# Main
+
+export cCurDir gpBin gpCmdName tSrc
+
+gpCmdName=${BASH_SOURCE##*/}
+
+# -------------------
+# Set current directory location in PWD and cCurDir
+if [ -z "$PWD" ]; then
+    PWD=$(pwd)
+fi
+cCurDir=$PWD
+
+# -------------------
+# Define the location of this script
+gpBin=${0%/*}
+if [ "$gpBin" = "." ]; then
+    gpBin=$PWD
+fi
+cd $gpBin >/dev/null 2>&1
+gpBin=$PWD
+cd - >/dev/null 2>&1
+
+# -------------------
+. $gpBin/gitproj-com.inc
+# Calls: fComSetGlobals
+
+tSrc=${BASH_SOURCE##*/}
+if ! fComMustBeInProjRepo $PWD; then
+    fError -m "Quitting" -l $tSrc:$LINENO
+fi
+
+. $gpBin/gitproj-push.inc
+fPushSetGlobals
+
+tSrc=${BASH_SOURCE##*/}
+tPushBranch=0
+while getopts :bhH:vx tArg; do
+    case $tArg in
+        # Script arguments
+        b) tPushBranch=1 ;;
+        # Common arguments
+        h) fUsage long ;;
+        H) fUsage "$OPTARG" ;;
+        v) let ++gpVerbose ;;
+        x) let ++gpDebug ;;
+        # Problem arguments
+        :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
+    esac
+done
+shift $((OPTIND - 1))
+if [ $# -ne 0 ]; then
+    fError -m "Unknown option: $*" -l $tSrc:$LINENO
+fi
+
+# ----------
+fPushToOrigin $tPushBranch
+exit 0

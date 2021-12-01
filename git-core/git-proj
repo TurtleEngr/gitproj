@@ -75,7 +75,7 @@ files, and repositiories on external drives.
 
  	pSubCmd: init, remote, clone, push, pull, add, config, status, check
 	pSubCmdOpt: Just run: "git proj [pSubCmd]"
- 	pComOpt: [-h] [-H pStyle] [-v] [-x]
+ 	[common-options]: [-h] [-H pStyle] [-v] [-vv...] [-x] [-xx...]
  
 =head1 DESCRIPTION
 
@@ -154,8 +154,10 @@ See B<-H pStyle> in pComOpt section, for the output styles.
 
 =back
 
-=head2 pComOpt
+=head2 [common-options]
+
 minimum
+
 =over 4
 
 =item B<-h>
@@ -182,15 +184,18 @@ Styles:
 Verbose output. Default is is only output (or log) messages with
 level "warning" and higher.
 
- -v - output "notice" and higher.
- -vv - output "info" and higher.
+ -v - output "notice" and higher log messages.
+ -vv - output "info" and higher log messages.
 
 =item B<-x>
 
-Set the gpDebug level. Add 1 for each -x.
-Or you can set gpDebug before running the script.
+Set the gpDebug level number. Add 1 for each -x.  Or you can set
+gpDebug before running the script.
 
-See: fLog (Internal documentation)
+    "fLog -p debug" messages will be output if gpDebug != 0.
+    "fLog -p debug-N" messages will be output if gpDebug >= N.
+
+See: fLog Internal documentation for more details.
 
 =back
 

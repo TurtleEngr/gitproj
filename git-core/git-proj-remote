@@ -24,7 +24,7 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj remote [-a] [-d pMountDir] [-h]
+    git proj remote [-a] [-d pMountDir] [common-options]
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,14 @@ at the top directory video-2019-04-01, with:
 
  git proj init -e /mnt/usb-video/video-2019-04-01
 
-=item B<-h>
+=item B<[common-options]>
+
+ -h
+ -H pStyle
+ -v, -vv
+ -x, -xx
+
+Run "git proj -h"  for details.
 
 =back
 

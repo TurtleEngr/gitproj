@@ -22,9 +22,9 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [-h]
+    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [common-options]
 
-        Defaults: [-l $PWD] [-s 10K] [-m] [-f]
+    Defaults: [-l $PWD] [-s 10K]
 
 =head1 DESCRIPTION
 
@@ -90,7 +90,14 @@ the file directly from the raw directories.
 
     Setup git-flow (-f) [y/n]?
 
-=item B<-h>
+=item B<[common-options]>
+
+ -h
+ -H pStyle
+ -v, -vv
+ -x, -xx
+
+Run "git proj -h"  for details.
 
 =back
 
