@@ -75,7 +75,6 @@ fRemoteVerifyState()
 fRemoteCheckDir()
 {
     local pDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -d $pDir ]; then
@@ -103,7 +102,6 @@ fRemoteCheckDirSpace()
 {
     local pMountDir=$1
     local pMinSpace=$2
-
     local tSrc=${BASH_SOURCE##*/}
     local tAvail
     local tGitSize
@@ -134,7 +132,6 @@ fRemoteCheckDirSpace()
 fRemoteGetDirList()
 {
     local pMountDir="$1"
-
     local tSrc=${BASH_SOURCE##*/}
     local tLiist
     export gResponse=""
@@ -165,7 +162,6 @@ fRemoteSelect()
     PS3="$1"
     local pDirList="$2"
     local pHelp="$3"
-
     local tSrc=${BASH_SOURCE##*/}
     local tResponse
     local tStatus=1
@@ -208,7 +204,6 @@ fRemoteSelect()
 fRemoteGetAnotherMountDir()
 {
     local pMountDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tReply
     local tMaxLoop=30
@@ -247,7 +242,6 @@ fRemoteGetAnotherMountDir()
 fRemoteGetMountDir()
 {
     local pMountDir="$1"
-
     local tSrc=${BASH_SOURCE##*/}
     export gResponse=""
     local tDirList
@@ -273,6 +267,10 @@ fRemoteGetMountDir()
 
     # ----------
     # Prompt/response
+    if [ $cInteractive -eq 0 ]; then
+        fError -m "You are not 'interactive', see -a option." -l $tSrc:$LINENO
+    fi
+
     # Offer choices, with two dir levels (remove dirs with spaces in names)
     fRemoteGetDirList $pMountDir
     tDirList=$gResponse
@@ -323,6 +321,7 @@ EOF
 fRemoteGetRemoteRawDir()
 {
     local tSrc=${BASH_SOURCE##*/}
+
     # gpMountDir has already been validated
     # gpProjName has already been validated
     # $gpMountDir/$gpProjName.raw should have be verified to not exist
@@ -339,10 +338,10 @@ fRemoteGetRemoteRawDir()
 fRemoteMkRemote()
 {
     local pMountDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tProjName=${PWD##*/}
     local tVerbose
+    local tOpt="-azC"
 
     cd $pMountDir >/dev/null 2>&1
     fLog -p notice -m "git clone to $pMountDir" -l $tSrc:$LINENO
@@ -363,10 +362,10 @@ fRemoteMkRemote()
         tVervose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
-        tVervose=-vP
+        tVervose=-viP
     fi
-    fLog -p notice -m "'rsync' -rlptz $tVerbose $gpLocalTopDir/raw/* $gpLocalTopDir/raw/* $gpRemoteRawDir/"
-    'rsync' -rlptz $tVerbose $gpLocalTopDir/raw/* $gpRemoteRawDir/
+    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/* $gpLocalTopDir/raw/ $gpRemoteRawDir"
+    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
     if [ $? -ne 0 ]; then
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
     fi
@@ -444,7 +443,6 @@ EOF
 fRemoteCreateRemoteGit()
 {
     local pMountDir="$1"
-
     local tSrc=${BASH_SOURCE##*/}
 
     # Called by: "git-proj-remote -d pMountPath"

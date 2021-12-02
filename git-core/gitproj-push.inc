@@ -11,82 +11,58 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 # ========================================
 
 # --------------------
-fPushSetGlobals()
+fPushIsRemoteMounted()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    # Assumes we in git dir, and one that is managed by gitproj.
-    if ! fComMustBeInProjRepo $PWD; then
-        fUsage usage
-        exit 1
+    if [ -d $gpRemoteRawDir ]; then
+        return 0
     fi
 
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
-    gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
-    gpLocalTopDir=$($cGetTopDir 2>/dev/null)
-
-    # Called this way, so that the -e option will exit script if errors
-    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e
-    gpProjName=$gGetConfigValue
-
-    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e 
-    gpRemoteRawDir=$gGetConfigValue
-    
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648")  # 2g
-
-    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e
-    gpLocalStatus=$gGetConfigValue
-
-    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e
-    gpRemoteStatus=$gGetConfigValue
-
-    return 0
-} # fPushSetGlobals
-
-# --------------------
-fPushVerifyState()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tTopDir
-
-    fComGetVer
-
-    if [ "$gpLocalStatus" != "defined" ]; then
-        fError -m "It looks like 'git proj init' did not finish. Config local-status should be 'defined' " -l $tSrc:$LINENO
-    fi
-
-    tTopDir=$($cGetTopDir)
-    if [ "$gpLocalTopDir" != "$tTopDir" ]; then
-        fError -m "This repo appears to be configured for $gpLocalTopDir, not $tTopDir. Run 'git proj config' to reconfigure for a different host." -l $tSrc:$LINENO
-    fi
-
-    if [ "$gpRemoteStatus" = "defined" ]; then
-        fLog -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
-        if [ $gpAuto -ne 0 ]; then
-            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
-        fi
-    fi
-
-    if [ "$gpRemoteStatus" = "not-defined" ] &&
-        [ "$gpRemoteRawDir" != "TBD" ] &&
-        [ -n "$gpRemoteRawDir" ]; then
-        fError -i -m "Config problem remote-status=not-defined, but remote-raw-dir is set to $gpRemoteRawDir. It should be undefined or set to TBD" -l $tSrc:$LINENO
-    fi
-
-    return 0
-} # fPushVerifyState
+    fError -m "$gpRemoteRawDir was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
+} # fPushIsRemoteMounted
 
 # --------------------
 fPushRawFiles()
 {
-    echo TBD
-    return 0
+    local tVerbose
+    local tSrc=${BASH_SOURCE##*/}
+    local tOpt="-azC --delete-after"
+    local tStatus
+    
+    if [ $gpVerbose -ge 2 ]; then
+        tVervose=-viP
+    fi
+
+    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpLocalTopDir/raw/* $gpRemoteRawDir"
+
+    'rsync' $tOpt $tVerbose --dry-run -iv $gpLocalTopDir/raw/ $gpRemoteRawDir
+    echo -n "Continue (y/n)? "
+    read
+    if [ "$REPLY" != 'y' ]; then
+        fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
+	exit 1
+    fi
+
+    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
+    tStatus=$?
+
+    return $tStatus
 } # fPushRawFiles()
 
 # --------------------
 fPushGit()
 {
-    echo TBD
+    local pPushBranch="$1"
+    local tSrc=${BASH_SOURCE##*/}
+    
+    if [ $pPushBranch -eq 0 ]; then
+        return 0
+    fi
+
+    # tBranch = current branch
+    # git push origin $tBranch
+
     return 0
 } # fPushGit()
 
@@ -94,21 +70,22 @@ fPushGit()
 fPushToOrigin()
 {
     local pPushBranch="$1"
-
     local tSrc=${BASH_SOURCE##*/}
 
     # Called by: "git-proj-push [-b]
 
-    fPushVerifyState
-
-    fPushRawFiles
-
-    if [ $pPushBranch -ne 0 ]; then
-        fPushGit
+    if [ $cInteractive -eq 0 ]; then
+        fError -m "You need to be 'interactive' for this command." -l $tSrc:$LINENO
     fi
+
+    fComGetProjGlobals
+    fPushIsRemoteMounted
+    fPushRawFiles
+    fPushGit
+
     return 0
 } # fPushToOrigin
 
 # ========================================
-# Don't forget to call fPushSetGlobals
+# Don't forget to call fComGetProjGlobals
 # Not done here, so some functions can be tested "stand-alone"

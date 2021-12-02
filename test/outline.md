@@ -136,18 +136,15 @@ installed files would be tricky, and of low value.
     |   |   |.git.config - see "include.path" .gitproj.config.global
     |   |   |.gitproj.config.global
     |   |   |ANY-DIR/
-    |   |   |   |PROJECT.raw/
-    |   |   |   |   |DIR1/
-    |   |   |   |   |   |DIR2/
-    |   |   |   |   |   |  |LARGE-FILE.MP4
     |   |   |   |PROJECT/
     |   |   |   |   |.git/
     |   |   |   |   |   |config - see "include.path" ../.gitproj.config.global
     |   |   |   |   |.gitproj.config.local
-    |   |   |   |   |raw -> ../PROJECT.raw
-    |   |   |   |   |DIR1/    
-    |   |   |   |   |   |DIR2/    
-    |   |   |   |   |   |   |LARGE-FILE.MP4 -> ../raw/DIRS/LARGE-FILE.MP4 
+    |   |   |   |   |raw/
+    |   |   |   |   |   |DIR/
+    |   |   |   |   |   |  |LARGE-FILE.MP4
+    |   |   |   |   |DIR/    
+    |   |   |   |   |   |LARGE-FILE.MP4 -> ../raw/DIR/LARGE-FILE.MP4 
     
 ## After running git-proj-remote
 

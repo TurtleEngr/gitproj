@@ -20,10 +20,16 @@ fUsage()
 =head1 DESCRIPTION
 
     Verify origin is set to a path that exists.
-    Verify the raw symlink points a directory.
-    Verify the origin raw dir exists (assumes at least one push)
-    Give a "diff" of the raw files, local vs external.
-    if -v, show all the config settings.
+    Verify gitproj.config.remote-raw-dir is defined
+    Verify gitproj.config.remote-raw-dir exists (if mounted)
+    Give a "diff" of the raw files, local vs remote (if mounted)
+    Do a "git status"
+
+Check install related health
+
+    fComGetVer
+    Compare .git/hooks/pre-commit to $gpDoc/hooks/pre-commit
+    if -v, show all the proj related config settings.
 
 =cut
 

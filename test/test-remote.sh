@@ -112,7 +112,7 @@ setUp()
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
-        cGetTopDir cGitProjVersion cPID gErr
+        cGetTopDir cGitProjVersion cInteractive cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -120,6 +120,7 @@ setUp()
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
     fTestSetupEnv
+    cInteractive=1
     fTestCreateEnv
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
@@ -545,7 +546,7 @@ testRemoteMkRemote()
     assertTrue "$LINENO" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "git clone to $gpMountDir"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
-    assertContains "$LINENO $tResult" "$tResult" "'rsync' -rlptz"
+    assertContains "$LINENO $tResult" "$tResult" "'rsync' -azC"
     assertContains "$LINENO $tResult" "$tResult" "/$gpProjName.raw"
 
     # ----------

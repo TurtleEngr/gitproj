@@ -2,7 +2,7 @@
 
 # --------------------------------
 export cConfigGlobal cConfigLocal cConfigHost cCurDir cGitProjVersion \
-    cGetOrigin cGetTopDir cPID
+    cGetOrigin cGetTopDir cInteractive cPID
 export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
     gpLocalRawDir gpSysLog gpVerbose PWD \
     gGetConfigValue gGetConfigOrigin
@@ -170,6 +170,11 @@ fComSetGlobals()
 
     cGitProjVersion=$(cat $gpDoc/VERSION)
 
+    cInteractive=1
+    if [ "${-#*i}" != "$-" ]; then
+        cInteractive=1
+    fi
+
     # Included in ~/.gitproj.config (Use -G to set config vars to this)
     # Note: ~/$cConfigGlobal does not work all the time, so use:
     # $HOME/$cConfigGlobal  However ~ is OK for use in literals.
@@ -228,7 +233,6 @@ fComCheckDeps()
 {
     local pRequired="$1"
     local pOptional="$2"
-
     local tSrc=${BASH_SOURCE##*/}
     local tProg
     local tErr=0
@@ -273,7 +277,6 @@ EOF
 fComInternalDoc()
 {
     local pAll=$1
-
     local tSrc=${BASH_SOURCE##*/}
 
     if [ ".$pAll" = ".-a" ]; then
@@ -317,11 +320,9 @@ fComUsage()
     local pInt=0
     local pAll=""
     local pTitle="$gpCmdName Usage"
-
     local tSrc=${BASH_SOURCE##*/}
     local tProg=""
     local tTidy='tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no'
-
     local OPTIND=1
     local OPTARG
     local tArg
@@ -484,7 +485,6 @@ fComFmtLog()
     local pMsg="$2"
     local pLine=$3
     local pErr=$4
-
     local tSrc=${BASH_SOURCE##*/}
     local tDebugLevel
     local tLevel
@@ -593,7 +593,6 @@ fLog()
     local pLine=""
     local pErr=""
     local pInt=0
-
     local tSrc=${BASH_SOURCE##*/}
     local OPTARG=1
     local OPTIND
@@ -655,7 +654,6 @@ fError()
     local pErr=1
     local pInt=0
     local pNoExit=0
-
     local tSrc=${BASH_SOURCE##*/}
     local OPTIND=1
     local OPTARG
@@ -736,7 +734,6 @@ fComSetConfig()
     local pKey=""
     local pValue=""
     local pAdd=""
-
     local tSrc=${BASH_SOURCE##*/}
     local tTopDir
     local OPTIND=1
@@ -891,7 +888,6 @@ fComGetConfig()
     local pDefault=""
     local pFilter=""
     local pExitOnError=0
-
     local tSrc=${BASH_SOURCE##*/}
     local tValue=""
     local tExit="-n"
@@ -1108,7 +1104,6 @@ fComUnsetConfig()
     local pScope=""
     local pKey=""
     local pAll="--unset"
-
     local tSrc=${BASH_SOURCE##*/}
     local OPTIND=1
     local OPTARG
@@ -1183,7 +1178,6 @@ fComSaveVar2Config()
     local pFile="$1"
     local pKey="$2"
     local pVarName="$3"
-
     local tSrc=${BASH_SOURCE##*/}
     local tValue
 
@@ -1203,7 +1197,6 @@ fComSaveVar2Config()
 fComCheckPkg()
 {
     local pPkg=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tStatus
 
@@ -1217,7 +1210,6 @@ fComCheckPkg()
 fComMustBeInGitRepo()
 {
     local pDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -d $pDir ]; then
@@ -1243,7 +1235,6 @@ fComMustBeInGitRepo()
 fComMustNotBeInGit()
 {
     local pDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tFound=0
     local tGitDir
@@ -1275,7 +1266,6 @@ fComMustNotBeInGit()
 fComMustBeInProjRepo()
 {
     local pDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tTopDir
 
@@ -1287,6 +1277,7 @@ fComMustBeInProjRepo()
         fError -n -m "Missing ~/.gitconfig, run 'git proj init'" -l $tSrc:$LINENO
         return 1
     fi
+
     if [ ! -f $HOME/$cConfigGlobal ]; then
         fError -n -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
         if [ $gpDebug -ge 2 ]; then
@@ -1316,7 +1307,6 @@ fComMustBeInProjRepo()
 fComAllMustBeReadable()
 {
     local pDir=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tFound
 
@@ -1333,6 +1323,40 @@ fComAllMustBeReadable()
     fi
     return 0
 } # fComAllMustBeReadable
+
+# --------------------
+fComGetProjGlobals()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    # Assumes we in git dir, and one that is managed by gitproj.
+    if ! fComMustBeInProjRepo $PWD; then
+        fUsage usage
+        exit 1
+    fi
+
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
+    gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
+    gpLocalTopDir=$($cGetTopDir 2>/dev/null)
+
+    # Called this way, so that the -e option will exit script if errors
+    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e
+    gpProjName=$gGetConfigValue
+
+    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e 
+    gpRemoteRawDir=$gGetConfigValue
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648")  # 2g
+
+    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e
+    gpLocalStatus=$gGetConfigValue
+
+    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e
+    gpRemoteStatus=$gGetConfigValue
+
+    fComGetVer
+
+    return 0
+} # fComGetProjGlobals()
 
 fComGetVer()
 {

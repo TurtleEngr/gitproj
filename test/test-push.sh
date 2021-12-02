@@ -113,7 +113,7 @@ setUp()
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
-        cGetTopDir cGitProjVersion cPID gErr
+        cGetTopDir cGitProjVersion cInteractive cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -157,22 +157,22 @@ tearDown()
 # ========================================
 
 # --------------------------------
-testPushSetGlobals()
+testComGetProjGlobals()
 {
     local tResult
     
     cd $cDatHome >/dev/null 2>&1
-    tResult=$(fPushSetGlobals 2>&1)
+    tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "You must be in a git workspace for this command."
 
     cd $cDatHome/$cDatProj3 >/dev/null 2>&1
-    tResult=$(fPushSetGlobals 2>&1)
+    tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "This git workspace is not setup for gitproj, run"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    fPushSetGlobals  >/dev/null 2>&1
+    fComGetProjGlobals >/dev/null 2>&1
     assertTrue "$LINENO $tResult" "$?"
     assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.raw" "$gpRemoteRawDir"
 
@@ -182,12 +182,47 @@ testPushSetGlobals()
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     fComSetConfig -H -k "gitproj.config.proj-name" -v "TBD"
     fComSetConfig -L -k "gitproj.config.proj-name" -v "TBD"
-    tResult=$(fPushSetGlobals 2>&1)
+    tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "crit: Unexpected: gitproj.config.proj-name should not be set to: TBD"
 
     return 0
-} # testPushSetGlobals
+} # testComGetProjGlobals
+
+# --------------------------------
+testPushIsRemoteMounted()
+{
+    local tResult
+
+    fComGetProjGlobals >/dev/null 2>&1
+    
+    tResult=$(fPushIsRemoteMounted 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
+    mv $gpRemoteRawDir $gpRemoteRawDir.sav
+    tResult=$(fPushIsRemoteMounted 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
+    mv $gpRemoteRawDir.sav $gpRemoteRawDir 
+    
+    return 0
+} # testPushIsRemoteMounted
+
+# --------------------------------
+testPushRawFiles()
+{
+    local tResult
+
+    fComGetProjGlobals >/dev/null 2>&1
+
+    gpVerbose=2
+    tResult=$(fPushRawFiles 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "x"
+    
+    return 0
+} # testPushRawFiles
+
 
 # ========================================
 # This should be the last defined function

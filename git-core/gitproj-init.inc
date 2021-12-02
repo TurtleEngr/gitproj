@@ -103,6 +103,9 @@ EOF
         fLog -p debug-2 -m "fInitGettingStarted in $PWD" -l $tSrc:$LINENO
         return 0
     fi
+    if [ $cInteractive -eq 0 ]; then
+        fError -m "You are not 'interactive', see -a option." -l $tSrc:$LINENO
+    fi
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
 
@@ -128,7 +131,6 @@ EOF
 fInitValidLocalPath()
 {
     local pLocalPath=$1
-
     local tSrc=${BASH_SOURCE##*/}
 
     if ! fComMustNotBeInGit $pLocalPath; then
@@ -148,7 +150,6 @@ fInitValidLocalPath()
 fInitGetLocalPath()
 {
     local pLocalPath=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tMaxLoop=30
     declare -l tResult
@@ -190,7 +191,6 @@ EOF
 fInitValidSize()
 {
     declare -l pMaxSize=$1
-
     local tSrc=${BASH_SOURCE##*/}
 
     echo $pMaxSize | grep -Eq '[0-9]+[bkmg]'
@@ -207,7 +207,6 @@ fInitValidSize()
 fInitGetSize()
 {
     local pMaxSize=$1
-
     local tSrc=${BASH_SOURCE##*/}
     local tMaxLoop=30
     declare -l tResult

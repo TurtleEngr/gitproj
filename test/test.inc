@@ -4,7 +4,7 @@
 # Test globals
 
 export cCurDir cDatHome cHome cTestCurDir cTestDestDir \
-    cTestFiles cTestSrcDir HOSTNAME
+    cTestFiles cTestSrcDir HOSTNAME cInteractive
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
@@ -69,6 +69,10 @@ fTestSetupEnv()
     cd - >/dev/null 2>&1
 
     . $gpBin/gitproj-com.inc
+
+    # Set to 1 so that tests will work in "batch" mode for manual tests
+    # Set this to 0, for tests were this is checked.
+    cInteractive=1
 
     cTestSrcDir=$gpTest
     cTestFiles=$cTestSrcDir/test-env.tgz

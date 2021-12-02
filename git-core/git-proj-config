@@ -42,6 +42,10 @@ Description
 	remote. pPath is the path pointing the current repo's remote
 	repo on an external drive.
 
+	Setup a different host.
+
+	Review and change the current settings interactively.
+
 Example
 	The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git
 	But the drive is now mounted at /mnt/usb-drive, use:
