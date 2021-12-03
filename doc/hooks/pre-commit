@@ -11,15 +11,15 @@
 #     be moved to the GIT_DIR/raw/ directory. See 'git proj move', if this
 #     is set to false.
 
-local tAgainst
-local tCheckBigFiles
-local tCheckFileNames
-local tEnabled
-local tErr=0
-local tFile
-local tMaxSize
-local tSize
-local tTest
+#local tAgainst
+#local tCheckBigFiles
+#local tCheckFileNames
+#local tEnabled
+#local tErr=0
+#local tFile
+#local tMaxSize
+#local tSize
+#local tTest
 
 # Redirect output to stderr.
 exec 1>&2

@@ -78,7 +78,7 @@ test-env_ProjLocalDefined.tgz :
 	export gpSaveTestEnv=1; ./test-init.sh testInitCreateLocalGitAuto
 
 test-env_TestDestDirAfterMkRemote.tgz :
-	export gpSaveTestEnv=1; ./test-remote.sh testRemoteMkRemoteAuto
+	export gpSaveTestEnv=1; ./test-remote.sh testRemoteMkRemote
 
 test-env_TestDestDirAfterRemoteReport.tgz :
 	export gpSaveTestEnv=1; ./test-remote.sh testRemoteReport

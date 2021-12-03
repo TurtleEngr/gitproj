@@ -583,6 +583,7 @@ testRemoteCreateRemoteGit()
     local tResult
     local tTopDir
 
+    gpVerbose=2
     gpAuto=1
     gpMountDir=""
     tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
@@ -608,12 +609,17 @@ testRemoteCreateRemoteGit()
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "video-2020-04-02 is not writable for you"
 
+    gpVerbose=2
+    cd $tTopDir >/dev/null 2>&1
     chmod ug+w $gpMountDir
     tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
-    assertTrue "$LINENO" "$?"
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
     assertContains "$LINENO $tResult" "$tResult" "$gpMountDir/$gpProjName.git"
     assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and that"
+    #assertNotContains "$LINENO UPSTREAM $tResult" "$tResult" "but the upstream is gone"
+    #assertContains "$LINENO $tResult" "$tResult" "xxx"
 
     return 0
 } # testRemoteCreateRemoteGit

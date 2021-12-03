@@ -97,8 +97,6 @@ gpPath=$1
 fCheckForGit
 tNewPath=$(fFindRemote $gpPath)
 
-set -x
 git remote set-url origin $tNewPath
-set +x
 
 exit 0

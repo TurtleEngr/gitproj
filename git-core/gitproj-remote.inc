@@ -133,7 +133,7 @@ fRemoteGetDirList()
 {
     local pMountDir="$1"
     local tSrc=${BASH_SOURCE##*/}
-    local tLiist
+    local tList
     export gResponse=""
 
     if [ -n "$pMountDir" ]; then
@@ -308,7 +308,7 @@ fRemoteMkRemote()
     fComSetConfig -l -k "branch.main.remote" -v "origin"
     fComSetConfig -l -k "branch.main.merge" -v "refs/heads/main"
     fComSetConfig -l -k "branch.develop.remote" -v "origin"
-    fComSetConfig -l -k "branch.develop.merge" -v "refs/heads/main"
+    fComSetConfig -l -k "branch.develop.merge" -v "refs/heads/develop"
 
     mkdir -p $gpRemoteRawDir
     if [ $gpVerbose -ge 1 ]; then
@@ -393,6 +393,31 @@ EOF
 } # fRemoteReport
 
 # --------------------
+NAfComGit()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    fLog -p info -m "git $@" -l $tSrc:$LINENO
+    if ! git "$@"; then
+        fError -i -m "Fix this then try again." -l $tSrc:$LINENO
+    fi
+} # fComGit
+
+# --------------------
+fRemoteCommit()
+{
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fComGit add $cConfigLocal $cConfigHost
+    fComGit commit -am "git proj remote has been setup"
+    fComGit push origin develop
+    fComGit checkout main
+    fComGit merge develop
+    fComGit push origin main
+    fComGit checkout develop
+    return 0
+} # fRemoteCommit
+
+# --------------------
 fRemoteCreateRemoteGit()
 {
     local pMountDir="$1"
@@ -415,6 +440,7 @@ fRemoteCreateRemoteGit()
 
     fRemoteMkRemote $gpMountDir
     fRemoteReport
+    fRemoteCommit
 
     return 0
 } # fRemoteCreateRemoteGit

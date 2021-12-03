@@ -528,6 +528,7 @@ fInitMkGitFlow()
     # Define the default prefixes
 
     fComSetConfig -g -k gitflow.branch.main -v main
+    fComSetConfig -g -k gitflow.branch.master -v main
     fComSetConfig -g -k gitflow.branch.develop -v develop
 
     fComSetConfig -g -k gitflow.prefix.feature -v feature/

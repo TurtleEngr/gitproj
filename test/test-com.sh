@@ -718,6 +718,16 @@ testComSelect()
     return 0
 } # testComSelect
 
+# --------------------------------
+NAtestComGit()
+{
+    local tResult
+
+    gpVerbose=2
+    tResult=$(fComGit ????)
+    
+} # testComGit
+
 # ========================================
 # This should be the last defined function
 fTestRun()

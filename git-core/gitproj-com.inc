@@ -748,6 +748,37 @@ If no -i, then "fUsage short", will be called.
 EOF
 } # fError
 
+# --------------------
+fComGit()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tOpt
+
+    tOpt=$(echo "$@" | sed 's/-/\-/g; s/"/\\\"/g')
+
+    fLog -p info -l $tSrc:$LINENO -m "git $tOpt"
+    if ! git "$@"; then
+        fError -i -m "Fix this then try again." -l $tSrc:$LINENO
+    fi
+    return 0
+    cat <<EOF
+=internal-pod
+
+=internal-head3 fComGit [pArgs...]
+
+This is a wrapper for "git". If gpVerbose is >= 2, the git call will
+will be echoed. If the git call exits with a non-0, then an error
+message is output and the script exits (if not called in a sub-shell).
+
+This is used to make the code look "clean". You don't need to clutter
+the code with if statements with every git command. I.e. this supports
+the "design pattern" where, if a command exits, it is assumed all is
+OK, because if it failed, the script would exit.
+
+=internal-cut
+EOF
+} # fComGit
+
 # --------------------------------
 fComMkHostConfig()
 {
@@ -789,11 +820,9 @@ fComSetConfig()
                 ;;
             G)
                 if [ ! -f $HOME/$cConfigGlobal ]; then
-                    set +x
                     fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
                     return 1
                 fi
-                set +x
                 ;;
             H | l | L)
                 tTopDir="$($cGetTopDir 2>&1)"

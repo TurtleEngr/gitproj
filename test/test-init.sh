@@ -195,7 +195,6 @@ testInitSetGlobals()
 {
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
     cd $HOME/$cDatProj1
-
     fInitSetGlobals
 
     assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
@@ -680,7 +679,7 @@ testInitMoveBinaryFiles()
         echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
         cd $HOME >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .gitconfig .gitproj.config.global
+        tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .
         echo
     fi
 
@@ -723,8 +722,8 @@ testInitMkGitDir()
     local tTop
 
     gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    fInitFirstTimeSet
+    cd $HOME >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -733,13 +732,14 @@ testInitMkGitDir()
     gpAuto=0
 
     cd $gpLocalTopDir >/dev/null 2>&1
+
     tResult=$(fInitMkGitDir 2>&1)
     tStatus=$?
     assertTrue $LINENO "$tStatus"
     assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
     assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
     assertTrue $LINENO "$(
-        grep -q core $gpLocalTopDir/.gitignore
+        grep -q raw $gpLocalTopDir/.gitignore
         echo $?
     )"
 
@@ -758,7 +758,8 @@ testInitMkGitDir()
         tar -cvzf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
     fi
 
-    assertTrue "$LINENO" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO not exec" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
 
     return 0
 } # testInitMkGitDir
