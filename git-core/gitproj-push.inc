@@ -29,26 +29,41 @@ fPushRawFiles()
     local tSrc=${BASH_SOURCE##*/}
     local tOpt="-azC --delete-after"
     local tStatus
+    local tHelp
+    declare -l tReply
     
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-viP
     fi
 
-    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpLocalTopDir/raw/* $gpRemoteRawDir"
+    cat <<EOF
 
-    'rsync' $tOpt $tVerbose --dry-run -iv $gpLocalTopDir/raw/ $gpRemoteRawDir
-    echo -n "Continue (y/n)? "
-    read
-    if [ "$REPLY" != 'y' ]; then
-        fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
-	exit 1
-    fi
+Dry Run:
+'rsync' $tOpt $tVerbose
+        $gpLocalTopDir/raw/
+        $gpRemoteRawDir"
+
+EOF
+    'rsync' $tOpt $tVerbose --dry-run -v $gpLocalTopDir/raw/ $gpRemoteRawDir
+
+    echo
+    tHelp="Select 'Yes' if the above Dry Run looks OK."
+    fComSelect "Continue? " "Yes-push-these-files No-skip-pushing" "$tHelp"
+    case $gResponse in
+        QUIT)
+            exit 1
+	    ;;
+	No*)
+            fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
+	    return 1
+	    ;;
+    esac
 
     'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
     tStatus=$?
 
     return $tStatus
-} # fPushRawFiles()
+} # fPushRawFiles
 
 # --------------------
 fPushGit()
@@ -64,7 +79,7 @@ fPushGit()
     # git push origin $tBranch
 
     return 0
-} # fPushGit()
+} # fPushGit
 
 # --------------------
 fPushToOrigin()
@@ -73,10 +88,6 @@ fPushToOrigin()
     local tSrc=${BASH_SOURCE##*/}
 
     # Called by: "git-proj-push [-b]
-
-    if [ $cInteractive -eq 0 ]; then
-        fError -m "You need to be 'interactive' for this command." -l $tSrc:$LINENO
-    fi
 
     fComGetProjGlobals
     fPushIsRemoteMounted

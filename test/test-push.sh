@@ -216,13 +216,30 @@ testPushRawFiles()
     fComGetProjGlobals >/dev/null 2>&1
 
     gpVerbose=2
-    tResult=$(fPushRawFiles 2>&1)
+
+    tResult=$(fPushRawFiles 2>&1 < <(echo -e "1\n"))
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fPushRawFiles 2>&1 < <(echo -e "2\n1\n"))
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "if the above Dry Run looks OK"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fPushRawFiles 2>&1 < <(echo -e "4\n"))
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Nothing was pushed"
+    assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
+
+    echo "Make a new file" >$gpLocalTopDir/raw/NewFile.txt
+    tResult=$(fPushRawFiles 2>&1 < <(echo -e "3\n"))
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "x"
-    
+    assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
+    assertContains "$LINENO $tResult" "$tResult" "total size is"
+    ##assertContains "$LINENO $tResult" "$tResult" "SHOW tResult"
+
     return 0
 } # testPushRawFiles
-
 
 # ========================================
 # This should be the last defined function

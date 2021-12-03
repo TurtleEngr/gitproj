@@ -2,10 +2,10 @@
 
 # --------------------------------
 export cConfigGlobal cConfigLocal cConfigHost cCurDir cGitProjVersion \
-    cGetOrigin cGetTopDir cInteractive cPID
+    cGetOrigin cGetTopDir cPID
 export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
     gpLocalRawDir gpSysLog gpVerbose PWD \
-    gGetConfigValue gGetConfigOrigin
+    gGetConfigValue gGetConfigOrigin gResponse
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -169,11 +169,6 @@ fComSetGlobals()
     cd - >/dev/null 2>&1
 
     cGitProjVersion=$(cat $gpDoc/VERSION)
-
-    cInteractive=1
-    if [ "${-#*i}" != "$-" ]; then
-        cInteractive=1
-    fi
 
     # Included in ~/.gitproj.config (Use -G to set config vars to this)
     # Note: ~/$cConfigGlobal does not work all the time, so use:
@@ -477,6 +472,47 @@ fComStackTrace()
 
     return 0
 } # fComStackTrace
+
+# --------------------
+fComSelect()
+{
+    PS3="$1"
+    local pDirList="$2"
+    local pHelp="$3"
+    local tSrc=${BASH_SOURCE##*/}
+    local tResponse
+    local tStatus=1
+    export gResponse
+
+    # Loop until a valid selection, or QUIT or OTHER
+    select tResponse in QUIT HELP $pDirList; do
+        echo
+        case $tResponse in
+            QUIT)
+                fLog -p warning -m "Quitting." -l $tSrc:$LINENO
+                break
+                ;;
+            HELP)
+                echo 1>&2
+                echo "$pHelp" 1>&2
+                echo 1>&2
+                continue
+                ;;
+        esac
+        if [ -z "$tResponse" ]; then
+            fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
+            continue
+        fi
+        if [ -n "$tResponse" ]; then
+            tStatus=0
+            break
+        fi
+    done
+
+    PS3=""
+    gResponse=$tResponse
+    return $tStatus
+} # fComSelect
 
 # ------------------
 fComFmtLog()

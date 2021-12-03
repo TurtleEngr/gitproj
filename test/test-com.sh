@@ -686,6 +686,38 @@ testComUnsetConfigMore()
     # untar a git env., test in and out of git dir
 } #testComUnsetConfigMore
 
+# --------------------------------
+testComSelect()
+{
+    local tResult
+    local tDirList
+    local tPrompt
+    local tHelp
+
+    gpAuto=0
+    
+    tDirList=$(find $cDatMount3 $cDatMount3/* $cDatMount3/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
+    tPrompt="Select a mount point: "
+    tHelp="Just select by number."
+    tResult=$(fComSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "1\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "QUIT"
+    assertContains "$LINENO $tResult" "$tResult" "warning"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    tResult=$(fComSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "2\n1\n"))
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "QUIT"
+    assertContains "$LINENO $tResult" "$tResult" "Just select by number"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncoment to show tResult"
+
+    fComSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "5\n") >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $gResponse" "$gResponse" "/mnt/usb-video/video-2019-11-26/dev"
+
+    return 0
+} # testComSelect
+
 # ========================================
 # This should be the last defined function
 fTestRun()

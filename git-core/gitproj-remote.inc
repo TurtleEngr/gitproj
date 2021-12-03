@@ -157,50 +157,6 @@ fRemoteGetDirList()
 } # fRemoteGetDirList
 
 # --------------------
-fRemoteSelect()
-{
-    PS3="$1"
-    local pDirList="$2"
-    local pHelp="$3"
-    local tSrc=${BASH_SOURCE##*/}
-    local tResponse
-    local tStatus=1
-    export gResponse
-
-    # Loop until a valid selection, or QUIT or OTHER
-    select tResponse in QUIT HELP OTHER $pDirList; do
-        echo
-        case $tResponse in
-            QUIT)
-                fLog -p warning -m "Quitting." -l $tSrc:$LINENO
-                break
-                ;;
-            HELP)
-                echo 1>&2
-                echo "$pHelp" 1>&2
-                echo 1>&2
-                continue
-                ;;
-            OTHER)
-                break
-                ;;
-        esac
-        if [ -z "$tResponse" ]; then
-            fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
-            continue
-        fi
-        if [ -n "$tResponse" ]; then
-            tStatus=0
-            break
-        fi
-    done
-
-    PS3=""
-    gResponse=$tResponse
-    return $tStatus
-} # fRemoteSelect
-
-# --------------------
 fRemoteGetAnotherMountDir()
 {
     local pMountDir=$1
@@ -267,9 +223,6 @@ fRemoteGetMountDir()
 
     # ----------
     # Prompt/response
-    if [ $cInteractive -eq 0 ]; then
-        fError -m "You are not 'interactive', see -a option." -l $tSrc:$LINENO
-    fi
 
     # Offer choices, with two dir levels (remove dirs with spaces in names)
     fRemoteGetDirList $pMountDir
@@ -285,7 +238,7 @@ EOF
     # Loop until the selection is OK, or Quit
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
-        fRemoteSelect "$tPrompt" "$tDirList" "$tHelp"
+        fComSelect "$tPrompt" "OTHER $tDirList" "$tHelp"
         tStatus=$?
         tMountDir=$gResponse
         if [ "$tMountDir" = "QUIT" ]; then

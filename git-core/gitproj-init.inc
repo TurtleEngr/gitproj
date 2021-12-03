@@ -103,9 +103,6 @@ EOF
         fLog -p debug-2 -m "fInitGettingStarted in $PWD" -l $tSrc:$LINENO
         return 0
     fi
-    if [ $cInteractive -eq 0 ]; then
-        fError -m "You are not 'interactive', see -a option." -l $tSrc:$LINENO
-    fi
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
 
@@ -300,21 +297,23 @@ directory. A symlink will replace the moved file. The symlink will
 point to [raw]. Quit if you want to change the MaxSize.
 
 EOF
+	# TBD convert this logic to use fComSelect()
         echo -n "Move the files (-m) [y/n/quit]? "
         read -r tResult
-        tResult=${tResult%${tResult#[a-z]}}
-        if [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
-        if [ "$tResult" = "y" ]; then
-            gpAutoMove=1
-            break
-        fi
-        if [ "$tResult" = "n" ]; then
-            gpAutoMove=0
-            break
-        fi
+	case $tResult in
+	    q*)
+                fLog -p warning -m "Quitting" -l $tSrc:$LINENO
+            	exit 1
+		;;
+            y*)
+                gpAutoMove=1
+            	break
+        	;;
+            n*)
+                gpAutoMove=0
+            	break
+        	;;
+	esac
     done
     if [ $tMaxLoop -eq 0 ]; then
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO

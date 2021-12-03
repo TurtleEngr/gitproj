@@ -112,7 +112,7 @@ setUp()
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
-        cGetTopDir cGitProjVersion cInteractive cPID gErr
+        cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -120,7 +120,6 @@ setUp()
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
     fTestSetupEnv
-    cInteractive=1
     fTestCreateEnv
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
@@ -384,37 +383,6 @@ testRemoteGetDirList()
 
     return 0
 } # testRemoteGetDirList
-
-# --------------------------------
-testRemoteSelect()
-{
-    local tResult
-    local tDirList
-    local tPrompt
-    local tHelp
-
-    gpAuto=0
-    fRemoteGetDirList "$cDatMount3"
-    tDirList=$gResponse
-    tPrompt="Select a mount point: "
-    tHelp="Just select by number."
-    tResult=$(fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "1\n"))
-    assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "QUIT"
-    assertContains "$LINENO $tResult" "$tResult" "warning"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    tResult=$(fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "2\n1\n"))
-    assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "QUIT"
-    assertContains "$LINENO $tResult" "$tResult" "Just select by number"
-
-    fRemoteSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "6\n") >/dev/null 2>&1
-    assertTrue "$LINENO" "$?"
-    assertContains "$LINENO $gResponse" "$gResponse" "/mnt/usb-video/video-2019-11-26/dev"
-
-    return 0
-} # testRemoteSelect
 
 testRemoteGetAnotherMountDir()
 {

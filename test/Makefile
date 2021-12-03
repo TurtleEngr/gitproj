@@ -111,7 +111,7 @@ stats :
 	@cat \
 		Makefile *.md *.sh *.inc \
 		../doc/VERSION \
-		../do/config/* ../doc/hooks/* \
+		../doc/config/* ../doc/hooks/* \
 		../git-core/* \
 	| wc -l
 	@echo -n "Total lines of doc: "

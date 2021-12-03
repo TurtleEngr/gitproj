@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export gpTest cTestCurDir gpTestList gpCmdName gpSaveTestEnv
-gpCmdName=manual-test-RemoteSelect
+gpCmdName=manual-test-ComSelect
 
 # -------------------
 # Set current directory location in PWD and cTestCurDir
@@ -36,7 +36,7 @@ cd - >/dev/null 2>&1
 
 tPrompt="Select by number, the location for the remote git and raw files? "
 fRemoteGetDirList $cDatMount3
-tDirList=$gResponse
+tDirList="OTHER $gResponse"
 tHelp=$(
     cat <<EOF
 This is a list of dirs under the -d pMountDir, if you gave that option.
