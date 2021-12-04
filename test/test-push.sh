@@ -217,26 +217,34 @@ testPushRawFiles()
 
     gpVerbose=2
 
+    tResult=$(fPushRawFiles 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
+
+    echo "Make a new file" >$gpLocalTopDir/raw/NewFile.txt
+
     tResult=$(fPushRawFiles 2>&1 < <(echo -e "1\n"))
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     tResult=$(fPushRawFiles 2>&1 < <(echo -e "2\n1\n"))
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "if the above Dry Run looks OK"
+    assertContains "$LINENO $tResult" "$tResult" "if the above differences look OK"
+    assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     tResult=$(fPushRawFiles 2>&1 < <(echo -e "4\n"))
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Nothing was pushed"
     assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    echo "Make a new file" >$gpLocalTopDir/raw/NewFile.txt
     tResult=$(fPushRawFiles 2>&1 < <(echo -e "3\n"))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
-    ##assertContains "$LINENO $tResult" "$tResult" "SHOW tResult"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
 } # testPushRawFiles
@@ -284,16 +292,40 @@ testPushToOrigin()
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
-
     echo "New file in raw/" >raw/newfile.txt
 
     tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
-    ##assertContains "$LINENO $tResult" "$tResult" "xxx"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
 } # testPushToOrigin
+
+# --------------------------------
+testGitProjPushCLI()
+{
+    local tResult
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    echo "Make a change." >>README.html
+    git commit -am "Updated README.html" >/dev/null 2>&1
+    assertTrue "$LINENO $tResult" "$?"
+    echo "New file in raw/" >raw/newfile.txt
+
+    tResult=$($gpBin/git-proj-push -vv 2>&1 < <(echo -e "3\n"))
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "newfile.txt"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
+
+    tResult=$($gpBin/git-proj-push -b -vv 2>&1 < <(echo -e "3\n3"))
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
+    assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
+
+    return 0
+} # testGitProjPushCLI
 
 # ========================================
 # This should be the last defined function

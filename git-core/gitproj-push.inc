@@ -25,29 +25,49 @@ fPushIsRemoteMounted()
 # --------------------
 fPushRawFiles()
 {
-    local tVerbose
     local tSrc=${BASH_SOURCE##*/}
+    local tDiff
+    local tHelp
     local tOpt="-azC --delete-after"
     local tStatus
-    local tHelp
+    local tVerbose
     declare -l tReply
     
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-viP
     fi
 
-    cat <<EOF
+    tDiff=$(diff -rq $gpLocalTopDir/raw $gpRemoteRawDir 2>&1)
+    if [ $? -eq 0 ]; then
+        tVerbose=$gpVerbose
+        fLog -p notice -m "There are no differences found with 'raw' files." -l $tSrc:$LINENO
+        gpVerbose=$tVerbose
+        return 0
+    fi
+
+    tHelp=$(
+        cat <<EOF
+
+diff summary:
+$tDiff
+
+Select 'Yes' if the above differences look OK."
+EOF
+)
+    echo "$tHelp"
+
+    if [ $gpVerbose -ne 0 ]; then
+        cat <<EOF
 
 Dry Run:
-'rsync' $tOpt $tVerbose
+'rsync' $tOpt $tVerbose --dry-run
         $gpLocalTopDir/raw/
         $gpRemoteRawDir"
-
 EOF
-    'rsync' $tOpt $tVerbose --dry-run -v $gpLocalTopDir/raw/ $gpRemoteRawDir
+        'rsync' $tOpt $tVerbose --dry-run -v $gpLocalTopDir/raw/ $gpRemoteRawDir
+    fi
 
     echo
-    tHelp="Select 'Yes' if the above Dry Run looks OK."
     fComSelect "Continue? " "Yes-push-these-files No-skip-pushing" "$tHelp"
     case $gResponse in
         QUIT)

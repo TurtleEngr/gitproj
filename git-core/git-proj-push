@@ -106,6 +106,7 @@ EOF
 export cCurDir gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -134,14 +135,14 @@ if ! fComMustBeInProjRepo $PWD; then
 fi
 
 . $gpBin/gitproj-push.inc
-fPushSetGlobals
+fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
-tPushBranch=0
+tPushBranchFlag=0
 while getopts :bhH:vx tArg; do
     case $tArg in
         # Script arguments
-        b) tPushBranch=1 ;;
+        b) tPushBranchFlag=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -158,5 +159,5 @@ if [ $# -ne 0 ]; then
 fi
 
 # ----------
-fPushToOrigin $tPushBranch
+fPushToOrigin $tPushBranchFlag
 exit 0
