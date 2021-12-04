@@ -89,7 +89,7 @@ fPushGit()
 # --------------------
 fPushToOrigin()
 {
-    local pPushBranch="$1"
+    local pPushBranchFlag="${1:-0}"
     local tSrc=${BASH_SOURCE##*/}
 
     # Called by: "git-proj-push [-b]
@@ -97,7 +97,7 @@ fPushToOrigin()
     fComGetProjGlobals
     fPushIsRemoteMounted
     fPushRawFiles
-    fPushGit
+    fPushGit $pPushBranchFlag
 
     return 0
 } # fPushToOrigin

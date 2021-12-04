@@ -273,7 +273,7 @@ testPushGit()
 } # testPushGit
 
 # --------------------------------
-NAtestPushToOrigin()
+testPushToOrigin()
 {
     local tResult
 
@@ -281,6 +281,18 @@ NAtestPushToOrigin()
 
     gpVerbose=2
 
+    echo "Make a change." >>README.html
+    git commit -am "Updated README.html" >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+
+    echo "New file in raw/" >raw/newfile.txt
+
+    tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxx"
+
+    return 0
 } # testPushToOrigin
 
 # ========================================

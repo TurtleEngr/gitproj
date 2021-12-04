@@ -499,13 +499,13 @@ fComSelect()
                 continue
                 ;;
         esac
-        if [ -z "$tResponse" ]; then
-            fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
-            continue
-        fi
         if [ -n "$tResponse" ]; then
             tStatus=0
             break
+        fi
+        if [ -z "$tResponse" ]; then
+            fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
+            continue
         fi
     done
 
@@ -1400,22 +1400,22 @@ fComGetProjGlobals()
         exit 1
     fi
 
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true" 2>&1)
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
     gpLocalTopDir=$($cGetTopDir 2>/dev/null)
 
     # Called this way, so that the -e option will exit script if errors
-    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e
+    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e >/dev/null 2>&1
     gpProjName=$gGetConfigValue
 
-    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e 
+    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e  >/dev/null 2>&1
     gpRemoteRawDir=$gGetConfigValue
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648")  # 2g
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648" 2>&1)  # 2g
 
-    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e
+    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e >/dev/null 2>&1
     gpLocalStatus=$gGetConfigValue
 
-    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e
+    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e >/dev/null 2>&1
     gpRemoteStatus=$gGetConfigValue
 
     fComGetVer
