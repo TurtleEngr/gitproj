@@ -241,6 +241,48 @@ testPushRawFiles()
     return 0
 } # testPushRawFiles
 
+# --------------------------------
+testPushGit()
+{
+    local tResult
+
+    fComGetProjGlobals >/dev/null 2>&1
+
+    gpVerbose=2
+    echo "Make a change." >>README.html
+    git commit -am "Updated README.html" >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+    
+    tResult=$(fPushGit 1 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+
+    echo "Make another change." >>README.html
+    git commit -am "Updated README.html" >/dev/null 2>&1
+    assertTrue "$LINENO" "$?"
+
+    tResult=$(fPushGit 0 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertNotContains "$LINENO $tResult" "$tResult" "git push origin develop"
+
+    tResult=$(fPushGit 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertNotContains "$LINENO $tResult" "$tResult" "git push origin develop"
+
+    return 0
+} # testPushGit
+
+# --------------------------------
+NAtestPushToOrigin()
+{
+    local tResult
+
+    fComGetProjGlobals >/dev/null 2>&1
+
+    gpVerbose=2
+
+} # testPushToOrigin
+
 # ========================================
 # This should be the last defined function
 

@@ -68,15 +68,20 @@ EOF
 # --------------------
 fPushGit()
 {
-    local pPushBranch="$1"
+    local pPushBranchFlag="${1:-0}"
     local tSrc=${BASH_SOURCE##*/}
+    local tBranch
     
-    if [ $pPushBranch -eq 0 ]; then
+    if [ $pPushBranchFlag -eq 0 ]; then
         return 0
     fi
 
-    # tBranch = current branch
-    # git push origin $tBranch
+    tBranch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ $? -ne 0 ]; then
+        fError -i -m "Problem getting current branch name." -l $tSrc:$LINENO
+    fi
+
+    fComGit push origin $tBranch
 
     return 0
 } # fPushGit
