@@ -35,7 +35,8 @@ mTestEnvFiles = \
 	test-env_ProjAfterGInit.tgz \
 	test-env_ProjLocalDefined.tgz \
 	test-env_TestDestDirAfterMkRemote.tgz \
-	test-env_TestDestDirAfterRemoteReport.tgz
+	test-env_TestDestDirAfterRemoteReport.tgz \
+	test-env_Home2AfterPush.tgz
 
 # --------------------
 test-all : $(mDepList) $(mBaseList) test-cmds
@@ -82,6 +83,9 @@ test-env_TestDestDirAfterMkRemote.tgz :
 
 test-env_TestDestDirAfterRemoteReport.tgz :
 	export gpSaveTestEnv=1; ./test-remote.sh testRemoteReport
+
+test-env_Home2AfterPush.tgz :
+	export gpSaveTestEnv=1; ./test-push.sh testGitProjPushCLI
 
 # --------------------
 stats :

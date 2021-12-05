@@ -28,8 +28,9 @@ fUsage()
 
 =head1 DESCRIPTION
 
-Use this command to pull (or copy), the "raw" files from
-[remote-raw-dir] to ../[ProjName].raw
+
+rsync will be used top copy the [remote-raw-dir]/[ProjName].raw/ files
+to '[ProjName]/raw/'.
 
 If the -b option is given then run:
 
@@ -107,6 +108,7 @@ EOF
 export cCurDir gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
 
 # -------------------
 # Set current directory location in PWD and cCurDir
@@ -135,14 +137,14 @@ if ! fComMustBeInProjRepo $PWD; then
 fi
 
 . $gpBin/gitproj-pull.inc
-fPullSetGlobals
+fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
-tPullBranch=0
+tBranchFlag=0
 while getopts :bhH:vx tArg; do
     case $tArg in
         # Script arguments
-        b) tPullBranch=1 ;;
+        b) tBranchFlag=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -159,5 +161,5 @@ if [ $# -ne 0 ]; then
 fi
 
 # ----------
-fPullFromOrigin $tPullBranch
+fPullFromOrigin $tBranchFlag
 exit 0

@@ -11,19 +11,20 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 # ========================================
 
 # --------------------
-fPushIsRemoteMounted()
+fPullIsRemoteMounted()
 {
     local tSrc=${BASH_SOURCE##*/}
-
+    #TBD: duplicate, see fPushIsRemoteMounted
+    
     if [ -d $gpRemoteRawDir ]; then
         return 0
     fi
 
     fError -m "$gpRemoteRawDir was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
-} # fPushIsRemoteMounted
+} # fPullIsRemoteMounted
 
 # --------------------
-fPushRawFiles()
+fPullRawFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tDiff
@@ -37,7 +38,7 @@ fPushRawFiles()
         tVervose=-viP
     fi
 
-    tDiff=$(diff -rq $gpLocalTopDir/raw $gpRemoteRawDir 2>&1)
+    tDiff=$(diff -rq $gpRemoteRawDir $gpLocalTopDir/raw 2>&1)
     if [ $? -eq 0 ]; then
         tVerbose=$gpVerbose
         fLog -p notice -m "There are no differences found with 'raw' files." -l $tSrc:$LINENO
@@ -61,32 +62,32 @@ EOF
 
 Dry Run:
 'rsync' $tOpt $tVerbose --dry-run
-        $gpLocalTopDir/raw/
         $gpRemoteRawDir"
+        $gpLocalTopDir/raw/
 EOF
-        'rsync' $tOpt $tVerbose --dry-run -v $gpLocalTopDir/raw/ $gpRemoteRawDir
+        'rsync' $tOpt $tVerbose --dry-run -v $gpRemoteRawDir $gpLocalTopDir/raw/
     fi
 
     echo
-    fComSelect "Continue? " "Yes-push-these-files No-skip-pushing" "$tHelp"
+    fComSelect "Continue? " "Yes-pull-these-files No-skip-pulling" "$tHelp"
     case $gResponse in
         QUIT)
             exit 1
 	    ;;
 	No*)
-            fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
+            fLog -p warning -m "Nothing was pulled." -l $tSrc:$LINENO
 	    return 1
 	    ;;
     esac
 
-    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
+    'rsync' $tOpt $tVerbose $gpRemoteRawDir $gpLocalTopDir/raw/
     tStatus=$?
 
     return $tStatus
-} # fPushRawFiles
+} # fPullRawFiles
 
 # --------------------
-fPushGit()
+fPullGit()
 {
     local pBranchFlag="${1:-0}"
     local tSrc=${BASH_SOURCE##*/}
@@ -101,26 +102,26 @@ fPushGit()
         fError -i -m "Problem getting current branch name." -l $tSrc:$LINENO
     fi
 
-    fComGit push origin $tBranch
+    fComGit pull origin $tBranch
 
     return 0
-} # fPushGit
+} # fPullGit
 
 # --------------------
-fPushToOrigin()
+fPullFromOrigin()
 {
     local pBranchFlag="${1:-0}"
     local tSrc=${BASH_SOURCE##*/}
 
-    # Called by: "git-proj-push [-b]
+    # Called by: "git-proj-pull [-b]
 
     fComGetProjGlobals
-    fPushIsRemoteMounted
-    fPushRawFiles
-    fPushGit $pBranchFlag
+    fPullIsRemoteMounted
+    fPullRawFiles
+    fPullGit $pBranchFlag
 
     return 0
-} # fPushToOrigin
+} # fPullFromOrigin
 
 # ========================================
 # Don't forget to call fComGetProjGlobals

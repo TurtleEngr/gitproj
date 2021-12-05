@@ -3,7 +3,7 @@
 # ========================================
 fUsage()
 {
-    fComUsage -s usage -f $cTestCurDir/test-push.sh
+    fComUsage -s usage -f $cTestCurDir/test-pull.sh
 
     # This is the start of the testing internal documentation. See:
     # fGitProjComInternalDoc()
@@ -16,13 +16,13 @@ fUsage()
 
 =for html <hr/>
 
-=head1 test-push.sh
+=head1 test-pull.sh
 
-test-push.sh - test git-proj-push and gitproj-push.inc
+test-pull.sh - test git-proj-pull and gitproj-pull.inc
 
 =head1 SYNOPSIS
 
-    ./test-push.sh [test,test,...]
+    ./test-pull.sh [test,test,...]
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ NAoneTimeSetUp()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head2 Test gitproj-push.inc
+=internal-head2 Test gitproj-pull.inc
 
 =internal-head3 oneTimeSetuUp
 
@@ -127,7 +127,13 @@ setUp()
     cd - >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    . $gpBin/gitproj-push.inc
+    . $gpBin/gitproj-pull.inc
+
+    cd $cDatHome2 >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_Home2AfterPush.tgz
+    cd - >/dev/null 2>&1
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
 
     gpDebug=0
     gpUnitDebug=0
@@ -190,26 +196,26 @@ testComGetProjGlobals()
 } # testComGetProjGlobals
 
 # --------------------------------
-testPushIsRemoteMounted()
+testPullIsRemoteMounted()
 {
     local tResult
 
     fComGetProjGlobals >/dev/null 2>&1
     
-    tResult=$(fPushIsRemoteMounted 2>&1)
+    tResult=$(fPullIsRemoteMounted 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
     mv $gpRemoteRawDir $gpRemoteRawDir.sav
-    tResult=$(fPushIsRemoteMounted 2>&1)
+    tResult=$(fPullIsRemoteMounted 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
     mv $gpRemoteRawDir.sav $gpRemoteRawDir 
     
     return 0
-} # testPushIsRemoteMounted
+} # testPullIsRemoteMounted
 
 # --------------------------------
-testPushRawFiles()
+testPullRawFiles()
 {
     local tResult
 
@@ -217,18 +223,18 @@ testPushRawFiles()
 
     gpVerbose=2
 
-    tResult=$(fPushRawFiles 2>&1)
+    tResult=$(fPullRawFiles 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
 
-    echo "Make a new file" >$gpLocalTopDir/raw/NewFile.txt
+    echo "Make a new file" >$gpRemoteRawDir/raw/NewFile.txt
 
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "1\n"))
+    tResult=$(fPullRawFiles 2>&1 < <(echo -e "1\n"))
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "2\n1\n"))
+    tResult=$(fPullRawFiles 2>&1 < <(echo -e "2\n1\n"))
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "if the above differences look OK"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
@@ -236,54 +242,58 @@ testPushRawFiles()
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "4\n"))
+    tResult=$(fPullRawFiles 2>&1 < <(echo -e "4\n"))
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Nothing was pushed"
+    assertContains "$LINENO $tResult" "$tResult" "Nothing was pulled"
     assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "3\n"))
+    tResult=$(fPullRawFiles 2>&1 < <(echo -e "3\n"))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
-} # testPushRawFiles
+} # testPullRawFiles
 
 # --------------------------------
-testPushGit()
+testPullGit()
 {
     local tResult
 
     fComGetProjGlobals >/dev/null 2>&1
+    
+# ??? setup another gitproj area, pointing to same remote area.
+# Make changes to the other area. Now this can be used to test.
+# The seconde area needes to be saved in a tar file.
 
     gpVerbose=2
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
     
-    tResult=$(fPushGit 1 2>&1)
+    tResult=$(fPullGit 1 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
 
     echo "Make another change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
 
-    tResult=$(fPushGit 0 2>&1)
+    tResult=$(fPullGit 0 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertNotContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    assertNotContains "$LINENO $tResult" "$tResult" "git pull origin develop"
 
-    tResult=$(fPushGit 2>&1)
+    tResult=$(fPullGit 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertNotContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    assertNotContains "$LINENO $tResult" "$tResult" "git pull origin develop"
 
     return 0
-} # testPushGit
+} # testPullGit
 
 # --------------------------------
-testPushToOrigin()
+testPullToOrigin()
 {
     local tResult
 
@@ -296,19 +306,18 @@ testPushToOrigin()
     assertTrue "$LINENO" "$?"
     echo "New file in raw/" >raw/newfile.txt
 
-    tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
+    tResult=$(fPullToOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
-} # testPushToOrigin
+} # testPullToOrigin
 
 # --------------------------------
-testGitProjPushCLI()
+testGitProjPullCLI()
 {
     local tResult
-    local tStatus
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     echo "Make a change." >>README.html
@@ -316,33 +325,19 @@ testGitProjPushCLI()
     assertTrue "$LINENO $tResult" "$?"
     echo "New file in raw/" >raw/newfile.txt
 
-    tResult=$($gpBin/git-proj-push -vv 2>&1 < <(echo -e "3\n"))
+    tResult=$($gpBin/git-proj-pull -vv 2>&1 < <(echo -e "3\n"))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "newfile.txt"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$($gpBin/git-proj-push -b -vv 2>&1 < <(echo -e "3\n3"))
-    tStatus=$?
-    assertTrue "$LINENO $tResult" "$tStatus"
+    tResult=$($gpBin/git-proj-pull -b -vv 2>&1 < <(echo -e "3\n3"))
+    assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
-    assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    # ----------
-    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-        echo -e "\tCapture state of project after files pushed."
-        echo -e "\tRestore test-env_Home2AfterPush.tgz relative to env cDatHome2"
-        mkdir -p $cDatHome2/$cDatProj4
-        rsync -a $cDatHome/ $cDatHome2
-        rm -rf $cDatHome2/project/beach
-        rm -rf $cDatHome2/project/paulb
-	cd $cDatHome2 >/dev/null 2>&1
-	echo -en "\t"
-        tar -cvzf $gpTest/test-env_Home2AfterPush.tgz .
-        echo
-    fi
     return 0
-} # testGitProjPushCLI
+} # testGitProjPullCLI
 
 # ========================================
 # This should be the last defined function

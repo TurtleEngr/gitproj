@@ -9,8 +9,10 @@ export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
 
-# Relative to $HOME
+# Relative to $HOME, cDatHome, george
 export cDatProj1 cDatProj2 cDatProj3
+# Relative to $HOME, cDatHome2, bob
+export cDatProj4
 
 # Relative to the corresponding $cDatProjN
 export cDatProj1Big cDatProj2Big
@@ -89,6 +91,8 @@ fTestSetupEnv()
     cDatProj1=project/george
     cDatProj2=project/paulb
     cDatProj3=project/beach
+    cDatHome2=$cTestDestDir/test/root/home/bob
+    cDatProj4=project/george
     # .git, but not a proj git
     cDatProj1Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/george.mp4"
     cDatProj2Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/paulb.mp4"
