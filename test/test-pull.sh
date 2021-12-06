@@ -163,7 +163,7 @@ tearDown()
 # ========================================
 
 # --------------------------------
-testComGetProjGlobals()
+NAtestComGetProjGlobals()
 {
     local tResult
     
@@ -222,6 +222,15 @@ testPullRawFiles()
     fComGetProjGlobals >/dev/null 2>&1
 
     gpVerbose=2
+
+    # Setup a change in raw files in $cDatHome/$cDatProj1
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    # touch file in raw/
+    # push
+
+    # pull the change to $cDatHome2$cDatProj4
+    cd $cDatHome2$cDatProj4 >/dev/null 2>&1
+
 
     tResult=$(fPullRawFiles 2>&1)
     assertTrue "$LINENO $tResult" "$?"

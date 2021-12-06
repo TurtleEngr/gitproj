@@ -6,7 +6,7 @@ export cCurDir cGetOrigin cGetTopDir cTop
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
     gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
-    gpVer gpVerbose gResponse
+    gpVer gpVerbose gpYes gResponse
 
 # ========================================
 

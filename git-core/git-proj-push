@@ -24,12 +24,12 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj push [-b] [common-options]
+    git proj push [-b] [-y|-n] [common-options]
 
 =head1 DESCRIPTION
 
-rsync will be used top copy the '[ProjName]/raw/' files to
-[remote-raw-dir]/[ProjName].raw.
+ rsync will be used top copy the '[ProjName]/raw/' files to
+ [remote-raw-dir]/[ProjName].raw.
 
 If the -b option is given then run:
 
@@ -40,6 +40,12 @@ If the -b option is given then run:
 =over 4
 
 =item B<-b>
+
+=item B<-y|-n>
+
+If -y, then default to "yes" to all prompts to continue.
+
+If -n, then default to "no" to all prompts to continue.
 
 =item B<[common-options]>
 
@@ -140,10 +146,13 @@ fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
 tBranchFlag=0
-while getopts :bhH:vx tArg; do
+gpYes=0
+while getopts :bnyhH:vx tArg; do
     case $tArg in
         # Script arguments
         b) tBranchFlag=1 ;;
+	n) gpYes=0
+	y) gpYes=1
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

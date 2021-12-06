@@ -141,10 +141,13 @@ fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
 tBranchFlag=0
-while getopts :bhH:vx tArg; do
+gpYes=0
+while getopts :bnyhH:vx tArg; do
     case $tArg in
         # Script arguments
         b) tBranchFlag=1 ;;
+	n) gpYes=0 ;;
+	y) gpYes=1 ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
