@@ -1405,17 +1405,17 @@ fComGetProjGlobals()
     gpLocalTopDir=$($cGetTopDir 2>/dev/null)
 
     # Called this way, so that the -e option will exit script if errors
-    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e >/dev/null 2>&1
+    fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e >/dev/null
     gpProjName=$gGetConfigValue
 
-    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e  >/dev/null 2>&1
+    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e  >/dev/null
     gpRemoteRawDir=$gGetConfigValue
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648" 2>&1)  # 2g
 
-    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e >/dev/null 2>&1
+    fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e >/dev/null
     gpLocalStatus=$gGetConfigValue
 
-    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e >/dev/null 2>&1
+    fComGetConfig -k "gitproj.config.remote-status" -d "not-defined" -e >/dev/null
     gpRemoteStatus=$gGetConfigValue
 
     fComGetVer
