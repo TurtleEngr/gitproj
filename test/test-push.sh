@@ -246,6 +246,7 @@ testPushRawFiles()
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawDir/NewFile.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
@@ -299,6 +300,7 @@ testPushToOrigin()
     tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawDir/newfile.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0

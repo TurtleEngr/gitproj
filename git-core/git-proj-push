@@ -54,7 +54,7 @@ If -n, then default to "no" to all prompts to continue.
  -v, -vv
  -x, -xx
 
-Run "git proj -h"  for details.
+Run "git proj -h" for details.
 
 =back
 
@@ -146,13 +146,13 @@ fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
 tBranchFlag=0
-gpYes=0
+gpYesNo=""
 while getopts :bnyhH:vx tArg; do
     case $tArg in
         # Script arguments
         b) tBranchFlag=1 ;;
-	n) gpYes=0
-	y) gpYes=1
+	n) gpYesNo=No ;;
+	y) gpYesNo=Yes ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

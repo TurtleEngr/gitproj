@@ -6,7 +6,7 @@ export cCurDir cGetOrigin cGetTopDir cTop
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
     gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
-    gpVer gpVerbose gpYes gResponse
+    gpVer gpVerbose gpYesNo gResponse
 
 # ========================================
 
@@ -68,15 +68,24 @@ EOF
     fi
 
     echo
-    fComSelect "Continue? " "Yes-push-these-files No-skip-pushing" "$tHelp"
+    gResponse=$gpYesNo
+    if [ -z "$gpYesNo" ]; then
+        fComSelect "Continue? " "Yes-push-these-files No-skip-pushing" "$tHelp"
+    fi
     case $gResponse in
         QUIT)
             exit 1
-	    ;;
-	No*)
+            ;;
+        No*)
             fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
-	    return 1
-	    ;;
+            return 1
+            ;;
+        Yes*)
+            :
+            ;;
+        *)
+            fError -i -m "Expected: Yes or No" -l $tSrc:$LINENO
+            ;;
     esac
 
     'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir

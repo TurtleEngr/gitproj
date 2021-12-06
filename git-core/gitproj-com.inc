@@ -1421,7 +1421,7 @@ fComGetProjGlobals()
     fComGetVer
 
     return 0
-} # fComGetProjGlobals()
+} # fComGetProjGlobals
 
 fComGetVer()
 {

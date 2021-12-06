@@ -133,6 +133,10 @@ setUp()
     tar -xzf $gpTest/test-env_Home2AfterPush.tgz
     cd - >/dev/null 2>&1
 
+    fComGetProjGlobals >/dev/null 2>&1
+
+    cd $cDatHome/$cDatProj4 >/dev/null 2>&1
+# ????    
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
 
     gpDebug=0
@@ -163,45 +167,11 @@ tearDown()
 # ========================================
 
 # --------------------------------
-NAtestComGetProjGlobals()
-{
-    local tResult
-    
-    cd $cDatHome >/dev/null 2>&1
-    tResult=$(fComGetProjGlobals 2>&1)
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "You must be in a git workspace for this command."
-
-    cd $cDatHome/$cDatProj3 >/dev/null 2>&1
-    tResult=$(fComGetProjGlobals 2>&1)
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "This git workspace is not setup for gitproj, run"
-
-    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    fComGetProjGlobals >/dev/null 2>&1
-    assertTrue "$LINENO $tResult" "$?"
-    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.raw" "$gpRemoteRawDir"
-
-    tResult=$(git config --get --local remote.origin.url)
-    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.git" "$tResult"
-
-    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    fComSetConfig -H -k "gitproj.config.proj-name" -v "TBD"
-    fComSetConfig -L -k "gitproj.config.proj-name" -v "TBD"
-    tResult=$(fComGetProjGlobals 2>&1)
-    assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: Unexpected: gitproj.config.proj-name should not be set to: TBD"
-
-    return 0
-} # testComGetProjGlobals
-
-# --------------------------------
-testPullIsRemoteMounted()
+testSetUp()
 {
     local tResult
 
-    fComGetProjGlobals >/dev/null 2>&1
-    
+
     tResult=$(fPullIsRemoteMounted 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
@@ -212,7 +182,7 @@ testPullIsRemoteMounted()
     mv $gpRemoteRawDir.sav $gpRemoteRawDir 
     
     return 0
-} # testPullIsRemoteMounted
+} # testSetUp
 
 # --------------------------------
 testPullRawFiles()
