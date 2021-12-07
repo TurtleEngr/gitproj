@@ -753,14 +753,17 @@ fComGit()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tOpt
+    local tStatus
 
     tOpt=$(echo "$@" | sed 's/-/\-/g; s/"/\\\"/g')
 
     fLog -p info -l $tSrc:$LINENO -m "git $tOpt"
-    if ! git "$@"; then
-        fError -i -m "Fix this then try again." -l $tSrc:$LINENO
+    git "$@"
+    tStatus=$?
+    if [ $tStatus -ne 0 ]; then
+        fLog -p warning -m "Fix this then try again." -l $tSrc:$LINENO
     fi
-    return 0
+    return $tStatus
     cat <<EOF
 =internal-pod
 

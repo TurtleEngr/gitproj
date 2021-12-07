@@ -333,14 +333,14 @@ testGitProjPushCLI()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after files pushed."
-        echo -e "\tRestore test-env_Home2AfterPush.tgz relative to env cDatHome2"
-        mkdir -p $cDatHome2/$cDatProj4
+        echo -e "\tRestore test-env_Home2AfterPush.tgz relative to cTestDestDir"
+        mkdir -p $cDatHome2
         rsync -a $cDatHome/ $cDatHome2
         rm -rf $cDatHome2/project/beach
         rm -rf $cDatHome2/project/paulb
-	cd $cDatHome2 >/dev/null 2>&1
+	cd $cTestDestDir >/dev/null 2>&1
 	echo -en "\t"
-        tar -cvzf $gpTest/test-env_Home2AfterPush.tgz .
+        tar -cvzf $gpTest/test-env_Home2AfterPush.tgz test
         echo
     fi
     return 0

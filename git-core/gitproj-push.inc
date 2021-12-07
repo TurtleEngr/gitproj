@@ -14,6 +14,7 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 fPushIsRemoteMounted()
 {
     local tSrc=${BASH_SOURCE##*/}
+# TBD move this to com.inc?
 
     if [ -d $gpRemoteRawDir ]; then
         return 0
@@ -111,6 +112,7 @@ fPushGit()
     fi
 
     fComGit push origin $tBranch
+    tStatus=$?
 
     return 0
 } # fPushGit

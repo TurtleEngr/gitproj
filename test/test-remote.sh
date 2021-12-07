@@ -443,10 +443,11 @@ testRemoteGetMountDirManual()
     assertContains "$LINENO $tResult" "$tResult" "This is a list of dirs under the -d pMountDir"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-    tResult=$(fRemoteGetMountDir "" < <(echo -e "xx\n10\n1\n") 2>&1)
+    tResult=$(fRemoteGetMountDir "" < <(echo -e "xx\n100\n1") 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Invalid selection"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxx"
 
     gpProjName=example
     tResult=$(fRemoteGetMountDir "$cDatMount3" < <(echo -e "5\n1\n") 2>&1)
@@ -601,7 +602,10 @@ testRemoteCreateRemoteGit()
     cd $tTopDir >/dev/null 2>&1
     fComSetGlobals
     fRemoteSetGlobals
-    assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
+    ##assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
+    #/mnt/plasma.data3/home/bruce/ver/public/app/gitproj/test/root/home/john/project/george
+    #                 /home/bruce/ver/public/app/gitproj/test/root/home/john/project/george
+    assertContains "$LINENO" "$gpLocalTopDir" "$tTopDir"
 
     gpMountDir=$cDatMount3/video-2020-04-02
     chmod a-w $gpMountDir

@@ -145,7 +145,7 @@ fRemoteGetDirList()
         for i in $(
             df -h 2>/dev/null |
                 grep -E '^/dev/|/mnt|/media' |
-                grep -Ev '/$|/boot' |
+                grep -Ev '/$|/boot|/home' |
                 awk '{print $6}'
         ); do
             find $i $i/* $i/*/* -prune -type d 2>/dev/null | grep -v ' '

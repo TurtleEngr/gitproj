@@ -14,7 +14,7 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 fPullIsRemoteMounted()
 {
     local tSrc=${BASH_SOURCE##*/}
-    #TBD: duplicate, see fPushIsRemoteMounted
+#TBD: duplicate, see fPushIsRemoteMounted, move to com.inc?
     
     if [ -d $gpRemoteRawDir ]; then
         return 0
@@ -62,10 +62,10 @@ EOF
 
 Dry Run:
 'rsync' $tOpt $tVerbose --dry-run
-        $gpRemoteRawDir"
-        $gpLocalTopDir/raw/
+        $gpRemoteRawDir/"
+        $gpLocalTopDir/raw
 EOF
-        'rsync' $tOpt $tVerbose --dry-run -v $gpRemoteRawDir $gpLocalTopDir/raw/
+        'rsync' $tOpt $tVerbose --dry-run -v $gpRemoteRawDir/ $gpLocalTopDir/raw
     fi
 
     echo
@@ -89,7 +89,7 @@ EOF
             ;;
     esac
 
-    'rsync' $tOpt $tVerbose $gpRemoteRawDir $gpLocalTopDir/raw/
+    'rsync' $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalTopDir/raw
     tStatus=$?
 
     return $tStatus
@@ -112,8 +112,9 @@ fPullGit()
     fi
 
     fComGit pull origin $tBranch
-
-    return 0
+    tStatus=$?
+    
+    return $tStatus
 } # fPullGit
 
 # --------------------
