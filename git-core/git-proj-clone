@@ -12,68 +12,145 @@ fUsage()
 
 =for html <hr/>
 
- git proj clone pExternalPath
+=head1 NAME git proj clone
 
-    Clone a local git repo from the external pDirPath.
+=head1 SYNOPSIS
 
+    git proj clone -d pRemoteDir [common-options]
 
- Usage:
-	proj-get-local pPath
-	
- Description
-	Use this script get a local copy of the remote git repo on a
-	mounted drive.
+=head1 DESCRIPTION
 
- Example
-	The drive is mounted at: /mnt/usb-video and the the repo is
-	at: video-2019-04-01/trip.git So use this to get a local copy.
+Clone a local git repo from the external pRemoteDir.
 
-	    proj-get-local /mnt/usb-video/video-2019-04-01/trip.git
+Use this script get a local copy of the remote git repo frome a
+mounted drive.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d pRemoteDir>
+
+=item B<[common-options]>
+
+ -h
+ -H pStyle
+ -v, -vv
+ -x, -xx
+
+Run "git proj -h"  for details.
+
+=back
+
+=head1 RETURN VALUE
+
+ 0 - if OK
+ !0 - if errors
+
+=for comment =head1 ERRORS
+
+=head1 EXAMPLES
+
+The drive is mounted at: /mnt/usb-video and the the repo is
+at: video-2019-04-01/trip.git So use this to get a local copy.
+
+proj-get-local -d /mnt/usb-video/video-2019-04-01/trip.git
+
+=for comment=head1 ENVIRONMENT
+
+=for comment=head1 FILES
+
+=head1 SEE ALSO
+
+ git proj
+ git proj remote
+ git proj clone
+ git proj add
+ git proj push
+ git proj pull
+ git proj set
+ git proj status
+ git flow
+
+=for comment =head1 NOTES
+
+=for comment =head1 CAVEATS
+
+=for comment =head1 DIAGNOSTICS
+
+=for comment =head1 BUGS
+
+=for comment =head1 RESTRICTIONS
+
+=head1 AUTHOR
+
+TurtleEngr
+
+=head1 HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
 
 =cut
 EOF
     exit 1
-}
+} # fUsage
 
-# --------------------
-fCheckForGit()
-{
-    if $cGetOrigin; then
-        echo 'Error: The current directory is a git dir.'
-        exit 1
-    fi
-}
-
-# --------------------
-fCheckPath()
-{
-    local pPath=$1
-
-    if [ ! -r $pPath ]; then
-        echo "Error: Could not find $pPath, or it is not readable"
-        exit 1
-    fi
-}
-
-fGetLocal()
-{
-    local pPath=$1
-
-    git clone $pPath
-    echo "Done"
-    echo -n "Origin: "
-    $cGetOrigin
-}
-
-# ====================
+# ========================================
 # Main
 
-if [ $# -ne 1 ]; then
-    fUsage
+export cCurDir gpBin gpCmdName tSrc
+
+gpCmdName=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
+
+# -------------------
+# Set current directory location in PWD and cCurDir
+if [ -z "$PWD" ]; then
+    PWD=$(pwd)
+fi
+cCurDir=$PWD
+
+# -------------------
+# Define the location of this script
+gpBin=${0%/*}
+if [ "$gpBin" = "." ]; then
+    gpBin=$PWD
+fi
+cd $gpBin >/dev/null 2>&1
+gpBin=$PWD
+cd - >/dev/null 2>&1
+
+# -------------------
+. $gpBin/gitproj-com.inc
+# Calls: fComSetGlobals
+
+if [ $# -eq 0 ]; then
+    fError -m "Missing options." -l $tSrc:$LINENO
 fi
 
-gpPath=$1
+. $gpBin/gitproj-global.inc
+# Calls: fCloneSetGlobals
 
-fCheckForGit
-fCheckPath $gpPath
-fGetLocal $gpPath
+gpRemoteDir
+while getopts :d:hH:vx tArg; do
+    case $tArg in
+        # Script arguments
+        d) gpRemmoteDir="$OPTARG" ;;
+        # Common arguments
+        h) fUsage long ;;
+        H) fUsage "$OPTARG" ;;
+        v) let ++gpVerbose ;;
+        x) let ++gpDebug ;;
+        # Problem arguments
+        :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
+    esac
+done
+shift $((OPTIND - 1))
+if [ $# -ne 0 ]; then
+    fError -m "Unknown option: $*" -l $tSrc:$LINENO
+fi
+
+# ----------
+fCloneFromRemoteDir
+exit 0
