@@ -13,16 +13,17 @@ mDepList = \
 
 mBaseList = \
 	test-com \
+	test-com2 \
 	test-gitproj \
 
 mCmdList = \
 	init \
-	remote
+	remote \
+	push \
+	pull
 
 mCmdToDo = \
 	clone \
-	push \
-	pull \
 	add \
 	move \
 	rm \
@@ -39,9 +40,12 @@ mTestEnvFiles = \
 	test-env_Home2AfterPush.tgz
 
 # --------------------
-test-all : $(mDepList) $(mBaseList) test-cmds
+test test-all : $(mDepList) $(mBaseList) test-cmds
 
 test-com : $(mDepList) test-com.sh
+	./$@.sh
+
+test-com2 : $(mDepList) test-com2.sh
 	./$@.sh
 
 test-gitproj : $(mDepList) test-gitproj.sh $(mCore)/git-proj

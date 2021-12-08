@@ -69,7 +69,7 @@ EOF
 # --------------------------------
 NAoneTimeSetUp()
 {
-    return 0
+    return 1
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -99,6 +99,7 @@ EOF
 # --------------------------------
 NAoneTimeTearDown()
 {
+    return 1
     if [ $gpDebug -ne 0 ]; then
         fTestRmEnv
     fi
@@ -122,8 +123,19 @@ setUp()
 
     fTestSetupEnv
     fTestCreateEnv
+    cd $cTestDestDir >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    cd - >/dev/null 2>&1
+    # git proj to be cloned:
+    # $cDatMount3/video-2020-04-02/george.git
+    # $cDatMount3/video-2020-04-02/george.raw
+
+    mkdir -p $cDatHome3/project >/dev/null 2>&1
+    HOME=$cDatHome3
     HOSTNAME=testserver2
+    cd $cDatHome3/project >/dev/null 2>&1
     . $gpBin/gitproj-clone.inc
+    
     gpUnitDebug=0
     return 0
 
@@ -154,7 +166,7 @@ tearDown()
 # ========================================
 
 # --------------------------------
-testGitProjClone()
+testGitProjCloneUsage()
 {
     local tResult
 
@@ -166,159 +178,19 @@ testGitProjClone()
 
     # git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
 
-    cd $HOME/$cDatProj1 >/dev/null 2>&1
+    cd $cDatHome3 >/dev/null 2>&1
+    assertEquals "$LINENO" "$HOME" "$cDatHome3"
     assertFalse "$LINENO" "[ -d .git ]"
     cd - >/dev/null 2>&1
     return 0
-} # testGitProjClone
+} # testGitProjCloneUsage
 
-# --------------------------------
-testFirstTimeSet()
-{
-
-    # source gitproj-clone.inc calls fCloneSetGlobals, which calls
-    # fCloneFirstTimeSet, which creates these files.
-    #assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
-    #assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-
-    fCloneFirstTimeSet
-    assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
-    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-    assertTrue "$LINENO" "$(
-        grep -q path $HOME/.gitconfig
-        echo $?
-    )"
-    return 0
-} # testFirstTimeSet
-
-# --------------------------------
-testCloneSetGlobals()
-{
-    assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
-    cd $HOME/$cDatProj1
-    fCloneSetGlobals
-
-    assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
-
-    assertEquals "$LINENO" "true" "$gpSysLog"
-    assertEquals "$LINENO" "user" "$gpFacility"
-    assertEquals "$LINENO" "0" "$gpAuto"
-    assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
-    assertEquals "$LINENO" "${gpLocalTopDir}/raw" "$gpLocalRawDir"
-    assertEquals "$LINENO" "10k" "$gpMaxSize"
-    assertEquals "$LINENO" "false" "$gpGitFlow"
-    assertNull "$LINENO" "$gpAction"
-
-    cd - >/dev/null 2>&1
-    return 0
-} # testCloneSetGlobals
-
-# --------------------------------
-checkComMustNotBeInGit()
-{
-    local pFun=$1
-
-    local tResult
-    local tStatus
-
-    gpUnitDebug=0
-
-    # This dir does not exist
-    tResult=$($pFun $HOME/foo-bar 2>&1)
-    tStatus=$?
-    fTestDebug "Check: $HOME/foo-bar"
-    fTestDebug "Check: $tResult"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $pFun $tResult" "$tResult" "does not exist"
-
-    # Git is below this dir
-    tResult=$($pFun $HOME 2>&1)
-    tStatus=$?
-    fTestDebug "$LINENO Check: $HOME"
-    fTestDebug "$LINENO Check: $tResult"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $pFun x${HOME}x $tResult" "$tResult" "must NOT be in a git repo"
-
-    # This is in a git dir
-    tResult=$($pFun $HOME/$cDatProj3 2>&1)
-    tStatus=$?
-    fTestDebug "$LINENO Check: $HOME/$cDatProj3"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $pFun $tResult" "$tResult" "must NOT be in a git repo"
-
-    # This is in a git dir
-    tResult=$($pFun $HOME/$cDatProj3/edit 2>&1)
-    tStatus=$?
-    fTestDebug "$LINENO Check: $HOME/$cDatProj3/edit"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $pFun $tResult" "$tResult" "must NOT be in a git repo"
-
-    # No git dir above or below this dir
-    tResult=$($pFun $HOME/$cDatProj1 2>&1)
-    tStatus=$?
-    fTestDebug "$LINENO Check: $HOME/$cDatProj1"
-    assertTrue $LINENO $tStatus
-    return 0
-} # checkComMustNotBeInGit
-
-# --------------------------------
-testComMustNotBeInGit()
-{
-    gpUnitDebug=0
-    checkComMustNotBeInGit fComMustNotBeInGit
-    return 0
-} # testComMustNotBeInGit
-
-# --------------------------------
-checkComAllMustBeReadable()
-{
-    local tResult
-    local tStatus
-
-    tResult=$(fComAllMustBeReadable $HOME 2>&1)
-    tStatus=$?
-    assertTrue $LINENO $tStatus
-
-    # Create a file and make it unreadable
-    touch $HOME/foo
-    chmod a-r $HOME/foo
-    tResult=$(fComAllMustBeReadable $HOME 2>&1)
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable"
-
-    # Create a dir and make it unreadable
-    rm $HOME/foo
-    mkdir $HOME/foo
-    chmod a-r $HOME/foo
-    tResult=$(fComAllMustBeReadable $HOME 2>&1)
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable"
-
-    # A dir can not be listed
-    chmod a+r,a-x $HOME/foo
-    tResult=$(fComAllMustBeReadable $HOME 2>&1)
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable"
-    return 0
-} # checkComAllMustBeReadable
-
-# --------------------------------
-testComAllMustBeReadable()
-{
-    gpUnitDebug=0
-    checkComAllMustBeReadable fComAllMustBeReadable
-    return 0
-} # testComAllMustBeReadable
-
-# --------------------------------
 testCloneGettingStarted()
 {
     local tResult
     local tStatus
-
+#TBD
+return 1
     gpUnitDebug=0
 
     cd $HOME/$cDatProj1
@@ -342,232 +214,18 @@ testCloneGettingStarted()
 } # testCloneGettingStarted
 
 # --------------------------------
-testCloneValidLocalPath()
+testCloneValidRemoteDir()
 {
     local tResult
-    local tStatus
-
-    gpUnitDebug=0
-
-    checkComMustNotBeInGit fCloneValidLocalPath
-    checkComAllMustBeReadable fCloneValidLocalPath
-
-    tResult=$(fCloneValidLocalPath $HOME/$cDatProj1 2>&1)
-    tStatus=$?
-    gpUnitDebug=0
-    fTestDebug "Check: $HOME/$cDatProj1"
-    fTestDebug "tResult: $tResult"
-    assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
-
-    # Called again, so that the global vars will be defined.
-    fCloneValidLocalPath $HOME/$cDatProj1 >/dev/null 2>&1
-    assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalTopDir"
-    assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
-    return 0
-} # testCloneValidLocalPath
-
-# --------------------------------
-testCloneGetLocalPath()
-{
-    local tResult
-    local tStatus
-
-    gpAuto=1
-    # Auto
-
-    # Auto fail
-    tResult=$(fCloneGetLocalPath $HOME/foo-bar 2>&1)
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "does not exist"
-
-    # Auto success
-    tResult=$(fCloneGetLocalPath $HOME/$cDatProj1 2>&1)
-    tStatus=$?
-    assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
-
-    gpAuto=0
-    # No auto, prompt/response
-
-    # Just Enter, i.e. defaultt. Look for success
-    tResult=$(fCloneGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "\n"))
-    tStatus=$?
-    assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Define the existing project directory"
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
-
-    # Enter "quit". Look for quit
-    tResult=$(fCloneGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "quit"))
-    tStatus=$?
-    gpUnitDebug=0
-    fTestDebug "tResult=$tResult"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    # Enter $HOME; $HOME/$cDatProj3; quit
-    tResult=$(fCloneGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj3\nquit\nq"))
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    # Enter $HOME; $HOME/$cDatProj1
-    tResult=$(fCloneGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj1"))
-    tStatus=$?
-    assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
-
-    # Called again, so that the global vars will be defined.
-    fCloneGetLocalPath $HOME/$cDatProj1 < <(echo -e "$HOME\n$HOME/$cDatProj1") >/dev/null 2>&1
-    assertTrue $LINENO $tStatus
-    assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalTopDir"
-    assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
-    return 0
-} # testCloneGetLocalPath
-
-# --------------------------------
-testCloneValidSize()
-{
-    local tResult
-    local tStatus
-    declare -l tLower
-
-    tResult=$(fCloneValidSize "12K" 2>&1)
-    tStatus=$?
-    assertTrue $LINENO $tStatus
-
-    fCloneValidSize "12K"
-    assertEquals $LINENO "12k" "$gpMaxSize"
-
-    for i in 3b 34k 8m 2g 3B 34k 8M 2G; do
-        fCloneValidSize "$i"
-        tLower=$i
-        assertEquals "$LINENO $i" "$tLower" "$gpMaxSize"
-    done
-
-    for i in 3x k 8 2 K2; do
-        tResult=$(fCloneValidSize "$i" 2>&1)
-        tStatus=$?
-        assertFalse "$LINENO $i" $tStatus
-        assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
-    done
-
-    return 0
-} # testCloneValidSize
-
-# --------------------------------
-testCloneGetSize()
-{
-    local tResult
-    local tStatus
-    declare -l tLower
-
-    tResult=$(fCloneGetSize 2>&1 < <(echo -e "12K"))
-    tStatus=$?
-    assertTrue "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Define the size for large binary files"
-
-    fCloneGetSize >/dev/null 2>&1 < <(echo -e "12K")
-    assertTrue $LINENO $?
-    assertEquals "$LINENO" "12k" "$gpMaxSize"
-
-    tResult=$(fCloneGetSize 2>&1 < <(echo -e "42\n66x\nq"))
-    tStatus=$?
-    assertFalse "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    return 0
-}
-
-# --------------------------------
-testCloneGetBinaryFiles()
-{
-    local tResult
-
-    gpMaxSize="18k"
-    gpLocalTopDir=$HOME/$cDatProj1
-
-    tResult=$(fCloneGetBinaryFiles 2>&1)
-    assertTrue "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "src/final/george.mp4"
-    assertContains "$LINENO $tResult" "$tResult" "src/raw/MOV001.mp4"
-    assertNotContains "$LINENO $tResult" "$tResult" "src/raw/MOV001.mp3"
-
-    gpMaxSize="2g"
-    tResult=$(fCloneGetBinaryFiles 2>&1)
-    assertFalse "$LINENO" $?
-
-    return 0
-} # testCloneGetBinaryFiles
-
-# --------------------------------
-testCloneGetMoveFiles()
-{
-    local tResult
-    local tStatus
-
-    gpLocalTopDir=$HOME/$cDatProj1
-
-    gpMaxSize="24m"
-    tResult=$(fCloneGetMoveFiles 2>&1 < <(echo -e "q"))
-    tStatus=$?
-    assertTrue "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "No large binary files were found"
-
-    gpMaxSize="18k"
-    tResult=$(fCloneGetMoveFiles 2>&1 < <(echo -e "x\nquit"))
-    tStatus=$?
-    assertFalse "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "The listed files can be moved"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    gpMaxSize="18k"
-    fCloneGetMoveFiles >/dev/null 2>&1 < <(echo -e "x\nn")
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "0" "$gpAutoMove"
-
-    gpMaxSize="18k"
-    fCloneGetMoveFiles >/dev/null 2>&1 < <(echo -e "y")
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "1" "$gpAutoMove"
-
-    return 0
-} # testCloneGetMoveFiles
-
-# --------------------------------
-testCloneGetGitFlow()
-{
-    local tResult
-    local tStatus
-
-    tResult=$(fCloneGetGitFlow 2>&1 < <(echo -e "\nquit"))
-    assertFalse "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    fCloneGetGitFlow >/dev/null 2>&1 < <(echo -e "yes")
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "true" "$gpGitFlow"
-
-    fCloneGetGitFlow >/dev/null 2>&1 < <(echo -e "No")
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "false" "$gpGitFlow"
-
-    gpGitFlowPkg=foo-bar
-    tResult=$(fCloneGetGitFlow 2>&1 < <(echo -e "\n"))
-    assertTrue "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "git-flow is not installed"
-
-    return 0
-} # testCloneGetGitFlow
+    return 1
+} # testCloneValidRemoteDir
 
 # --------------------------------
 testCloneSummary()
 {
     local tResult
     local tStatus
+return 1
 
     gpLocalTopDir=$HOME/$cDatProj1
     gpProjName=${cDatProj1##*/}
@@ -594,133 +252,12 @@ testCloneSummary()
 } # testCloneSummary
 
 # --------------------------------
-testCloneMkRaw()
-{
-    local tResult
-
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneFirstTimeSet
-
-    gpProjName=${cDatProj1##*/}
-    gpLocalRawDir=$gpLocalTopDir/raw
-    gpGitFlow="true"
-    gpMaxSize="1k"
-    gpAutoMove=true
-    gpAuto=0
-    gpVerbose=2
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fCloneMkRaw 2>&1)
-    assertTrue $LINENO $?
-    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
-    assertTrue $LINENO "[ -f $gpLocalRawDir/README.txt ]"
-    assertTrue $LINENO "$(
-        grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt
-        echo $?
-    )"
-    assertContains "$LINENO $tResult" "$tResult" "mkdir"
-    assertContains "$LINENO $tResult" "$tResult" "Create: raw/README.txt"
-
-    gpUnitDebug=0
-    fTestDebug "$tResult"
-
-    return 0
-} # testCloneMkRaw
-
-# --------------------------------
-testCloneMoveBinaryFiles()
-{
-    local tResult
-    local tStatus
-
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneFirstTimeSet
-
-    gpProjName=${cDatProj1##*/}
-    gpLocalRawDir=$gpLocalTopDir/raw
-    gpGitFlow="true"
-    gpAutoMove=true
-    gpAuto=0
-    gpVerbose=2
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneMkRaw >/dev/null 2>&1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    gpMaxSize="10k"
-    tResult=$(fCloneMoveBinaryFiles 2>&1)
-    tStatus=$?
-    assertTrue "$LINENO $tResult" "$tStatus"
-    assertNotContains "$LINENO" "$tResult" "Binary files were found"
-    assertNotContains "$LINENO" "$tResult" "Could not create:"
-    assertNotContains "$LINENO" "$tResult" "Could not move:"
-    assertNotContains "$LINENO" "$tResult" "Could not create symlink for:"
-    assertContains "$LINENO" "$tResult" "Moving large binary file"
-    assertContains "$LINENO" "$tResult" "Exists:"
-    assertContains "$LINENO" "$tResult" "Created link"
-    assertContains "$LINENO" "$tResult" "Version and use the file symlinks,"
-    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
-    assertTrue $LINENO "[ ! -f raw/edit/george.kdenlive ]"
-    assertTrue $LINENO "[ -f raw/src/raw/MOV001.mp4 ]"
-    assertTrue $LINENO "[ -f raw/src/raw/MOV001.MP3 ]"
-    assertTrue $LINENO "[ -f raw/src/final/george.mp4 ]"
-    assertTrue $LINENO "[ -L src/raw/MOV001.mp4 ]"
-    assertTrue $LINENO "[ -L src/raw/MOV001.MP3 ]"
-    assertTrue $LINENO "[ -L src/final/george.mp4 ]"
-
-    gpUnitDebug=0
-    fTestDebug "Size 10k: $tResult"
-
-    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-        echo -e "\tCapture state of project after files have been moved."
-        echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
-        cd $HOME >/dev/null 2>&1
-        echo -en "\t"
-        tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .
-        echo
-    fi
-
-    return 0
-} # testCloneMoveBinaryFiles
-
-# --------------------------------
-testCloneMkGitFlow()
-{
-    local tResult
-
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneFirstTimeSet
-
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="1k"
-    gpAutoMove=true
-    gpAuto=0
-
-    tResult=$(fCloneMkGitFlow 2>&1)
-    assertTrue $LINENO $?
-    assertEquals $LINENO "main" "$(git config --get --global gitflow.branch.main)"
-    assertEquals $LINENO "develop" "$(git config --get --global gitflow.branch.develop)"
-    assertEquals $LINENO "feature/" "$(git config --get --global gitflow.prefix.feature)"
-    assertEquals $LINENO "bug/" "$(git config --get --global gitflow.prefix.bugfix)"
-    assertEquals $LINENO "release/" "$(git config --get --global gitflow.prefix.release)"
-    assertEquals $LINENO "hotfix/" "$(git config --get --global gitflow.prefix.hotfix)"
-    assertEquals $LINENO "support/" "$(git config --get --global gitflow.prefix.support)"
-
-    return 0
-} # testCloneMkGitFlow
-
-# --------------------------------
 testCloneMkGitDir()
 {
     local tResult
     local tStatus
     local tTop
+return 1
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $HOME >/dev/null 2>&1
@@ -766,8 +303,46 @@ testCloneMkGitDir()
 } # testCloneMkGitDir
 
 # --------------------------------
-testCloneMkLocalConfig()
+testCloneMkRawDir()
 {
+    local tResult
+return 1
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fCloneFirstTimeSet
+
+    gpProjName=${cDatProj1##*/}
+    gpLocalRawDir=$gpLocalTopDir/raw
+    gpGitFlow="true"
+    gpMaxSize="1k"
+    gpAutoMove=true
+    gpAuto=0
+    gpVerbose=2
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fCloneMkRaw 2>&1)
+    assertTrue $LINENO $?
+    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    assertTrue $LINENO "[ -f $gpLocalRawDir/README.txt ]"
+    assertTrue $LINENO "$(
+        grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt
+        echo $?
+    )"
+    assertContains "$LINENO $tResult" "$tResult" "mkdir"
+    assertContains "$LINENO $tResult" "$tResult" "Create: raw/README.txt"
+
+    gpUnitDebug=0
+    fTestDebug "$tResult"
+
+    return 0
+} # testCloneMkRawDir
+
+# --------------------------------
+testCloneMkHostConfig()
+{
+# TBD
+return 1
     local tSrc=${BASH_SOURCE##*/}
     local tResult
 
@@ -815,8 +390,9 @@ testCloneMkLocalConfig()
 } # testCloneMkLocalConfig
 
 # --------------------------------
-testCloneSaveVarsToConfigs()
+testCloneSaveVars()
 {
+return 1
     local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tFile
@@ -884,11 +460,12 @@ testCloneSaveVarsToConfigs()
     done
 
     return 0
-} # testCloneSaveVarsToConfigs
+} # testCloneSaveVars
 
 # --------------------------------
-testCloneCreateLocalGitAuto()
+testCloneFromRemoteDir()
 {
+return 1
     local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tStatus
@@ -920,37 +497,75 @@ testCloneCreateLocalGitAuto()
     fi
 
     return 0
-} # testCloneCreateLocalGitAuto
+} # testCloneFromRemoteDir
 
 # --------------------------------
-TBDtestCloneCreateLocalGitPrompted()
+testGetProjCloneCLI()
 {
-    startSkipping
-    fail "TBD"
-    return 0
-} # testCloneCreateLocalGitPrompted
-
-# --------------------------------
-TBDtestGetProjCloneLocalAutoCLI()
-{
+return 1
     startSkipping
     fail "TBD"
     return 0
 
     cd $HOME/$cDatProj1
     $gpBin/git-proj-clone local -a
-} # testGetProjCloneLocalAutoCLI
+} # testGetProjCloneCLI
 
 # --------------------------------
-TBDtestGetProjCloneLocalPromptedCLI()
+NAtestCloneGetGitFlow()
 {
-    startSkipping
-    fail "TBD"
-    return 0
+return 1
+    local tResult
+    local tStatus
 
-    cd $HOME/$cDatProj1
-    $gpBin/git-proj-clone local -a
-} # testGetProjCloneLocalPromptedCLI
+    tResult=$(fCloneGetGitFlow 2>&1 < <(echo -e "\nquit"))
+    assertFalse "$LINENO" $?
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    fCloneGetGitFlow >/dev/null 2>&1 < <(echo -e "yes")
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "true" "$gpGitFlow"
+
+    fCloneGetGitFlow >/dev/null 2>&1 < <(echo -e "No")
+    assertTrue "$LINENO" $?
+    assertEquals "$LINENO" "false" "$gpGitFlow"
+
+    gpGitFlowPkg=foo-bar
+    tResult=$(fCloneGetGitFlow 2>&1 < <(echo -e "\n"))
+    assertTrue "$LINENO" $?
+    assertContains "$LINENO $tResult" "$tResult" "git-flow is not installed"
+
+    return 0
+} # testCloneGetGitFlow
+
+# --------------------------------
+NAtestCloneMkGitFlow()
+{
+return 1
+    local tResult
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $gpLocalTopDir >/dev/null 2>&1
+    fCloneFirstTimeSet
+
+    gpProjName=${cDatProj1##*/}
+    gpGitFlow="true"
+    gpMaxSize="1k"
+    gpAutoMove=true
+    gpAuto=0
+
+    tResult=$(fCloneMkGitFlow 2>&1)
+    assertTrue $LINENO $?
+    assertEquals $LINENO "main" "$(git config --get --global gitflow.branch.main)"
+    assertEquals $LINENO "develop" "$(git config --get --global gitflow.branch.develop)"
+    assertEquals $LINENO "feature/" "$(git config --get --global gitflow.prefix.feature)"
+    assertEquals $LINENO "bug/" "$(git config --get --global gitflow.prefix.bugfix)"
+    assertEquals $LINENO "release/" "$(git config --get --global gitflow.prefix.release)"
+    assertEquals $LINENO "hotfix/" "$(git config --get --global gitflow.prefix.hotfix)"
+    assertEquals $LINENO "support/" "$(git config --get --global gitflow.prefix.support)"
+
+    return 0
+} # testCloneMkGitFlow
 
 # ========================================
 # This should be the last defined function

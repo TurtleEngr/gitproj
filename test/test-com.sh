@@ -541,12 +541,10 @@ testComSetConfigGlobal()
     local tResult
     local tGlobal=$HOME/.gitconfig
 
-    # Note: more complete "git config" is done when a test env is setup.
+    # Note: a more complete "git config" is done when a test env is setup.
 
-    assertFalse "$LINENO did tearDown run?" "$(
-        grep -q '\[gitproj "testit"\]' $tGlobal
-        echo $?
-    )"
+    grep -q '\[gitproj "testit"\]' $tGlobal >/dev/null 2>&1
+    assertFalse "$LINENO did tearDown run?" "$?"
 
     fComSetConfig -g -k gitproj.testit.test-str -v "test a string"
     assertTrue "$LINENO -g" "[ -r $tGlobal ]"

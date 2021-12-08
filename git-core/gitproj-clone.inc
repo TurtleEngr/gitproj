@@ -77,10 +77,10 @@ fCloneValidRemoteDir()
         fError -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO
     fi
 
-    if ! fComAllMustBeReadable $gpRemoteGitDir
+    if ! fComAllMustBeReadable $gpRemoteGitDir; then
         exit 1
     fi
-    if ! fComAllMustBeReadable $gpRemoteRawDir
+    if ! fComAllMustBeReadable $gpRemoteRawDir; then
         exit 1
     fi
 
@@ -105,8 +105,6 @@ fCloneValidRemoteDir()
     if [ $tAvail -lt $tDesiredSize ]; then
         fError -m "There is not enough space in current directory. $gpProjName needs ${tDesiredSize}MB" -l $tSrc:$LINENO
     fi
-
-    gpLocalTopDir=$PWD/$gpProjName
 
     return 0
 } # fCloneValidRemoteDir
@@ -255,6 +253,8 @@ fCloneMkGitDir()
     local tSrc=${BASH_SOURCE##*/}
     local tStatus
 
+    gpLocalTopDir=$PWD/$gpProjName
+
     cd $gpLocalTopDir >/dev/null 2>&1
 
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
@@ -289,7 +289,7 @@ fCloneMkGitDir()
 } # fCloneMkGitDir
 
 # --------------------
-fCloneMkRaw()
+fCloneMkRawDir()
 {
 #TBD
     local tSrc=${BASH_SOURCE##*/}
@@ -316,7 +316,7 @@ For help with the "git proj" subcommand, just type "git proj -h".
 EOF
     cd - >/dev/null 2>&1
     return 0
-} # fCloneMkRaw
+} # fCloneMkRawDir
 
 # --------------------
 fCloneMkHostConfig()
@@ -343,7 +343,7 @@ fCloneMkHostConfig()
 } # fCloneMkHostConfig
 
 # --------------------
-fCloneSaveVars
+fCloneSaveVars()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tFile
