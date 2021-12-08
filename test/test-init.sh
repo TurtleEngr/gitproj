@@ -172,25 +172,6 @@ testGitProjInit()
 } # testGitProjInit
 
 # --------------------------------
-testFirstTimeSet()
-{
-
-    # source gitproj-init.inc calls fInitSetGlobals, which calls
-    # fInitFirstTimeSet, which creates these files.
-    #assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
-    #assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-
-    fInitFirstTimeSet
-    assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
-    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-    assertTrue "$LINENO" "$(
-        grep -q path $HOME/.gitconfig
-        echo $?
-    )"
-    return 0
-} # testFirstTimeSet
-
-# --------------------------------
 testInitSetGlobals()
 {
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
@@ -599,7 +580,6 @@ testInitMkRaw()
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
-    fInitFirstTimeSet
 
     gpProjName=${cDatProj1##*/}
     gpLocalRawDir=$gpLocalTopDir/raw
@@ -635,7 +615,6 @@ testInitMoveBinaryFiles()
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
-    fInitFirstTimeSet
 
     gpProjName=${cDatProj1##*/}
     gpLocalRawDir=$gpLocalTopDir/raw
@@ -693,7 +672,6 @@ testInitMkGitFlow()
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
-    fInitFirstTimeSet
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -781,7 +759,6 @@ testInitMkLocalConfig()
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
-    fInitFirstTimeSet
 
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_HomeAfterBMove.tgz

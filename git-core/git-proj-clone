@@ -128,10 +128,10 @@ if [ $# -eq 0 ]; then
     fError -m "Missing options." -l $tSrc:$LINENO
 fi
 
-. $gpBin/gitproj-global.inc
+. $gpBin/gitproj-clone.inc
 # Calls: fCloneSetGlobals
 
-gpRemoteDir
+gpRemoteDir=""
 while getopts :d:hH:vx tArg; do
     case $tArg in
         # Script arguments
@@ -149,6 +149,9 @@ done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
+fi
+if [ -z "$gpRemoteDir" ]; then
+    fError -m "-d pRemoteDir option is required." -l $tSrc:$LINENO
 fi
 
 # ----------

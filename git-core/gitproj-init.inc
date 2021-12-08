@@ -12,42 +12,12 @@ export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
 # ========================================
 
 # --------------------
-fInitFirstTimeSet()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tInclude
-    local tUserName
-    local tUserEmail
-
-    if [ ! -f $HOME/.gitconfig ]; then
-        fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
-        cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
-    fi
-
-    tUserName=$(fComGetConfig -g -k "user.name")
-    tUserEmail=$(fComGetConfig -g -k "user.email")
-    if [ -z "$tUserName" ] || [ -z "$tUserEmail" ]; then
-        fError -m "user.name and user.email must be in your ~/.gitconfig file. See $cgDoc/config/gitconfig.default for some other useful settings." -l $tSrc:$LINENO
-    fi
-
-    if [ ! -f $HOME/cConfigGlobal ]; then
-        fLog -p info -m "Create: ~/$cConfigGlobal" -l $tSrc:$LINENO
-        cp $gpDoc/config/gitproj.config.global $HOME/$cConfigGlobal
-    fi
-    tInclude=$(fComGetConfig -g -k "include.path" -v $cConfigGlobal)
-    if [ -z "$tInclude" ]; then
-        fLog -p info -m "include.path=$cConfigGlobal" -l $tSrc:$LINENO
-        fComSetConfig -a -g -k "include.path" -v $cConfigGlobal
-    fi
-} # fInitFirstTimeSet
-
-# --------------------
 fInitSetGlobals()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tTrim
 
-    fInitFirstTimeSet
+    fComFirstTimeSet
 
     gpVer=$cGitProjVersion
 

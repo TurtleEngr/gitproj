@@ -212,6 +212,25 @@ EOF
 } # testInitialConfig
 
 # --------------------------------
+testComFirstTimeSet()
+{
+
+    # source gitproj-init.inc calls fInitSetGlobals, which calls
+    # fComFirstTimeSet, which creates these files.
+    #assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
+    #assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+
+    fComFirstTimeSet
+    assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
+    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+    assertTrue "$LINENO" "$(
+        grep -q path $HOME/.gitconfig
+        echo $?
+    )"
+    return 0
+} # testComFirstTimeSet
+
+# --------------------------------
 testComLog_MultiplePermutations()
 {
     local tMsg
