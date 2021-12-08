@@ -172,28 +172,6 @@ testGitProjInit()
 } # testGitProjInit
 
 # --------------------------------
-testInitSetGlobals()
-{
-    assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
-    cd $HOME/$cDatProj1
-    fInitSetGlobals
-
-    assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
-
-    assertEquals "$LINENO" "true" "$gpSysLog"
-    assertEquals "$LINENO" "user" "$gpFacility"
-    assertEquals "$LINENO" "0" "$gpAuto"
-    assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
-    assertEquals "$LINENO" "${gpLocalTopDir}/raw" "$gpLocalRawDir"
-    assertEquals "$LINENO" "10k" "$gpMaxSize"
-    assertEquals "$LINENO" "false" "$gpGitFlow"
-    assertNull "$LINENO" "$gpAction"
-
-    cd - >/dev/null 2>&1
-    return 0
-} # testInitSetGlobals
-
-# --------------------------------
 checkComMustNotBeInGit()
 {
     local pFun=$1

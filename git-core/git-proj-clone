@@ -3,6 +3,12 @@
 #--------------------
 fUsage()
 {
+    # Quick help, run this:
+    # git-proj-clone -h | less
+
+    local pStyle="${1:-usage}"
+
+    fComUsage -s $pStyle -f $gpBin/$gpCmdName
     exit 1
 
     cat <<EOF >/dev/null
@@ -16,7 +22,7 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj clone -d pRemoteDir [common-options]
+    git proj clone -d pRemoteDir [-y|-n] [common-options]
 
 =head1 DESCRIPTION
 
@@ -30,6 +36,14 @@ mounted drive.
 =over 4
 
 =item B<-d pRemoteDir>
+
+TBD
+
+=item B<-y|-n>
+
+If -y, then default to "yes" to all prompts to continue.
+
+If -n, then default to "no" to all prompts to continue.
 
 =item B<[common-options]>
 
@@ -124,18 +138,26 @@ cd - >/dev/null 2>&1
 . $gpBin/gitproj-com.inc
 # Calls: fComSetGlobals
 
-if [ $# -eq 0 ]; then
-    fError -m "Missing options." -l $tSrc:$LINENO
-fi
+#if [ $# -eq 0 ]; then
+#    fError -m "Missing options." -l $tSrc:$LINENO
+#fi
 
 . $gpBin/gitproj-clone.inc
 # Calls: fCloneSetGlobals
 
-gpRemoteDir=""
-while getopts :d:hH:vx tArg; do
+gpRemoteGitDir=""
+gpYesNo=""
+while getopts :d:nyhH:vx tArg; do
     case $tArg in
         # Script arguments
-        d) gpRemmoteDir="$OPTARG" ;;
+        d)
+	    gpRemoteGitDir="$OPTARG"
+	    gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+	    gpProjName=${gpRemoteGitDir##*/}
+	    gpProjName=${gpProjName%.git}
+	    ;;
+	n) gpYesNo=No ;;
+	y) gpYesNo=Yes ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

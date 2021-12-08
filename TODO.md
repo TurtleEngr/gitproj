@@ -8,17 +8,15 @@
 
     * remote-status = not-defined, defined, multiple-defined
 
-* Code git-proj-push
-
-* Code git-proj-pull
-
 * Code git-proj-clone
 
-* Code git-proj-add (support adding whole directory trees)
+* Make a fComYesNo() function with fComSelect
 
 * Code git-proj-status
 
 * Code git-proj-config
+
+* Code git-proj-add (support adding whole directory trees)
 
 * Remove the need for cCurDir ?
 
@@ -136,4 +134,8 @@
   the Minor number is different, just warn the user(?) and continue.
   Mostly done
 
-* Code git-proj-remote - mostly done
+* Code git-proj-remote - done
+
+* Code git-proj-push - done
+
+* Code git-proj-pull - done

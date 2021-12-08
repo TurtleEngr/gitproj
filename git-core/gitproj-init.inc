@@ -12,49 +12,6 @@ export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
 # ========================================
 
 # --------------------
-fInitSetGlobals()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tTrim
-
-    fComFirstTimeSet
-
-    gpVer=$cGitProjVersion
-
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
-    gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
-
-    gpAuto=0
-    gpLocalTopDir=$PWD
-    gpProjName=$(fComGetConfig -k "gitproj.config.name" -d "TBD")
-    if [ "$gpProjName" = "TBD" ]; then
-        gpProjName="${gpLocalTopDir##*/}"
-    fi
-
-    gpLocalRawDir=$gpLocalTopDir/raw
-
-    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #20g
-
-    gpAutoMove="true"
-    gpGitFlow="false"
-    gpGitFlowPkg=$(fComGetConfig -k "gitproj.config.git-flow-pkg" -d "git-flow")
-
-    gpProjStatus=$(fComGetConfig -k "gitproj.config.proj-status" -d "installed")
-    gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
-    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
-
-    gpCheckFileNames=true
-    gpCheckForBigFiles=true
-    gpPreCommitEnabled=true
-    gpHookSource=hooks/pre-commit
-    gpMountDir=TBD
-    gpRemoteRawDir=TBD
-
-    return 0
-} # fInitSetGlobals
-
-# --------------------
 fInitGettingStarted()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -684,4 +641,4 @@ EOF
 
 # ========================================
 export tSrc=${BASH_SOURCE##*/}
-fInitSetGlobals
+fComPreProjSetGlobals

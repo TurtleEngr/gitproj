@@ -109,6 +109,7 @@ setUp()
     # Restore default global values, before each test
     unset gpBin cCurDir cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
     fTestSetupEnv
+    fTestCreateEnv
     gpUnitDebug=0
     return 0
 
@@ -229,6 +230,28 @@ testComFirstTimeSet()
     )"
     return 0
 } # testComFirstTimeSet
+
+# --------------------------------
+testComPreProjSetGlobals()
+{
+    assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
+    cd $HOME/$cDatProj1
+    fComPreProjSetGlobals
+
+    assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
+
+    assertEquals "$LINENO" "true" "$gpSysLog"
+    assertEquals "$LINENO" "user" "$gpFacility"
+    assertEquals "$LINENO" "0" "$gpAuto"
+    assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"
+    assertEquals "$LINENO" "${gpLocalTopDir}/raw" "$gpLocalRawDir"
+    assertEquals "$LINENO" "10k" "$gpMaxSize"
+    assertEquals "$LINENO" "false" "$gpGitFlow"
+    assertNull "$LINENO" "$gpAction"
+
+    cd - >/dev/null 2>&1
+    return 0
+} # testComPreProjSetGlobals
 
 # --------------------------------
 testComLog_MultiplePermutations()

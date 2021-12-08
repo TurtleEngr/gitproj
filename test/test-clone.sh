@@ -122,6 +122,7 @@ setUp()
 
     fTestSetupEnv
     fTestCreateEnv
+    HOSTNAME=testserver2
     . $gpBin/gitproj-clone.inc
     gpUnitDebug=0
     return 0
@@ -160,7 +161,7 @@ testGitProjClone()
     tResult=$($gpBin/git-proj-clone 2>&1)
     assertContains "$LINENO $tResult" "$tResult" 'Usage'
 
-    tResult=$($gpBin/git-proj-clone -h)
+    tResult=$($gpBin/git-proj-clone -h 2>&1)
     assertContains "$LINENO $tResult" "$tResult" 'DESCRIPTION'
 
     # git proj init [-l pDirPath] [-r] [-e pDirPath] [-h]
