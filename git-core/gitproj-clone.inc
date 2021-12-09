@@ -110,143 +110,6 @@ fCloneValidRemoteDir()
 } # fCloneValidRemoteDir
 
 # --------------------
-NAfCloneGetGitFlow()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
-    declare -l tResult
-
-    fComCheckPkg $gpGitFlowPkg
-    if [ $? -ne 0 ]; then
-        fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
-        gpGitFlow="false"
-        return 0
-    fi
-    if [ $gpAuto -ne 0 ]; then
-        return 0
-    fi
-
-    while [ $tMaxLoop -gt 0 ]; do
-        let --tMaxLoop
-
-        echo -n "Setup git-flow (-f) [y/n/quit]? "
-        read -r tResult
-        tResult=${tResult%${tResult#[a-z]}}
-        if [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
-        if [ "$tResult" = "y" ]; then
-            gpGitFlow="true"
-            break
-        fi
-        if [ "$tResult" = "n" ]; then
-            gpGitFlow="false"
-            break
-        fi
-    done
-    if [ $tMaxLoop -eq 0 ]; then
-        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
-    fi
-
-    return 0
-} # fCloneGetGitFlow
-
-# --------------------
-NAfCloneMkGitFlow()
-{
-# TBD: is this needed?
-    local tSrc=${BASH_SOURCE##*/}
-
-    if [ "$gpGitFlow" = "false" ]; then
-        return 0
-    fi
-    if ! fComCheckPkg git-flow; then
-        fError -n -m "git-flow is not installed" -l $tSrc:$LINENO
-        return 1
-    fi
-    fLog -p info -m "git flow init" -l $tSrc:$LINENO
-    git flow init -d
-
-    # Define the default prefixes
-
-    fComSetConfig -g -k gitflow.branch.main -v main
-    fComSetConfig -g -k gitflow.branch.master -v main
-    fComSetConfig -g -k gitflow.branch.develop -v develop
-
-    fComSetConfig -g -k gitflow.prefix.feature -v feature/
-    fComSetConfig -g -k gitflow.prefix.bugfix -v bug/
-    fComSetConfig -g -k gitflow.prefix.release -v release/
-    fComSetConfig -g -k gitflow.prefix.hotfix -v hotfix/
-    fComSetConfig -g -k gitflow.prefix.support -v support/
-
-    return 0
-} # fCloneMkGitFlow
-
-# --------------------
-fCloneSummary()
-{
-# TBD
-    local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
-    declare -l tResult
-
-    cat <<EOF
-
-Summary
-           (auto) = $gpAuto
-        (verbose) = $gpVerbose
-          (debug) = $gpDebug
-          (exits)   HOME/.gitconfig
-        (created)   HOME/$cConfigGlobal
-  (local-raw-dir) = $gpLocalRawDir
-  (git-flow init) = $gpGitFlow
-
-[gitproj "config"]
-      proj-status = $gpProjStatus
-     local-status = $gpLocalStatus
-              ver = $gpVer
-           syslog = $gpSysLog
-         facility = $gpFacility
-              bin = $gpBin
-              doc = $gpDoc
-             test = $gpTest
-        proj-name = $gpProjName
-     git-flow-pkg = $gpGitFlowPkg
-
-[gitproj "hook"]
-                source = $gpHookSource
-    pre-commit-enabled = $gpPreCommitEnabled=true
-      check-file-names = $gpCheckFileNames=true
-   check-for-big-files = $gpCheckForBigFiles=true
-binary-file-size-limit = $gpMaxSize
-             auto-move = $gpAutoMove
-
-EOF
-    if [ $gpAuto -eq 0 ]; then
-        while [ $tMaxLoop -gt 0 ]; do
-            let --tMaxLoop
-
-            echo -n "Continue with creating a local git repo [y/n]? "
-            read -r tResult
-            tResult=${tResult%${tResult#[a-z]}}
-            if [ "$tResult" = "y" ]; then
-                break
-            fi
-            if [ "$tResult" = "n" ]; then
-                fLog -p warning -m "Quitting, nothing will be done." -l $tSrc:$LINENO
-                exit 1
-            fi
-            fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
-        done
-        if [ $tMaxLoop -eq 0 ]; then
-            fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
-        fi
-    fi
-    return 0
-} # fCloneSummary
-
-# --------------------
 fCloneMkGitDir()
 {
 #TBD
@@ -394,6 +257,69 @@ fCloneSaveVars()
 } # fCloneSaveVars
 
 # --------------------
+fCloneSummary()
+{
+# TBD
+    local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
+    declare -l tResult
+
+    cat <<EOF
+
+Summary
+           (auto) = $gpAuto
+        (verbose) = $gpVerbose
+          (debug) = $gpDebug
+          (exits)   HOME/.gitconfig
+        (created)   HOME/$cConfigGlobal
+  (local-raw-dir) = $gpLocalRawDir
+  (git-flow init) = $gpGitFlow
+
+[gitproj "config"]
+      proj-status = $gpProjStatus
+     local-status = $gpLocalStatus
+              ver = $gpVer
+           syslog = $gpSysLog
+         facility = $gpFacility
+              bin = $gpBin
+              doc = $gpDoc
+             test = $gpTest
+        proj-name = $gpProjName
+     git-flow-pkg = $gpGitFlowPkg
+
+[gitproj "hook"]
+                source = $gpHookSource
+    pre-commit-enabled = $gpPreCommitEnabled=true
+      check-file-names = $gpCheckFileNames=true
+   check-for-big-files = $gpCheckForBigFiles=true
+binary-file-size-limit = $gpMaxSize
+             auto-move = $gpAutoMove
+
+EOF
+    if [ $gpAuto -eq 0 ]; then
+        while [ $tMaxLoop -gt 0 ]; do
+            let --tMaxLoop
+
+            echo -n "Continue with creating a local git repo [y/n]? "
+            read -r tResult
+            tResult=${tResult%${tResult#[a-z]}}
+            if [ "$tResult" = "y" ]; then
+                break
+            fi
+            if [ "$tResult" = "n" ]; then
+                fLog -p warning -m "Quitting, nothing will be done." -l $tSrc:$LINENO
+                exit 1
+            fi
+            fLog -p warning -m "Invalid answer: $tResult" -l $tSrc:$LINENO
+        done
+        if [ $tMaxLoop -eq 0 ]; then
+            fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+        fi
+    fi
+    return 0
+} # fCloneSummary
+
+# --------------------
 fCloneFromRemoteDir()
 {
     # Called by "git proj clone"
@@ -413,6 +339,80 @@ fCloneFromRemoteDir()
 EOF
     return 0
 } # fCloneFromRemoteDir
+
+# --------------------
+NAfCloneGetGitFlow()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tMaxLoop=30
+    declare -l tResult
+
+    fComCheckPkg $gpGitFlowPkg
+    if [ $? -ne 0 ]; then
+        fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
+        gpGitFlow="false"
+        return 0
+    fi
+    if [ $gpAuto -ne 0 ]; then
+        return 0
+    fi
+
+    while [ $tMaxLoop -gt 0 ]; do
+        let --tMaxLoop
+
+        echo -n "Setup git-flow (-f) [y/n/quit]? "
+        read -r tResult
+        tResult=${tResult%${tResult#[a-z]}}
+        if [ "$tResult" = "q" ]; then
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
+            exit 1
+        fi
+        if [ "$tResult" = "y" ]; then
+            gpGitFlow="true"
+            break
+        fi
+        if [ "$tResult" = "n" ]; then
+            gpGitFlow="false"
+            break
+        fi
+    done
+    if [ $tMaxLoop -eq 0 ]; then
+        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    fi
+
+    return 0
+} # fCloneGetGitFlow
+
+# --------------------
+NAfCloneMkGitFlow()
+{
+# TBD: is this needed?
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ "$gpGitFlow" = "false" ]; then
+        return 0
+    fi
+    if ! fComCheckPkg git-flow; then
+        fError -n -m "git-flow is not installed" -l $tSrc:$LINENO
+        return 1
+    fi
+    fLog -p info -m "git flow init" -l $tSrc:$LINENO
+    git flow init -d
+
+    # Define the default prefixes
+
+    fComSetConfig -g -k gitflow.branch.main -v main
+    fComSetConfig -g -k gitflow.branch.master -v main
+    fComSetConfig -g -k gitflow.branch.develop -v develop
+
+    fComSetConfig -g -k gitflow.prefix.feature -v feature/
+    fComSetConfig -g -k gitflow.prefix.bugfix -v bug/
+    fComSetConfig -g -k gitflow.prefix.release -v release/
+    fComSetConfig -g -k gitflow.prefix.hotfix -v hotfix/
+    fComSetConfig -g -k gitflow.prefix.support -v support/
+
+    return 0
+} # fCloneMkGitFlow
 
 # ========================================
 export tSrc=${BASH_SOURCE##*/}
