@@ -1,9 +1,0 @@
-# Put this in your top git dir: .gitproj.config.$HOSTNAME
-# This file should be versioned.
-# This will be put at end of .git/config by "git proj init" or "git proj clone"
-#      include.path=../.gitproj.config.$HOSTNAME
-# This file will first include .gitproj.config.local
-# From: /usr/share/doc/gitproj/config/gitproj.config.local
-
-[include]
-	path = .gitproj.config.local

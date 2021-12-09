@@ -515,7 +515,7 @@ fInitMkLocalConfig()
     fLog -p info -m "Create: $cConfigLocal" -l $tSrc:$LINENO
     cp $gpDoc/config/gitproj.config.local $cConfigLocal
     fLog -p info -m "Create: $cConfigHost" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.HOSTNAME $cConfigHost
+    cp $gpDoc/config/gitproj.config.local $cConfigHost
 
     tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
     if [ -n "$tInclude" ]; then

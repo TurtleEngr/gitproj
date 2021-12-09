@@ -5,10 +5,10 @@
     gitproj/
     |   |doc/
     |   |   |config/
-    |   |   |   |gitproj.config.system
+    |   |   |   |gitconfig.default
+    |   |   |   |gitignore.default
     |   |   |   |gitproj.config.global
     |   |   |   |getproj.config.local
-    |   |   |   |gitproj.config.test
     |   |   |hooks/
     |   |   |   |pre-commit*
     |   |   |html/ - generated user level docs
@@ -105,7 +105,8 @@ installed files would be tricky, and of low value.
     |   |   |   |   |LICENSE
     |   |   |   |   |README
     |   |   |   |   |config/
-    |   |   |   |   |   |gitproj.config.system
+    |   |   |   |   |   |gitconfig.default
+    |   |   |   |   |   |gitignore.default
     |   |   |   |   |   |gitproj.config.global
     |   |   |   |   |   |getproj.config.local
     |   |   |   |   |hooks/
@@ -138,8 +139,9 @@ installed files would be tricky, and of low value.
     |   |   |ANY-DIR/
     |   |   |   |PROJECT/
     |   |   |   |   |.git/
-    |   |   |   |   |   |config - see "include.path" ../.gitproj.config.global
+    |   |   |   |   |   |config -"include.path" ../.gitproj.config.$HOSTNAME
     |   |   |   |   |.gitproj.config.local
+    |   |   |   |   |.gitproj.config.$HOSTNAME
     |   |   |   |   |raw/
     |   |   |   |   |   |DIR/
     |   |   |   |   |   |  |LARGE-FILE.MP4
@@ -164,10 +166,9 @@ The last definition 'wins".
 2. /home/USER/.gitconfig
 3. /home/USER/.gitproj.config.global (include.path at end of .gitconfig)
 4. GIT_DIR/.git/config
-5. GIT_DIR/.gitproj.config.local (include.path at beginning of GIT_DIR/.gitproj.config.$HOSTNAME)
-6. GIT_DIR/.gitproj.config.$HOSTNAME (include.path at end of GIT_DIR/.git/config)
-7. Env. var. will override corresponding .git config vars.
-8. Command line options will override env. var. and corresponding .git config vars.
+5. GIT_DIR/.gitproj.config.$HOSTNAME (include.path at end of GIT_DIR/.git/config)
+6. Env. var. will override corresponding .git config vars.
+7. Command line options will override env. var. and corresponding .git config vars.
 
 ## Variable Naming Convention
 
@@ -175,7 +176,7 @@ The last definition 'wins".
 the scripts, begin with "gp" (global paramater). For example: gpVAR
 (if they are not already defined before script (#7), set the initial
 value to files #1 through #6. The command line option can always set
-the value (#8)
+the value (#7)
 
 * Global variables should begin with a "g"
 
@@ -199,22 +200,21 @@ functions in gitproj-init.inc begin with "fInit".
 ## Coding patterns
 
 * At the top of include files define exports for all the globals that
-the include file reads writes to.
+the include file reads/writes to.
 
 * At the end of an include file, call a function that will define
-defaults for the important globals used by the include file.
+defaults for the important globals used by the include file. [optional]
 
-* For user callable scripts, do minimal setup, include files with
+* For the user callable scripts, do minimal setup, include files with
 common functions and functions specific to the script. Put as much as
-possible into functions in the commands include file, so that the
-functions can be directly tested with unit test scripts found in
-doc/test.
+possible into functions in the include file, so that the functions can
+be directly tested with unit test scripts found in doc/test.
 
 * Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test script.
 All other vars can be defined from include files or from git config vars.
 
-* Define gpCmdName at the top of each each script, that is a main script
-called by a user.
+* Define gpCmdName at the top of each each script that is called by a
+user.
 
 * The -p option is not used with the "read" command, because this
 prompt is not captured with the test scripts. So use "echo -n" for the
@@ -230,7 +230,7 @@ prompts before the read command.
 
         local tSrc=${BASH_SOURCE##*/}
 
-    * in Error and Log pass this argument:
+    * in Error and Log always pass this argument:
 
         -l $tSrc:$LINENO
 

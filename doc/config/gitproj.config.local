@@ -1,6 +1,6 @@
 # Put this in your top git dir: .gitproj.config.local
 # This file should be versioned.
-# This file will be included by .gitproj.config.$HOSTNAME
+# This file will be used to create the first .gitproj.config.$HOSTNAME
 # From: /usr/share/doc/gitproj/config/gitproj.config.local
 
 [gitproj "config"]

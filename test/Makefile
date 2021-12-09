@@ -2,14 +2,20 @@
 
 mCore = ../git-core
 
+# Note: the order matters
+mTestEnvFiles = \
+	test-env_HomeAfterBMove.tgz \
+	test-env_ProjAfterGInit.tgz \
+	test-env_ProjLocalDefined.tgz \
+	test-env_TestDestDirAfterMkRemote.tgz \
+	test-env_TestDestDirAfterRemoteReport.tgz \
+	test-env_Home2AfterPush.tgz
+
 mDepList = \
 	shunit2.1 \
 	$(mCore)/gitproj-com.inc \
 	test.inc \
-	test-env.tgz \
-	test-env_HomeAfterBMove.tgz \
-	test-env_ProjAfterGInit.tgz \
-	test-env_ProjLocalDefined.tgz
+	test-env.tgz
 
 mBaseList = \
 	test-com \
@@ -31,14 +37,6 @@ mCmdToDo = \
 	status \
 	check
 
-mTestEnvFiles = \
-	test-env_HomeAfterBMove.tgz \
-	test-env_ProjAfterGInit.tgz \
-	test-env_ProjLocalDefined.tgz \
-	test-env_TestDestDirAfterMkRemote.tgz \
-	test-env_TestDestDirAfterRemoteReport.tgz \
-	test-env_Home2AfterPush.tgz
-
 # --------------------
 test test-all : $(mDepList) $(mBaseList) test-cmds
 
@@ -58,11 +56,6 @@ test-cmds : $(mDepList)
 	done
 
 # --------------------
-test-env : $(mTestEnvFiles)
-	@echo "To update the test-env files:"
-	@echo "$^"
-	@echo "move them out of the way, then run this make target again"
-
 test-env.tgz :
 	@echo "$@ needs to be manually updated."
 	@echo "Do not remove: $@"
@@ -72,6 +65,12 @@ test-env.tgz :
 	@echo "tar -czf test-env.tgz test"
 	@echo "mv -fv test-env.tgz gitproj/doc/test"
 	@echo "Now you should update the other test-env tar files."
+
+# --------------------
+test-env : $(mTestEnvFiles)
+	@echo "To update the test-env files:"
+	@echo "$^"
+	@echo "move them out of the way, then run this make target again"
 
 test-env_HomeAfterBMove.tgz :
 	export gpSaveTestEnv=1; ./test-init.sh testInitMoveBinaryFiles
