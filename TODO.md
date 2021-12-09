@@ -1,16 +1,5 @@
 # TODO
 
-* Refactor .gitproj.config.local, .gitproj.config.HOSTNAME mgmt
-  * .gitproj.config.local will only be used as a default to create
-    .gitproj.config.HOSTNAME, i.e. it will not be used by "git config --get"
-  * Remove doc/config/.gitproj.config.HOSTNAME
-  * git-proj-init may save changes to .gitproj.config.local, i.e. when
-    a project it first created.
-  * If in a gitproj git dir, at start of cmd, look for .gitproj.config.HOSTNAME
-    If not found the cp .gitproj.config.local .gitproj.config.HOSTNAME,
-    and set .git/config include too .gitproj.config.HOSTNAME
-    Tell user to review .gitproj.config.HOSTNAME and .gitproj.config.local
-
 * Code git-proj-clone
 
 * Make a fComYesNo() function with fComSelect
@@ -147,3 +136,14 @@
     * proj-status = installed, install-errors (add)
     * local-status = not-defined, defined (rename proj-status)
     * remote-status = not-defined, defined, multiple-defined
+
+* Refactor .gitproj.config.local, .gitproj.config.HOSTNAME mgmt - Done
+  * .gitproj.config.local will only be used as a default to create
+    .gitproj.config.HOSTNAME, i.e. it will not be used by "git config --get"
+  * Remove doc/config/.gitproj.config.HOSTNAME
+  * git-proj-init may save changes to .gitproj.config.local, i.e. when
+    a project it first created.
+  * If in a gitproj git dir, at start of cmd, look for .gitproj.config.HOSTNAME
+    If not found the cp .gitproj.config.local .gitproj.config.HOSTNAME,
+    and set .git/config include too .gitproj.config.HOSTNAME
+    Tell user to review .gitproj.config.HOSTNAME and .gitproj.config.local
