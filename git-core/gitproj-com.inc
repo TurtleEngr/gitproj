@@ -2,9 +2,9 @@
 
 # --------------------------------
 export cConfigGlobal cConfigLocal cConfigHost cCurDir cGitProjVersion \
-    cGetOrigin cGetTopDir cPID
+    cGetOrigin cGetTopDir cGetCurBranch cPID
 export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
-    gpLocalRawDir gpSysLog gpVerbose PWD \
+    gpLocalRawDir gpSysLog gpVerbose gpYesNo PWD \
     gGetConfigValue gGetConfigOrigin gResponse
 
 # --------------------------------
@@ -211,7 +211,6 @@ fComSetGlobals()
 
     # This is put in cTop, project dir. (Use -H to set config vars to this)
     # This is included by .git/config
-    # This first includes: cConfigLocal
     cConfigHost=".gitproj.config.$HOSTNAME"
 
     # cConfigGlobal, cConfigLocal, and $cConfigLocal should be
@@ -225,6 +224,10 @@ fComSetGlobals()
     # Use:
     #     tTop=$($cGetTopDir); cd $tTop
     cGetTopDir='git rev-parse --show-toplevel'
+
+    # Use:
+    #     tBranch=$($cGetCurBranch)
+    cGetCurBranch='git rev-parse --abbrev-ref HEAD'
 
     # -------------------
     # Setup log variables
@@ -1461,21 +1464,22 @@ fComMustBeInProjRepo()
 
 fComAllMustBeReadable()
 {
-    local pDir=$1
+    local pDir=${1:-$PWD}
     local tSrc=${BASH_SOURCE##*/}
     local tFound
 
-    pDir=${pDir:-$PWD}
-    tFound=$(find $pDir \! -readable -print)
-    if [ -n "$tFound" ]; then
-        fError -n -m "All directories and files must be readable, under $pDir" -l $tSrc:$LINENO
-        return 1
-    fi
-    tFound=$(find $pDir -type d \! -executable -print)
+    tFound=$(find $pDir -type d \! -executable -print 2>/dev/null)
     if [ -n "$tFound" ]; then
         fError -n -m "All directories must be executable, under $pDir" -l $tSrc:$LINENO
         return 1
     fi
+
+    tFound=$(find $pDir \! -readable -print 2>/dev/null)
+    if [ -n "$tFound" ]; then
+        fError -n -m "All directories and files must be readable, under $pDir" -l $tSrc:$LINENO
+        return 1
+    fi
+
     return 0
 } # fComAllMustBeReadable
 

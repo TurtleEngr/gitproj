@@ -126,16 +126,24 @@ setUp()
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
     cd - >/dev/null 2>&1
-    # git proj to be cloned:
-    # $cDatMount3/video-2020-04-02/george.git
-    # $cDatMount3/video-2020-04-02/george.raw
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
+
+    cd $HOME/project >/dev/null 2>&1
+    . $gpBin/gitproj-clone.inc
+
+    # git proj to be cloned:
     HOME=$cDatHome3
     HOSTNAME=testserver2
-    cd $cDatHome3/project >/dev/null 2>&1
-    . $gpBin/gitproj-clone.inc
-    
+    gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    gpProjName=${gpRemoteGitDir##*/}
+    gpProjName=${gpProjName%.git}
+
+    find $gpRemoteGitDir $gpRemoteRawDir -exec chmod a+r {} \;
+    find $gpRemoteGitDir $gpRemoteRawDir -exec chmod ug+w {} \;
+    find $gpRemoteGitDir $gpRemoteRawDir -type d -exec chmod a+rx {} \;
+
     gpUnitDebug=0
     return 0
 
@@ -170,6 +178,14 @@ testGitProjCloneUsage()
 {
     local tResult
 
+    cd $HOME
+    assertEquals "$LINENO" "$PWD" "$HOME"
+
+    assertEquals "$LINENO gpRemoteGitDir" "$cDatMount3/video-2020-04-02/george.git" "$gpRemoteGitDir"
+    assertEquals "$LINENO gpRemoteRawDir" "${gpRemoteGitDir%.git}.raw" "$gpRemoteRawDir"
+    assertEquals "$LINENO gpProjName" "george" "$gpProjName"
+    assertEquals "$LINENO HOSTNAME" "testserver2" "$HOSTNAME"
+
     tResult=$($gpBin/git-proj-clone 2>&1)
     assertContains "$LINENO $tResult" "$tResult" 'Usage'
 
@@ -182,74 +198,120 @@ testGitProjCloneUsage()
     assertEquals "$LINENO" "$HOME" "$cDatHome3"
     assertFalse "$LINENO" "[ -d .git ]"
     cd - >/dev/null 2>&1
+
     return 0
 } # testGitProjCloneUsage
-
-testCloneGettingStarted()
-{
-    local tResult
-    local tStatus
-#TBD
-return 1
-    gpUnitDebug=0
-
-    cd $HOME/$cDatProj1
-    gpAuto=1
-    tResult=$(fCloneGettingStarted)
-    assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
-
-    gpAuto=0
-    tResult=$(fCloneGettingStarted 2>&1 < <(echo -e "\nx\ny"))
-    tStatus=$?
-    fTestDebug "tResult=$tResult"
-    assertContains "$LINENO $tResult" "$tResult" "is not valid"
-    assertTrue $LINENO $tStatus
-
-    tResult=$(fCloneGettingStarted 2>&1 < <(echo -e "n"))
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-
-    cd - >/dev/null 2>&1
-    return 0
-} # testCloneGettingStarted
 
 # --------------------------------
 testCloneValidRemoteDir()
 {
     local tResult
-    return 1
+    local tSave
+
+    #gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    #gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    #gpProjName=${gpRemoteGitDir##*/}
+    #gpProjName=${gpProjName%.git}
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
+
+    cd $HOME/project >/dev/null 2>&1
+
+    chmod a-w $HOME/project
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Current dir is not writable"
+    chmod ug+w $HOME/project
+
+    tSave=$gpRemoteGitDir
+    gpRemoteGitDir=$cDatMount3/video-2020-04-xx/george.git
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteGitDir does not exist"
+    gpRemoteGitDir=$tSave
+
+    tSave=$gpRemoteRawDir
+    gpRemoteRawDir=$cDatMount3/video-2020-04-xx/george.git
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir does not exist"
+    gpRemoteRawDir=$tSave
+
+    chmod a-r $gpRemoteGitDir/objects
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $gpRemoteGitDir"
+    chmod -R a+r $gpRemoteGitDir/objects
+
+    chmod a-x $gpRemoteGitDir/objects
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteGitDir"
+    chmod a+x $gpRemoteGitDir/objects
+
+    chmod a-r $gpRemoteRawDir/src
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $gpRemoteRawDir"
+    chmod -R a+r $gpRemoteRawDir/src
+
+    chmod a-x $gpRemoteRawDir/src/raw
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteRawDir"
+    chmod a+x $gpRemoteRawDir/src/raw
+
+    cd $HOME/project >/dev/null 2>&1
+    touch $gpProjName
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "A $gpProjName already exists in this dir"
+    rm $gpProjName
+
+    # Test for not enough room. Mock "df" to return a small value.
+    df()
+    {
+	echo "2M"
+    }
+    tResult=$(df -BM $PWD --output=avail | tail -n1)
+    assertEquals "$LINENO" "2M" "$tResult"
+    tResult=$(fCloneValidRemoteDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There is not enough space in current directory. Project '$gpProjName' needs 6MB"
+    unset -f df
+    
+    return 0
 } # testCloneValidRemoteDir
 
-# --------------------------------
-testCloneSummary()
+testCloneGettingStarted()
 {
     local tResult
-    local tStatus
-return 1
+    
+    gpDebug=2
+    cd $HOME/project >/dev/null 2>&1
+    gpYesNo=No
+    tResult=$(fCloneGettingStarted 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
+    assertContains "$LINENO $tResult" "$tResult" "Not continuing"
 
-    gpLocalTopDir=$HOME/$cDatProj1
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="10k"
+    gpYesNo=Yes
+    tResult=$(fCloneGettingStarted 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
+    assertContains "$LINENO $tResult" "$tResult" "Cloning: $gpProjName"
 
-    tResult=$(fCloneSummary 2>&1 < <(echo -e "foo\nn"))
-    assertFalse $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
-    assertContains "$LINENO $tResult" "$tResult" "Invalid answer:"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    gpUnitDebug=0
-    fTestDebug "No result = $tResult"
-
-    tResult=$(fCloneSummary 2>&1 < <(echo -e "y"))
-    assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
-
-    gpUnitDebug=0
-    fTestDebug "Yes result = $tResult"
+    gpYesNo=""
+    tResult=$(fCloneGettingStarted 2>&1 < <(echo y))
+    assertTrue "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
+    assertContains "$LINENO $tResult" "$tResult" "Cloning: $gpProjName"
 
     return 0
-} # testCloneSummary
+} # testCloneGettingStarted
 
 # --------------------------------
 testCloneMkGitDir()
@@ -461,6 +523,37 @@ return 1
 
     return 0
 } # testCloneSaveVars
+
+# --------------------------------
+testCloneSummary()
+{
+    local tResult
+    local tStatus
+return 1
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    gpProjName=${cDatProj1##*/}
+    gpGitFlow="true"
+    gpMaxSize="10k"
+
+    tResult=$(fCloneSummary 2>&1 < <(echo -e "foo\nn"))
+    assertFalse $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
+    assertContains "$LINENO $tResult" "$tResult" "Invalid answer:"
+    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+
+    gpUnitDebug=0
+    fTestDebug "No result = $tResult"
+
+    tResult=$(fCloneSummary 2>&1 < <(echo -e "y"))
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
+
+    gpUnitDebug=0
+    fTestDebug "Yes result = $tResult"
+
+    return 0
+} # testCloneSummary
 
 # --------------------------------
 testCloneFromRemoteDir()
