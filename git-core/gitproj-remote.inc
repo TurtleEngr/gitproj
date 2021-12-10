@@ -317,7 +317,7 @@ fRemoteMkRemote()
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-viP
     fi
-    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/* $gpLocalTopDir/raw/ $gpRemoteRawDir"
+    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir"
     'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
     if [ $? -ne 0 ]; then
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
