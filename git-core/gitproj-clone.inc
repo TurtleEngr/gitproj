@@ -244,10 +244,12 @@ fCloneMkGitDir()
     fCloneCheckProjConfig
     fCloneCheckHostConfig
     fCloneCheckLocalConfig
-    
+
     fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
     fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
     cp $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+
+    git commit -am "Updating configs for this host."
 
     return 0
 } # fCloneMkGitDir
