@@ -314,6 +314,143 @@ testCloneGettingStarted()
 } # testCloneGettingStarted
 
 # --------------------------------
+testCloneCheckLocalConfig()
+{
+    local tResult
+    
+    # SetUp
+    cd $cDatHome >/dev/null 2>&1
+    HOME=$PWD
+    cd $cDatProj1 >/dev/null 2>&1
+    gpLocalTopDir=$PWD
+    gpProjName=george
+    HOSTNAME=testserver
+    cConfigHost=.gitproj.config.$HOSTNAME
+
+    # Start tests
+    tResult=$(fCloneCheckLocalConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
+    gpDebug=2
+    rm $cConfigLocal
+    tResult=$(fCloneCheckLocalConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Missing file: $cConfigLocal It should have been versioned. Will try to recreate it from a host config file"
+    assertContains "$LINENO $tResult" "$tResult" "cp $cConfigHost $cConfigLocal"
+
+    tResult=$(grep remote-raw-dir $cConfigHost 2>&1)
+    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
+
+    rm $cConfigLocal $cConfigHost
+    tResult=$(fCloneCheckLocalConfig 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There are not host file to copy from"
+
+    return 0
+} # testCloneCheckLocalConfig
+
+# --------------------------------
+testCloneCheckHostConfigNoHost()
+{
+    local tResult
+
+    # SetUp
+    cd $cDatHome >/dev/null 2>&1
+    HOME=$PWD
+    cd $cDatProj1 >/dev/null 2>&1
+    gpLocalTopDir=$PWD
+    gpProjName=george
+    HOSTNAME=testserver
+    cConfigHost=.gitproj.config.$HOSTNAME
+
+    # Start tests
+    tResult=$(fCloneCheckHostConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
+    rm $cConfigHost
+    gpDebug=2
+    tResult=$(fCloneCheckHostConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Missing host file: $cConfigHost  It will be created for this new host"
+    assertContains "$LINENO $tResult" "$tResult" "cp $cConfigLocal $cConfigHost"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+
+    tResult=$(grep remote-raw-dir $cConfigHost 2>&1)
+    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
+    
+    return 0
+} # testCloneCheckHostConfigNoHost
+
+
+# --------------------------------
+testCloneCheckHostConfigManyHosts()
+{
+    local tResult
+
+    cd $cDatHome >/dev/null 2>&1
+    HOME=$PWD
+    cd $cDatProj1 >/dev/null 2>&1
+    gpLocalTopDir=$PWD
+    gpProjName=george
+    HOSTNAME=testserver2
+    cConfigHost=.gitproj.config.$HOSTNAME
+
+    cp .gitproj.config.testserver .gitproj.config.testserver-1
+    echo '#gitproj.config.testserver-1' >>.gitproj.config.testserver-1
+    
+    cp .gitproj.config.testserver .gitproj.config.testserver-2
+    echo '#gitproj.config.testserver-2' >>.gitproj.config.testserver-2
+
+    touch .gitproj.config.testserver-2
+    sleep 0.25
+    touch .gitproj.config.local
+
+    gpDebug=2
+    tResult=$(fCloneCheckHostConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO $tResult" "[ -f $cConfigHost ]"
+    assertContains "$LINENO $tResult" "$tResult" "Missing host file: $cConfigHost  It will be created for this new host"
+    assertContains "$LINENO $tResult" "$tResult" "cp .gitproj.config.testserver-2 $cConfigHost"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+
+    tResult=$(grep remote-raw-dir $cConfigHost 2>&1)
+    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
+    
+    return 0
+} # testCloneCheckHostConfigManyHosts
+
+# --------------------------------
+testCloneCheckProjConfig()
+{
+    local tResult
+
+    # SetUp
+    cd $cDatHome >/dev/null 2>&1
+    HOME=$PWD
+    cd $cDatProj1 >/dev/null 2>&1
+    gpLocalTopDir=$PWD
+    gpProjName=george
+    HOSTNAME=testserver
+    cConfigHost=.gitproj.config.$HOSTNAME
+
+    # Start tests
+    tResult=$(fCloneCheckProjConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
+    gpDebug=2
+    rm $cConfigLocal $cConfigHost
+    tResult=$(fCloneCheckProjConfig 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values"
+    assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+
+    assertTrue "$LINENO $tResult" "[ -f $cConfigLocal ]"
+    assertTrue "$LINENO $tResult" "[ -f $cConfigHost ]"
+ 
+    return 0
+} # testCloneCheckProjConfig
+
+# --------------------------------
 testCloneMkGitDir()
 {
     local tResult

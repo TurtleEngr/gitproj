@@ -125,11 +125,20 @@ fCloneCheckLocalConfig()
     fi
     fLog -p warning -m "Missing file: $cConfigLocal It should have been versioned. Will try to recreate it from a host config file." -l $tSrc:$LINENO
 
-    # Look for the newest host file (by date-stamp)
-    # if no host file, then internal error! Cannot continue, exit
-    # cp newest host file to $cConfigLocal
-    # git add $cConfigLocal
-    # git commit -am "msg"
+    # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
+    tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
+    if [ -z "$tHost" ]; then
+        fError -i -m "There are not host file to copy from." -l $tSrc:$LINENO
+    fi
+
+    fLog -p debug-2 -m "cp $tHost $cConfigLocal" -l $tSrc:$LINENO
+    cp $tHost $cConfigLocal
+
+    # Adjust the host var values
+    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
+
+    git add $cConfigLocal
+
     return 0
 } # fCloneCheckLocalConfig
 
@@ -137,6 +146,7 @@ fCloneCheckLocalConfig()
 fCloneCheckHostConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tHost
 
     if [ -f $cConfigHost ]; then
         return 0
@@ -146,13 +156,15 @@ fCloneCheckHostConfig()
     # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
     tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
     if [ -n "$tHost" ]; then
+        fLog -p debug-2 -m "cp $tHost $cConfigHost" -l $tSrc:$LINENO
         cp $tHost $cConfigHost
     else
+        fLog -p debug-2 -m "cp $cConfigLocal $cConfigHost" -l $tSrc:$LINENO
         cp $cConfigLocal $cConfigHost
     fi
     
     # Adjust the host var values
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteGitDir
+    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
 
     git add $cConfigHost
 
@@ -164,21 +176,35 @@ fCloneCheckProjConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
     declare -a tHostList
+    local tC
     
     tHostList=(.gitproj.config.*)
     if [ "${tHostList[0]}" != ".gitproj.config.*" ]; then
         return 0
     fi
 
-    fError -n -i -m "There are no host project config files for this project. They should have been versioned! Will try to create them." -l $tSrc:$LINENO
+    fLog -p warning -m "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values." -l $tSrc:$LINENO
 
     # Get a raw local file from $gpDoc
-    cp $gpDoc/$cConfigLocal .
+    fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal"
+    cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal
+    fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigHost"
+    cp $gpDoc/config/${cConfigLocal#.} $cConfigHost
+    
     # Fix up the vars, making some assumptions.
-    # ...
-    # git add $cConfigLocal
-    # git commit -am "msg"
-    fCloneCreateHostConfig
+    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
+    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
+
+    for tC in L H; do
+        fComSetConfig -$tC -k "gitproj.config.local-status" -v "defined"
+    	fComSetConfig -$tC -k "gitproj.config.remote-status" -v "defined"
+    	fComSetConfig -$tC -k "gitproj.config.proj-name" -v "$gpProjName"
+    	fComSetConfig -$tC -k "gitproj.config.git-flow-pkg" -v "git-flow"
+    done
+
+    git add $cConfigLocal
+    git add $cConfigHost
+
     return 0
 } # fCloneCreateProjConfig
 
