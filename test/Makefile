@@ -18,18 +18,18 @@ mDepList = \
 	test-env.tgz
 
 mBaseList = \
-	test-com \
-	test-com2 \
-	test-gitproj \
+	test-com.log \
+	test-com2.log
 
 mCmdList = \
-	init \
-	remote \
-	push \
-	pull
+	test-gitproj.log \
+	test-init.log \
+	test-remote.log \
+	test-push.log \
+	test-pull.log \
+	test-clone.log
 
 mCmdToDo = \
-	clone \
 	add \
 	move \
 	rm \
@@ -38,22 +38,24 @@ mCmdToDo = \
 	check
 
 # --------------------
-test test-all : $(mDepList) $(mBaseList) test-cmds
+test : $(mDepList) $(mBaseList) $(mCmdList)
 
-test-com : $(mDepList) test-com.sh
-	./$@.sh
+test-all : clear-logs test
 
-test-com2 : $(mDepList) test-com2.sh
-	./$@.sh
+clear-logs :
+	rm test-*.log
 
-test-gitproj : $(mDepList) test-gitproj.sh $(mCore)/git-proj
-	./$@.sh
+test-com.log : $(mDepList) test-com.sh
+	./test-com.sh 2>&1 | tee $@
 
-test-cmds : $(mDepList)
-	for tCmd in $(mCmdList); do \
-		echo ./test-$${tCmd}.sh; \
-		./test-$${tCmd}.sh; \
-	done
+test-com2.log : $(mDepList) test-com2.sh
+	./test-com2.sh 2>&1 | tee $@
+
+test-gitproj.log : $(mDepList) test-gitproj.sh $(mCore)/git-proj
+	./test-gitproj.sh 2>&1 | tee $@
+
+test-%.log : test-%.sh $(mDepList) $(mCore)/gitproj-%.inc $(mCore)/git-proj-%
+	./$< 2>&1 | tee $@
 
 # --------------------
 test-env.tgz :

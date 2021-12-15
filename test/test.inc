@@ -5,7 +5,6 @@
 
 export cCurDir cDatHome cDatHome2 cDatHome3 cHome cTestCurDir \
     cTestDestDir cTestFiles cTestSrcDir HOSTNAME
-    
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
@@ -60,6 +59,8 @@ EOF
 fTestSetupEnv()
 {
     local tSrc=${BASH_SOURCE##*/}
+    
+    SHUNIT_COLOR=none
 
     gpBin=$gpTest/../git-core
     cd $gpBin >/dev/null 2>&1
