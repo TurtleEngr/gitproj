@@ -121,6 +121,7 @@ setUp()
         gpLocalTopDir gpMaxSize \
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
+    HOSTNAME=testserver2
     fTestSetupEnv
     fTestCreateEnv
     cd $cTestDestDir >/dev/null 2>&1
@@ -129,13 +130,12 @@ setUp()
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
 
-    cd $HOME/project >/dev/null 2>&1
-    . $gpBin/gitproj-clone.inc
-
     # git proj to be cloned:
     HOME=$cDatHome3
-    HOSTNAME=testserver2
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+
+    cd $HOME/project >/dev/null 2>&1
+    . $gpBin/gitproj-clone.inc
     gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     gpProjName=${gpRemoteGitDir##*/}
     gpProjName=${gpProjName%.git}
@@ -442,7 +442,7 @@ testCloneCheckProjConfig()
     tResult=$(fCloneCheckProjConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values"
-    assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     assertTrue "$LINENO $tResult" "[ -f $cConfigLocal ]"
     assertTrue "$LINENO $tResult" "[ -f $cConfigHost ]"
@@ -451,52 +451,92 @@ testCloneCheckProjConfig()
 } # testCloneCheckProjConfig
 
 # --------------------------------
+testCloneMkGitDirFail()
+{
+    local tResult
+    local tStatus
+    local tTop
+
+    # Assumes setUp has run
+    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # 				cTestDestDir=$gpTest/../..
+    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    # HOSTNAME=testserver2
+    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpProjName=george
+
+    assertContains "$LINENO $HOME" $HOME "adric"
+    assertContains "$LINENO $gpRemoteGitDir" $gpRemoteGitDir 'video-2020-04-02/george.git'
+    assertContains "$LINENO gpRemoteRawDir=$gpRemoteRawDir" $gpRemoteRawDir 'video-2020-04-02/george.raw'
+    assertTrue $LINENO "[ -r $HOME/.gitconfig ]"
+    assertTrue $LINENO "[ -r $HOME/$cConfigGlobal ]"
+
+    # Force a failure
+    cd $HOME/project >/dev/null 2>&1
+
+    chmod a-w .
+    tResult=$(fCloneMkGitDir 2>&1)
+    assertFalse $LINENO "$?"
+    assertContains $LINENO "$tResult" "The above command should have worked"
+
+    return 0
+} # testCloneMkGitDirFail
+
+# --------------------------------
 testCloneMkGitDir()
 {
     local tResult
     local tStatus
     local tTop
-return 1
 
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $HOME >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
+    # Assumes setUp has run
+    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # 				cTestDestDir=$gpTest/../..
+    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    # HOSTNAME=testserver2
+    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpProjName=george
 
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="1k"
-    gpAutoMove=true
-    gpAuto=0
+    assertContains "$LINENO $HOME" $HOME "adric"
+    assertContains "$LINENO $gpRemoteGitDir" $gpRemoteGitDir 'video-2020-04-02/george.git'
+    assertContains "$LINENO gpRemoteRawDir=$gpRemoteRawDir" $gpRemoteRawDir 'video-2020-04-02/george.raw'
+    assertEquals $LINENO  george $gpProjName
+    assertTrue $LINENO "[ -r $HOME/.gitconfig ]"
+    assertTrue $LINENO "[ -r $HOME/$cConfigGlobal ]"
 
-    cd $gpLocalTopDir >/dev/null 2>&1
+    cd $HOME/project >/dev/null 2>&1
+    fCloneMkGitDir >/dev/null 2>&1
+    assertTrue $LINENO "$?"
+    assertEquals $LINENO  george $gpProjName
+    assertEquals $LINENO  $HOME/project/george $gpLocalTopDir
+    assertTrue "$LINENO $HOME/project/$gpProjName" "[ -d $HOME/project/$gpProjName ]"
 
-    tResult=$(fCloneMkGitDir 2>&1)
-    tStatus=$?
-    assertTrue $LINENO "$tStatus"
-    assertTrue $LINENO "[ -d $gpLocalTopDir/.git ]"
-    assertTrue $LINENO "[ -f $gpLocalTopDir/.gitignore ]"
-    assertTrue $LINENO "$(
-        grep -q raw $gpLocalTopDir/.gitignore
-        echo $?
-    )"
-
-    tTop=$($cGetTopDir)
-    assertContains $LINENO "$tTop" "$gpLocalTopDir"
+    cd $HOME/project/$gpProjName >/dev/null 2>&1
+    assertTrue $LINENO "[ -f .gitproj.config.local ]"
+    assertTrue $LINENO "[ -f .gitproj.config.$HOSTNAME ]"
+    assertTrue $LINENO "[ -f $HOME/.gitconfig ]"
+    assertTrue $LINENO "[ -f $HOME/$cConfigGlobal ]"
+    assertTrue $LINENO "[ -d .git ]"
+    assertTrue $LINENO "[ -x .git/hooks/pre-commit ]"
+    assertEquals $LINENO testserver2 $HOSTNAME
+    assertTrue $LINENO "grep .gitproj.config.$HOSTNAME .git/config"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     tResult=$(git branch 2>&1)
-    assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "develop"
+    assertTrue $LINENO "$?"
     assertContains "$LINENO $tResult" "$tResult" "main"
+    assertContains "$LINENO $tResult" "$tResult" "develop"
+    ##assertContains "$LINENO tResult=$tResult" "$tResult" "Uncomment to check"
 
-    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-        echo -e "\tCapture state of project after git init."
-        echo -e "\tRestore test-env_ProjAfterGClone.tgz relative to cDatHome/project"
-        cd $HOME/project >/dev/null 2>&1
-        tar -cvzf $gpTest/test-env_ProjAfterGClone.tgz $gpProjName
-    fi
-
-    assertTrue "$LINENO not exec" "[ -x $tTop/.git/hooks/pre-commit ]"
-    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
+    tResult=$(git config --get --includes gitproj.config.local-status)
+    assertTrue $LINENO "$?"
+    assertNotContains "$LINENO $tResult" "$tResult" "not-defined"
 
     return 0
 } # testCloneMkGitDir

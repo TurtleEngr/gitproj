@@ -81,7 +81,7 @@ fTestSetupEnv()
         exit 1
     fi
 
-    HOSTNAME=testserver
+    HOSTNAME=${HOSTNAME:-testserver}
 
     cTestDestDir=$gpTest/../..
     cd $cTestDestDir >/dev/null 2>&1

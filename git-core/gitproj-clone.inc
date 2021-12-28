@@ -206,7 +206,7 @@ fCloneCheckProjConfig()
     git add $cConfigHost
 
     return 0
-} # fCloneCreateProjConfig
+} # fCloneCheckProjConfig
 
 # --------------------
 fCloneMkGitDir()
@@ -221,19 +221,29 @@ fCloneMkGitDir()
         fLog -p info -m "git clone $gpRemoteGitDir" -l $tSrc:$LINENO
         fError -i -m "The above command should have worked." -l $tSrc:$LINENO
     fi
+    gpProjName=${gpRemoteGitDir##*/}
+    gpProjName=${gpProjName%.git}
     gpLocalTopDir=$PWD/$gpProjName
 
+    # Checkout some expected branches
     cd $gpLocalTopDir >/dev/null 2>&1
-    tFound=0
     for gpBranch in develop main master; do
-        if git checkout $gpBranch; then
+        git checkout $gpBranch >/dev/null 2>&1
+    done
+
+    # Set to the "best" default branch
+    tFound=0
+    git checkout develop >/dev/null 2>&1
+    for gpBranch in develop main master; do
+        if git checkout $gpBranch >/dev/null 2>&1; then
 	    tFound=1
 	    break
 	fi
     done
+    
     gpBranch=$($cGetCurBranch)
     if [ $tFound -eq 0 ]; then
-	fLog -p warning -m "Unexpected branch: $gpBranch" -l $tSrc:$LINENO
+	fLog -p warning -m "Unexpected default branch: $gpBranch" -l $tSrc:$LINENO
     fi    
 
     if [ ! -f .gitignore ]; then
