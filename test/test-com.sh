@@ -759,13 +759,49 @@ testComSelect()
 } # testComSelect
 
 # --------------------------------
+testComYesNo()
+{
+    local tResult
+
+    gpYesNo="Yes"
+    fComYesNo "Continue" 2>&1
+    assertTrue $LINENO $?
+    assertEquals $LINENO "Yes" "$gResponse"
+
+    gpYesNo="No"
+    fComYesNo "Continue" 2>&1
+    assertFalse $LINENO $?
+    assertEquals $LINENO "No" "$gResponse"
+
+    gpYesNo=""
+    
+    fComYesNo "Continue" >/dev/null 2>&1 < <(echo yes)
+    assertTrue $LINENO $?
+    assertEquals $LINENO "Yes" $gResponse
+
+    tResult=$(fComYesNo "Continue" 2>&1 < <(echo Yes))
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Continue [y/n]?"
+
+    fComYesNo "Continue" >/dev/null 2>&1 < <(echo no)
+    assertFalse $LINENO $?
+    assertEquals $LINENO "No" $gResponse
+
+    fComYesNo "Continue" >/dev/null 2>&1 < <(echo xx)
+    assertFalse $LINENO $?
+    assertEquals $LINENO "No" $gResponse
+    
+    return 0
+} # testComYesNo
+
+# --------------------------------
 NAtestComGit()
 {
     local tResult
 
     gpVerbose=2
     tResult=$(fComGit ????)
-    
+
 } # testComGit
 
 # ========================================

@@ -125,7 +125,7 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     cd $cTestDestDir >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    tar -xzf $gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
     cd - >/dev/null 2>&1
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
@@ -486,7 +486,7 @@ testCloneMkGitDirFail()
 } # testCloneMkGitDirFail
 
 # --------------------------------
-testCloneMkGitDir()
+testCloneMkGitDirPass()
 {
     local tResult
     local tStatus
@@ -512,7 +512,8 @@ testCloneMkGitDir()
 
     cd $HOME/project >/dev/null 2>&1
     fCloneMkGitDir >/dev/null 2>&1
-    assertTrue $LINENO "$?"
+    tStatus=$?
+    assertTrue $LINENO "$tStatus"
     assertEquals $LINENO  george $gpProjName
     assertEquals $LINENO  $HOME/project/george $gpLocalTopDir
     assertTrue "$LINENO $HOME/project/$gpProjName" "[ -d $HOME/project/$gpProjName ]"
@@ -538,196 +539,169 @@ testCloneMkGitDir()
     assertTrue $LINENO "$?"
     assertNotContains "$LINENO $tResult" "$tResult" "not-defined"
 
+    tResult=$(git config --get --includes gitproj.config.remote-status)
+    assertTrue $LINENO "$?"
+    assertNotContains "$LINENO $tResult" "$tResult" "not-defined"
+
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
+        echo -e "\tCapture state of project after CloneMkGitDir."
+        echo -e "\tRestore test-env_Home3AfterCloneMkGit.tgz relative to env cDatHome3=$cDatHome3"
+        cd $cDatHome3 >/dev/null 2>&1
+        echo -en "\t"
+        tar -cvzf $gpTest/test-env_Home3AfterCloneMkGit.tgz .
+        echo
+    fi
+
     return 0
-} # testCloneMkGitDir
+} # testCloneMkGitDirPass
 
 # --------------------------------
-testCloneMkRawDir()
+testCloneMkRawDirFail()
 {
     local tResult
-return 1
 
-    gpLocalTopDir=$HOME/$cDatProj1
+    # Assumes setUp has run
+    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # 				cTestDestDir=$gpTest/../..
+    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    # HOSTNAME=testserver2
+    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpProjName=george
+
+    cd $cDatHome3 >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+
+    gpLocalTopDir=$HOME/project/george
     cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneFirstTimeSet
 
-    gpProjName=${cDatProj1##*/}
-    gpLocalRawDir=$gpLocalTopDir/raw
-    gpGitFlow="true"
-    gpMaxSize="1k"
-    gpAutoMove=true
-    gpAuto=0
+    export gpVerbose=2
+    mkdir -p raw/src/final/george.mp4
+    chmod -R a-wx raw 2>/dev/null
+    tResult=$(fCloneMkRawDir 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    chmod -R ug+wx raw 2>/dev/null
+    assertContains "$LINENO $tResult" "$tResult" "already exists"
+    assertContains "$LINENO $tResult" "$tResult" "Run:"
+    assertContains "$LINENO $tResult" "$tResult" "There may be a problem with this rsync"
+    ##assertContains "$LINENO tResult=$tResult" "$tResult" "Uncomment to check"
+
+    return 0
+} # testCloneMkRawDirFail
+
+# --------------------------------
+testCloneMkRawDirPass()
+{
+    local tResult
+
+    # Assumes setUp has run
+    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # 				cTestDestDir=$gpTest/../..
+    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    # HOSTNAME=testserver2
+    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpProjName=george
+
+    # Setup
+    cd $cDatHome3 >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    gpLocalTopDir=$HOME/project/george
+    gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=2
-
+    
     cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fCloneMkRaw 2>&1)
-    assertTrue $LINENO $?
-    assertTrue $LINENO "[ -d $gpLocalRawDir ]"
+    tResult=$(fCloneMkRawDir 2>&1)
+    assertTrue "$LINENO" "$?"
     assertTrue $LINENO "[ -f $gpLocalRawDir/README.txt ]"
-    assertTrue $LINENO "$(
-        grep -q 'Do NOT remove these files' $gpLocalRawDir/README.txt
-        echo $?
-    )"
     assertContains "$LINENO $tResult" "$tResult" "mkdir"
-    assertContains "$LINENO $tResult" "$tResult" "Create: raw/README.txt"
-
-    gpUnitDebug=0
-    fTestDebug "$tResult"
+    assertTrue "$LINENO" "[ -f $gpLocalRawDir/src/final/george.mp4 ]"
+    ##assertContains "$LINENO tResult=$tResult" "$tResult" "Uncomment to check"
 
     return 0
-} # testCloneMkRawDir
+} # testCloneMkRawDirPass
 
 # --------------------------------
-testCloneMkHostConfig()
+testCloneUpdateHostConfig()
 {
-# TBD
-return 1
-    local tSrc=${BASH_SOURCE##*/}
     local tResult
 
-    if [ ! -f $gpTest/test-env_HomeAfterBMove.tgz ]; then
-        fail "Missing test-env_HomeAfterBMove.tgz [$tSrc:$LINENO]"
-        return 1
-    fi
-    if [ ! -f $gpTest/test-env_ProjAfterGClone.tgz ]; then
-        fail "Missing test-env_ProjAfterGClone.tgz [$tSrc:$LINENO]"
-        return 1
-    fi
+    # Assumes setUp has run
+    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # 				cTestDestDir=$gpTest/../..
+    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    # HOSTNAME=testserver2
+    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpProjName=george
 
-    gpLocalTopDir=$HOME/$cDatProj1
+    # Setup
+    cd $cDatHome3 >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    gpLocalTopDir=$HOME/project/george
+    gpLocalRawDir=$HOME/project/george/raw
+    gpVerbose=2
+    
     cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneFirstTimeSet
-
-    cd $HOME >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
-    cd $gpTest
-
-    cd $HOME/project >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_ProjAfterGClone.tgz
-    cd $gpTest
-
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="10k"
-    gpAutoMove=true
-    gpAuto=0
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    assertFalse $LINENO "[ -f $cConfigLocal ]"
-    assertFalse $LINENO "[ -f $cConfigHost ]"
-    assertFalse $LINENO "$(grep -q gitproj.config .git/config >/dev/null 2>&1); echo $?)"
-
-    tResult=$(fCloneMkLocalConfig 2>&1)
-    assertTrue $LINENO "$?"
-    assertTrue $LINENO "[ -f $cConfigLocal ]"
+    tResult=$(fCloneUpdateHostConfig 2>&1)
+    assertTrue $LINENO $?
     assertTrue $LINENO "[ -f $cConfigHost ]"
 
-    tResult=$(git config --local --list --show-origin --includes 2>&1)
+    tResult=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
+    assertContains "$LINENO $tResult" "$tResult" "../$cConfigHost"
+
+    tResult=$(fComGetConfig -H -k "gitproj.config.remote-raw-dir")
+    assertContains "$LINENO $tResult" "$gpRemoteGitDir"
+
+    tResult=$(fCloneUpdateHostConfig 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "Weird, include.path is alrady set"
+
+    tResult=$(fComGetConfig -H -k "gitproj.config.remote-status")
     assertTrue $LINENO "$?"
-    assertContains "$LINENO $tResult" "include.path=../$cConfigHost"
-
-} # testCloneMkLocalConfig
-
-# --------------------------------
-testCloneSaveVars()
-{
-return 1
-    local tSrc=${BASH_SOURCE##*/}
-    local tResult
-    local tFile
-    local tS
-
-    if [ ! -f $gpTest/test-env_ProjAfterGClone.tgz ]; then
-        fail "Missing test-env_ProjAfterGClone.tgz [$tSrc:$LINENO]"
-        return 1
-    fi
-    cd $HOME/project >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_ProjAfterGClone.tgz
-    cd $gpTest
-
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fCloneMkLocalConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue $LINENO "[ -f $cConfigLocal ]"
-    assertTrue $LINENO "[ -f $cConfigHost ]"
-
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="10k"
-    gpAutoMove=true
-    gpAuto=0
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fCloneSaveVarsToConfigs 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-
-    # TBD refactor to use for loops with hash array maps?
-    # cMapConf[gpBin]=gitproj.config.bin
-    # generated from cMapConf: cMapVar[gitproj.config.bin]=gpBin
-    # cMapFile[gitproj.config.bin]=global
-    # cMapFile[gitproj.config.proj-name]=local
-    # if cMapFile[key] is undefined, then assume it is global and local
-
-    tFile=~/.gitproj.config.global
-    tS=gitproj.config
-    fTestCheckConfig2Var $tFile $tS.proj-status gpProjStatus ${gpProjStatus} $LINENO
-    fTestCheckConfig2Var $tFile $tS.bin gpBin "${gBin#$gpLocalTopDir/}" $LINENO
-    fTestCheckConfig2Var $tFile $tS.doc gpDoc "${gDoc#$gpLocalTopDir/}" $LINENO
-    fTestCheckConfig2Var $tFile $tS.test gpTest "${gTest#$gpLocalTopDir/}" $LINENO
-    fTestCheckConfig2Var $tFile $tS.facility gpFacility user $LINENO
-    fTestCheckConfig2Var $tFile $tS.syslog gpSysLog true $LINENO
-
-    for tFile in $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
-        tS=gitproj.config
-        fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined $LINENO
-        fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined $LINENO
-        fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName $LINENO
-    done
-
-    for tFile in ~/.gitproj.config.global $gpLocalTopDir/$cConfigLocal; do
-        tS=gitproj.config
-        fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true $LINENO
-        tS=gitproj.hook
-        fTestCheckConfig2Var $tFile $tS.auto-move gpAutoMove true $LINENO
-        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
-        fTestCheckConfig2Var $tFile $tS.check-file-names gpCheckFileNames true $LINENO
-        fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
-        fTestCheckConfig2Var $tFile $tS.pre-commit-enabled gpPreCommitEnabled true $LINENO
-        fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit $LINENO
-    done
+    assertNotContains "$LINENO $tResult" "$tResult" "not-defined"
 
     return 0
-} # testCloneSaveVars
+} # testCloneUpdateHostConfig
 
 # --------------------------------
 testCloneSummary()
 {
     local tResult
     local tStatus
-return 1
 
-    gpLocalTopDir=$HOME/$cDatProj1
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="10k"
+    # Setup
+    cd $cDatHome3 >/dev/null 2>&1
+    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    gpLocalTopDir=$HOME/project/george
+    gpLocalRawDir=$HOME/project/george/raw
+    gpVerbose=2
+    gpYesNo=Yes
 
-    tResult=$(fCloneSummary 2>&1 < <(echo -e "foo\nn"))
-    assertFalse $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
-    assertContains "$LINENO $tResult" "$tResult" "Invalid answer:"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fCloneMkRawDir 2>&1)
+    assertTrue "$LINENO $tResult" $?
+    tResult=$(fCloneUpdateHostConfig 2>&1)
+    assertTrue "$LINENO $tResult" $?
 
-    gpUnitDebug=0
-    fTestDebug "No result = $tResult"
+    gpYesNo=No
+    tResult=$(fCloneSummary 2>&1)
+    assertFalse "$LINENO $tResult" $?
+    assertContains "$LINENO $tResult" "$tResult" "Not continuing"
 
-    tResult=$(fCloneSummary 2>&1 < <(echo -e "y"))
-    assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Continue with creating"
-
-    gpUnitDebug=0
-    fTestDebug "Yes result = $tResult"
+    gpYesNo=Yes
+    tResult=$(fCloneSummary 2>&1)
+    assertTrue "$LINENO $tResult" $?
+    assertContains "$LINENO $tResult" "$tResult" "Committing changes"
+    #assertContains "$LINENO $tResult" "$tResult" "Added .gitproj.config.testserver2"
+    assertContains "$LINENO $tResult" "$tResult" "nothing to commit"
+    assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0
 } # testCloneSummary
@@ -735,7 +709,8 @@ return 1
 # --------------------------------
 testCloneFromRemoteDir()
 {
-return 1
+fail "$LINENO TBD"
+return 0
     local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tStatus
@@ -772,7 +747,8 @@ return 1
 # --------------------------------
 testGetProjCloneCLI()
 {
-return 1
+fail "$LINENO TBD"
+return 0
     startSkipping
     fail "TBD"
     return 0
@@ -780,62 +756,6 @@ return 1
     cd $HOME/$cDatProj1
     $gpBin/git-proj-clone local -a
 } # testGetProjCloneCLI
-
-# --------------------------------
-NAtestCloneGetGitFlow()
-{
-return 1
-    local tResult
-    local tStatus
-
-    tResult=$(fCloneGetGitFlow 2>&1 < <(echo -e "\nquit"))
-    assertFalse "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    fCloneGetGitFlow >/dev/null 2>&1 < <(echo -e "yes")
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "true" "$gpGitFlow"
-
-    fCloneGetGitFlow >/dev/null 2>&1 < <(echo -e "No")
-    assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "false" "$gpGitFlow"
-
-    gpGitFlowPkg=foo-bar
-    tResult=$(fCloneGetGitFlow 2>&1 < <(echo -e "\n"))
-    assertTrue "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "git-flow is not installed"
-
-    return 0
-} # testCloneGetGitFlow
-
-# --------------------------------
-NAtestCloneMkGitFlow()
-{
-return 1
-    local tResult
-
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    fCloneFirstTimeSet
-
-    gpProjName=${cDatProj1##*/}
-    gpGitFlow="true"
-    gpMaxSize="1k"
-    gpAutoMove=true
-    gpAuto=0
-
-    tResult=$(fCloneMkGitFlow 2>&1)
-    assertTrue $LINENO $?
-    assertEquals $LINENO "main" "$(git config --get --global gitflow.branch.main)"
-    assertEquals $LINENO "develop" "$(git config --get --global gitflow.branch.develop)"
-    assertEquals $LINENO "feature/" "$(git config --get --global gitflow.prefix.feature)"
-    assertEquals $LINENO "bug/" "$(git config --get --global gitflow.prefix.bugfix)"
-    assertEquals $LINENO "release/" "$(git config --get --global gitflow.prefix.release)"
-    assertEquals $LINENO "hotfix/" "$(git config --get --global gitflow.prefix.hotfix)"
-    assertEquals $LINENO "support/" "$(git config --get --global gitflow.prefix.support)"
-
-    return 0
-} # testCloneMkGitFlow
 
 # ========================================
 # This should be the last defined function

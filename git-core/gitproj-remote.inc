@@ -393,17 +393,6 @@ EOF
 } # fRemoteReport
 
 # --------------------
-NAfComGit()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-    fLog -p info -m "git $@" -l $tSrc:$LINENO
-    if ! git "$@"; then
-        fError -i -m "Fix this then try again." -l $tSrc:$LINENO
-    fi
-} # fComGit
-
-# --------------------
 fRemoteCommit()
 {
     cd $gpLocalTopDir >/dev/null 2>&1

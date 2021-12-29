@@ -19,10 +19,10 @@ fUsage()
 
 =head1 DESCRIPTION
 
-    Verify origin is set to a path that exists.
     Verify gitproj.config.remote-raw-dir is defined
+    Verify origin is set to a path that exists (if mounted)
     Verify gitproj.config.remote-raw-dir exists (if mounted)
-    Give a "diff" of the raw files, local vs remote (if mounted)
+    Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
     Do a "git status"
 
 Check install related health

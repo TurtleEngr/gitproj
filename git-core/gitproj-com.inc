@@ -572,10 +572,17 @@ fComSelect()
     local tSrc=${BASH_SOURCE##*/}
     local tResponse
     local tStatus=1
+    local tMaxLoop=30
     export gResponse
 
     # Loop until a valid selection, or QUIT or OTHER
     select tResponse in QUIT HELP $pDirList; do
+        let --tMaxLoop
+	if [ $tMaxLoop -le 0 ]; then
+            fLog -p warning -m "Too many responses." -l $tSrc:$LINENO
+	    tResponse="QUIT"
+	    break
+	fi
         echo
         case $tResponse in
             QUIT)
@@ -603,6 +610,48 @@ fComSelect()
     gResponse=$tResponse
     return $tStatus
 } # fComSelect
+
+# ------------------
+fComYesNo()
+{
+    local pPrompt="$1"
+    local tSrc=${BASH_SOURCE##*/}
+    declare -l tResult
+
+    if [ "$gpYesNo" = "Yes" ]; then
+        gResponse="Yes"
+	return 0
+    fi
+    if [ "$gpYesNo" = "No" ]; then
+        gResponse="No"
+	return 1
+    fi
+
+    echo -n "$pPrompt [y/n]? "
+    read -r tResult
+    tResult=${tResult%${tResult#[a-z]}}
+    if [ "$tResult" = "y" ]; then
+        gResponse="Yes"
+	return 0
+    fi
+    gResponse="No"
+    return 1
+=internal-pod
+
+=internal-head3 fComYesNo pPrompt
+
+If gpYesNo = "Yes", set gResponse to "y", and return 0.
+
+If gpYesNo = "No", set gResponse to "n", and return 1.
+
+If gpYesNo is not set, output the pPrompt, then "read" the response.
+
+If the response begins with a "y", then that is the same as gpYesNo = "Yes"
+
+If the response is not a "y", then that is the same as gpYesNo = "No"
+
+=internal-cut
+} # fComYesNo
 
 # ------------------
 fComFmtLog()

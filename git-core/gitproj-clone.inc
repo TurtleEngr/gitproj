@@ -15,8 +15,6 @@ export gpAuto gpAutoMove gpBin gpBranch gpCheckFileNames \
 fCloneGettingStarted()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
-    local tResult
 
     cat <<EOF
 
@@ -27,34 +25,11 @@ Project Name:   $gpProjName
 Project Dir:    $PWD/$gpProjName
 
 EOF
-    # TBD: convert to using fComSelect or com yes/no. Remove dup. msgs.
-    if [ "$gpYesNo" = "Yes" ]; then
-        fLog -p debug-2 -m "Cloning: $gpProjName" -l $tSrc:$LINENO
-        return 0
-    fi
-    if [ "$gpYesNo" = "No" ]; then
+    if ! fComYesNo "Continue"; then
         fLog -p warning -m "Not continuing." -l $tSrc:$LINENO
         exit 1
     fi
-    while [ $tMaxLoop -gt 0 ]; do
-        let --tMaxLoop
-        echo -n "Continue [y/n]? "
-        read -r tResult
-        tResult=${tResult%${tResult#[a-z]}}
-        if [ "$tResult" = "y" ]; then
-    	    fLog -p debug-2 -m "Cloning: $gpProjName" -l $tSrc:$LINENO
-            return 0
-        fi
-        if [ "$tResult" = "n" ]; then
-            fLog -p warning -m "Not continuing." -l $tSrc:$LINENO
-            exit 1
-        fi
-        echo "$tResult is not valid."
-    done
-    if [ $tMaxLoop -eq 0 ]; then
-        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
-    fi
-
+    fLog -p debug-2 -m "Cloning: $gpProjName" -l $tSrc:$LINENO
     return 0
 } #fCloneGettingStarted
 
@@ -215,6 +190,8 @@ fCloneMkGitDir()
     local tStatus
     local tFound
 
+    # Assumes you are cd'd to the dir you want to clone into.
+
     git clone $gpRemoteGitDir
     if [ $? -ne 0 ]; then
         gpVerbose=2
@@ -270,96 +247,53 @@ fCloneMkRawDir()
     local tSrc=${BASH_SOURCE##*/}
     local tOpt="-azC"
     local tVerbose=""
+    local tStatus
+    local tCmd
 
     gpLocalRawDir=$gpLocalTopDir/raw
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    fLog -p info -m "mkdir $gpLocalRawDir" -l $tSrc:$LINENO
-    mkdir $gpLocalRawDir
+    if [ -d $gpLocalRawDir ]; then
+        fLog -i -p warning -m "$gpLocalRawDir already exists." -l $tSrc:$LINENO
+    else
+        fLog -p info -m "mkdir $gpLocalRawDir" -l $tSrc:$LINENO
+        mkdir $gpLocalRawDir
+    fi
 
     if [ $gpVerbose -ge 1 ]; then
-        tVervose=-v
+        tVerbose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
-        tVervose=-viP
+        tVerbose=-viP
     fi
-    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalTopDir/raw"
-    'rsync' $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalRawDir
-    if [ $? -ne 0 ]; then
-        fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
+    tCmd="/usr/bin/rsync $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalRawDir"
+    fLog -p notice -m "Run: $tCmd"
+    $tCmd
+    tStatus=$?
+    if [ $tStatus -ne 0 ]; then
+        fLog -p warning -m "There may be a problem with this rsync:" -l $tSrc:$LINENO
+        fLog -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
-    return 0
+    return $tStatus
 } # fCloneMkRawDir
-
-# --------------------
-NAfCloneSaveVars()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tFile
-    local tS
-
-    gErr=0
-
-    tFile=$HOME/$cConfigGlobal
-    tS=gitproj.config
-    fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
-    fComSaveVar2Config $tFile $tS.bin gpBin
-    fComSaveVar2Config $tFile $tS.doc gpDoc
-    fComSaveVar2Config $tFile $tS.test gpTest
-    fComSaveVar2Config $tFile $tS.facility gpFacility
-    fComSaveVar2Config $tFile $tS.syslog gpSysLog
-
-    for tFile in \
-        $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
-        tS=gitproj.config
-        fComSaveVar2Config $tFile $tS.ver gpVer
-        fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
-        fComSaveVar2Config $tFile $tS.remote-status gpRemoteStatus
-        fComSaveVar2Config $tFile $tS.proj-name gpProjName
-    done
-
-    for tFile in $HOME/$cConfigGlobal \
-        $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
-        tS=gitproj.config
-        fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
-        tS=gitproj.hook
-        fComSaveVar2Config $tFile $tS.auto-move gpAutoMove
-        fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
-        fComSaveVar2Config $tFile $tS.check-file-names gpCheckFileNames
-        fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
-        fComSaveVar2Config $tFile $tS.pre-commit-enabled gpPreCommitEnabled
-        fComSaveVar2Config $tFile $tS.source gpHookSource
-    done
-
-    if [ $gErr -eq 0 ]; then
-        fLog -p info -m "Save local configs" -l $tSrc:$LINENO
-        git add .gitproj.config.*
-        git commit -am "Save gitproj.config"
-    fi
-
-    return $gErr
-} # fCloneSaveVars
 
 # --------------------
 fCloneUpdateHostConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteGitDir
+    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
 
     tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
     if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, $cConfigHost is already included" -l $tSrc:$LINENO
-        return 0
+        fLog -i -p warning -m "Weird, include.path is alrady set." -l $tSrc:$LINENO
     fi
 
     fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
     fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
 
-#? fCloneSaveVars
+    git add $cConfigHost
 
     return 0
 } # fCloneUpdateHostConfig
@@ -367,52 +301,76 @@ fCloneUpdateHostConfig()
 # --------------------
 fCloneSummary()
 {
-# TBD
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
-    declare -l tResult
+    local tOrigin
+
+    function flExists()
+    {
+        local tFile=$1
+	if [ -e $tFile ]; then
+	    echo "found"
+	    return 0
+	fi
+	echo "not-found"
+	return 1
+    } # flExists
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    gpBranch=$($cGetCurBranch)
+    tOrigin=$($cGetOrigin)
 
     cat <<EOF
 
 Summary
-      (auto mode)  $gpYesNo
-        (verbose)  $gpVerbose
-          (debug)  $gpDebug
-         (exists)  HOME/.gitconfig
-         (exists)  HOME/$cConfigGlobal
-         (exists)  HOME/.gitignore
-         (exists)  $gpProjName/$cConfigLocal
-         (exists)  $gpProjName/$cConfigHost
-         (exists)  $gpProjName/.gitignore	#?
-         (branch)  $gpBranch
- (remote-git-dir)  $gpRemoteGitDir
-  (local-raw-dir)  $gpLocalRawDir
+    (auto mode)  $gpYesNo
+    (verbose)  $gpVerbose
+    (debug)  $gpDebug
+    ($(flExists $HOME/.gitconfig))  HOME/.gitconfig
+    ($(flExists $HOME/$cConfigGlobal))  HOME/$cConfigGlobal
+    ($(flExists $HOME/.gitignore))  HOME/.gitignore
+    ($(flExists $cConfigLocal))  $gpProjName/$cConfigLocal
+    ($(flExists $cConfigHost))  $gpProjName/$cConfigHost
+    ($(flExists .gitignore))  $gpProjName/.gitignore
+    (branch)  $gpBranch
+    (remote-git-dir $(flExists $tOrigin))  $tOrigin
+    (local-raw-dir $(flExists $gpLocalRawDir))  $gpLocalRawDir
 
+Global Config ~/$cConfigGlobal
 [gitproj "config"]
-     proj-status = $gpProjStatus
-    local-status = $gpLocalStatus
-   remote-status = $gpRemoteStatus
-             ver = $gpVer
-          syslog = $gpSysLog
-        facility = $gpFacility
-             bin = $gpBin
-             doc = $gpDoc
-       proj-name = $gpProjName
-    git-flow-pkg = $gpGitFlowPkg
-(remoge-raw-dir) = $gpRemoteRawDir
+    proj-status = $(fComGetConfig -k "gitproj.config.proj-status")
+    syslog = $(fComGetConfig -k "gitproj.config.syslog")
+    facility = $(fComGetConfig -k "gitproj.config.facility")
+    bin = $(fComGetConfig -k "gitproj.config.bin")
+    doc = $(fComGetConfig -k "gitproj.config.doc")
+    test = $(fComGetConfig -k "gitproj.config.test")
 
+Local Config $gpProjName/$cConfigHost
+[gitproj "config"]
+    local-status = $(fComGetConfig -k "gitproj.config.local-status")
+    remote-status = $(fComGetConfig -k "gitproj.config.remote-status")
+    ver = $(fComGetConfig -k "gitproj.config.ver")
+    proj-name = $(fComGetConfig -k "gitproj.config.proj-name")
+    git-flow-pkg = $(fComGetConfig -k "gitproj.config.git-flow-pkg")
+    remote-raw-dir = $(fComGetConfig -k "gitproj.config.remote-raw-dir")
+    remote-min-size = $(fComGetConfig -k "gitproj.config.remote-min-size")
 [gitproj "hook"]
-                source = $gpHookSource
-    pre-commit-enabled = $gpPreCommitEnabled=true
-      check-file-names = $gpCheckFileNames=true
-   check-for-big-files = $gpCheckForBigFiles=true
-binary-file-size-limit = $gpMaxSize
-             auto-move = $gpAutoMove
+    source = $(fComGetConfig -k "gitproj.hook.source")
+    pre-commit-enabled = $(fComGetConfig -k "gitproj.hook.pre-commit-enabled")
+    check-file-names = $(fComGetConfig -k "gitproj.hook.check-file-names")
+    check-for-big-files = $(fComGetConfig -k "gitproj.hook.check-for-big-files")
+    binary-file-size-limit = $(fComGetConfig -k "gitproj.hook.binary-file-size-limit")
+    auto-move = $(fComGetConfig -k "gitproj.hook.auto-move")
 
 Modified files:
 $(git status)
 
 EOF
+    if ! fComYesNo "Continue (commit the changes)"; then
+        fLog -p warning -m "Not continuing." -l $tSrc:$LINENO
+        return 1
+    fi
+    fLog -p notice -m "Committing changes" -l $tSrc:$LINENO
+    git commit -am "Updated $cConfigHost"
     return 0
 } # fCloneSummary
 
@@ -425,11 +383,9 @@ fCloneFromRemoteDir()
     fCloneGettingStarted
     fCloneValidRemoteDir
     fCloneMkGitDir
-    fCloneMkRaw
+    fCloneMkRawDir
     fCloneUpdateHostConfig
- ##fCloneSaveVars
     fCloneSummary
-    git commit -am "Added $cConfigHost"
 
     cat <<EOF | fComFmt
 
@@ -437,80 +393,6 @@ fCloneFromRemoteDir()
 EOF
     return 0
 } # fCloneFromRemoteDir
-
-# --------------------
-NAfCloneGetGitFlow()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
-    declare -l tResult
-
-    fComCheckPkg $gpGitFlowPkg
-    if [ $? -ne 0 ]; then
-        fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
-        gpGitFlow="false"
-        return 0
-    fi
-    if [ $gpAuto -ne 0 ]; then
-        return 0
-    fi
-
-    while [ $tMaxLoop -gt 0 ]; do
-        let --tMaxLoop
-
-        echo -n "Setup git-flow (-f) [y/n/quit]? "
-        read -r tResult
-        tResult=${tResult%${tResult#[a-z]}}
-        if [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
-        if [ "$tResult" = "y" ]; then
-            gpGitFlow="true"
-            break
-        fi
-        if [ "$tResult" = "n" ]; then
-            gpGitFlow="false"
-            break
-        fi
-    done
-    if [ $tMaxLoop -eq 0 ]; then
-        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
-    fi
-
-    return 0
-} # fCloneGetGitFlow
-
-# --------------------
-NAfCloneMkGitFlow()
-{
-# TBD: is this needed?
-    local tSrc=${BASH_SOURCE##*/}
-
-    if [ "$gpGitFlow" = "false" ]; then
-        return 0
-    fi
-    if ! fComCheckPkg git-flow; then
-        fError -n -m "git-flow is not installed" -l $tSrc:$LINENO
-        return 1
-    fi
-    fLog -p info -m "git flow init" -l $tSrc:$LINENO
-    git flow init -d
-
-    # Define the default prefixes
-
-    fComSetConfig -g -k gitflow.branch.main -v main
-    fComSetConfig -g -k gitflow.branch.master -v main
-    fComSetConfig -g -k gitflow.branch.develop -v develop
-
-    fComSetConfig -g -k gitflow.prefix.feature -v feature/
-    fComSetConfig -g -k gitflow.prefix.bugfix -v bug/
-    fComSetConfig -g -k gitflow.prefix.release -v release/
-    fComSetConfig -g -k gitflow.prefix.hotfix -v hotfix/
-    fComSetConfig -g -k gitflow.prefix.support -v support/
-
-    return 0
-} # fCloneMkGitFlow
 
 # ========================================
 export tSrc=${BASH_SOURCE##*/}

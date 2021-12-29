@@ -583,6 +583,7 @@ testRemoteCreateRemoteGit()
 {
     local tResult
     local tTopDir
+    local tStatus
 
     gpVerbose=2
     gpAuto=1
@@ -617,13 +618,24 @@ testRemoteCreateRemoteGit()
     cd $tTopDir >/dev/null 2>&1
     chmod ug+w $gpMountDir
     tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
+    tStatus=$?
+    assertTrue "$LINENO $tResult" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
     assertContains "$LINENO $tResult" "$tResult" "$gpMountDir/$gpProjName.git"
     assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and that"
     #assertNotContains "$LINENO UPSTREAM $tResult" "$tResult" "but the upstream is gone"
     #assertContains "$LINENO $tResult" "$tResult" "xxx"
+
+    # ----------
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
+        echo -e "\tCapture state of test env after fRemoteReport is run."
+        echo -e "\tRestore test-env_HomeAfterRemoteReport.tgz relative to env cTestDestDir"
+        cd $cTestDestDir >/dev/null 2>&1
+        echo -en "\t"
+        tar -cvzf $gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz test
+        echo
+    fi
 
     return 0
 } # testRemoteCreateRemoteGit
