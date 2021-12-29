@@ -657,7 +657,7 @@ testCloneUpdateHostConfig()
     assertContains "$LINENO $tResult" "$tResult" "../$cConfigHost"
 
     tResult=$(fComGetConfig -H -k "gitproj.config.remote-raw-dir")
-    assertContains "$LINENO $tResult" "$gpRemoteGitDir"
+    assertContains "$LINENO $tResult" $tResult "$gpRemoteRawDir"
 
     tResult=$(fCloneUpdateHostConfig 2>&1)
     assertTrue $LINENO $?
@@ -701,7 +701,7 @@ testCloneSummary()
     assertContains "$LINENO $tResult" "$tResult" "Committing changes"
     #assertContains "$LINENO $tResult" "$tResult" "Added .gitproj.config.testserver2"
     assertContains "$LINENO $tResult" "$tResult" "nothing to commit"
-    assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0
 } # testCloneSummary
@@ -709,6 +709,7 @@ testCloneSummary()
 # --------------------------------
 testCloneFromRemoteDir()
 {
+startSkipping
 fail "$LINENO TBD"
 return 0
     local tSrc=${BASH_SOURCE##*/}
@@ -747,11 +748,9 @@ return 0
 # --------------------------------
 testGetProjCloneCLI()
 {
+startSkipping
 fail "$LINENO TBD"
 return 0
-    startSkipping
-    fail "TBD"
-    return 0
 
     cd $HOME/$cDatProj1
     $gpBin/git-proj-clone local -a
