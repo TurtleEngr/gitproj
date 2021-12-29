@@ -126,6 +126,39 @@ EOF
 # Common Functions
 
 # --------------------
+fComIntroText()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    cat <<EOF | fComFmt
+
+You now have a local git repository project (${gpProjName}) setup at
+${gpLocalTopDir} with support for managing large binary files (larger
+than $gpMaxSize).
+
+~/gitconfig will include the ~/gitproj.config.global file, which will
+be used for defaults when you create other "git proj" projects on your
+system.  The variables will also be used, if are not overridden by the
+project's config definitions found at: $cConfigLocal and
+.gitproj.config.\$HOSTNAME You should version these files with your
+project.
+
+When you "clone" your git project on another system, a new
+.gitproj.config.\$HOSTNAME will be created, so that differences
+between systems are saved. For example, mount points and filesystem
+differences will be saved.
+
+For a more complete overview type: "git proj -h | more" For a quick list of
+the git proj subcommands just type: "git proj"
+
+Since all subcommands will ...
+
+[$tSrc:$LINENO]
+EOF
+    return 0
+} # fComIntroText
+
+# --------------------
 fComFirstTimeSet()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -361,37 +394,23 @@ EOF
 # --------------------------------
 fComInternalDoc()
 {
-    local pAll=$1
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ ".$pAll" = ".-a" ]; then
-        awk '
-	    /^=internal-pod/,/^=internal-cut/ {
-	        sub(/^=internal-/,"=");
-	    }
-	    {
-		print $0;
-	    }
-	'
-    else
-        awk '
-	    /^=internal-pod/,/^=internal-cut/ {
-		sub(/^=internal-/,"=");
-		print $0;
-	    }
-	'
-    fi
-    return
+    awk '
+        /^=internal-pod/,/^=internal-cut/ {
+            sub(/^=internal-/,"=");
+            print $0;
+        }
+    '
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head3 fComInternalDoc [-a]
+=internal-head3 fComInternalDoc
 
 This function collects all of the "internal-pod" documentation from
 stdin and it outputs to stdout.
-
-If -a option is givein, then ALL pod documentation is output.
 
 =internal-cut
 EOF
@@ -403,7 +422,6 @@ fComUsage()
     local pFileList=""
     local pStyle="long"
     local pInt=0
-    local pAll=""
     local pTitle="$gpCmdName Usage"
     local tSrc=${BASH_SOURCE##*/}
     local tProg=""
@@ -412,16 +430,12 @@ fComUsage()
     local OPTARG
     local tArg
 
-    while getopts :f:s:t:ia tArg; do
+    while getopts :f:s:t:i tArg; do
         case $tArg in
             f) pFileList="$pFileList $OPTARG" ;;
             s) pStyle="$OPTARG" ;;
             t) pTitle="$OPTARG" ;;
             i) pInt=1 ;;
-            a)
-                pInt=1
-                pAll='-a'
-                ;;
             :) fError -i -m "fComUsage: Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
             \?) fError -i "fComUsage: Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
         esac
@@ -457,10 +471,17 @@ fComUsage()
             ;;
         *)
             tProg=pod2text
+            fLog -p warning -m "Unknown style: $pStyle so usiing text" -l $tSrc:$LINENO
             ;;
     esac
 
     # Validate
+    if ! which $tProg >/dev/null 2>&1; then
+        fLog -p warning -m "Could not find $tProg so using text" -l $tSrc:$LINENO
+        tProg=pod2text
+    fi
+
+
     # shellcheck disable=SC2116
     pFileList="$(echo $pFileList)"
     if [ -z "$pFileList" ]; then
@@ -488,10 +509,10 @@ fComUsage()
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | fComInternalDoc $pAll | $tProg --title="$pTitle" | $tTidy
+            cat $pFileList | fComInternalDoc | $tProg --title="$pTitle" | $tTidy
         else
             # shellcheck disable=SC2002
-            cat $pFileList | fComInternalDoc $pAll | $tProg
+            cat $pFileList | fComInternalDoc | $tProg
         fi
     fi
 
@@ -518,8 +539,6 @@ fComUsage()
 =internal-item B<-t> - title for HTML style
 
 =internal-item B<-i> - internal doc only (see fComInternalDoc)
-
-=internal-item B<-a> - all docs: user and internal (see fComInternalDoc)
 
 =internal-back
 
@@ -578,11 +597,11 @@ fComSelect()
     # Loop until a valid selection, or QUIT or OTHER
     select tResponse in QUIT HELP $pDirList; do
         let --tMaxLoop
-	if [ $tMaxLoop -le 0 ]; then
+        if [ $tMaxLoop -le 0 ]; then
             fLog -p warning -m "Too many responses." -l $tSrc:$LINENO
-	    tResponse="QUIT"
-	    break
-	fi
+            tResponse="QUIT"
+            break
+        fi
         echo
         case $tResponse in
             QUIT)
@@ -620,11 +639,11 @@ fComYesNo()
 
     if [ "$gpYesNo" = "Yes" ]; then
         gResponse="Yes"
-	return 0
+        return 0
     fi
     if [ "$gpYesNo" = "No" ]; then
         gResponse="No"
-	return 1
+        return 1
     fi
 
     echo -n "$pPrompt [y/n]? "
@@ -632,7 +651,7 @@ fComYesNo()
     tResult=${tResult%${tResult#[a-z]}}
     if [ "$tResult" = "y" ]; then
         gResponse="Yes"
-	return 0
+        return 0
     fi
     gResponse="No"
     return 1
@@ -1131,9 +1150,9 @@ fComGetConfig()
         case $tArg in
             b) pType="--bool" ;;
             d) pDefault="${OPTARG}" ;;
-	    e) pExitOnError=1
-	       tExit=""
-	       ;;
+            e) pExitOnError=1
+               tExit=""
+               ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
             G) pScope="--file $HOME/$cConfigGlobal" ;;
@@ -1162,16 +1181,16 @@ fComGetConfig()
 
     if [ $pExitOnError -ne 0 ]; then
         if [ -z "$gGetConfigValue" ]; then
-	    fError -m "Unexpected: $pKey is not defined!" -l $tSrc:$LINENO
-	fi
-	
-	if [ -n "$pDefault" ] && [ "$gGetConfigValue" = "$pDefault" ]; then
-	    fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
-	fi
-	
-	if [ "$gGetConfigValue" = "TBD" ] || [ "$gGetConfigValue" = "not-defined" ]; then
-	    fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
-	fi
+            fError -m "Unexpected: $pKey is not defined!" -l $tSrc:$LINENO
+        fi
+        
+        if [ -n "$pDefault" ] && [ "$gGetConfigValue" = "$pDefault" ]; then
+            fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
+        fi
+        
+        if [ "$gGetConfigValue" = "TBD" ] || [ "$gGetConfigValue" = "not-defined" ]; then
+            fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
+        fi
     fi
 
     if [ -z "$gGetConfigValue" ] && [ -n "$pDefault" ]; then
@@ -1201,7 +1220,7 @@ fComGetConfig()
 =internal-head3 Synopsis
 
     fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
-    		  [-d pDefault] [-e] [-v pFilter]
+                  [-d pDefault] [-e] [-v pFilter]
 
 =internal-head3 Description
 
