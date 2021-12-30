@@ -144,8 +144,8 @@ while getopts :bnyhH:vx tArg; do
     case $tArg in
         # Script arguments
         b) tBranchFlag=1 ;;
-	n) gpYesNo=No ;;
-	y) gpYesNo=Yes ;;
+        n) gpYesNo=No ;;
+        y) gpYesNo=Yes ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

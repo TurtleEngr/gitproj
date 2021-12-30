@@ -137,13 +137,13 @@ setUp()
     # Add a file to local raw/ and remove a file from local raw/
     echo "Make a new file in bob dir" >raw/NewFile2.txt
     rm raw/src/raw/MOV001.mp4
-    
+
     # Add a file to local git, and change a file in local git
     echo "Add a file to git area, in bob dir" >doc/NewFileFromBob.txt
     git add doc/NewFileFromBob.txt >/dev/null 2>&1
     ##git status
     git commit -am Added >/dev/null 2>&1
-    
+
     # Push changes to remote ($gpRemoteRawDir)
     $gpBin/git-proj-push -b -y >/dev/null 2>&1
 
@@ -261,7 +261,7 @@ testPullGit()
     tResult=$(fPullGit 0 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertNotContains "$LINENO $tResult" "$tResult" "git pull origin develop"
-    
+
     tResult=$(fPullGit 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertNotContains "$LINENO $tResult" "$tResult" "git pull origin develop"
@@ -300,7 +300,7 @@ testPullFromOrigin()
     assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
     assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
-    # debug    
+    # debug
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
@@ -322,7 +322,7 @@ testGitProjPullCLI()
     assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
     assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
-    # debug    
+    # debug
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0

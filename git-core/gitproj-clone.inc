@@ -94,7 +94,7 @@ fCloneValidRemoteDir()
 fCloneCheckLocalConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
-    
+
     if [ -f $cConfigLocal ]; then
         return 0
     fi
@@ -127,7 +127,7 @@ fCloneCheckHostConfig()
         return 0
     fi
     fLog -p warning -m "Missing host file: $cConfigHost  It will be created for this new host" -l $tSrc:$LINENO
-    
+
     # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
     tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
     if [ -n "$tHost" ]; then
@@ -137,7 +137,7 @@ fCloneCheckHostConfig()
         fLog -p debug-2 -m "cp $cConfigLocal $cConfigHost" -l $tSrc:$LINENO
         cp $cConfigLocal $cConfigHost
     fi
-    
+
     # Adjust the host var values
     fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
 
@@ -152,7 +152,7 @@ fCloneCheckProjConfig()
     local tSrc=${BASH_SOURCE##*/}
     declare -a tHostList
     local tC
-    
+
     tHostList=(.gitproj.config.*)
     if [ "${tHostList[0]}" != ".gitproj.config.*" ]; then
         return 0
@@ -165,16 +165,16 @@ fCloneCheckProjConfig()
     cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal
     fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigHost"
     cp $gpDoc/config/${cConfigLocal#.} $cConfigHost
-    
+
     # Fix up the vars, making some assumptions.
     fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
     fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
 
     for tC in L H; do
         fComSetConfig -$tC -k "gitproj.config.local-status" -v "defined"
-    	fComSetConfig -$tC -k "gitproj.config.remote-status" -v "defined"
-    	fComSetConfig -$tC -k "gitproj.config.proj-name" -v "$gpProjName"
-    	fComSetConfig -$tC -k "gitproj.config.git-flow-pkg" -v "git-flow"
+        fComSetConfig -$tC -k "gitproj.config.remote-status" -v "defined"
+        fComSetConfig -$tC -k "gitproj.config.proj-name" -v "$gpProjName"
+        fComSetConfig -$tC -k "gitproj.config.git-flow-pkg" -v "git-flow"
     done
 
     git add $cConfigLocal
@@ -213,20 +213,20 @@ fCloneMkGitDir()
     git checkout develop >/dev/null 2>&1
     for gpBranch in develop main master; do
         if git checkout $gpBranch >/dev/null 2>&1; then
-	    tFound=1
-	    break
-	fi
+            tFound=1
+            break
+        fi
     done
-    
+
     gpBranch=$($cGetCurBranch)
     if [ $tFound -eq 0 ]; then
-	fLog -p warning -m "Unexpected default branch: $gpBranch" -l $tSrc:$LINENO
-    fi    
+        fLog -p warning -m "Unexpected default branch: $gpBranch" -l $tSrc:$LINENO
+    fi
 
     if [ ! -f .gitignore ]; then
         fLog -p warning -m "Missing .gitignore file. Adding one now." -l $tSrc:$LINENO
-    	cp $gpDoc/config/gitignore.default .gitignore
-	git add .gitignore
+        cp $gpDoc/config/gitignore.default .gitignore
+        git add .gitignore
     fi
 
     fCloneCheckProjConfig
@@ -308,12 +308,12 @@ fCloneSummary()
     function flExists()
     {
         local tFile=$1
-	if [ -e $tFile ]; then
-	    echo "found"
-	    return 0
-	fi
-	echo "not-found"
-	return 1
+        if [ -e $tFile ]; then
+            echo "found"
+            return 0
+        fi
+        echo "not-found"
+        return 1
     } # flExists
 
     cd $gpLocalTopDir >/dev/null 2>&1

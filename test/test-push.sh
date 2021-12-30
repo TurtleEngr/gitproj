@@ -160,7 +160,7 @@ tearDown()
 testComGetProjGlobals()
 {
     local tResult
-    
+
     cd $cDatHome >/dev/null 2>&1
     tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO $tResult" "$?"
@@ -195,7 +195,7 @@ testComIsRemoteMounted()
     local tResult
 
     fComGetProjGlobals >/dev/null 2>&1
-    
+
     tResult=$(fComIsRemoteMounted 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
@@ -203,8 +203,8 @@ testComIsRemoteMounted()
     tResult=$(fComIsRemoteMounted 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
-    mv $gpRemoteRawDir.sav $gpRemoteRawDir 
-    
+    mv $gpRemoteRawDir.sav $gpRemoteRawDir
+
     return 0
 } # testComIsRemoteMounted
 
@@ -263,7 +263,7 @@ testPushGit()
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
-    
+
     tResult=$(fPushGit 1 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
@@ -338,8 +338,8 @@ testGitProjPushCLI()
         rsync -a $cDatHome/ $cDatHome2
         rm -rf $cDatHome2/project/beach
         rm -rf $cDatHome2/project/paulb
-	cd $cTestDestDir >/dev/null 2>&1
-	echo -en "\t"
+        cd $cTestDestDir >/dev/null 2>&1
+        echo -en "\t"
         tar -cvzf $gpTest/test-env_Home2AfterPush.tgz test
         echo
     fi

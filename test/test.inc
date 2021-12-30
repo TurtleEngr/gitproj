@@ -59,7 +59,7 @@ EOF
 fTestSetupEnv()
 {
     local tSrc=${BASH_SOURCE##*/}
-    
+
     SHUNIT_COLOR=none
 
     gpBin=$gpTest/../git-core
@@ -88,30 +88,30 @@ fTestSetupEnv()
 
     # These are found in the unpacked $cTestFiles
     cDatHome=$cTestDestDir/test/root/home/john
-	# Home dir for most tests
+    # Home dir for most tests
     cDatProj1=project/george
-	# Has some binary files, main proj will be created here
+    # Has some binary files, main proj will be created here
     cDatProj2=project/paulb
-	# Has some binary files
+    # Has some binary files
     cDatProj3=project/beach
-	# Already has a git repo in it, but not a proj git
+    # Already has a git repo in it, but not a proj git
     cDatHome2=$cTestDestDir/test/root/home/bob
-	# created by test-pull.sh, home/paul will be copied to here
+    # created by test-pull.sh, home/paul will be copied to here
     cDatHome3=$cTestDestDir/test/root/home/adric
-	# created by test-clone.sh, only has project/ in it
+    # created by test-clone.sh, only has project/ in it
     cDatProj1Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/george.mp4"
     cDatProj2Big="src/raw/MOV001.mp4 src/raw/MOV001.MP3 src/final/paulb.mp4"
     cDatMount1=$cTestDestDir/test/root/mnt/disk-2
     cDatMount2=$cTestDestDir/test/root/mnt/usb-misc
-	# files-2021-08-12/archive/video/
-    	# files-2021-08-12/development/
+    # files-2021-08-12/archive/video/
+    # files-2021-08-12/development/
     cDatMount3=$cTestDestDir/test/root/mnt/usb-video
-	# video-2019-11-26/example.git
-    	# video-2019-11-26/example.raw
-    	# video-2019-11-26/dev/
-    	# video-2019-11-26/release/
-    	# video-2019-11-26/src/
-    	# video-2020-04-02 - a remote git proj will be put here
+    # video-2019-11-26/example.git
+    # video-2019-11-26/example.raw
+    # video-2019-11-26/dev/
+    # video-2019-11-26/release/
+    # video-2019-11-26/src/
+    # video-2020-04-02 - a remote git proj will be put here
 
     return
 } # fTestSetupEnv

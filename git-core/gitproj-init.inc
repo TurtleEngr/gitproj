@@ -224,23 +224,23 @@ directory. A symlink will replace the moved file. The symlink will
 point to [raw]. Quit if you want to change the MaxSize.
 
 EOF
-	# TBD convert this logic to use fComSelect()
+        # TBD convert this logic to use fComSelect()
         echo -n "Move the files (-m) [y/n/quit]? "
         read -r tResult
-	case $tResult in
-	    q*)
+        case $tResult in
+            q*)
                 fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            	exit 1
-		;;
+                exit 1
+                ;;
             y*)
                 gpAutoMove=1
-            	break
-        	;;
+                break
+                ;;
             n*)
                 gpAutoMove=0
-            	break
-        	;;
-	esac
+                break
+                ;;
+        esac
     done
     if [ $tMaxLoop -eq 0 ]; then
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO

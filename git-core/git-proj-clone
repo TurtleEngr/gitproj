@@ -147,13 +147,13 @@ while getopts :d:nyhH:vx tArg; do
     case $tArg in
         # Script arguments
         d)
-	    gpRemoteGitDir="$OPTARG"
-	    gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
-	    gpProjName=${gpRemoteGitDir##*/}
-	    gpProjName=${gpProjName%.git}
-	    ;;
-	n) gpYesNo=No ;;
-	y) gpYesNo=Yes ;;
+            gpRemoteGitDir="$OPTARG"
+            gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+            gpProjName=${gpRemoteGitDir##*/}
+            gpProjName=${gpProjName%.git}
+            ;;
+        n) gpYesNo=No ;;
+        y) gpYesNo=Yes ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;

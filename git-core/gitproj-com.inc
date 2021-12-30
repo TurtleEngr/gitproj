@@ -298,7 +298,7 @@ fComPreProjSetGlobals()
     local tTrim
 
     fComFirstTimeSet
-    
+
     gpVer=$cGitProjVersion
 
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
@@ -310,7 +310,7 @@ fComPreProjSetGlobals()
     if [ "$gpProjName" = "TBD" ]; then
         gpProjName="${gpLocalTopDir##*/}"
     fi
-    
+
     gpLocalRawDir=$gpLocalTopDir/raw
 
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
@@ -1155,9 +1155,10 @@ fComGetConfig()
         case $tArg in
             b) pType="--bool" ;;
             d) pDefault="${OPTARG}" ;;
-            e) pExitOnError=1
-               tExit=""
-               ;;
+            e)
+                pExitOnError=1
+                tExit=""
+                ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
             G) pScope="--file $HOME/$cConfigGlobal" ;;
@@ -1188,11 +1189,11 @@ fComGetConfig()
         if [ -z "$gGetConfigValue" ]; then
             fError -m "Unexpected: $pKey is not defined!" -l $tSrc:$LINENO
         fi
-        
+
         if [ -n "$pDefault" ] && [ "$gGetConfigValue" = "$pDefault" ]; then
             fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
         fi
-        
+
         if [ "$gGetConfigValue" = "TBD" ] || [ "$gGetConfigValue" = "not-defined" ]; then
             fError -m "Unexpected: $pKey should not be set to: $gGetConfigValue" -l $tSrc:$LINENO
         fi
@@ -1599,9 +1600,9 @@ fComGetProjGlobals()
     fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e >/dev/null
     gpProjName=$gGetConfigValue
 
-    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e  >/dev/null
+    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e >/dev/null
     gpRemoteRawDir=$gGetConfigValue
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648" 2>&1)  # 2g
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648" 2>&1) # 2g
 
     fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e >/dev/null
     gpLocalStatus=$gGetConfigValue

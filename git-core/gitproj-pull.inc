@@ -20,7 +20,7 @@ fPullRawFiles()
     local tStatus
     local tVerbose
     declare -l tReply
-    
+
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-viP
     fi
@@ -41,7 +41,7 @@ $tDiff
 
 Select 'Yes' if the above differences look OK."
 EOF
-)
+    )
     echo "$tHelp"
 
     if [ $gpVerbose -ne 0 ]; then
@@ -88,7 +88,7 @@ fPullGit()
     local pBranchFlag="${1:-0}"
     local tSrc=${BASH_SOURCE##*/}
     local tBranch
-    
+
     if [ $pBranchFlag -eq 0 ]; then
         return 0
     fi
@@ -100,7 +100,7 @@ fPullGit()
 
     fComGit pull origin $tBranch
     tStatus=$?
-    
+
     return $tStatus
 } # fPullGit
 

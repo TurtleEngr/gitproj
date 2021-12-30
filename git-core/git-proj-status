@@ -71,9 +71,9 @@ cd - >/dev/null 2>&1
 
 tSrc=${BASH_SOURCE##*/}
 gpShort=""
-while getopts :hH:vx tArg; do
+while getopts :shH:vx tArg; do
     case $tArg in
-    	s) gpShort="-s"
+    	s) gpShort="-s" ;;
         # Script arguments
         # Common arguments
         h) fUsage long ;;

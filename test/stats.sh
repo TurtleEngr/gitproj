@@ -4,7 +4,7 @@ tProjStart=2021-10-23
 tProjEnd=$(date +%F)
 tProjDuration=$(dateutils.ddiff $tProjStart $tProjEnd)
 
-tNumTests=$(grep '^test' test-*.sh |grep '()' | wc -l)
+tNumTests=$(grep '^test' test-*.sh | grep '()' | wc -l)
 tNumAsserts=$(grep assert *.sh | wc -l)
 tLinesTest=$(cat Makefile *.md *.sh *.inc | wc -l)
 tLinesTestDoc=$(
@@ -21,10 +21,10 @@ let tOnlyTest=tLinesTest-tLinesTestDoc
 
 tLinesCode=$(
     cat \
-	../doc/VERSION \
-	../doc/config/* ../doc/hooks/* \
-	../git-core/* \
-    | wc -l
+        ../doc/VERSION \
+        ../doc/config/* ../doc/hooks/* \
+        ../git-core/* |
+        wc -l
 )
 tLinesCodeDoc=$(
     awk '
@@ -43,11 +43,11 @@ tNumCmds=$('ls' ../git-core/git-proj-* | wc -l)
 
 tTotalLines=$(
     cat \
-	Makefile *.md *.sh *.inc \
-	../doc/VERSION \
-	../doc/config/* ../doc/hooks/* \
-	../git-core/* \
-    | wc -l
+        Makefile *.md *.sh *.inc \
+        ../doc/VERSION \
+        ../doc/config/* ../doc/hooks/* \
+        ../git-core/* |
+        wc -l
 )
 tTotalLinesDoc=$(
     awk '

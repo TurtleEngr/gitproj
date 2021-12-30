@@ -591,7 +591,7 @@ testComGetConfigGlobal()
     fComGetConfig -g -k gitproj.testit.foobar >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
     assertEquals "$LINENO" "not-found" "$gGetConfigOrigin"
-    
+
     tResult=$(fComGetConfig -g -k gitproj.testit.foobar -d TBD -e 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "gitproj.testit.foobar is not defined"
@@ -739,7 +739,7 @@ testComSelect()
     local tHelp
 
     gpAuto=0
-    
+
     tDirList=$(find $cDatMount3 $cDatMount3/* $cDatMount3/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
     tPrompt="Select a mount point: "
     tHelp="Just select by number."
@@ -778,7 +778,7 @@ testComYesNo()
     assertEquals $LINENO "No" "$gResponse"
 
     gpYesNo=""
-    
+
     fComYesNo "Continue" >/dev/null 2>&1 < <(echo yes)
     assertTrue $LINENO $?
     assertEquals $LINENO "Yes" $gResponse
@@ -794,7 +794,7 @@ testComYesNo()
     fComYesNo "Continue" >/dev/null 2>&1 < <(echo xx)
     assertFalse $LINENO $?
     assertEquals $LINENO "No" $gResponse
-    
+
     return 0
 } # testComYesNo
 

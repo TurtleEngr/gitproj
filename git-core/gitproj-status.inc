@@ -16,14 +16,14 @@ fStatusGit()
     local pShort="$1"
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
-    
+
     git status $pShort
 
     if fStatusIsRemoteMounted warn; then
         tOrigin=$($cGetOrigin)
-	if [ -d $tOrigin ]; then
-	    fLog -p warning -m "Could not find: $tOrigin" -l $tSrc:$LINENO
-	fi
+        if [ -d $tOrigin ]; then
+            fLog -p warning -m "Could not find: $tOrigin" -l $tSrc:$LINENO
+        fi
     fi
 
     return 0
@@ -36,7 +36,7 @@ fStatusRaw()
 
     if ! fComIsRemoteMounted warn; then
         fLog -p warning -m "Remote: $gpRemoteRawDir is not mounted, so cannot give status of raw/ files." -l $tSrc:$LINENO
-	return 0
+        return 0
     fi
 
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -44,7 +44,7 @@ fStatusRaw()
     echo "REMOTE/ = $gpRemoteRawDir/"
     diff -qr raw/ $gpRemoteRawDir/ | sed "s;$gpRemoteRawDir;REMOTE;"
     cd - >/dev/null 2>&1
-    
+
     return 0
 } # fStatusRaw
 
