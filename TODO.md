@@ -2,6 +2,12 @@
 
 * Code git-proj-status
 
+* Code and test pre-commit checks.
+
+* Move "auto-move" out of hooks config.  Use this in git-proj-add (or move)
+  add: find binary files that are greater than binary-file-size-limit
+  add: move and create symlink, or just move to raw/
+
 * Create install.sh to install directly from development git
   dir. Implement it with a pseudo root var, so that the script can be
   used to create the dist/ dir that EPM will use.
