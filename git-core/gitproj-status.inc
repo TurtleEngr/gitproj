@@ -17,11 +17,12 @@ fStatusGit()
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
 
-    git status $pShort
+    echo
+    git status $pShort --ignored
 
-    if fStatusIsRemoteMounted warn; then
+    if fComIsRemoteMounted warn; then
         tOrigin=$($cGetOrigin)
-        if [ -d $tOrigin ]; then
+        if [ ! -d $tOrigin ]; then
             fLog -p warning -m "Could not find: $tOrigin" -l $tSrc:$LINENO
         fi
     fi
@@ -43,6 +44,9 @@ fStatusRaw()
     echo
     echo "REMOTE/ = $gpRemoteRawDir/"
     diff -qr raw/ $gpRemoteRawDir/ | sed "s;$gpRemoteRawDir;REMOTE;"
+    if [ ${PIPESTATUS[0]} -eq 0 ]; then
+        echo "No differences."
+    fi
     cd - >/dev/null 2>&1
 
     return 0
@@ -63,4 +67,4 @@ fStatusOutput()
 
 # ========================================
 export tSrc=${BASH_SOURCE##*/}
-fComPreProjSetGlobals
+fComGetProjGlobals

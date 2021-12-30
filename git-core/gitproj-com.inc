@@ -1522,7 +1522,7 @@ fComMustBeInProjRepo()
     tTopDir=$($cGetTopDir)
 
     if [ ! -f $tTopDir/$cConfigLocal ]; then
-        fError -n -m "This git workspace is not setup for gitproj, run 'git proj init'" -l $tSrc:$LINENO
+        fError -n -m "This git workspace is not setup for gitproj." -l $tSrc:$LINENO
         if [ $gpDebug -ge 2 ]; then
             fComStackTrace
         fi
@@ -1568,7 +1568,7 @@ fComIsRemoteMounted()
 
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "None")
     if [ "$gpRemoteRawDir" = "None" ]; then
-        fError-m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+        fError -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
     fi
     if [ -d $gpRemoteRawDir ]; then
         return 0

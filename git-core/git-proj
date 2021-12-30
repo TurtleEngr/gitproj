@@ -75,7 +75,7 @@ files, and repositiories on external drives.
 	
  	git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
- 	pSubCmd: init, remote, clone, push, pull, add, config, status, check
+ 	pSubCmd: init, remote, clone, push, pull, status
 	pSubCmdOpt: Just run: "git proj [pSubCmd]"
  	[common-options]: [-h] [-H pStyle] [-v] [-vv...] [-x] [-xx...]
  
@@ -409,56 +409,56 @@ See gitproj-com.test
 
 =back
 
-=head1 RETURN VALUE
+=for comment =head1 RETURN VALUE
 
-=head1 ERRORS
+=for comment =head1 ERRORS
 
-=head1 EXAMPLES
+=for comment =head1 EXAMPLES
 
 =head1 ENVIRONMENT
 
 See Globals section for details.
 
-HOME,USER, gpSysLog, gpFacility, gpVerbose, gpDebug, gpUnitDebug
+HOME, USER, HOSTNAME, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
 
 =head1 FILES
 
+    ~/.gitconfig
+    ~/.gitproj.config.global
+    PROJ/.gitproj.config.local
+    PROJ/.gitproj.config.$HOSTNAME
+    PROJ/.git/config
+
 =head1 SEE ALSO
 
-shunit2.1
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
 
-=head1 NOTES
+=for comment =head1 NOTES
 
 =head1 CAVEATS
 
-[Things to take special care with; sometimes called WARNINGS.]
+Currently gitproj only supports B<local> git repos. The repos are
+called "remote" but that is only because the repo could be put on a
+"mounted" disk.
 
-=head1 DIAGNOSTICS
+A future implementation could support git repos that are truly remote,
+on other systems. When that is implemented, an existing repo could be
+"upgraded" to a gitproj repo.
 
-=head2 Testing
+A remote repo implies the "raw" files will also be managed on a remote
+or local system. I.e. the raw files could be on most any servers that
+is supported by rsync or rclone.
 
-In the top git cloned directory, run the unit test functions with the
-command:
+=for comment =head1 DIAGNOSTICS
 
-    gitproj-com.test
+=for comment =head1 BUGS
 
-will run all of the functions that begin with "test".
-
-    gitproj-com.test [testName,testName,...]
-
-This will run the listed testName functions.
-
-For more details about shunit2 (or shunit2.1), see
-shunit2/shunit2-manual.html
-L<Source|https://github.com/kward/shunit2>
-
-See shunit2, shunit2.1, and global: gpUnitDebug
-
-Also for more help, use the "-H int" option.
-
-=head1 BUGS
-
-=head1 RESTRICTIONS
+=for comment =for comment =head1 RESTRICTIONS
 
 =head1 AUTHOR
 

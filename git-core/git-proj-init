@@ -29,8 +29,8 @@ fUsage()
 =head1 DESCRIPTION
 
 This will create a local git repo with branches. If git-flow is
-installed can will optionally be setup too. After this setup
-the remote git repo with "git proj init remote"
+installed can will optionally be setup too. After this setup the
+remote git repo with "git proj init remote"
 
 If there is a -a option, "git proj init local" will be run with all
 the default options, which can be overridden with the options.
