@@ -173,7 +173,7 @@ The last definition 'wins".
 ## Variable Naming Convention
 
 * Globals that came from command line, config files, or external to
-the scripts, begin with "gp" (global paramater). For example: gpVAR
+the scripts, begin with "gp" (global parameter). For example: gpVAR
 (if they are not already defined before script (#7), set the initial
 value to files #1 through #6. The command line option can always set
 the value (#7)
@@ -205,10 +205,11 @@ the include file reads/writes to.
 * At the end of an include file, call a function that will define
 defaults for the important globals used by the include file. [optional]
 
-* For the user callable scripts, do minimal setup, include files with
-common functions and functions specific to the script. Put as much as
-possible into functions in the include file, so that the functions can
-be directly tested with unit test scripts found in doc/test.
+* For the user callable scripts, do minimal setup--mainly collect the
+and validate the options.  Include files with common functions and
+functions specific to the script. Put as much as possible into
+functions in the include file, so that the functions can be directly
+tested with unit test scripts found in doc/test.
 
 * Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test script.
 All other vars can be defined from include files or from git config vars.
@@ -216,9 +217,50 @@ All other vars can be defined from include files or from git config vars.
 * Define gpCmdName at the top of each each script that is called by a
 user.
 
-* The -p option is not used with the "read" command, because this
-prompt is not captured with the test scripts. So use "echo -n" for the
-prompts before the read command.
+* Clean-Coding style (well I try).
+
+    * Ifs
+
+        * Avoid if/then/else.
+
+        * Avoid long contents in ifs
+
+        * Don't nest ifs more than 2 levels. One level is preferred.
+
+        * Don't clutter the code with "pass-through" error-handling
+          ifs. (see below)
+
+        * Rather than using debug ifs, use fLog with its debug level
+          support. Using TDD, the need for internal debug output should
+          be reduced.
+
+    * Identify problems or defaults early in a function so it can exit
+      early.
+
+    * Most of the code is structured so that if a function returns,
+      you can assume it executed OK, or it took an acceptable default
+      action. There should be no need to continually check exit codes
+      from functions.
+
+    * In other words, if there is a "fatal" error, cleanup, and exit
+      with an error msg. Don't pass around exit codes, through
+      multiple levels (one level is OK for the "utility"
+      functions). Exit codes are mainly for the immediate calling
+      function--if there was and error, exit, don't pass the error up
+      to another level.
+
+* Use TDD: Every function should have tests to exercise all the input
+boundary conditions, and all of the error-handling states that are
+unique to the function.
+
+* shunit2 is used for the TDD framework. See test/Makefile
+
+* TDD is done with the git development environment structure. It is
+not done with "installed" code.
+
+* The -p option is not used with the "read" command, because the
+prompt is not "captured" with the test scripts. So use "echo -n" for
+the prompts before the read command.
 
 * fLog and fError messages
 
@@ -241,9 +283,9 @@ prompts before the read command.
 
         $gpBin/git-proj-CMD
             . $gpBin/gitproj-com.inc
-	        fComSetGlobals
+                fComSetGlobals
             . $gpBin/gitproj-CMD.inc
-	        fCMDSetGlobals
+                fCMDSetGlobals
 
 ## File include pattern - dev
 
@@ -252,9 +294,9 @@ prompts before the read command.
 
         $gpBin/git-proj-CMD
             . $gpBin/gitproj-com.inc
-	        fComSetGlobals
+                fComSetGlobals
             . $gpBin/gitproj-CMD.inc
-	        fCMDSetGlobals
+                fCMDSetGlobals
 
 ## File include pattern - dev-test
 
@@ -264,21 +306,21 @@ prompts before the read command.
 
         $gpTest/test-com.sh*
             . $gpTest/test.inc
-		fTestSetupEnv
-            	. $gpBin/gitproj-com.inc
-		    fComSetGlobals
-	    fComRunTests
+                fTestSetupEnv
+                . $gpBin/gitproj-com.inc
+                    fComSetGlobals
+            fComRunTests
                 . $gpTest/shunit2.1*
 
         $gpTest/test-CMD.sh
             . $gpTest/test.inc
-		fTestSetupEnv
-            	. $gpBin/gitproj-com.inc
-		    fComSetGlobals
-	    fTestCreateEnv
+                fTestSetupEnv
+                . $gpBin/gitproj-com.inc
+                    fComSetGlobals
+            fTestCreateEnv
             . $gpBin/gitproj-CMD.inc
-	        fCMDSetGlobals
-	    fTestConfigSetup
+                fCMDSetGlobals
+            fTestConfigSetup
 
 ## dev-test Environment
 
@@ -298,22 +340,22 @@ Creates:
     |   |   |test-files.txt - this outline
     |   |   |root/
             |   |mnt/
-            |   |   |disk-2/		- $cDatMount1
-            |   |   |usb-misc/ 		- $cDatMount2
+            |   |   |disk-2/            - $cDatMount1
+            |   |   |usb-misc/          - $cDatMount2
             |   |   |   |files-2021-08-12/ 
-            |   |   |usb-video/ 	- $cDatMount3
+            |   |   |usb-video/         - $cDatMount3
             |   |   |   |video-2020-04-02/
             |   |home/
-            |   |   |john/		- $HOME
+            |   |   |john/              - $HOME
             |   |   |   |project/
-            |   |   |   |   |beach/	- $cDatProj3
+            |   |   |   |   |beach/     - $cDatProj3
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |file1.txt
             |   |   |   |   |   |   |file2.txt
             |   |   |   |   |   |edit/
             |   |   |   |   |   |   |file.txt
             |   |   |   |   |   |.git/
-            |   |   |   |   |george/	- $cDatProj1
+            |   |   |   |   |george/    - $cDatProj1
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
@@ -326,7 +368,7 @@ Creates:
             |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj1Big
             |   |   |   |   |   |.gitignore
             |   |   |   |   |   |README.html
-            |   |   |   |   |paulb/		- $cDatProj2
+            |   |   |   |   |paulb/             - $cDatProj2
             |   |   |   |   |   |doc/
             |   |   |   |   |   |   |notes.html
             |   |   |   |   |   |edit/
