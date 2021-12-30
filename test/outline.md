@@ -23,45 +23,19 @@
     |   |   |LICENSE
     |   |git-core/
     |   |   |gitproj-com.inc*
-    |   |   |gitproj-init.inc*
-    |   |   |gitproj-add.inc*
-    |   |   |gitproj-clone.inc*
-    |   |   |gitproj-config.inc*
-    |   |   |gitproj-move.inc*
-    |   |   |gitproj-pull.inc*
-    |   |   |gitproj-push.inc*
-    |   |   |gitproj-remote.inc*
-    |   |   |gitproj-rm.inc*
-    |   |   |gitproj-status.inc*
+    |   |   |gitproj-SUBCMD.inc*
     |   |   |git-proj*
-    |   |   |git-proj-add*
-    |   |   |git-proj-clone*
-    |   |   |git-proj-config*
-    |   |   |git-proj-init*
-    |   |   |git-proj-move*
-    |   |   |git-proj-pull*
-    |   |   |git-proj-push*
-    |   |   |git-proj-remote*
-    |   |   |git-proj-rm*
-    |   |   |git-proj-status*
+    |   |   |git-proj-SUBCMD*
     |   |test/
+    |   |   |Makefile
     |   |   |outline.md
     |   |   |shunit2 -> shunit2.1*
     |   |   |shunit2.1*
     |   |   |test-env.tgz -> ../../test-env.tgz
-    |   |   |test-install.sh*
+    |   |   |test-env_FILE.tgz -> ../../test-env_FILE.tgz
     |   |   |test.inc
     |   |   |test-com.sh*
-    |   |   |test-add.sh*
-    |   |   |test-clone.sh*
-    |   |   |test-config.sh*
-    |   |   |test-init.sh*
-    |   |   |test-move.sh*
-    |   |   |test-pull.sh*
-    |   |   |test-push.sh*
-    |   |   |test-remote.sh*
-    |   |   |test-rm.sh*
-    |   |   |test-status.sh*
+    |   |   |test-SUBCMD.sh*
     |   |.gitignore
     |   |Makefile
     |   |README.md
@@ -111,11 +85,6 @@ installed files would be tricky, and of low value.
     |   |   |   |   |   |getproj.config.local
     |   |   |   |   |hooks/
     |   |   |   |   |   |pre-commit*
-    |   |   |   |   |test/
-    |   |   |   |   |   |outline.md
-    |   |   |   |   |   |shunit2 -> shunit2.1*
-    |   |   |   |   |   |shunit2.1*
-    |   |   |   |   |   |test-install.sh*
     |   |   |man/
     |   |   |   |man1/
     |   |   |   |   |gitproj.1.gz - generated, all user commands
@@ -143,10 +112,10 @@ installed files would be tricky, and of low value.
     |   |   |   |   |.gitproj.config.local
     |   |   |   |   |.gitproj.config.$HOSTNAME
     |   |   |   |   |raw/
-    |   |   |   |   |   |DIR/
+    |   |   |   |   |   |ANY-DIR/
     |   |   |   |   |   |  |LARGE-FILE.MP4
-    |   |   |   |   |DIR/    
-    |   |   |   |   |   |LARGE-FILE.MP4 -> ../raw/DIR/LARGE-FILE.MP4 
+    |   |   |   |   |ANY-DIR/    
+    |   |   |   |   |   |LARGE-FILE.MP4 -> ../raw/ANY-DIR/LARGE-FILE.MP4 
     
 ## After running git-proj-remote
 
