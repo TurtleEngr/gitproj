@@ -138,10 +138,6 @@ cd - >/dev/null 2>&1
 . $gpBin/gitproj-com.inc
 # Calls: fComSetGlobals
 
-#if [ $# -eq 0 ]; then
-#    fError -m "Missing options." -l $tSrc:$LINENO
-#fi
-
 . $gpBin/gitproj-clone.inc
 # Calls: fCloneSetGlobals
 

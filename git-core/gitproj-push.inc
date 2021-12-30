@@ -11,19 +11,6 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 # ========================================
 
 # --------------------
-fPushIsRemoteMounted()
-{
-    local tSrc=${BASH_SOURCE##*/}
-# TBD move this to com.inc?
-
-    if [ -d $gpRemoteRawDir ]; then
-        return 0
-    fi
-
-    fError -m "$gpRemoteRawDir was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
-} # fPushIsRemoteMounted
-
-# --------------------
 fPushRawFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
@@ -126,7 +113,7 @@ fPushToOrigin()
     # Called by: "git-proj-push [-b]
 
     fComGetProjGlobals
-    fPushIsRemoteMounted
+    fComIsRemoteMounted
     fPushRawFiles
     fPushGit $pBranchFlag
 

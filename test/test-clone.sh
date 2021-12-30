@@ -125,6 +125,8 @@ setUp()
     HOSTNAME=testserver2
     fTestSetupEnv
     fTestCreateEnv
+
+    mkdir -p $cDatHome3/project >/dev/null 2>&1
     cd $cTestDestDir >/dev/null 2>&1
     if [ ! -r $tTar ]; then
         echo "Could not find: $tTar [$LINENO]"
@@ -132,8 +134,6 @@ setUp()
     fi
     tar -xzf $tTar
     cd - >/dev/null 2>&1
-
-    mkdir -p $cDatHome3/project >/dev/null 2>&1
 
     # git proj to be cloned:
     HOME=$cDatHome3
@@ -496,7 +496,7 @@ testCloneMkGitDirPass()
     local tResult
     local tStatus
     local tTop
-    locall tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
@@ -682,7 +682,7 @@ testCloneUpdateHostConfig()
 
     tResult=$(fCloneUpdateHostConfig 2>&1)
     assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Weird, include.path is alrady set"
+    assertContains "$LINENO $tResult" "$tResult" "Weird, include.path is alredy set"
 
     tResult=$(fComGetConfig -H -k "gitproj.config.remote-status")
     assertTrue $LINENO "$?"
@@ -772,7 +772,7 @@ testGetProjCloneCLI()
 {
     local tResult
 
-    cd $cDatHome3 >/dev/null 2>&1
+    cd $cDatHome3/project >/dev/null 2>&1
     tResult=$($gpBin/git-proj-clone -y -vv -d $cDatMount3/video-2020-04-02/george.git -y 2>&1)
     assertTrue $LINENO $?
     assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"

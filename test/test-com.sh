@@ -489,8 +489,12 @@ testComUsage()
     assertContains "$LINENO tcu-int-md.3" "$tResult" '### testComUsage'
 
     #-----
-    tResult=$(fComUsage -a -s long -f $tUsageScript -f $tInternalScript 2>&1)
-    assertContains "$LINENO long" "$tResult" "DESCRIPTION"
+    tResult=$(fComUsage -s long -f $tUsageScript -f $tInternalScript 2>&1)
+    assertContains "$LINENO $tResult" "$tResult" "DESCRIPTION"
+
+    #-----
+    tResult=$(fComUsage -i -s long -f $tInternalScript 2>&1)
+    assertContains "$LINENO $tResult" "$tResult" "Internal Documentation"
 
     #-----
     gpUnitDebug=0

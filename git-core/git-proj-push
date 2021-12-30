@@ -136,11 +136,6 @@ cd - >/dev/null 2>&1
 . $gpBin/gitproj-com.inc
 # Calls: fComSetGlobals
 
-tSrc=${BASH_SOURCE##*/}
-if ! fComMustBeInProjRepo $PWD; then
-    fError -m "Quitting" -l $tSrc:$LINENO
-fi
-
 . $gpBin/gitproj-push.inc
 fComGetProjGlobals
 

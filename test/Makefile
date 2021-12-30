@@ -1,5 +1,8 @@
 # gitproj/doc/test/Makefile
 
+# TBD add missing tar file rules
+# TBD add tar file deps to the tests scripts
+
 mCore = ../git-core
 
 # Note: the order matters
@@ -91,6 +94,15 @@ test-env_TestDestDirAfterRemoteReport.tgz :
 
 test-env_Home2AfterPush.tgz :
 	export gpSaveTestEnv=1; ./test-push.sh testGitProjPushCLI
+
+#test-env_TestDestDirAfterCreateRemoteGit.tgz :
+#	export gpSaveTestEnv=1; ./test-remote.sh testRemoteCreateRemoteGit
+
+#test-env_Home3AfterCloneMkGit.tgz :
+#	export gpSaveTestEnv=1; ./test-clone.sh testCloneMkGit
+
+#test-env_Home3AfterCloneSummary.tgz :
+#	export gpSaveTestEnv=1; ./test-clone.sh testCloneSummary
 
 # --------------------
 stats :

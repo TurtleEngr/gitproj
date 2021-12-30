@@ -190,23 +190,23 @@ testComGetProjGlobals()
 } # testComGetProjGlobals
 
 # --------------------------------
-testPushIsRemoteMounted()
+testComIsRemoteMounted()
 {
     local tResult
 
     fComGetProjGlobals >/dev/null 2>&1
     
-    tResult=$(fPushIsRemoteMounted 2>&1)
+    tResult=$(fComIsRemoteMounted 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
     mv $gpRemoteRawDir $gpRemoteRawDir.sav
-    tResult=$(fPushIsRemoteMounted 2>&1)
+    tResult=$(fComIsRemoteMounted 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
     mv $gpRemoteRawDir.sav $gpRemoteRawDir 
     
     return 0
-} # testPushIsRemoteMounted
+} # testComIsRemoteMounted
 
 # --------------------------------
 testPushRawFiles()

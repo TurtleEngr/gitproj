@@ -483,7 +483,6 @@ fComUsage()
         tProg=pod2text
     fi
 
-
     # shellcheck disable=SC2116
     pFileList="$(echo $pFileList)"
     if [ -z "$pFileList" ]; then
@@ -1557,6 +1556,29 @@ fComAllMustBeReadable()
 
     return 0
 } # fComAllMustBeReadable
+
+# --------------------
+fComIsRemoteMounted()
+{
+    local pWarn="$1"
+    local tSrc=${BASH_SOURCE##*/}
+
+    # Assumes we are in a gitproj managed dir
+
+    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "None")
+    if [ "$gpRemoteRawDir" = "None" ]; then
+        fError-m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+    fi
+    if [ -d $gpRemoteRawDir ]; then
+        return 0
+    fi
+
+    if [ -n "$pWarn" ]; then
+        # Just return error code if not found
+        return 1
+    fi
+    fError -m "$gpRemoteRawDir was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
+} # fComIsRemoteMounted
 
 # --------------------
 fComGetProjGlobals()

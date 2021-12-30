@@ -1,12 +1,20 @@
 # TODO
 
-* Code git-proj-clone
-
-* Make a fComYesNo() function with fComSelect
-
 * Code git-proj-status
 
+* Create install.sh to install directly from development git
+  dir. Implement it with a pseudo root var, so that the script can be
+  used to create the dist/ dir that EPM will use.
+
+* Make OS installers. Use EPM to make a portable installer and a native
+  deb installer.
+
 * Code git-proj-config
+
+* Remove the duplicate path, in .git/config (introduced by git-proj-clone)
+  [include]
+        path = ../.gitproj.config.testserver2
+        path = ../.gitproj.config.testserver2
 
 * Code git-proj-add (support adding whole directory trees)
 
@@ -53,13 +61,10 @@
 
 * Make and cleanup the internal docs.
 
-* Make installer. Use epm to make a portable installer and a native
-  deb installer.
-
-* Verify install with gitproj-com.test
+* Verify install with gitproj-com.test - NO!
 
 * Fix-up gitproj-com.test so it can be run from /usr/share/doc/git-proj
-  or from gitproj working dir.
+  or from gitproj working dir. - NO!
 
 * More travis-ci.
     * Run tests with changes to develop or main branches.
@@ -147,3 +152,8 @@
     If not found the cp .gitproj.config.local .gitproj.config.HOSTNAME,
     and set .git/config include too .gitproj.config.HOSTNAME
     Tell user to review .gitproj.config.HOSTNAME and .gitproj.config.local
+
+* Code git-proj-clone - done
+
+* Make a fComYesNo() function with fComSelect - done
+

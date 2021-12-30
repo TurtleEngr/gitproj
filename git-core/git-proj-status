@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export gpCmdName gpBin cCurDir gpShort
+
 #--------------------
 fUsage()
 {
@@ -15,15 +17,14 @@ fUsage()
 
 =head1 SYNOPSIS
 
- git proj status [-v]
+ git proj status [-s] [common-options]
 
 =head1 DESCRIPTION
 
-    Verify gitproj.config.remote-raw-dir is defined
-    Verify origin is set to a path that exists (if mounted)
-    Verify gitproj.config.remote-raw-dir exists (if mounted)
-    Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
     Do a "git status"
+    Verify gitproj.config.remote-raw-dir is defined and mounted
+    Verify origin is set to a path that exists (if mounted)
+    Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
 
 Check install related health
 
@@ -35,3 +36,60 @@ Check install related health
 
 EOF
 }
+
+# ========================================
+# Main
+
+export cCurDir gpBin gpCmdName tSrc
+
+gpCmdName=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
+
+# -------------------
+# Set current directory location in PWD and cCurDir
+if [ -z "$PWD" ]; then
+    PWD=$(pwd)
+fi
+cCurDir=$PWD
+
+# -------------------
+# Define the location of this script
+gpBin=${0%/*}
+if [ "$gpBin" = "." ]; then
+    gpBin=$PWD
+fi
+cd $gpBin >/dev/null 2>&1
+gpBin=$PWD
+cd - >/dev/null 2>&1
+
+# -------------------
+. $gpBin/gitproj-com.inc
+# Calls: fComSetGlobals
+
+. $gpBin/gitproj-status.inc
+# Calls: fComGetProjGlobals
+
+tSrc=${BASH_SOURCE##*/}
+gpShort=""
+while getopts :hH:vx tArg; do
+    case $tArg in
+    	s) gpShort="-s"
+        # Script arguments
+        # Common arguments
+        h) fUsage long ;;
+        H) fUsage "$OPTARG" ;;
+        v) let ++gpVerbose ;;
+        x) let ++gpDebug ;;
+        # Problem arguments
+        :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
+    esac
+done
+shift $((OPTIND - 1))
+if [ $# -ne 0 ]; then
+    fError -m "Unknown option: $*" -l $tSrc:$LINENO
+fi
+
+# ----------
+fStatusOutput $gpShort
+exit 0
