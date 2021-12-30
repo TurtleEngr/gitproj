@@ -73,7 +73,7 @@ tSrc=${BASH_SOURCE##*/}
 gpShort=""
 while getopts :shH:vx tArg; do
     case $tArg in
-    	s) gpShort="-s" ;;
+        s) gpShort="-s" ;;
         # Script arguments
         # Common arguments
         h) fUsage long ;;
