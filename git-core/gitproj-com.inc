@@ -136,22 +136,24 @@ You now have a local git repository project (${gpProjName}) setup at
 ${gpLocalTopDir} with support for managing large binary files (larger
 than $gpMaxSize).
 
-~/gitconfig will include the ~/gitproj.config.global file, which will
-be used for defaults when you create other "git proj" projects on your
-system.  The variables will also be used, if are not overridden by the
-project's config definitions found at: $cConfigLocal and
-.gitproj.config.\$HOSTNAME You should version these files with your
-project.
+~/.gitconfig will include the ~/.gitproj.config.global file, which
+will be used for defaults when you create other "git proj" projects on
+your system.  The global variables can be overridden by a project's
+config definitions. See: Project/.gitproj.config.locall and
+Project/.gitproj.config.\$HOSTNAME You should version these files with
+your project.
 
 When you "clone" your git project on another system, a new
-.gitproj.config.\$HOSTNAME will be created, so that differences
-between systems are saved. For example, mount points and filesystem
-differences will be saved.
+Project/.gitproj.config.\$HOSTNAME file will be created, so that
+differences between systems are saved. For example, mount points and
+filesystem differences will be saved.
 
-For a more complete overview type: "git proj -h | more" For a quick list of
-the git proj subcommands just type: "git proj"
+For a more complete overview type: "git proj -h | more"
 
-Since all subcommands will ...
+For a quick list of the git proj subcommands just type: "git proj"
+
+All subcommands will output help text with the -h option. For example:
+"git proj SubCmd -h | more"
 
 [$tSrc:$LINENO]
 EOF
@@ -655,6 +657,7 @@ fComYesNo()
     fi
     gResponse="No"
     return 1
+    cat <<EOF >/dev/null
 =internal-pod
 
 =internal-head3 fComYesNo pPrompt
@@ -670,6 +673,7 @@ If the response begins with a "y", then that is the same as gpYesNo = "Yes"
 If the response is not a "y", then that is the same as gpYesNo = "No"
 
 =internal-cut
+EOF
 } # fComYesNo
 
 # ------------------
@@ -968,6 +972,7 @@ fComSetConfig()
     local OPTARG
     local tArg
     while getopts :abf:gGHik:lLv: tArg; do
+        # shellcheck disable=SC2213,SC2220
         case $tArg in
             f)
                 if [ ! -f ${OPTARG} ]; then
@@ -1126,6 +1131,7 @@ fComGetConfig()
     local OPTARG
     local tArg
     while getopts :bd:ef:gGHik:lLv: tArg; do
+        # shellcheck disable=SC2213,SC2220
         case $tArg in
             f)
                 if [ ! -f ${OPTARG} ]; then
@@ -1335,6 +1341,7 @@ fComUnsetConfig()
     local OPTARG
     local tArg
     while getopts :af:gGHk:lL tArg; do
+        # shellcheck disable=SC2213,SC2220
         case $tArg in
             f)
                 if [ ! -f ${OPTARG} ]; then

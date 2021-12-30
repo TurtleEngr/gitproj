@@ -12,25 +12,27 @@ fUsage()
     local tFileList="\
 	-f $gpBin/git-proj \
 	-f $gpBin/git-proj-init \
+    	-f $gpBin/git-proj-remote \
+    	-f $gpBin/git-proj-clone \
+    	-f $gpBin/git-proj-push \
+    	-f $gpBin/git-proj-pull \
 	"
     tFileList="$(echo $tFileList)"
 
-    #-f $gpBin/git-proj-remote \
-    #-f $gpBin/git-proj-clone \
-    #-f $gpBin/git-proj-add \
-    #-f $gpBin/git-proj-push \
-    #-f $gpBin/git-proj-pull \
-    #-f $gpBin/git-proj-add \
-    #-f $gpBin/git-proj-move \
-    #-f $gpBin/git-proj-rm \
-    #-f $gpBin/git-proj-config \
     #-f $gpBin/git-proj-status \
+    #-f $gpBin/git-proj-config \
+    #-f $gpBin/git-proj-add \
+    #-f $gpBin/git-proj-rm \
     #-f $gpBin/git-proj-check \
 
     local tIntFileList="\
         $tFileList \
 	-f $gpBin/gitproj-com.inc \
-	-f $gpBin/gitproj-com.test \
+	-f $gpBin/gitproj-init.inc \
+	-f $gpBin/gitproj-remote.inc \
+	-f $gpBin/gitproj-clone.inc \
+	-f $gpBin/gitproj-pull.inc \
+	-f $gpBin/gitproj-push.inc \
     "
     tIntFileList="$(echo $tIntFileList)"
 
@@ -175,9 +177,9 @@ Styles:
 	man 	    - Output long usage help as a man page.
 	html 	    - Output long usage help as html. All subcommands.
 	md 	    - Output long usage help as markdown.
-	int 	    - Also output internal documentation as text.
-	int-html    - Also output internal documentation as html.
-	int-md 	    - Also output internal documentation as markdown.
+	int 	    - Output internal documentation as text.
+	int-html    - Output internal documentation as html.
+	int-md 	    - Output internal documentation as markdown.
 
 =item B<-v>
 
@@ -539,8 +541,7 @@ while getopts :vVhH:x-: tArg; do
 done
 shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
-    # TBD: actually expect a subcommand
-    fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO
+    fError -m "Unknown option: $*" -l $tSrc:$LINENO
 fi
 
 echo "Version: $cGitProjVersion"

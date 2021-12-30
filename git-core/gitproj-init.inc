@@ -612,27 +612,12 @@ fInitCreateLocalGit()
 
     gpLocalStatus=defined
     fInitSaveVarsToConfigs
+    fComIntroText
 
     cat <<EOF | fComFmt
 
-You now have a local git repository project (${gpProjName}) setup at
-${gpLocalTopDir} with support for managing large binary files (larger
-than $gpMaxSize).
-
-~/gitconfig will include the ~/gitproj.config.global file, which will
-be used for defaults when you create other "git proj" projects on your
-system.  The variables will also be used, if are not overridden by the
-project's config definitions found at: $cConfigLocal and
-.gitproj.config.\$HOSTNAME You should version these files with your
-project.
-
-When you "clone" your git project to another system, a new
-.gitproj.config.\$HOSTNAME will be created, so that differences
-between systems are saved. For example, mount points and filesystem
-differences.
-
 Now would be a good time to setup an external drive for archiving your
-project: "git proj init remote -d pMountPath"
+project: "git proj remote -d pMountPath"
 
 [$tSrc:$LINENO]
 EOF

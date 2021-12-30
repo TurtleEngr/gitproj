@@ -224,8 +224,9 @@ fCloneMkGitDir()
     fi    
 
     if [ ! -f .gitignore ]; then
-        fLog -p warning -m "Missing .gitignore file" -l $tSrc:$LINENO
-	# TBD Get default?
+        fLog -p warning -m "Missing .gitignore file. Adding one now." -l $tSrc:$LINENO
+    	cp $gpDoc/config/gitignore.default .gitignore
+	git add .gitignore
     fi
 
     fCloneCheckProjConfig
@@ -287,7 +288,7 @@ fCloneUpdateHostConfig()
 
     tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
     if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, include.path is alrady set." -l $tSrc:$LINENO
+        fLog -i -p warning -m "Weird, include.path is alredy set." -l $tSrc:$LINENO
     fi
 
     fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
@@ -377,7 +378,11 @@ EOF
 # --------------------
 fCloneFromRemoteDir()
 {
-    # Called by "git proj clone"
+    # Called by "git-projoclone"
+    # Minimum settings:
+    # All the common vars set by gitproj-com.inc fComSetGlobals()
+    # Required: gpRemoteGitDir, gpRemoteRawDir, gpProjName
+    # Optional: gpYesNo
     local tSrc=${BASH_SOURCE##*/}
 
     fCloneGettingStarted
@@ -386,11 +391,8 @@ fCloneFromRemoteDir()
     fCloneMkRawDir
     fCloneUpdateHostConfig
     fCloneSummary
+    fComIntroText
 
-    cat <<EOF | fComFmt
-
-[Reuse text at gitproj-init.inc fInitCreateLocalGit]
-EOF
     return 0
 } # fCloneFromRemoteDir
 

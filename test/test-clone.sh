@@ -111,6 +111,7 @@ NAoneTimeTearDown()
 # --------------------------------
 setUp()
 {
+    local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
@@ -125,7 +126,11 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     cd $cTestDestDir >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    if [ ! -r $tTar ]; then
+        echo "Could not find: $tTar [$LINENO]"
+        exit 1
+    fi
+    tar -xzf $tTar
     cd - >/dev/null 2>&1
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
@@ -274,7 +279,7 @@ testCloneValidRemoteDir()
     # Test for not enough room. Mock "df" to return a small value.
     df()
     {
-	echo "2M"
+        echo "2M"
     }
     tResult=$(df -BM $PWD --output=avail | tail -n1)
     assertEquals "$LINENO" "2M" "$tResult"
@@ -459,11 +464,11 @@ testCloneMkGitDirFail()
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
-    # 				cTestDestDir=$gpTest/../..
-    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
-    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    #                           cTestDestDir=$gpTest/../..
+    # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
     # HOSTNAME=testserver2
-    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
     # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
@@ -491,14 +496,15 @@ testCloneMkGitDirPass()
     local tResult
     local tStatus
     local tTop
+    locall tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
-    # 				cTestDestDir=$gpTest/../..
-    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
-    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    #                           cTestDestDir=$gpTest/../..
+    # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
     # HOSTNAME=testserver2
-    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
     # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
@@ -545,10 +551,10 @@ testCloneMkGitDirPass()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after CloneMkGitDir."
-        echo -e "\tRestore test-env_Home3AfterCloneMkGit.tgz relative to env cDatHome3=$cDatHome3"
+        echo -e "\tRestore $tTar relative to env cDatHome3=$cDatHome3"
         cd $cDatHome3 >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $gpTest/test-env_Home3AfterCloneMkGit.tgz .
+        tar -cvzf $tTar .
         echo
     fi
 
@@ -559,20 +565,25 @@ testCloneMkGitDirPass()
 testCloneMkRawDirFail()
 {
     local tResult
+    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
-    # 				cTestDestDir=$gpTest/../..
-    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
-    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    #                           cTestDestDir=$gpTest/../..
+    # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
     # HOSTNAME=testserver2
-    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
     # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     cd $cDatHome3 >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    if [ ! -r $tTar ]; then
+        fail "Could not find $tTar [$LINENO]"
+        return 1
+    fi
+    tar -xzf $tTar
 
     gpLocalTopDir=$HOME/project/george
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -595,21 +606,26 @@ testCloneMkRawDirFail()
 testCloneMkRawDirPass()
 {
     local tResult
-
+    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
-    # 				cTestDestDir=$gpTest/../..
-    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
-    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    #                           cTestDestDir=$gpTest/../..
+    # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
     # HOSTNAME=testserver2
-    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
     # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     # Setup
     cd $cDatHome3 >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    if [ ! -r $tTar ]; then
+        fail "Could not find $tTar [$LINENO]"
+        return 1
+    fi
+    tar -xzf $tTar
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=2
@@ -629,21 +645,26 @@ testCloneMkRawDirPass()
 testCloneUpdateHostConfig()
 {
     local tResult
+    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
-    # 				cTestDestDir=$gpTest/../..
-    # $cDatHome3/project	$cTestDestDir/test/root/home/adric/project
-    # HOME=$cDatHome3		$cTestDestDir/test/root/home/adric
+    #                           cTestDestDir=$gpTest/../..
+    # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
+    # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
     # HOSTNAME=testserver2
-    #		      cDatMount3=$cTestDestDir/test/root/mnt/usb-video
+    #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
     # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     # Setup
     cd $cDatHome3 >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    if [ ! -r $tTar ]; then
+        fail "Could not find $tTar [$LINENO]"
+        return 1
+    fi
+    tar -xzf $tTar
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=2
@@ -675,10 +696,16 @@ testCloneSummary()
 {
     local tResult
     local tStatus
+    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
 
     # Setup
     cd $cDatHome3 >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_Home3AfterCloneMkGit.tgz
+    if [ ! -r $tTar ]; then
+        fail "Could not find $tTar [$LINENO]"
+        return 1
+    fi
+    tar -xzf $tTar
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=2
@@ -690,6 +717,8 @@ testCloneSummary()
     tResult=$(fCloneUpdateHostConfig 2>&1)
     assertTrue "$LINENO $tResult" $?
 
+    # Tests
+
     gpYesNo=No
     tResult=$(fCloneSummary 2>&1)
     assertFalse "$LINENO $tResult" $?
@@ -697,11 +726,21 @@ testCloneSummary()
 
     gpYesNo=Yes
     tResult=$(fCloneSummary 2>&1)
-    assertTrue "$LINENO $tResult" $?
+    tStatus=$?
+    assertTrue "$LINENO $tResult" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Committing changes"
     #assertContains "$LINENO $tResult" "$tResult" "Added .gitproj.config.testserver2"
     assertContains "$LINENO $tResult" "$tResult" "nothing to commit"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+
+    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
+        echo -e "\tCapture state of project after fCloneSummary."
+        echo -e "\tRestore $tTar2 relative to env cDatHome3=$cDatHome3"
+        cd $cDatHome3 >/dev/null 2>&1
+        echo -en "\t"
+        tar -cvzf $tTar2 .
+        echo
+    fi
 
     return 0
 } # testCloneSummary
@@ -709,38 +748,21 @@ testCloneSummary()
 # --------------------------------
 testCloneFromRemoteDir()
 {
-startSkipping
-fail "$LINENO TBD"
-return 0
-    local tSrc=${BASH_SOURCE##*/}
     local tResult
-    local tStatus
-    local tFile
-    local tS
 
-    gpGitFlow="true"
-    gpMaxSize="10k"
-    gpAutoMove=true
+    # Setup
+    cd $cDatHome3 >/dev/null 2>&1
+    gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    gpProjName=george
+    gpYesNo=Yes
+    gpVerbose=2
+    cd $HOME/project >/dev/null 2>&1
 
-    gpAuto=1
-    gpSysLog=true
-    gpVerbose=3
-    gpDebug=10
-
-    # Create local git and local raw
-    gpLocalTopDir=$HOME/$cDatProj1
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fCloneCreateLocalGit 2>&1)
-    tStatus=$?
-    assertTrue "$LINENO $tResult" "$tStatus"
-    assertTrue "$LINENO" "[ -d $gpLocalTopDir/raw ]"
-
-    if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
-        echo -e "\tCapture state of project after git init."
-        echo -e "\tRestore test-env_ProjLocalDefined.tgz relative to HOME/project"
-        cd $HOME >/dev/null 2>&1
-        tar -cvzf $gpTest/test-env_ProjLocalDefined.tgz .gitconfig .gitproj.config.global $cDatProj1
-    fi
+    tResult=$(fCloneFromRemoteDir 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0
 } # testCloneFromRemoteDir
@@ -748,12 +770,15 @@ return 0
 # --------------------------------
 testGetProjCloneCLI()
 {
-startSkipping
-fail "$LINENO TBD"
-return 0
+    local tResult
 
-    cd $HOME/$cDatProj1
-    $gpBin/git-proj-clone local -a
+    cd $cDatHome3 >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-clone -y -vv -d $cDatMount3/video-2020-04-02/george.git -y 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+    
+    return 0
 } # testGetProjCloneCLI
 
 # ========================================

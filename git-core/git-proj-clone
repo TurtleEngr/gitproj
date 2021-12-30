@@ -172,7 +172,7 @@ shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
 fi
-if [ -z "$gpRemoteDir" ]; then
+if [ -z "$gpRemoteGitDir" ]; then
     fError -m "-d pRemoteDir option is required." -l $tSrc:$LINENO
 fi
 
