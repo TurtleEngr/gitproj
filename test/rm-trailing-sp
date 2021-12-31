@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+    cat <<EOF
+Usage:
+    rm-trailing-sp FILE...
+    
+Remove trailing whitespace. Only use this on text files.
+The script skip files when the "file" command does not show "ASCII text".
+
+Backup the files if you want to be careful.
+EOF
+    exit 1
+fi
+
+for i in $*; do
+    file $i | grep -q 'ASCII text'
+    if [ $? -ne 0 ]; then
+        echo "Skipping $i"
+        continue
+    fi
+    sed -Ei 's/[[:space:]]*$//' $i
+done

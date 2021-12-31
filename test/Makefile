@@ -25,7 +25,8 @@ mDepList = \
 
 mBaseList = \
 	test-com.log \
-	test-com2.log
+	test-com2.log \
+	test-pre-commit.log
 
 mCmdList = \
 	test-gitproj.log \
@@ -56,6 +57,9 @@ test-com.log : $(mDepList) test-com.sh
 
 test-com2.log : $(mDepList) test-com2.sh
 	./test-com2.sh 2>&1 | tee $@
+
+test-pre-commit.log : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit
+	./test-pre-commit.sh 2>&1 | tee $@
 
 test-gitproj.log : $(mDepList) test-gitproj.sh $(mCore)/git-proj
 	./test-gitproj.sh 2>&1 | tee $@

@@ -100,8 +100,10 @@ fCheckFileNames()
     if [ -n "$gFileList" ]; then
         let ++gErr
 	echo
-        echo "These files are not valid: $gFileList" | fmt
+        echo "These files are not valid:"
+	echo "$gFileList" | fmt -w 10
         cat <<EOF
+
 Names can only use letters, numbers, hypen, dash, and periods.
 Names cannot begin with hyphens or end with periods.
 Names cannot be all periods.
@@ -112,6 +114,31 @@ EOF
     fi
     return 0
 } # fCheckFileNames
+
+# --------------------
+fCheckWhiteSpace()
+{
+    local tFile
+
+    tResult=$(git config --get --bool gitproj.hook.check-whitespace)
+    if [ "$tResult" != "true" ]; then
+        return 0
+    fi
+
+    # If there are whitespace errors, print the offending file names
+    for tFile in $(git diff-index --color=never --check --cached $gAgainst -- | tr ' ' '!' | awk '/trailing/ {print $1}'); do
+        tFile=${tFile%%:*}
+	fReport 0 1 $tFile "trailing whitespace" $LINENO
+    done
+    if [ -n "$gFileList" ]; then
+        let ++gErr
+	echo
+        echo "These files had trailing whitespaces:"
+	eccho "$gFileList" | fmt -w 10
+	echo
+    fi
+    return 0
+} # fCheckWhiteSpace
 
 # --------------------
 fCheckNotRaw()
@@ -134,8 +161,10 @@ fCheckNotRaw()
         let ++gErr
 	tResult=$(git config --get gitproj.config.remote-raw-dir)
 	echo
-	echo "These files should not be managed in git: $gFileList" | fmt
+	echo "These files should not be managed in git:"
+	echo "$gFileList" | fmt -w 10
 	cat <<EOF  | fmt
+
 Use "git proj push" to save binary files, in raw/, to $tResult
 Also, run "git proj -h | less" for a description of how git-proj
 can manage large binary files and keep your git repo nimble.
@@ -145,30 +174,6 @@ EOF
     fi
     return 0
 } # fCheckNotRaw
-
-# --------------------
-fCheckWhiteSpace()
-{
-    local tFile
-
-    tResult=$(git config --get --bool gitproj.hook.check-whitespace)
-    if [ "$tResult" != "true" ]; then
-        return 0
-    fi
-
-    # If there are whitespace errors, print the offending file names
-    for tFile in $(git diff-index --color=never --check --cached $gAgainst -- | tr ' ' '!' | awk '/trailing/ {print $1}'); do
-        tFile=${tFile%%:*}
-	fReport 0 1 $tFile "trailing whitespace" $LINENO
-    done
-    if [ -n "$gFileList" ]; then
-        let ++gErr
-	echo
-        echo "These files had trailing whitespaces: $gFileList" | fmt
-	echo
-    fi
-    return 0
-} # fCheckWhiteSpace
 
 # --------------------
 fCheckBigFiles()
@@ -201,14 +206,15 @@ fCheckBigFiles()
     if [ -n "$gFileList" ]; then
         let ++gErr
 	echo
-        echo "These files were > $tMaxSize: $gFileList" | fmt
+        echo "These files were > $tMaxSize:"
+	echo "$gFileList" | fmt -w 10
         cat <<EOF | fmt
 
 Large binary files should NOT be committed to git.  Move the files to
 the top raw/ dir, or use "git proj move FILE" to move the file to the
 raw/ dir and it will make a symlink to the files old location. Or
 change config gitproj.hook.binary-file-size-limit to be larger. Or
-disable this check, and create massive git repo.
+disable this check, and live with a massive git repo.
 
 EOF
         return 1
@@ -228,9 +234,8 @@ fi
 gVerbose=$(git config --get --bool gitproj.hook.verbose)
 fEnabled
 fCheckFileNames
-fCheckBigFiles
-fCheckNotRaw
 fCheckWhiteSpace
+fCheckNotRaw
+fCheckBigFiles
 
-exit 1
 exit $gErr

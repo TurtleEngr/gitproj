@@ -119,6 +119,8 @@ setUp()
     cd $HOME/project/george >/dev/null 2>&1
     fComGetProjGlobals
 
+    cp $gpDoc/hooks/pre-commit .git/hooks
+
     gpUnitDebug=0
     return 0
 
@@ -172,8 +174,6 @@ testCheckFileNames()
     local tResult
 
     cd $HOME/project/george >/dev/null 2>&1
-    cp $gpDoc/hooks/pre-commit .git/hooks
-
     echo "illegal char" >foo:bar.txt
     echo "illegal char" >bar,foo.txt
     echo "illegal char" >"bar foo.txt"
@@ -219,6 +219,150 @@ testCheckFileNames()
 
     return 0
 } # testCheckFileNames
+
+# --------------------------------
+testCheckWhiteSpace()
+{
+    local tResult
+
+    # Make some files with trailing whitespace and "add" them
+    cd $HOME/project/george >/dev/null 2>&1
+    cat <<EOF >test-wsp.txt
+Testing whitespace
+
+lots of extra
+     jsjdfs
+     
+EOF
+    cp test-wsp.txt test2-wsp.txt
+    git add test-wsp.txt test2-wsp.txt
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "A  test-wsp.txt"
+    assertContains "$LINENO" "$tResult" "A  test2-wsp.txt"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git commit -m "Testing" 2>&1)
+    assertFalse $LINENO $?
+    assertContains "$LINENO" "$tResult" "test-wsp.txt trailing whitespace"
+    assertContains "$LINENO" "$tResult" "test2-wsp.txt trailing whitespace"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "?? test-wsp.txt"
+    assertContains "$LINENO" "$tResult" "?? test2-wsp.txt"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    # ----------
+    # Remove the trailing space, not add and check
+    $gpTest/rm-trailing-sp test-wsp.txt test2-wsp.txt
+    git add test-wsp.txt test2-wsp.txt
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "A  test-wsp.txt"
+    assertContains "$LINENO" "$tResult" "A  test2-wsp.txt"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git commit -am "Testing OK" 2>&1)
+    assertTrue $LINENO $?
+    assertNotContains "$LINENO" "$tResult" "test-wsp.txt trailing whitespace"
+    assertNotContains "$LINENO" "$tResult" "test2-wsp.txt trailing whitespace"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git log test-wsp.txt 2>&1 | head -n 10)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "Testing OK"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    return 0
+} # testCheckWhiteSpace
+
+# --------------------------------
+testCheckNotRaw()
+{
+    local tResult
+
+    # Put some files in raw/ dir
+    cd $HOME/project/george >/dev/null 2>&1
+    echo "test1" >raw/test1.txt
+    echo "test2" >raw/test2.txt
+    echo "test3" >raw/src/test3.txt
+    git add -f raw/test1.txt raw/test2.txt raw/src/test3.txt
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "A  raw/test1.txt"
+    assertContains "$LINENO" "$tResult" "A  raw/test2.txt"
+    assertContains "$LINENO" "$tResult" "A  raw/src/test3.txt"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git commit -m "Testing" 2>&1)
+    assertFalse $LINENO $?
+    assertContains "$LINENO" "$tResult" "raw/test1.txt Do not commit files in raw/"
+    assertContains "$LINENO" "$tResult" "raw/test2.txt Do not commit files in raw/"
+    assertContains "$LINENO" "$tResult" "raw/src/test3.txt Do not commit files in raw/"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git status -s --ignored 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "!! raw"
+    assertNotContains "$LINENO" "$tResult" "raw/test1.txt"
+    assertNotContains "$LINENO" "$tResult" "raw/test2.txt"
+    assertNotContains "$LINENO" "$tResult" "raw/src/test3.txt"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    return 0
+} # testCheckNotRaw
+
+# --------------------------------
+testCheckBigFiles()
+{
+    local tResult
+
+    # Create some big binary files
+    cd $HOME/project/george >/dev/null 2>&1
+    ln raw/src/raw/MOV001.mp4 src/final/test-MOV001.mp4
+    cp raw/src/raw/MOV001.MP3 edit/test-MOV001.MP3
+    cp raw/src/final/george.mp4 test-george.mp4
+    git add src/final/test-MOV001.mp4 edit/test-MOV001.MP3 test-george.mp4
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "A  src/final/test-MOV001.mp4"
+    assertContains "$LINENO" "$tResult" "A  edit/test-MOV001.MP3"
+    assertContains "$LINENO" "$tResult" "A  test-george.mp4"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git commit -m "Testing" 2>&1)
+    assertFalse $LINENO $?
+    assertContains "$LINENO" "$tResult" "edit/test-MOV001.MP3 size 15360 > 10240"
+    assertContains "$LINENO" "$tResult" "src/final/test-MOV001.mp4 size 20480 > 10240"
+    assertContains "$LINENO" "$tResult" "test-george.mp4 size 1048576 > 10240"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "?? edit/test-MOV001.MP3"
+    assertContains "$LINENO" "$tResult" "?? src/final/test-MOV001.mp4"
+    assertContains "$LINENO" "$tResult" "?? test-george.mp4"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    # Disable the big file chack and add the files
+    git config --bool gitproj.hook.check-for-big-files false
+    git add src/final/test-MOV001.mp4 edit/test-MOV001.MP3 test-george.mp4
+
+    tResult=$(git commit -m "Testing" 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "create mode 100644 edit/test-MOV001.MP3"
+    assertContains "$LINENO" "$tResult" "create mode 100644 src/final/test-MOV001.mp4"
+    assertContains "$LINENO" "$tResult" "create mode 100644 test-george.mp4"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    return 0
+} # testCheckBigFiles
 
 # ====================
 # This should be the last defined function
