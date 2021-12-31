@@ -15,16 +15,14 @@ export gAgainst
 export gFileList=""
 export LC_ALL=C
 export gErr=0
+export gSrc=${BASH_SOURCE##*/}
 
-# --------------------
-fEnabled()
+fIsBinary()
 {
-    tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
-    if [ "$tEnabled" != "true" ]; then
-        exit 0
-    fi
-    return 0
-} # fEnabled
+    local pFile="$1"
+    grep -Hm1 '^' < "$pFile" | grep -q '^Binary'
+    # Copied from: https://unix.stackexchange.com/questions/275516/is-there-a-convenient-way-to-classify-files-as-binary-or-text
+}
 
 fReport()
 {
@@ -33,7 +31,6 @@ fReport()
     local pFile=$3
     local pMsg="$4"
     local pLine=$5
-    local tSrc=${BASH_SOURCE##*/}
     local tErr=0
 
     if [ $pZero -eq 0 ] && [ $pResult -ne 0 ]; then
@@ -45,14 +42,28 @@ fReport()
     if [ $tErr -ne 0 ]; then
         let ++gErr
 	if [ "$gVerbose" = "true" ]; then
-	    echo "$pFile $pMsg [$tSrc:$pLine]"
+	    echo "$pFile $pMsg [$gSrc:$pLine]"
 	fi
         gFileList="$gFileList $pFile"
 	git reset HEAD $pFile
+	if [ "${pFile%!*}" != "$pFile" ]; then
+	    pFile=$(echo $pFile | tr '!' ' ')
+	    git reset HEAD "$pFile"
+	fi
 	return 1
     fi
     return 0
 } # fReport
+
+# --------------------
+fEnabled()
+{
+    tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
+    if [ "$tEnabled" != "true" ]; then
+        exit 0
+    fi
+    return 0
+} # fEnabled
 
 # --------------------
 fCheckFileNames()
@@ -66,9 +77,10 @@ fCheckFileNames()
         return 0
     fi
 
+    # Spaces in names really f**ks up scripts, so replace them with '!'
+    # another invalid character
     gFileList=""
-    git diff --cached --name-only --diff-filter=ACR -z $gAgainst | \
-    while IFS= read -r -d '' tFile; do
+    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
         tResult=$(echo -n "$tFile" | tr -d '[ -~]' | wc -c)
     	fReport 0 $tResult $tFile "has non-printable chars in name" $LINENO || continue
 
@@ -78,38 +90,22 @@ fCheckFileNames()
         tResult=$(echo -n "$tFile" | grep -Ei '(^|/)(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)' | wc -c)
 	fReport 0 $tResult $tFile "has reserved words in name" $LINENO || continue
 
-        tResult=$(echo -n "$tFile" | grep -Eq '(\.| )$' | wc -c)
-	fReport 0 $tResult $tFile "has trailing period or space" $LINENO || continue
-	
-        echo -n "$tFile" | grep -Eq '^(-)'
-	fReport 1 $? $tFile "has leading hyphen" $LINENO || continue
-	
-        echo -n "$tFile" | grep -Eq '(^\.*$)|(^\.*/)|(/\.*/)|(/\.*$)'
+        echo -n "$tFile" | grep -Eq '(\.\.+$)'
 	fReport 1 $? $tFile "has just periods in name" $LINENO || continue
-	
-        # Check file name length.
-	# Windows path plus file < 260 ch
-	# Linux: path plus file < 4096 ch
-	# Linux: filenames < 255 ch
-	# Tune this for Linux.
-        # But PWD can be different on different systems.
-        tResult=$(echo $PWD/$tFile | wc -c)
-	tPart=$(echo ${$tFile##*/} | wc -c)
-        if [ $tResult -ge 4096 ] || [ $tPart -ge 255 ]; then
-	    fReport 0 1 $tFile "name or path is too long" $LINENO || continue
-	fi
+
+        echo -n "$tFile" | grep -Eq '\.$'
+	fReport 1 $? $tFile "has trailing period" $LINENO || continue
     done
 
     if [ -n "$gFileList" ]; then
         let ++gErr
+	echo
         echo "These files are not valid: $gFileList" | fmt
         cat <<EOF
-
 Names can only use letters, numbers, hypen, dash, and periods.
 Names cannot begin with hyphens or end with periods.
 Names cannot be all periods.
-Names cannot be > 255 ch long.
-Names with Path cannot be > 4096 ch long.
+If you had a filename with spaces in it, the spaces were replaced with '!'.
 
 EOF
 	return 1
@@ -129,7 +125,7 @@ fCheckNotRaw()
     fi
 
     gFileList=""
-    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst); do
+    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
         echo $tFile | grep -q '^raw/'
 	fReport 1 $? $tFile "Do not commit files in raw/" $LINENO
     done
@@ -137,8 +133,14 @@ fCheckNotRaw()
     if [ -n "$gFileList" ]; then
         let ++gErr
 	tResult=$(git config --get gitproj.config.remote-raw-dir)
-        echo "These files are not managed in git: $gFileList" | fmt
-	echo "Use "git proj push" to save binary files, in raw/, to $tResult" | fmt
+	echo
+	echo "These files should not be managed in git: $gFileList" | fmt
+	cat <<EOF  | fmt
+Use "git proj push" to save binary files, in raw/, to $tResult
+Also, run "git proj -h | less" for a description of how git-proj
+can manage large binary files and keep your git repo nimble.
+
+EOF
 	return 1
     fi
     return 0
@@ -147,7 +149,6 @@ fCheckNotRaw()
 # --------------------
 fCheckWhiteSpace()
 {
-    local tLine
     local tFile
 
     tResult=$(git config --get --bool gitproj.hook.check-whitespace)
@@ -156,14 +157,15 @@ fCheckWhiteSpace()
     fi
 
     # If there are whitespace errors, print the offending file names
-    git diff-index --color=never --check --cached $gAgainst -- | \
-    while IFS= read -r -d '' tFile; do
-        tFile=${tLine%%:*}
+    for tFile in $(git diff-index --color=never --check --cached $gAgainst -- | tr ' ' '!' | awk '/trailing/ {print $1}'); do
+        tFile=${tFile%%:*}
 	fReport 0 1 $tFile "trailing whitespace" $LINENO
     done
     if [ -n "$gFileList" ]; then
         let ++gErr
+	echo
         echo "These files had trailing whitespaces: $gFileList" | fmt
+	echo
     fi
     return 0
 } # fCheckWhiteSpace
@@ -183,28 +185,30 @@ fCheckBigFiles()
 
     tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
     
-    # To detect binary files, we exploit the fact that the printable
-    # range starts at the space character and ends with tilde.
-
     gFileList=""
-    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst); do
-        if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
-            tSize=$(ls -l $tFile | awk '{print $5}')
-            if [ $tSize -gt $tMaxSize ]; then
-	          fReport 0 1 $tFile "size $tSize > $tMaxSize" $LINENO
-            fi
+    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
+        if [ ! -f "$tFile" ]; then
+	    continue
+	fi
+	if ! fIsBinary $tFile; then
+	    continue
+	fi
+        tSize=$(ls -l $tFile | awk '{print $5}')
+        if [ $tSize -gt $tMaxSize ]; then
+	      fReport 0 1 $tFile "size $tSize > $tMaxSize" $LINENO
         fi
     done
     if [ -n "$gFileList" ]; then
         let ++gErr
+	echo
         echo "These files were > $tMaxSize: $gFileList" | fmt
         cat <<EOF | fmt
 
-Large binary files should not be committed to git.  Move the files to
+Large binary files should NOT be committed to git.  Move the files to
 the top raw/ dir, or use "git proj move FILE" to move the file to the
 raw/ dir and it will make a symlink to the files old location. Or
 change config gitproj.hook.binary-file-size-limit to be larger. Or
-disable this check.
+disable this check, and create massive git repo.
 
 EOF
         return 1
@@ -214,9 +218,6 @@ EOF
 
 # ========================================
 # Main
-
-# Redirect output to stderr
-exec 1>&2
 
 gAgainst=HEAD
 if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
@@ -231,4 +232,5 @@ fCheckBigFiles
 fCheckNotRaw
 fCheckWhiteSpace
 
+exit 1
 exit $gErr
