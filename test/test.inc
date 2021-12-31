@@ -60,7 +60,7 @@ fTestSetupEnv()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    SHUNIT_COLOR=none
+#    SHUNIT_COLOR=none
 
     gpBin=$gpTest/../git-core
     cd $gpBin >/dev/null 2>&1
