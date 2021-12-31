@@ -355,12 +355,14 @@ Local Config $gpProjName/$cConfigHost
     remote-raw-dir = $(fComGetConfig -k "gitproj.config.remote-raw-dir")
     remote-min-size = $(fComGetConfig -k "gitproj.config.remote-min-size")
 [gitproj "hook"]
-    source = $(fComGetConfig -k "gitproj.hook.source")
+    verbose = $(fComGetConfig -k "gitproj.hook.verbose")
     pre-commit-enabled = $(fComGetConfig -k "gitproj.hook.pre-commit-enabled")
     check-file-names = $(fComGetConfig -k "gitproj.hook.check-file-names")
+    check-in-raw = $(fComGetConfig -k "gitproj.hook.check-in-raw")
+    check-whitespace = $(fComGetConfig -k "gitproj.hook.check-whitespace")
     check-for-big-files = $(fComGetConfig -k "gitproj.hook.check-for-big-files")
     binary-file-size-limit = $(fComGetConfig -k "gitproj.hook.binary-file-size-limit")
-    auto-move = $(fComGetConfig -k "gitproj.hook.auto-move")
+    source = $(fComGetConfig -k "gitproj.hook.source")
 
 Modified files:
 $(git status)

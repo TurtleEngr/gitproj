@@ -169,7 +169,7 @@ testComGetProjGlobals()
     cd $cDatHome/$cDatProj3 >/dev/null 2>&1
     tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "This git workspace is not setup for gitproj, run"
+    assertContains "$LINENO $tResult" "$tResult" "This git workspace is not setup for gitproj"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     fComGetProjGlobals >/dev/null 2>&1

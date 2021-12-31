@@ -4,10 +4,10 @@
 export cCurDir cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
-    gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
-    gpHookSource gpLocalRawDir \
-    gpLocalStatus gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled \
-    gpProjName gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
+    gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
+    gpGitFlow gpHookSource gpHookVerbose gpLocalRawDir gpLocalStatus \
+    gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
+    gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
 # ========================================
 
@@ -302,39 +302,40 @@ fInitSummary()
     cat <<EOF
 
 Summary
-           (auto) = $gpAuto
-        (verbose) = $gpVerbose
-          (debug) = $gpDebug
-          (exits)   HOME/.gitconfig
-        (created)   HOME/$cConfigGlobal
-  (local-raw-dir) = $gpLocalRawDir
-  (git-flow init) = $gpGitFlow
+    (auto) = $gpAuto
+    (verbose) = $gpVerbose
+    (debug) = $gpDebug
+    (exits)   HOME/.gitconfig
+    (created)   HOME/$cConfigGlobal
+    (local-raw-dir) = $gpLocalRawDir
+    (git-flow init) = $gpGitFlow
 
 [gitproj "config"]
-       proj-status = $gpProjStatus
-      local-status = $gpLocalStatus
-              ver = $gpVer
-           syslog = $gpSysLog
-         facility = $gpFacility
-              bin = $gpBin
-              doc = $gpDoc
-             test = $gpTest
-        proj-name = $gpProjName
-     git-flow-pkg = $gpGitFlowPkg
+    proj-status = $gpProjStatus
+    local-status = $gpLocalStatus
+    ver = $gpVer
+    syslog = $gpSysLog
+    facility = $gpFacility
+    bin = $gpBin
+    doc = $gpDoc
+    test = $gpTest
+    proj-name = $gpProjName
+    git-flow-pkg = $gpGitFlowPkg
 
 [gitproj "hook"]
-                source = $gpHookSource
-    pre-commit-enabled = $gpPreCommitEnabled=true
-      check-file-names = $gpCheckFileNames=true
-   check-for-big-files = $gpCheckForBigFiles=true
-binary-file-size-limit = $gpMaxSize
-             auto-move = $gpAutoMove
+    verbose = $gpHookVerbose
+    pre-commit-enabled = $gpPreCommitEnabled
+    check-file-names = $gpCheckFileNames
+    check-in-raw = $gpCheckInRaw
+    check-whitespace = $gpCheckWhitespace
+    check-for-big-files = $gpCheckForBigFiles
+    binary-file-size-limit = $gpMaxSize
+    source = $gpHookSource
 
 EOF
     if [ $gpAuto -eq 0 ]; then
         while [ $tMaxLoop -gt 0 ]; do
             let --tMaxLoop
-
             echo -n "Continue with creating a local git repo [y/n]? "
             read -r tResult
             tResult=${tResult%${tResult#[a-z]}}
@@ -563,11 +564,13 @@ fInitSaveVarsToConfigs()
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
         tS=gitproj.hook
-        fComSaveVar2Config $tFile $tS.auto-move gpAutoMove
-        fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
-        fComSaveVar2Config $tFile $tS.check-file-names gpCheckFileNames
-        fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
+	fComSaveVar2Config $tFile $tS.verbose gpHookVerbose
         fComSaveVar2Config $tFile $tS.pre-commit-enabled gpPreCommitEnabled
+        fComSaveVar2Config $tFile $tS.check-file-names gpCheckFileNames
+	fComSaveVar2Config $tFile $tS.check-in-raw gpCheckInRaw
+	fComSaveVar2Config $tFile $tS.check-whitespace gpCheckWhitespace
+        fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
+        fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
         fComSaveVar2Config $tFile $tS.source gpHookSource
     done
 

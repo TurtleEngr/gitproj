@@ -658,7 +658,7 @@ testGitProjRemoteCLIAuto()
     cd $cDatHome/$cDatProj3 >/dev/null 2>&1
     tResult=$($gpBin/git-proj-remote -a -d $PWD 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: This git workspace is not setup for gitproj, run"
+    assertContains "$LINENO $tResult" "$tResult" "crit: This git workspace is not setup for gitproj"
     assertContains "$LINENO $tResult" "$tResult" "Usage:"
 
     # -d required

@@ -1,89 +1,234 @@
 #!/bin/bash
 # This file is copied from gitproj doc/hooks/pre-commit to .git/hooks
 # These gitproj config hook vars control this script:
+
 # pre-commit-enabled = if true, this script is enabled
 # check-file-names = if true, "abnormal" file names will not be allowed
 # check-for-big-files = if true, files bigger than
 #     binary-file-size-limit cannot be committed.
 # binary-file-size-limit = defines the max size. # of bytes if no suffix.
 #     Suffixes: k,m,g
-# auto-move = if true, then binary files > binary-file-size-limit will
-#     be moved to the GIT_DIR/raw/ directory. See 'git proj move', if this
-#     is set to false.
 
-#local tAgainst
-#local tCheckBigFiles
-#local tCheckFileNames
-#local tEnabled
-#local tErr=0
-#local tFile
-#local tMaxSize
-#local tSize
-#local tTest
+# --------------------
+export gVerbose=true
+export gAgainst
+export gFileList=""
+export LC_ALL=C
+export gErr=0
 
-# Redirect output to stderr.
-exec 1>&2
+# --------------------
+fEnabled()
+{
+    tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
+    if [ "$tEnabled" != "true" ]; then
+        exit 0
+    fi
+    return 0
+} # fEnabled
 
-tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
-if "$tEnabled" != "true" ]; then
-    exit 0
-fi
+fReport()
+{
+    local pZero=$1
+    local pResult=$2
+    local pFile=$3
+    local pMsg="$4"
+    local pLine=$5
+    local tSrc=${BASH_SOURCE##*/}
+    local tErr=0
 
-tCheckBigFiles=$(git config --get --bool gitproj.hook.check-for-big-files)
-tCheckFileNames=$(git config --get --bool gitproj.hook.check-file-names)
+    if [ $pZero -eq 0 ] && [ $pResult -ne 0 ]; then
+        tErr=1
+    fi
+    if [ $pZero -eq 1 ] && [ $pResult -eq 0 ]; then
+        tErr=1
+    fi
+    if [ $tErr -ne 0 ]; then
+        let ++gErr
+	if [ "$gVerbose" = "true" ]; then
+	    echo "$pFile $pMsg [$tSrc:$pLine]"
+	fi
+        gFileList="$gFileList $pFile"
+	git reset HEAD $pFile
+	return 1
+    fi
+    return 0
+} # fReport
 
-if git rev-parse --verify HEAD >/dev/null 2>&1; then
-    tAgainst=HEAD
-else
-    # Initial commit: diff against an empty tree object
-    tAgainst=4b825dc642cb6eb9a060e54bf8d69288fbee4904
-fi
+# --------------------
+fCheckFileNames()
+{
+    local tFile
+    local tResult
+    local tPart
 
-if [ "$tCheckBigFiles" = "true" ]; then
+    tResult=$(git config --get --bool gitproj.hook.check-file-names)
+    if [ "$tResult" != "true" ]; then
+        return 0
+    fi
+
+    gFileList=""
+    git diff --cached --name-only --diff-filter=ACR -z $gAgainst | \
+    while IFS= read -r -d '' tFile; do
+        tResult=$(echo -n "$tFile" | tr -d '[ -~]' | wc -c)
+    	fReport 0 $tResult $tFile "has non-printable chars in name" $LINENO || continue
+
+    	tResult=$(echo -n "$tFile" | tr -d 'a-zA-Z0-9/._-' | wc -c)
+    	fReport 0 $tResult $tFile "has illegal chars in name" $LINENO || continue
+
+        tResult=$(echo -n "$tFile" | grep -Ei '(^|/)(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)' | wc -c)
+	fReport 0 $tResult $tFile "has reserved words in name" $LINENO || continue
+
+        tResult=$(echo -n "$tFile" | grep -Eq '(\.| )$' | wc -c)
+	fReport 0 $tResult $tFile "has trailing period or space" $LINENO || continue
+	
+        echo -n "$tFile" | grep -Eq '^(-)'
+	fReport 1 $? $tFile "has leading hyphen" $LINENO || continue
+	
+        echo -n "$tFile" | grep -Eq '(^\.*$)|(^\.*/)|(/\.*/)|(/\.*$)'
+	fReport 1 $? $tFile "has just periods in name" $LINENO || continue
+	
+        # Check file name length.
+	# Windows path plus file < 260 ch
+	# Linux: path plus file < 4096 ch
+	# Linux: filenames < 255 ch
+	# Tune this for Linux.
+        # But PWD can be different on different systems.
+        tResult=$(echo $PWD/$tFile | wc -c)
+	tPart=$(echo ${$tFile##*/} | wc -c)
+        if [ $tResult -ge 4096 ] || [ $tPart -ge 255 ]; then
+	    fReport 0 1 $tFile "name or path is too long" $LINENO || continue
+	fi
+    done
+
+    if [ -n "$gFileList" ]; then
+        let ++gErr
+        echo "These files are not valid: $gFileList" | fmt
+        cat <<EOF
+
+Names can only use letters, numbers, hypen, dash, and periods.
+Names cannot begin with hyphens or end with periods.
+Names cannot be all periods.
+Names cannot be > 255 ch long.
+Names with Path cannot be > 4096 ch long.
+
+EOF
+	return 1
+    fi
+    return 0
+} # fCheckFileNames
+
+# --------------------
+fCheckNotRaw()
+{
+    local tFile
+    local tResult
+
+    tResult=$(git config --get --bool gitproj.hook.check-in-raw)
+    if [ "$tResult" != "true" ]; then
+        return 0
+    fi
+
+    gFileList=""
+    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst); do
+        echo $tFile | grep -q '^raw/'
+	fReport 1 $? $tFile "Do not commit files in raw/" $LINENO
+    done
+
+    if [ -n "$gFileList" ]; then
+        let ++gErr
+	tResult=$(git config --get gitproj.config.remote-raw-dir)
+        echo "These files are not managed in git: $gFileList" | fmt
+	echo "Use "git proj push" to save binary files, in raw/, to $tResult" | fmt
+	return 1
+    fi
+    return 0
+} # fCheckNotRaw
+
+# --------------------
+fCheckWhiteSpace()
+{
+    local tLine
+    local tFile
+
+    tResult=$(git config --get --bool gitproj.hook.check-whitespace)
+    if [ "$tResult" != "true" ]; then
+        return 0
+    fi
+
+    # If there are whitespace errors, print the offending file names
+    git diff-index --color=never --check --cached $gAgainst -- | \
+    while IFS= read -r -d '' tFile; do
+        tFile=${tLine%%:*}
+	fReport 0 1 $tFile "trailing whitespace" $LINENO
+    done
+    if [ -n "$gFileList" ]; then
+        let ++gErr
+        echo "These files had trailing whitespaces: $gFileList" | fmt
+    fi
+    return 0
+} # fCheckWhiteSpace
+
+# --------------------
+fCheckBigFiles()
+{
+    local tMaxSize
+    local tSize
+    local tFile
+    local tResult
+
+    tResult=$(git config --get --bool gitproj.hook.check-for-big-files)
+    if [ "$tResult" != "true" ]; then
+        return 0
+    fi
+
+    tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
+    
     # To detect binary files, we exploit the fact that the printable
     # range starts at the space character and ends with tilde.
-    tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
-    LC_ALL=C
-    for tFile in $(git diff --cached --name-only --diff-filter=A -z $tAgainst); do
+
+    gFileList=""
+    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst); do
         if [ $(tr -d '[ -~]\0' <$tFile | wc -c) != 0 ]; then
             tSize=$(ls -l $tFile | awk '{print $5}')
             if [ $tSize -gt $tMaxSize ]; then
-                tErr=1
-                echo "Error: tFile size $tSize > $tMaxSize"
-                git reset HEAD $tFile
+	          fReport 0 1 $tFile "size $tSize > $tMaxSize" $LINENO
             fi
         fi
     done
-fi
-if [ $tErr -ne 0 ]; then
-    echo "Error: Large binary files should not be committed:"
-    echo 'Use "git proj add FILE" to save the files to the "raw" remote.'
-    echo "Or change config gitproj.hook.binary-file-size-limit to be larger."
+    if [ -n "$gFileList" ]; then
+        let ++gErr
+        echo "These files were > $tMaxSize: $gFileList" | fmt
+        cat <<EOF | fmt
+
+Large binary files should not be committed to git.  Move the files to
+the top raw/ dir, or use "git proj move FILE" to move the file to the
+raw/ dir and it will make a symlink to the files old location. Or
+change config gitproj.hook.binary-file-size-limit to be larger. Or
+disable this check.
+
+EOF
+        return 1
+    fi
+    return 0
+} # fCheckBigFiles
+
+# ========================================
+# Main
+
+# Redirect output to stderr
+exec 1>&2
+
+gAgainst=HEAD
+if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+    # Initial commit: diff against an empty tree object
+    gAgainst=4b825dc642cb6eb9a060e54bf8d69288fbee4904
 fi
 
-if [ "$tCheckFileNames" = "true" ]; then
-    for tFile in $(git diff --cached --name-only --diff-filter=A -z $tAgainst); do
-        tTest=$(echo $tFile | perl -ne '
-	    tr/-_.a-zA-Z0-9/x/cs;
-	    s/-+/-/g;
-	    s/\.+/\./g;
-	    s/_+/_/;
-	    print
-	')
-        if [ "$tTest" != "$tFile" ]; then
-            tErr=2
-            echo "Error: Invalid file name: \"$tFile\""
-        fi
-    done
-fi
-if [ $tErr -ne 0 ]; then
-    echo "Invalid file names were found. Names can only use letters"
-    echo "numbers, hypen, dash, and periods."
-fi
+gVerbose=$(git config --get --bool gitproj.hook.verbose)
+fEnabled
+fCheckFileNames
+fCheckBigFiles
+fCheckNotRaw
+fCheckWhiteSpace
 
-if [ $tErr -ne 0 ]; then
-    exit $tErr
-fi
-
-# If there are whitespace errors, print the offending file names and fail.
-exec git diff-index --check --cached $tAgainst --
+exit $gErr

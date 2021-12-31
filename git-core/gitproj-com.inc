@@ -3,9 +3,13 @@
 # --------------------------------
 export cConfigGlobal cConfigLocal cConfigHost cCurDir cGitProjVersion \
     cGetOrigin cGetTopDir cGetCurBranch cPID
-export gErr gpBin gpCmdName gpDebug gpDoc gpFacility \
-    gpLocalRawDir gpSysLog gpVerbose gpYesNo PWD \
-    gGetConfigValue gGetConfigOrigin gResponse
+
+export PWD gErr gGetConfigOrigin gGetConfigValue gResponse gpAuto \
+    gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles gpCheckInRaw \
+    gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
+    gpHookSource gpHookVerbose gpLocalRawDir gpLocalStatus \
+    gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
+    gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpYesNo
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -312,8 +316,6 @@ fComPreProjSetGlobals()
     fi
 
     gpLocalRawDir=$gpLocalTopDir/raw
-
-    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #20g
 
     gpAutoMove="true"
@@ -324,12 +326,18 @@ fComPreProjSetGlobals()
     gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
 
-    gpCheckFileNames=true
-    gpCheckForBigFiles=true
-    gpPreCommitEnabled=true
-    gpHookSource=hooks/pre-commit
     gpMountDir=TBD
     gpRemoteRawDir=TBD
+
+    # Hook section
+    gpHookVerbose=$(fComGetConfig -k "gitproj.hook.verbose" -d true)
+    gpPreCommitEnabled=$(fComGetConfig -k "gitproj.hook.pre-commit-enabled" -d true)
+    gpCheckFileNames=$(fComGetConfig -k "gitproj.hook.check-file-names" -d true)
+    gpCheckInRaw=$(fComGetConfig -k "gitproj.hook.check-in-raw" -d true)
+    gpCheckWhitespace=$(fComGetConfig -k "gitproj.hook.check-whitespace" -d true)
+    gpCheckForBigFiles=$(fComGetConfig -k "gitproj.hook.check-for-big-files" -d true)
+    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
+    gpHookSource=$(fComGetConfig -k "gitproj.hook.source" -d "hooks/pre-commit")
 
     # These will be redefined later
     #    gpLocalTopDir
@@ -356,7 +364,7 @@ fComCheckDeps()
     local tSrc=${BASH_SOURCE##*/}
     local tProg
     local tErr=0
-    local tComReq='logger pod2text pod2usage'
+    local tComReq='logger pod2text pod2usage rsync'
     local tComOpt='pod2html pod2man pod2markdown tidy shunit2.1 gawk sed tr fmt'
 
     for tProg in $pOptional $tComOpt; do

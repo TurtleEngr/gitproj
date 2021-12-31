@@ -590,6 +590,7 @@ testInitMoveBinaryFiles()
 {
     local tResult
     local tStatus
+    local tTar=$gpTest/test-env_HomeAfterBMove.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -633,10 +634,10 @@ testInitMoveBinaryFiles()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after files have been moved."
-        echo -e "\tRestore test-env_HomeAfterBMove.tgz relative to env cDatHome"
+        echo -e "\tRestore $tTar relative to env cDatHome"
         cd $HOME >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $gpTest/test-env_HomeAfterBMove.tgz .
+        tar -cvzf $tTar .
         echo
     fi
 
@@ -676,10 +677,16 @@ testInitMkGitDir()
     local tResult
     local tStatus
     local tTop
+    local tTar1=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTar2=$gpTest/test-env_ProjAfterGInit.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $HOME >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
+    if [ ! -r $tTar1 ]; then
+        echo "Could not find: $tTar [$LINENO]"
+        return 1
+    fi
+    tar -xzf $tTar1
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -709,9 +716,9 @@ testInitMkGitDir()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after git init."
-        echo -e "\tRestore test-env_ProjAfterGInit.tgz relative to cDatHome/project"
+        echo -e "\tRestore $tTar2 relative to cDatHome/project"
         cd $HOME/project >/dev/null 2>&1
-        tar -cvzf $gpTest/test-env_ProjAfterGInit.tgz $gpProjName
+        tar -cvzf $tTar2 $gpProjName
     fi
 
     assertTrue "$LINENO not exec" "[ -x $tTop/.git/hooks/pre-commit ]"
@@ -723,15 +730,16 @@ testInitMkGitDir()
 # --------------------------------
 testInitMkLocalConfig()
 {
-    local tSrc=${BASH_SOURCE##*/}
     local tResult
+    local tTar1=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTar2=$gpTest/test-env_ProjAfterGInit.tgz
 
-    if [ ! -f $gpTest/test-env_HomeAfterBMove.tgz ]; then
-        fail "Missing test-env_HomeAfterBMove.tgz [$tSrc:$LINENO]"
+    if [ ! -r $tTar1 ]; then
+        echo "Could not find: $tTar1 [$LINENO]"
         return 1
     fi
-    if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
-        fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
+    if [ ! -r $tTar2 ]; then
+        echo "Could not find: $tTar2 [$LINENO]"
         return 1
     fi
 
@@ -739,11 +747,11 @@ testInitMkLocalConfig()
     cd $gpLocalTopDir >/dev/null 2>&1
 
     cd $HOME >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_HomeAfterBMove.tgz
+    tar -xzf $tTar1
     cd $gpTest
 
     cd $HOME/project >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_ProjAfterGInit.tgz
+    tar -xzf $tTar2
     cd $gpTest
 
     gpProjName=${cDatProj1##*/}
@@ -771,17 +779,17 @@ testInitMkLocalConfig()
 # --------------------------------
 testInitSaveVarsToConfigs()
 {
-    local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tFile
     local tS
+    local tTar=$gpTest/test-env_ProjAfterGInit.tgz
 
-    if [ ! -f $gpTest/test-env_ProjAfterGInit.tgz ]; then
-        fail "Missing test-env_ProjAfterGInit.tgz [$tSrc:$LINENO]"
+    cd $HOME/project >/dev/null 2>&1
+    if [ ! -r $tTar ]; then
+        echo "Could not find: $tTar [$LINENO]"
         return 1
     fi
-    cd $HOME/project >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_ProjAfterGInit.tgz
+    tar -xzf $tTar
     cd $gpTest
 
     gpLocalTopDir=$HOME/$cDatProj1
@@ -829,11 +837,13 @@ testInitSaveVarsToConfigs()
         tS=gitproj.config
         fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true $LINENO
         tS=gitproj.hook
-        fTestCheckConfig2Var $tFile $tS.auto-move gpAutoMove true $LINENO
-        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
-        fTestCheckConfig2Var $tFile $tS.check-file-names gpCheckFileNames true $LINENO
-        fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
+        fTestCheckConfig2Var $tFile $tS.verbose	gpHookVerbose true $LINENO
         fTestCheckConfig2Var $tFile $tS.pre-commit-enabled gpPreCommitEnabled true $LINENO
+        fTestCheckConfig2Var $tFile $tS.check-file-names gpCheckFileNames true $LINENO
+        fTestCheckConfig2Var $tFile $tS.check-in-raw gpCheckInRaw true $LINENO
+        fTestCheckConfig2Var $tFile $tS.check-whitespace gpCheckWhitespace true $LINENO
+        fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
+        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
         fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit $LINENO
     done
 
@@ -843,11 +853,11 @@ testInitSaveVarsToConfigs()
 # --------------------------------
 testInitCreateLocalGitAuto()
 {
-    local tSrc=${BASH_SOURCE##*/}
     local tResult
     local tStatus
     local tFile
     local tS
+    local tTar=$gpTest/test-env_ProjLocalDefined.tgz
 
     gpGitFlow="true"
     gpMaxSize="10k"
@@ -868,9 +878,9 @@ testInitCreateLocalGitAuto()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after git init."
-        echo -e "\tRestore test-env_ProjLocalDefined.tgz relative to HOME/project"
+        echo -e "\tRestore $tTar relative to HOME/project"
         cd $HOME >/dev/null 2>&1
-        tar -cvzf $gpTest/test-env_ProjLocalDefined.tgz .gitconfig .gitproj.config.global $cDatProj1
+        tar -cvzf $tTar .gitconfig .gitproj.config.global $cDatProj1
     fi
 
     return 0

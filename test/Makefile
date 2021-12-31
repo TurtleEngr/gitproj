@@ -12,7 +12,10 @@ mTestEnvFiles = \
 	test-env_ProjLocalDefined.tgz \
 	test-env_TestDestDirAfterMkRemote.tgz \
 	test-env_TestDestDirAfterRemoteReport.tgz \
-	test-env_Home2AfterPush.tgz
+	test-env_Home2AfterPush.tgz \
+	test-env_TestDestDirAfterCreateRemoteGit.tgz \
+	test-env_Home3AfterCloneMkGit.tgz \
+	test-env_Home3AfterCloneSummary.tgz
 
 mDepList = \
 	shunit2.1 \
@@ -30,14 +33,14 @@ mCmdList = \
 	test-remote.log \
 	test-push.log \
 	test-pull.log \
-	test-clone.log
+	test-clone.log \
+	test-status.log
 
 mCmdToDo = \
 	add \
 	move \
 	rm \
 	config \
-	status \
 	check
 
 # --------------------
@@ -92,17 +95,17 @@ test-env_TestDestDirAfterMkRemote.tgz :
 test-env_TestDestDirAfterRemoteReport.tgz :
 	export gpSaveTestEnv=1; ./test-remote.sh testRemoteReport
 
+test-env_TestDestDirAfterCreateRemoteGit.tgz :
+	export gpSaveTestEnv=1; ./test-remote.sh testRemoteCreateRemoteGit
+
 test-env_Home2AfterPush.tgz :
 	export gpSaveTestEnv=1; ./test-push.sh testGitProjPushCLI
 
-#test-env_TestDestDirAfterCreateRemoteGit.tgz :
-#	export gpSaveTestEnv=1; ./test-remote.sh testRemoteCreateRemoteGit
+test-env_Home3AfterCloneMkGit.tgz :
+	export gpSaveTestEnv=1; ./test-clone.sh testCloneMkGitDirPass
 
-#test-env_Home3AfterCloneMkGit.tgz :
-#	export gpSaveTestEnv=1; ./test-clone.sh testCloneMkGit
-
-#test-env_Home3AfterCloneSummary.tgz :
-#	export gpSaveTestEnv=1; ./test-clone.sh testCloneSummary
+test-env_Home3AfterCloneSummary.tgz :
+	export gpSaveTestEnv=1; ./test-clone.sh testCloneSummary
 
 # --------------------
 stats :

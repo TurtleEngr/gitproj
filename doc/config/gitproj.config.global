@@ -11,13 +11,15 @@
 	test = /usr/share/doc/git-proj/test
 	proj-name = TBD
 	git-flow-pkg = git-flow
-	remote-min-size = 2g
+	remote-min-size = 20g
 [gitproj "hook"]
-	auto-move = true
-	binary-file-size-limit = 10k
-	check-file-names = true
-	check-for-big-files = true
+	verbose = true
 	pre-commit-enabled = true
+	check-file-names = true
+	check-in-raw = true
+	check-whitespace = true
+	check-for-big-files = true
+	binary-file-size-limit = 10k
 	source = hooks/pre-commit
 [gitflow "branch"]
         master = main

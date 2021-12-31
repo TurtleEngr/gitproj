@@ -130,7 +130,7 @@ setUp()
     cd $cTestDestDir >/dev/null 2>&1
     if [ ! -r $tTar ]; then
         echo "Could not find: $tTar [$LINENO]"
-        exit 1
+        return 1
     fi
     tar -xzf $tTar
     cd - >/dev/null 2>&1
