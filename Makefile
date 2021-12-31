@@ -2,28 +2,25 @@
 # --------------------
 # Config
 
-sh-files = \
-	git-core/* \
-	doc/hooks/* \
-	doc/test/*
-
 # --------------------
 clean :
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
 
 test : clean
-	cd doc/test; make test
+	cd test; make test-all
 
+install :
+	ll
+	
 build : test
-	-rm -rf dist
-	mkdir -p dist/usr/lib/git-core
-	rsync -a git-core/* dist/usr/lib/git-core/
-	mkdir -p dist/usr/share/doc/git-proj
-	rsync -a doc/* dist/usr/share/doc/git-proj/
-	rsync -a ../test-gitproj.tgz dist/usr/share/doc/git-proj/test
-
+	cd package; make build
+	
 package : build
+	cd package: make package
+
+release : package
+	cd package; make release
 
 # --------------------
 fmt :

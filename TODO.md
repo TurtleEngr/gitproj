@@ -41,10 +41,13 @@
             If no option, output the full version
             -M inc major, set minor, see -m (if rc, inc it, set all others to 0)
             -m inc minor, set patch to 0, see -p (if rc, inc it, set all others to 0)
-            -p inc patch (if rc, inc it, set build to 0)
+            -p inc patch (if rc, inc it, clear all after +)
             -r inc the release number, if none, inc patch, then insert
-               "-rc.1" after "patch" and before +, if build set it to 0
+               "-rc.1" after "patch", clear all after +
             -b inc build, if none, append "+1"
+	    -B datestamp build, clear all after + then add:
+	    	date ++%Y.%m.%d.%H.%M
+		     +2021.12.31.15.06
             -c clear release and build parts (do this after a "release")
             -v output with no build part
             -V output just the major.minor.fix parts
@@ -57,10 +60,10 @@
                  1 if ver > FILE if patch part is >
                  2 if ver > FILE if minor part is >
                  3 if ver > FILE if Major part is >
-         
+
     Rather than FILE, support reporting and updating the version
-    number in a git variable. That means the git config file and
-    variable key needs to be defined. Use: FILE:KEY For example:
+    number in a git config variable. That means the git config file
+    and variable key needs to be defined. Use: FILE:KEY For example:
     .gitproj.config.local:gitproj.config.proj-ver
 
 * Cleanup the user docs. (bump the "patch" number for doc-only changes)

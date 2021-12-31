@@ -52,18 +52,34 @@ test-all : clear-logs test
 clear-logs :
 	rm test-*.log
 
+stats :
+	./stats.sh
+
+# --------------------
 test-com.log : $(mDepList) test-com.sh
 	./test-com.sh 2>&1 | tee $@
 
 test-com2.log : $(mDepList) test-com2.sh
 	./test-com2.sh 2>&1 | tee $@
 
-test-pre-commit.log : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit
+test-pre-commit.log : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
 	./test-pre-commit.sh 2>&1 | tee $@
 
 test-gitproj.log : $(mDepList) test-gitproj.sh $(mCore)/git-proj
 	./test-gitproj.sh 2>&1 | tee $@
 
+# --------------------
+test-init.sh : test-env_HomeAfterBMove.tgz test-env_ProjAfterGInit.tgz
+
+test-remote.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
+
+test-push.sh : test-env_TestDestDirAfterRemoteReport.tgz test-env_ProjLocalDefined.tgz
+
+test-pull.sh : test-env_ProjLocalDefined.tgz test-clone.sh :
+
+test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
+
+# --------------------
 test-%.log : test-%.sh $(mDepList) $(mCore)/gitproj-%.inc $(mCore)/git-proj-%
 	./$< 2>&1 | tee $@
 
@@ -110,7 +126,3 @@ test-env_Home3AfterCloneMkGit.tgz :
 
 test-env_Home3AfterCloneSummary.tgz :
 	export gpSaveTestEnv=1; ./test-clone.sh testCloneSummary
-
-# --------------------
-stats :
-	./stats.sh
