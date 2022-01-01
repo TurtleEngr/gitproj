@@ -368,7 +368,7 @@ fInitMkRaw()
 
     fLog -p info -m "Create: raw/README.txt" -l $tSym:$LINENO
     cat <<EOF | fmt >raw/README.txt
-    
+
 Do NOT remove these files or this directory.
 
 These files are managed by the "git proj" subcommand. It's purpose is

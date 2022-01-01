@@ -232,7 +232,7 @@ Testing whitespace
 
 lots of extra
      jsjdfs
-     
+
 EOF
     cp test-wsp.txt test2-wsp.txt
     git add test-wsp.txt test2-wsp.txt

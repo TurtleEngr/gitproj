@@ -1043,7 +1043,7 @@ fComSetConfig()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head2 fComGetConfig 
+=internal-head2 fComGetConfig
 
 =internal-head3 Synopsis
 
@@ -1229,7 +1229,7 @@ fComGetConfig()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head2 fComGetConfig 
+=internal-head2 fComGetConfig
 
 =internal-head3 Synopsis
 
@@ -1291,7 +1291,7 @@ This will look in pFile for pKey. Includes will be followed.
 
 The value will be normalized to "true" or "false".
 
-Valid values in the files: 
+Valid values in the files:
 
 =internal-item B<-i>
 

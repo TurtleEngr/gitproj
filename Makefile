@@ -12,10 +12,10 @@ test : clean
 
 install :
 	ll
-	
+
 build : test
 	cd package; make build
-	
+
 package : build
 	cd package: make package
 
@@ -27,6 +27,10 @@ fmt :
 	+which shfmt
 	-git commit -am "Before fmt"
 	-rm fmt-err.tmp
+	rm-trailing-sp doc/config/* doc/hooks/* git-core/*
+	rm-trailing-sp test/*.sh
+	rm-trailing-sp doc/LICENSE doc/VERSION
+	rm-trailing-sp Makefile  README.md TODO.md
 	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
 		if ! bash -n $$i; then \

@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# --------------------
+fIsBinary()
+{
+    local pFile="$1"
+    grep -Hm1 '^' < "$pFile" | grep -q '^Binary'
+    # Copied from: https://unix.stackexchange.com/questions/275516/is-there-a-convenient-way-to-classify-files-as-binary-or-text
+}
+
+# ========================================
+# Main
+
+# ----------
 if [ $# -eq 0 ]; then
     cat <<EOF
 Usage:
@@ -13,11 +25,28 @@ EOF
     exit 1
 fi
 
-for i in $*; do
-    file $i | grep -q 'ASCII text'
-    if [ $? -ne 0 ]; then
-        echo "Skipping $i"
+# ----------
+for tFile in $*; do
+    if [ ! -f $tFile ]; then
+        echo "Skipping non-file $tFile"
         continue
     fi
-    sed -Ei 's/[[:space:]]*$//' $i
+
+    if [ ! -w $tFile ]; then
+        echo "Skipping non-writable $tFile"
+        continue
+    fi
+
+    file $tFile | grep -q 'text'
+    if [ $? -ne 0 ]; then
+        echo "Skipping binary $tFile"
+        continue
+    fi
+
+    if fIsBinary $tFile; then
+        echo "Skipping binary $tFile"
+        continue
+    fi
+
+    sed -Ei 's/[[:space:]]*$//' $tFile
 done

@@ -72,13 +72,13 @@ files, and repositiories on external drives.
 =head1 SYNOPSIS
 
  	git proj [-v] [-V] [--version]
-	
+
  	git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
  	pSubCmd: init, remote, clone, push, pull, status
 	pSubCmdOpt: Just run: "git proj [pSubCmd]"
  	[common-options]: [-h] [-H pStyle] [-v] [-vv...] [-x] [-xx...]
- 
+
 =head1 DESCRIPTION
 
 The "git proj" subcommand supports using git repo for versioning files to
@@ -131,7 +131,7 @@ no need to save every rendered version.
 =item B<config - Redefine config values>
 
  git proj config [-l pExternalPath] [-e pRawPath]
- 
+
 =item B<status - Show the staus of "raw" files, and more>
 
  git proj status [-b] [-v]
@@ -280,20 +280,20 @@ file.
 		test = /usr/share/doc/git-proj/test
 
 	 	# See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
-	
+
 		# States: not-defined, defined, config-errors
 		local-status = not-set-up
 
 		# States: not-defined, defined, multiple-defined
 		remote-status = not-defined
-	
+
 		# origin-url with path and .git remote
 		proj-name = TBD
-	
+
 		# This should only be changed on the matching host
 		# git rev-parse --show-toplevel
 		local-top-dir = TBD
-	
+
 		# Set by init. Changing these will require manual repair.
 		# If no ~ or /, this is relative to top-dir
 

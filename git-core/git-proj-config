@@ -14,9 +14,9 @@ fUsage()
  git proj config [-e pExternalPath] [-r pRawPath]
 
     Define or redefine the gitproj options.
-    
+
     -e pExternalPath
-    
+
        If the external repo is mounted at a different path than the
        original "origin", then use this command to set the origin to
        the new mount point.
@@ -27,16 +27,16 @@ fUsage()
        symlink will be updated.
 
     -c on/off
-    
+
        Set a commit hook to not allow commits for "large" binary files.
 
     -s pMaxSize
-    
+
        Set the max size for commits of binary files.
 
 Usage:
 	proj-set-remote pPath
-	
+
 Description
 	Use this script if the mount path is different from the origin
 	remote. pPath is the path pointing the current repo's remote
