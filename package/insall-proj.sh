@@ -1,18 +1,36 @@
+#!/bin/bash
 
-build :
-	-rm -rf ../dist
-	./install-proj.sh ../dist
+if [ $# -ne 1 ]; then
+    cat <<EOF
+Usage:
+    ./install TopDir
 
-install :
-	if [ "$$(whoami)" != "root" ]; then exit 1; fi
-	./install-proj.sh /
+Example:
+    ./install /
+    ./install ../dist
 
-uninstall :
-	if [ "$$(whoami)" != "root" ]; then exit 1; fi
-	./uninstall-proj.sh /
+Paths are relative to package/ dir.
+EOF
+    exit 1
+fi
+pRoot=$1
 
-package :
-	echo TBD
+if [ "$pRoot" = "/" ]; then
+    if [ "$(whoami)" != "root" ]; then
+        echo "You need to be root to install to '/'"
+        exit 1
+    fi
+    echo "Are you sure? Press enter to continue, ^C to quit. "
+    read
+else
+    if [ ! -w $pRoot ]; then
+        echo "You don't have write permission for $pRoot, or it is missing."
+        exit 1
+    fi
+fi
 
-release :
-	echo TBD
+mkdir -p $pRoot/usr/lib/git-core
+rsync -a ../git-core/* $pRoot/usr/lib/git-core/git-proj/
+
+mkdir $pRoot/usr/share/doc/git-proj
+rsync -a ../doc/* $pRoot/usr/share/doc/git-proj
