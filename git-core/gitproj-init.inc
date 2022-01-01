@@ -564,11 +564,11 @@ fInitSaveVarsToConfigs()
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
         tS=gitproj.hook
-	fComSaveVar2Config $tFile $tS.verbose gpHookVerbose
+        fComSaveVar2Config $tFile $tS.verbose gpHookVerbose
         fComSaveVar2Config $tFile $tS.pre-commit-enabled gpPreCommitEnabled
         fComSaveVar2Config $tFile $tS.check-file-names gpCheckFileNames
-	fComSaveVar2Config $tFile $tS.check-in-raw gpCheckInRaw
-	fComSaveVar2Config $tFile $tS.check-whitespace gpCheckWhitespace
+        fComSaveVar2Config $tFile $tS.check-in-raw gpCheckInRaw
+        fComSaveVar2Config $tFile $tS.check-whitespace gpCheckWhitespace
         fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
         fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
         fComSaveVar2Config $tFile $tS.source gpHookSource

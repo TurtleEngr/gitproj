@@ -158,7 +158,7 @@ tearDown()
 # --------------------------------
 testComGetVer()
 {
-return 0
+    return 0
     local tResult
 
     gpDebug=2

@@ -210,7 +210,7 @@ testCheckFileNames()
     assertTrue $LINENO $?
     assertContains "$LINENO" "$tResult" "?? foo:bar.txt"
     assertContains "$LINENO" "$tResult" "?? bar,foo.txt"
-#    assertContains "$LINENO $(ls)" "$tResult" '?? "bar foo.txt"'
+    #    assertContains "$LINENO $(ls)" "$tResult" '?? "bar foo.txt"'
     assertContains "$LINENO" "$tResult" "?? CON"
     assertContains "$LINENO" "$tResult" "?? doc/CON"
     assertContains "$LINENO" "$tResult" "?? testing."

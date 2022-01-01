@@ -20,7 +20,7 @@ export gSrc=${BASH_SOURCE##*/}
 fIsBinary()
 {
     local pFile="$1"
-    grep -Hm1 '^' < "$pFile" | grep -q '^Binary'
+    grep -Hm1 '^' <"$pFile" | grep -q '^Binary'
     # Copied from: https://unix.stackexchange.com/questions/275516/is-there-a-convenient-way-to-classify-files-as-binary-or-text
 }
 
@@ -41,16 +41,16 @@ fReport()
     fi
     if [ $tErr -ne 0 ]; then
         let ++gErr
-	if [ "$gVerbose" = "true" ]; then
-	    echo "$pFile $pMsg [$gSrc:$pLine]"
-	fi
+        if [ "$gVerbose" = "true" ]; then
+            echo "$pFile $pMsg [$gSrc:$pLine]"
+        fi
         gFileList="$gFileList $pFile"
-	git reset HEAD $pFile
-	if [ "${pFile%!*}" != "$pFile" ]; then
-	    pFile=$(echo $pFile | tr '!' ' ')
-	    git reset HEAD "$pFile"
-	fi
-	return 1
+        git reset HEAD $pFile
+        if [ "${pFile%!*}" != "$pFile" ]; then
+            pFile=$(echo $pFile | tr '!' ' ')
+            git reset HEAD "$pFile"
+        fi
+        return 1
     fi
     return 0
 } # fReport
@@ -82,26 +82,26 @@ fCheckFileNames()
     gFileList=""
     for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
         tResult=$(echo -n "$tFile" | tr -d '[ -~]' | wc -c)
-    	fReport 0 $tResult $tFile "has non-printable chars in name" $LINENO || continue
+        fReport 0 $tResult $tFile "has non-printable chars in name" $LINENO || continue
 
-    	tResult=$(echo -n "$tFile" | tr -d 'a-zA-Z0-9/._-' | wc -c)
-    	fReport 0 $tResult $tFile "has illegal chars in name" $LINENO || continue
+        tResult=$(echo -n "$tFile" | tr -d 'a-zA-Z0-9/._-' | wc -c)
+        fReport 0 $tResult $tFile "has illegal chars in name" $LINENO || continue
 
         tResult=$(echo -n "$tFile" | grep -Ei '(^|/)(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)' | wc -c)
-	fReport 0 $tResult $tFile "has reserved words in name" $LINENO || continue
+        fReport 0 $tResult $tFile "has reserved words in name" $LINENO || continue
 
         echo -n "$tFile" | grep -Eq '(\.\.+$)'
-	fReport 1 $? $tFile "has just periods in name" $LINENO || continue
+        fReport 1 $? $tFile "has just periods in name" $LINENO || continue
 
         echo -n "$tFile" | grep -Eq '\.$'
-	fReport 1 $? $tFile "has trailing period" $LINENO || continue
+        fReport 1 $? $tFile "has trailing period" $LINENO || continue
     done
 
     if [ -n "$gFileList" ]; then
         let ++gErr
-	echo
+        echo
         echo "These files are not valid:"
-	echo "$gFileList" | fmt -w 10
+        echo "$gFileList" | fmt -w 10
         cat <<EOF
 
 Names can only use letters, numbers, hypen, dash, and periods.
@@ -110,7 +110,7 @@ Names cannot be all periods.
 If you had a filename with spaces in it, the spaces were replaced with '!'.
 
 EOF
-	return 1
+        return 1
     fi
     return 0
 } # fCheckFileNames
@@ -128,14 +128,14 @@ fCheckWhiteSpace()
     # If there are whitespace errors, print the offending file names
     for tFile in $(git diff-index --color=never --check --cached $gAgainst -- | tr ' ' '!' | awk '/trailing/ {print $1}'); do
         tFile=${tFile%%:*}
-	fReport 0 1 $tFile "trailing whitespace" $LINENO
+        fReport 0 1 $tFile "trailing whitespace" $LINENO
     done
     if [ -n "$gFileList" ]; then
         let ++gErr
-	echo
+        echo
         echo "These files had trailing whitespaces:"
-	eccho "$gFileList" | fmt -w 10
-	echo
+        eccho "$gFileList" | fmt -w 10
+        echo
     fi
     return 0
 } # fCheckWhiteSpace
@@ -154,23 +154,23 @@ fCheckNotRaw()
     gFileList=""
     for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
         echo $tFile | grep -q '^raw/'
-	fReport 1 $? $tFile "Do not commit files in raw/" $LINENO
+        fReport 1 $? $tFile "Do not commit files in raw/" $LINENO
     done
 
     if [ -n "$gFileList" ]; then
         let ++gErr
-	tResult=$(git config --get gitproj.config.remote-raw-dir)
-	echo
-	echo "These files should not be managed in git:"
-	echo "$gFileList" | fmt -w 10
-	cat <<EOF  | fmt
+        tResult=$(git config --get gitproj.config.remote-raw-dir)
+        echo
+        echo "These files should not be managed in git:"
+        echo "$gFileList" | fmt -w 10
+        cat <<EOF | fmt
 
 Use "git proj push" to save binary files, in raw/, to $tResult
 Also, run "git proj -h | less" for a description of how git-proj
 can manage large binary files and keep your git repo nimble.
 
 EOF
-	return 1
+        return 1
     fi
     return 0
 } # fCheckNotRaw
@@ -189,25 +189,25 @@ fCheckBigFiles()
     fi
 
     tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
-    
+
     gFileList=""
     for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
         if [ ! -f "$tFile" ]; then
-	    continue
-	fi
-	if ! fIsBinary $tFile; then
-	    continue
-	fi
+            continue
+        fi
+        if ! fIsBinary $tFile; then
+            continue
+        fi
         tSize=$(ls -l $tFile | awk '{print $5}')
         if [ $tSize -gt $tMaxSize ]; then
-	      fReport 0 1 $tFile "size $tSize > $tMaxSize" $LINENO
+            fReport 0 1 $tFile "size $tSize > $tMaxSize" $LINENO
         fi
     done
     if [ -n "$gFileList" ]; then
         let ++gErr
-	echo
+        echo
         echo "These files were > $tMaxSize:"
-	echo "$gFileList" | fmt -w 10
+        echo "$gFileList" | fmt -w 10
         cat <<EOF | fmt
 
 Large binary files should NOT be committed to git.  Move the files to
