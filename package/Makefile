@@ -24,3 +24,7 @@ mkdist ../dist :
 	./install-proj.sh -r ../dist
 
 mkdocs : ../dist
+	mkdir -p ../dist/usr/share/man/man1
+	../git-core/git-proj -H man >../dist/usr/share/man/man1/gitproj.1
+	gzip ../dist/usr/share/man/man1/gitproj.1
+	../git-core/git-proj -H text >../dist/usr/share/doc/git-proj/gitproj.html

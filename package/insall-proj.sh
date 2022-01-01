@@ -33,4 +33,4 @@ mkdir -p $pRoot/usr/lib/git-core
 rsync -a ../git-core/* $pRoot/usr/lib/git-core/git-proj/
 
 mkdir $pRoot/usr/share/doc/git-proj
-rsync -a ../doc/* $pRoot/usr/share/doc/git-proj
+rsync -a ../doc/* $pRoot/usr/share/doc/git-proj/

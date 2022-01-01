@@ -10,11 +10,11 @@ clean :
 test : clean
 	cd test; make test-all
 
-install :
-	ll
-
-build : test
+build : test fmt
 	cd package; make build
+
+install :
+	cd package; make install
 
 package : build
 	cd package: make package
@@ -23,6 +23,15 @@ release : package
 	cd package; make release
 
 # --------------------
+mkdocs :
+	-mkdir -p man/man1
+	git-core/git-proj -H man >man/man1/gitproj.1
+	gzip man/man1/gitproj.1
+	git-core/git-proj -H text >doc/gitproj.html
+	# Generate internal docs at devel/
+	-mkdir -p devel/
+	#gitproj-com.inc
+
 fmt :
 	+which shfmt
 	-git commit -am "Before fmt"
