@@ -3,7 +3,7 @@
 # --------------------
 # Config
 
-mTestDir=$(PWD)/testxx
+mTestDir=$(PWD)/test
 mBinDir=$(PWD)/git-core
 mDocDir=$(PWD)/doc
 mGenDir=$(PWD)/generate
@@ -36,7 +36,8 @@ release : package
 	cd package; make release
 
 fmt : clean
-	+which shfmt
+	which shfmt
+	which $(mTestDir)/rm-trailing-sp
 	-rm fmt-err.tmp
 	rm-trailing-sp doc/config/* doc/hooks/* git-core/* test/*.sh
 	rm-trailing-sp doc/LICENSE doc/VERSION doc/README
