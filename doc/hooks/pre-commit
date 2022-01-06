@@ -121,6 +121,7 @@ EOF
 fCheckWhiteSpace()
 {
     local tFile
+    # Note: DOS EOL files will give a false report.
 
     tResult=$(git config --get --bool gitproj.hook.check-whitespace)
     if [ "$tResult" != "true" ]; then
