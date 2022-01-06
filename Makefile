@@ -1,19 +1,32 @@
+# Makefile
 
 # --------------------
 # Config
 
+mTestDir=$(PWD)/testxx
+mBinDir=$(PWD)/git-core
+mDocDir=$(PWD)/doc
+mGenDir=$(PWD)/generate
+mDistDir=$(PWD)/dist
+
 # --------------------
-clean :
+check : $(mTestDir) $(mBinDir) $(mDocDir)
+
+clean : check
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
+
+dist-clean : clean
+	-find $(mGenDir) $(mDistDir) -type l -exec rm {} \;
+	-rm -rf $(mGenDir) $(mDistDir)
 
 test : clean
 	cd test; make test-all
 
-build : test fmt
+build : clean test fmt
 	cd package; make build
 
-install :
+install : build
 	cd package; make install
 
 package : build
@@ -22,24 +35,12 @@ package : build
 release : package
 	cd package; make release
 
-# --------------------
-mkdocs :
-	-mkdir -p man/man1
-	git-core/git-proj -H man >man/man1/gitproj.1
-	gzip man/man1/gitproj.1
-	git-core/git-proj -H text >doc/gitproj.html
-	# Generate internal docs at devel/
-	-mkdir -p devel/
-	#gitproj-com.inc
-
-fmt :
+fmt : clean
 	+which shfmt
-	-git commit -am "Before fmt"
 	-rm fmt-err.tmp
-	rm-trailing-sp doc/config/* doc/hooks/* git-core/*
-	rm-trailing-sp test/*.sh
-	rm-trailing-sp doc/LICENSE doc/VERSION
-	rm-trailing-sp Makefile  README.md TODO.md
+	rm-trailing-sp doc/config/* doc/hooks/* git-core/* test/*.sh
+	rm-trailing-sp doc/LICENSE doc/VERSION doc/README
+	rm-trailing-sp Makefile README.md TODO.md
 	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
 		if ! bash -n $$i; then \

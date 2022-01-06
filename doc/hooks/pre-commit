@@ -60,8 +60,10 @@ fEnabled()
 {
     tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
     if [ "$tEnabled" != "true" ]; then
+        echo "Skipping pre-commit"
         exit 0
     fi
+    echo "Running pre-commit"
     return 0
 } # fEnabled
 
@@ -134,7 +136,7 @@ fCheckWhiteSpace()
         let ++gErr
         echo
         echo "These files had trailing whitespaces:"
-        eccho "$gFileList" | fmt -w 10
+        echo "$gFileList" | fmt -w 10
         echo
     fi
     return 0

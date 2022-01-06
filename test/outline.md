@@ -3,7 +3,14 @@
 ## gitproj Source Repo - dev
 
     gitproj/
+    |   |Makefile
+    |   |README.md
+    |   |TODO.md
+    |   |.gitignore
     |   |doc/
+    |   |   |LICENSE
+    |   |   |README
+    |   |   |VERSION
     |   |   |config/
     |   |   |   |gitconfig.default
     |   |   |   |gitignore.default
@@ -11,21 +18,11 @@
     |   |   |   |getproj.config.local
     |   |   |hooks/
     |   |   |   |pre-commit*
-    |   |   |html/ - generated user level docs
-    |   |   |   |index.html
-    |   |   |   |*.html
-    |   |   |markdown/ - generated user level docs
-    |   |   |   |*.md
-    |   |   |development/ - generated docs for developers
-    |   |   |   |index.html
-    |   |   |   |*.html
-    |   |   |   |*.md
-    |   |   |LICENSE
     |   |git-core/
-    |   |   |gitproj-com.inc*
-    |   |   |gitproj-SUBCMD.inc*
     |   |   |git-proj*
-    |   |   |git-proj-SUBCMD*
+    |   |   |gitproj-com.inc*
+    |   |   |gitproj-[SUBCMD].inc*
+    |   |   |git-proj-[SUBCMD]*
     |   |test/
     |   |   |Makefile
     |   |   |outline.md
@@ -35,11 +32,23 @@
     |   |   |test-env_FILE.tgz -> ../../test-env_FILE.tgz
     |   |   |test.inc
     |   |   |test-com.sh*
-    |   |   |test-SUBCMD.sh*
-    |   |.gitignore
-    |   |Makefile
-    |   |README.md
-    |   |TODO.md
+    |   |   |test-[SUBCMD].sh*
+    |   |package/
+    |   |   |Makefile
+    |   |generated/
+    |   |   |pkg/
+    |   |   |html/ - not versioned
+    |   |   |   |index.html
+    |   |   |   |*.html
+    |   |   |markdown/ - maybe versioned
+    |   |   |   |*.md
+    |   |   |development/ - not versioned
+    |   |   |   |index.html
+    |   |   |   |*.html
+    |   |   |   |*.md
+    |   |   |man/ - not versioned
+    |   |   |   |man1/
+    |   |   |   |   |gitproj.1.gz - user docs
 
 ## gitproj Installed Files - prod
 
@@ -49,35 +58,16 @@ installed files would be tricky, and of low value.
 
     /usr/
     |   |lib/
-    |   |   |git-core/
+    |   |   |git-core/  (gitproj/git-core/)
     |   |   |   |git-proj
-    |   |   |   |   |gitproj-com.inc*
-    |   |   |   |   |gitproj-init.inc*
-    |   |   |   |   |gitproj-add.inc*
-    |   |   |   |   |gitproj-clone.inc*
-    |   |   |   |   |gitproj-config.inc*
-    |   |   |   |   |gitproj-move.inc*
-    |   |   |   |   |gitproj-pull.inc*
-    |   |   |   |   |gitproj-push.inc*
-    |   |   |   |   |gitproj-remote.inc*
-    |   |   |   |   |gitproj-rm.inc*
-    |   |   |   |   |gitproj-status.inc*
-    |   |   |   |   |git-proj*
-    |   |   |   |   |git-proj-add*
-    |   |   |   |   |git-proj-clone*
-    |   |   |   |   |git-proj-config*
-    |   |   |   |   |git-proj-init*
-    |   |   |   |   |git-proj-move*
-    |   |   |   |   |git-proj-pull*
-    |   |   |   |   |git-proj-push*
-    |   |   |   |   |git-proj-remote*
-    |   |   |   |   |git-proj-rm*
-    |   |   |   |   |git-proj-status*
+    |   |   |   |gitproj-com.inc*
+    |   |   |   |git-proj-[SUBCMD].inc*
     |   |share/
-    |   |   |doc/
+    |   |   |doc/ (gitproj/doc/)
     |   |   |   |git-proj/
     |   |   |   |   |LICENSE
     |   |   |   |   |README
+    |   |   |   |   |VERSION
     |   |   |   |   |config/
     |   |   |   |   |   |gitconfig.default
     |   |   |   |   |   |gitignore.default
@@ -85,11 +75,9 @@ installed files would be tricky, and of low value.
     |   |   |   |   |   |getproj.config.local
     |   |   |   |   |hooks/
     |   |   |   |   |   |pre-commit*
-    |   |   |man/
+    |   |   |man/ (gitproj/generated/man/)
     |   |   |   |man1/
-    |   |   |   |   |gitproj.1.gz - generated, all user commands
-    |   |   |   |man8/
-    |   |   |   |   |gitproj.1.gz - generated, internal documentation
+    |   |   |   |   |gitproj.1.gz
     
 ## After running git-proj-init local, or git-proj-clone
 

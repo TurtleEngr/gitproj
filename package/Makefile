@@ -1,8 +1,26 @@
+# package/Makefile
+# First: cd package
+
+# --------------------
+# Config
+
+mTestDir=$(PWD)/../test
+mBinDir=$(PWD)/../git-core
+mDocDir=$(PWD)/../doc
+mGenDir=$(PWD)/../generate
+mDistDir=$(PWD)/../dist
 
 # TODO
 # pre and post install scripts?  Check for expected dirs.
 
-build : mkdist mkdocs
+# --------------------
+check : $(mTestDir) $(mBinDir) $(mDocDir) $(mGenDir) $(mDistDir)
+
+clean : check
+	-find $(mGenDir) $(mDistDir) -type l -exec rm {} \;
+	rm -rf $(mGenDir) $(mDistDir)
+
+build : clean $(mGenDir) $(mDistDir)
 	# Create epm list
 
 install :
@@ -19,12 +37,15 @@ release :
 	echo TBD
 
 # ----------------------------------------
-mkdist ../dist :
-	-rm -rf ../dist
-	./install-proj.sh -r ../dist
+# Working targets
 
-mkdocs : ../dist
-	mkdir -p ../dist/usr/share/man/man1
-	../git-core/git-proj -H man >../dist/usr/share/man/man1/gitproj.1
-	gzip ../dist/usr/share/man/man1/gitproj.1
-	../git-core/git-proj -H text >../dist/usr/share/doc/git-proj/gitproj.html
+$(mGenDir) :
+	mkdir $@
+
+$(mDistDir) :
+	mkdir $@
+
+mkdocs $(mGenDir)/man/man1 : $(mGenDir)
+	mkdir -p $(mGenDir)/man/man1
+	$(mBin)/git-proj -H man >$(mGenDir)/man/man1/gitproj.1
+	gzip $(mGenDir)/man/man1/gitproj.1
