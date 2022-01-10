@@ -106,8 +106,7 @@ test-package : epm.list $(ProdOSDist).require
 	-rm -rf pkg ver.epm >/dev/null 2>&1
 	mkdir pkg
 	export RELEASE=0; mkver.pl -e epm
-	epm -v -f native -m linux-noarch --output-dir pkg $(ProdName) ver.epm
-	#epm -v -f portable -m linux-noarch --output-dir pkg $(ProdName) ver.epm
+	epm -v -f native -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
 
 test-release : TBD
 
@@ -119,8 +118,8 @@ package : epm.list $(ProdOSDist).require
 	-rm -rf pkg ver.epm >/dev/null 2>&1
 	mkdir pkg
 	export RELEASE=1; mkver.pl -e epm
-	epm -v -f native -m $(ProdOSDist)-noarch --output-dir pkg $(ProdName) ver.epm
-	#$epm -v -f portable -m $(ProdOSDist)-noarch --output-dir pkg $(ProdName) ver.epm
+	epm -v -f native -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
+	#epm -v -f portable -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
 	# Set ProdRC for Release Candidate packages
 
 release : ver.env ver.mak

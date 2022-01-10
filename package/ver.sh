@@ -20,15 +20,15 @@ export ProdVer="0.1.1"
 # Requires 2 numbers, 3'rd number is optional
 # %version ProdVer
 
-export ProdRC=''
+export ProdRC=""
 # Release Candidate ver. Can be one or two numbers.
 # If set and RELEASE=1
   # %release rc.ProdRC
 
-export ProdBuild='2'
+export ProdBuild="2"
 # [0-9.]*
 # Required
-# If RELEASE=1, and ProdRC=''
+# If RELEASE=1, and ProdRC=""
   # %release test.ProdBuild
 
 # Generated: ProdBuildTime=YYYY.MM.DD.hh.mm
