@@ -1,0 +1,10 @@
+%requires bash
+%requires coreutils
+	# includes: fmt, tr
+%requires gawk
+%requires libpod-markdown-perl
+	# includes: pod2markdown
+%requires perl
+	# includes: pod2html, pod2man, pod2usage
+%requires sed
+%requires tidy

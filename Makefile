@@ -1,39 +1,36 @@
 # Makefile
 
 # --------------------
-# Config
+# To run all tests:
+#	cd test
+#	make test-all
 
-mTestDir=$(PWD)/test
-mBinDir=$(PWD)/git-core
-mDocDir=$(PWD)/doc
-mGenDir=$(PWD)/generate
-mDistDir=$(PWD)/dist
+# Local install (only for testing; use package intaller):
+#	cd package
+#	make dist-clean install
+
+# To build installer packages:
+#	cd package
+#	make dist-clean package
 
 # --------------------
-check : $(mTestDir) $(mBinDir) $(mDocDir)
+# Config
+
+mHtmlOpt = --cachedir=/tmp --index --backlink
+
+# --------------------
+check : doc git-core package test
 
 clean : check
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
 
-dist-clean : clean
-	-find $(mGenDir) $(mDistDir) -type l -exec rm {} \;
-	-rm -rf $(mGenDir) $(mDistDir)
-
-test : clean
-	cd test; make test-all
-
-build : clean test fmt
-	cd package; make build
-
-install : build
-	cd package; make install
-
-package : build
-	cd package: make package
-
-release : package
-	cd package; make release
+gen-doc :
+	-mkdir doc/user-doc
+	for tCmd in git-core/git-proj git-core/git-proj-*; do \
+		pod2markdown $$tCmd >doc/user-doc/$${tCmd##*/}.md; \
+		pod2html $(mHtmlOpt) $$tCmd >doc/user-doc/$${tCmd##*/}.html; \
+	done
 
 fmt : clean
 	which shfmt

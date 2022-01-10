@@ -71,7 +71,7 @@ files, and repositiories on external drives.
 
 =head1 SYNOPSIS
 
- 	git proj [-v] [-V] [--version]
+ 	git proj [-v] [-V] [--version] [-h] [-H pStyle]
 
  	git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 

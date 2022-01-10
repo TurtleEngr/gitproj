@@ -1,0 +1,7 @@
+$pDel{"/usr"} = 1;
+$pDel{"/usr/share"} = 1;
+$pDel{"/usr/share/man"} = 1;
+$pDel{"/usr/share/man/man1"} = 1;
+$pDel{"/usr/share/doc"} = 1;
+$pDel{"/usr/lib"} = 1;
+$pDel{"/usr/lib/git-core"} = 1;

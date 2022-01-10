@@ -436,6 +436,7 @@ fComUsage()
     local tSrc=${BASH_SOURCE##*/}
     local tProg=""
     local tTidy='tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no'
+    local tHtmlOpt='--cachedir=/tmp --index --backlink'
     local OPTIND=1
     local OPTARG
     local tArg
@@ -505,7 +506,7 @@ fComUsage()
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | $tProg --title="$pTitle" | $tTidy
+            cat $pFileList | $tProg --title="$pTitle" $tHtmlOpt  | $tTidy
         else
             if [ "$pStyle" = "short" ]; then
                 # shellcheck disable=SC2002
@@ -518,7 +519,7 @@ fComUsage()
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | fComInternalDoc | $tProg --title="$pTitle" | $tTidy
+            cat $pFileList | fComInternalDoc | $tProg --title="$pTitle" $tHtmlOpt | $tTidy
         else
             # shellcheck disable=SC2002
             cat $pFileList | fComInternalDoc | $tProg
