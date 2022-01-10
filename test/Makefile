@@ -75,7 +75,7 @@ test-remote.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote
 
 test-push.sh : test-env_TestDestDirAfterRemoteReport.tgz test-env_ProjLocalDefined.tgz
 
-test-pull.sh : test-env_ProjLocalDefined.tgz test-clone.sh :
+test-pull.sh : test-env_ProjLocalDefined.tgz
 
 test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
 

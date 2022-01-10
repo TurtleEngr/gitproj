@@ -460,8 +460,9 @@ testComUsage()
     #-----
     tResult=$(fComUsage -s html -f $tUsageScript -t "$gpCmdName Usage" 2>&1)
     assertContains "$LINENO tcu-html.1" "$tResult" '<li><a href="#DESCRIPTION">DESCRIPTION</a></li>'
-    assertContains "$LINENO tcu-html.2" "$tResult" '<h1 id="HISTORY">HISTORY</h1>'
+    assertContains "$LINENO tcu-html.2" "$tResult" '<h1 id="HISTORY"><a href="#_podtop_">HISTORY</a></h1>'
     assertContains "$LINENO tcu-html.3" "$tResult" "<title>$gpCmdName Usage</title>"
+    #assertContains "$LINENO $tResult" "$tResult" "Show tResult"
 
     #-----
     tResult=$(fComUsage -s md -f $tUsageScript 2>&1)

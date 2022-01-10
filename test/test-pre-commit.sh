@@ -227,13 +227,13 @@ testCheckWhiteSpace()
 
     # Make some files with trailing whitespace and "add" them
     cd $HOME/project/george >/dev/null 2>&1
-    cat <<EOF >test-wsp.txt
-Testing whitespace
-
-lots of extra
-     jsjdfs
-
-EOF
+    # Note: Changed "cat EOF" to echo, because this file cannot be
+    # committed with trailing whitespaces.
+    echo "Testing whitespace" >test-wsp.txt
+    echo "   " >>test-wsp.txt
+    echo "lots of extra" >>test-wsp.txt
+    echo "     jsjdfs   " >>test-wsp.txt
+    echo "   " >>test-wsp.txt
     cp test-wsp.txt test2-wsp.txt
     git add test-wsp.txt test2-wsp.txt
 
