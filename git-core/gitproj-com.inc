@@ -29,24 +29,48 @@ fComGitProjInternalDoc()
 
 =internal-head3 Configuration
 
- * Copy template.sh to your script file.
- * Your script, gitproj-com.inc, and gitproj-com.test need to be in the same directory.
- * Globally replace SCRIPTNAME with the name of your script file.
- * Update the getopts in the "Get Args Section". Add your script's options.
- * Loop: document (with POD), add tests, add validate functions
- * Loop: add unit test function, add functions, test
+=internal-over 4
+
+=internal-item * Copy template.sh to your script file.
+
+=internal-item * Your script, gitproj-com.inc, and gitproj-com.test
+need to be in the same directory.
+
+=internal-item * Globally replace SCRIPTNAME with the name of your
+script file.
+
+=internal-item * Update the getopts in the "Get Args Section". Add
+your script's options.
+
+=internal-item * Loop: document (with POD), add tests, add validate functions
+
+=internal-item * Loop: add unit test function, add functions, test
+
+=internal-back
 
 =internal-head3 Block Organization
 
- * Configuration - exit if errors
- * Get Args - exit if errors
- * Verify external progs - exit if errors
- * Run tests - if gpTest is set
- * Validate Args - exit if errors
- * Verify connections work - exit if errors
- * Read-only functional work - exit if errors
- * Write functional work - now you are committed! Try to keep going if errors
- * Output results and/or launch next process
+=internal-over 4
+
+=internal-item * Configuration - exit if errors
+
+=internal-item * Get Args - exit if errors
+
+=internal-item * Verify external progs - exit if errors
+
+=internal-item * Run tests - if gpTest is set
+
+=internal-item * Validate Args - exit if errors
+
+=internal-item * Verify connections work - exit if errors
+
+=internal-item * Read-only functional work - exit if errors
+
+=internal-item * Write functional work - now you are committed! Try to keep going if errors
+
+=internal-item * Output results and/or launch next process
+
+=internal-back
 
 To avoid a lot of rework and manual rollbacks, put-off I<writes> that
 cannot undone. Do as much as possible to make sure the script will be able
@@ -116,8 +140,9 @@ clear.
 The internal documentation uses POD commands that begin with "=internal-".
 See fComInternalDoc() for how this is used.
 
-Also TDD (Test Driven Development) should make refactoring easy,
-because the tests are also embedded in the script.
+=internal-for html <hr/>
+
+=internal-for html <hr/>
 
 =internal-head2 Common Script Functions
 
@@ -284,6 +309,8 @@ fComSetGlobals()
     cat <<EOF >/dev/null
 =internal-pod
 
+=internal-for html <hr/>
+
 =internal-head3 fComSetGlobals
 
 Set initial values for all of the globals use by this script. The ones
@@ -392,6 +419,8 @@ fComCheckDeps()
     cat <<EOF >/dev/null
 =internal-pod
 
+=internal-for html <hr/>
+
 =internal-head3 fComCheckDeps "pRequired List" "pOptional List"
 
 Check for required and optional programs or scripts used by this script.
@@ -416,6 +445,8 @@ fComInternalDoc()
 
     cat <<EOF >/dev/null
 =internal-pod
+
+=internal-for html <hr/>
 
 =internal-head3 fComInternalDoc
 
@@ -531,6 +562,8 @@ fComUsage()
 
     cat <<EOF >/dev/null
 =internal-pod
+
+=internal-for html <hr/>
 
 =internal-head3 fComUsage -f pFileList -s pStyle [-t pTitle] [-i] [-a]
 
@@ -668,6 +701,8 @@ fComYesNo()
     cat <<EOF >/dev/null
 =internal-pod
 
+=internal-for html <hr/>
+
 =internal-head3 fComYesNo pPrompt
 
 If gpYesNo = "Yes", set gResponse to "y", and return 0.
@@ -782,6 +817,8 @@ fComFmtLog()
     cat <<EOF >/dev/null
 =internal-pod
 
+=internal-for html <hr/>
+
 =internal-head3 fComFmtLog pLevel "pMsg" pLine pErr
 
 This function formats and outputs a consistent log message output.
@@ -829,6 +866,8 @@ fLog()
 
     cat <<EOF >/dev/null
 =internal-pod
+
+=internal-for html <hr/>
 
 =internal-head3 fLog -m pMsg [-p pLevel] [-l $LINENO] [-e pErr]
 
@@ -908,6 +947,8 @@ fError()
     cat <<EOF >/dev/null
 =internal-pod
 
+=internal-for html <hr/>
+
 =internal-head3 fError -m pMsg [-l $LINENO] [-e pErr] [-i]
 
 This will call: fLog -p crit -m "pMsg" -l pLine -e pErr
@@ -936,6 +977,8 @@ fComGit()
     return $tStatus
     cat <<EOF
 =internal-pod
+
+=internal-for html <hr/>
 
 =internal-head3 fComGit [pArgs...]
 
@@ -1044,15 +1087,17 @@ fComSetConfig()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head2 fComGetConfig
+=internal-for html <hr/>
 
-=internal-head3 Synopsis
+=internal-head3 fComGetConfig
+
+=internal-head4 Synopsis
 
     fComSetConfig -k pKey -v pValue [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-a]
 
-=internal-head3 Description
+=internal-head4 Description
 
-=internal-head3 Options
+=internal-head4 Options
 
 Only one of these will be used: -g, -l, -L, -H -f. The last one in the
 list of options will be used if there is more than one.  If none, then
@@ -1230,14 +1275,16 @@ fComGetConfig()
     cat <<EOF >/dev/null
 =internal-pod
 
-=internal-head2 fComGetConfig
+=internal-for html <hr/>
 
-=internal-head3 Synopsis
+=internal-head3 fComGetConfig
+
+=internal-head4 Synopsis
 
     fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
                   [-d pDefault] [-e] [-v pFilter]
 
-=internal-head3 Description
+=internal-head4 Description
 
 If pKey is found, the last defined value is echoed. And the value is
 saved in global gGetConfigValue. And the file location of the value is
@@ -1255,7 +1302,7 @@ Command Returns
     0 - OK (even for no value found)
     1 - Errors
 
-=internal-head3 Options
+=internal-head4 Options
 
 Only one of these will be used: -g, -l, -f. The last one in the list
 of options will be if there is more than one.  If none, then all the

@@ -78,7 +78,7 @@ installed files would be tricky, and of low value.
     |   |   |man/ (gitproj/generated/man/)
     |   |   |   |man1/
     |   |   |   |   |gitproj.1.gz
-    
+
 ## After running git-proj-init local, or git-proj-clone
 
     cd ~/ANY-DIR/PROJECT
@@ -102,9 +102,9 @@ installed files would be tricky, and of low value.
     |   |   |   |   |raw/
     |   |   |   |   |   |ANY-DIR/
     |   |   |   |   |   |  |LARGE-FILE.MP4
-    |   |   |   |   |ANY-DIR/    
-    |   |   |   |   |   |LARGE-FILE.MP4 -> ../raw/ANY-DIR/LARGE-FILE.MP4 
-    
+    |   |   |   |   |ANY-DIR/
+    |   |   |   |   |   |LARGE-FILE.MP4 -> ../raw/ANY-DIR/LARGE-FILE.MP4
+
 ## After running git-proj-remote
 
     cd ~/ANY-DIR/PROJECT
@@ -299,7 +299,7 @@ Creates:
             |   |mnt/
             |   |   |disk-2/            - $cDatMount1
             |   |   |usb-misc/          - $cDatMount2
-            |   |   |   |files-2021-08-12/ 
+            |   |   |   |files-2021-08-12/
             |   |   |usb-video/         - $cDatMount3
             |   |   |   |video-2020-04-02/
             |   |home/

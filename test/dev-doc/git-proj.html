@@ -1,0 +1,407 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>git-proj Internal Doc</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body>
+  <ul id="index">
+    <li>
+      <a href="#gitproj-com.inc-Internal-Documentation">gitproj-com.inc
+      Internal Documentation</a>
+      <ul>
+        <li>
+          <a href="#Template-Use">Template Use</a>
+          <ul>
+            <li><a href="#Configuration">Configuration</a></li>
+            <li><a href="#Block-Organization">Block Organization</a></li>
+            <li><a href="#Variable-Naming-Convention">Variable Naming
+            Convention</a></li>
+            <li><a href="#Global-Variables">Global Variables</a></li>
+            <li><a href="#Documentation-Format">Documentation Format</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#Common-Script-Functions">Common Script Functions</a>
+          <ul>
+            <li><a href="#fComSetGlobals">fComSetGlobals</a></li>
+            <li><a href=
+            "#fComCheckDeps-pRequired-List-pOptional-List">fComCheckDeps
+            "pRequired List" "pOptional List"</a></li>
+            <li><a href="#fComInternalDoc">fComInternalDoc</a></li>
+            <li><a href=
+            "#fComUsage--f-pFileList--s-pStyle--t-pTitle--i--a">fComUsage -f
+            pFileList -s pStyle [-t pTitle] [-i] [-a]</a></li>
+            <li><a href="#fComYesNo-pPrompt">fComYesNo pPrompt</a></li>
+            <li><a href="#fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog
+            pLevel "pMsg" pLine pErr</a></li>
+            <li>
+              <a href="#fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr">fLog -m
+              pMsg [-p pLevel] [-l $LINENO] [-e pErr]</a>
+              <ul>
+                <li><a href="#fLog-Examples">fLog Examples:</a></li>
+              </ul>
+            </li>
+            <li><a href="#fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg
+            [-l $LINENO] [-e pErr] [-i]</a></li>
+            <li><a href="#fComGit-pArgs">fComGit [pArgs...]</a></li>
+            <li>
+              <a href="#fComGetConfig">fComGetConfig</a>
+              <ul>
+                <li><a href="#Synopsis">Synopsis</a></li>
+                <li><a href="#Description">Description</a></li>
+                <li><a href="#Options">Options</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#fComGetConfig1">fComGetConfig</a>
+              <ul>
+                <li><a href="#Synopsis1">Synopsis</a></li>
+                <li><a href="#Description1">Description</a></li>
+                <li><a href="#Options1">Options</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <hr />
+  <h1 id="gitproj-com.inc-Internal-Documentation">gitproj-com.inc Internal
+  Documentation</h1>
+  <h2 id="Template-Use">Template Use</h2>
+  <h3 id="Configuration">Configuration</h3>
+  <ul>
+    <li>
+      <p>Copy template.sh to your script file.</p>
+    </li>
+    <li>
+      <p>Your script, gitproj-com.inc, and gitproj-com.test need to be in the
+      same directory.</p>
+    </li>
+    <li>
+      <p>Globally replace SCRIPTNAME with the name of your script file.</p>
+    </li>
+    <li>
+      <p>Update the getopts in the "Get Args Section". Add your script's
+      options.</p>
+    </li>
+    <li>
+      <p>Loop: document (with POD), add tests, add validate functions</p>
+    </li>
+    <li>
+      <p>Loop: add unit test function, add functions, test</p>
+    </li>
+  </ul>
+  <h3 id="Block-Organization">Block Organization</h3>
+  <ul>
+    <li>
+      <p>Configuration - exit if errors</p>
+    </li>
+    <li>
+      <p>Get Args - exit if errors</p>
+    </li>
+    <li>
+      <p>Verify external progs - exit if errors</p>
+    </li>
+    <li>
+      <p>Run tests - if gpTest is set</p>
+    </li>
+    <li>
+      <p>Validate Args - exit if errors</p>
+    </li>
+    <li>
+      <p>Verify connections work - exit if errors</p>
+    </li>
+    <li>
+      <p>Read-only functional work - exit if errors</p>
+    </li>
+    <li>
+      <p>Write functional work - now you are committed! Try to keep going if
+      errors</p>
+    </li>
+    <li>
+      <p>Output results and/or launch next process</p>
+    </li>
+  </ul>
+  <p>To avoid a lot of rework and manual rollbacks, put-off <i>writes</i>
+  that cannot undone. Do as much as possible to make sure the script will be
+  able to complete write operations.</p>
+  <p>For example, <b>do not do this:</b> collect information, transform it,
+  write it to a DB, then start the next process on another server. Whoops,
+  that server cannot be accessed, so the DB update is not valid! Gee, why
+  didn't you verify all the connections you will need, before committing to
+  the DB?! Even if you did check, the connection could have failed after the
+  check, so maybe write to a tmp DB, then when all is OK, then update the
+  master DB with the tmp DB changes.</p>
+  <p>Where ever possible make your scripts "re-entrant". Connections can fail
+  at anytime and scripts can be killed at anytime; How can any important work
+  be continued or work rolled-back? Planing for "failures" is NOT planning to
+  fail; it is what a professional engineer does to design in quality.</p>
+  <h3 id="Variable-Naming-Convention">Variable Naming Convention</h3>
+  <p>Prefix codes are used to show the <b>"scope"</b> of variables:</p>
+  <pre><code> gVar - global variable (may even be external to the script)
+ pVar - a function parameter I&lt;local&gt;
+ gpVar - global parameter, i.e. may be defined external to the script
+ cVar - global constant (set once)
+ tVar - temporary variable (usually I&lt;local&gt; to a function)
+ fFun - function</code></pre>
+  <p>All UPPERCASE variables are <i>only</i> used when they are required by
+  other programs or scripts.</p>
+  <p>If you have exported variables that are shared across scritps, then this
+  convention can be extended by using prefixes that are related to where the
+  variables are set.</p>
+  <h3 id="Global-Variables">Global Variables</h3>
+  <p>For more help, see the Globals section in fUsage.</p>
+  <pre><code> gpSysLog - -l
+ gpVerbose - -v, -vv
+ gpDebug - -x, -xx, ...
+ gpTest - -t
+ gErr - error code (0 = no error)
+ gpCmdName - script's name taken from $0
+ cCurDir - current directory
+ gpBin - directory where the script is executing from
+ gpDoc - directory for config/, hooks/, test/</code></pre>
+  <h3 id="Documentation-Format">Documentation Format</h3>
+  <p>POD is use to format the script's documentation. Sure MarkDown could
+  have been used, but it didn't exist 20 years ago. POD text can be output as
+  text, man, html, pdf, texi, just usage, and even MarkDown</p>
+  <p>Help for POD can be found at: <a href=
+  "https://perldoc.perl.org/perlpod">perlpod - the Plain Old Documentation
+  format</a></p>
+  <p>The documentation is embedded in the script so that it is more likely to
+  be updated. Separate doc files seem to <i>always</i> drift from the code.
+  Feel free to delete any documentation, if the code is clear enough. BUT
+  <i>clean up your code</i> so that the code <i>really</i> is clear.</p>
+  <p>The internal documentation uses POD commands that begin with
+  "=internal-". See fComInternalDoc() for how this is used.</p>
+  <hr />
+  <hr />
+  <h2 id="Common-Script-Functions">Common Script Functions</h2>
+  <hr />
+  <h3 id="fComSetGlobals">fComSetGlobals</h3>
+  <p>Set initial values for all of the globals use by this script. The ones
+  that begin with "gp" can usually be overridden by setting them before the
+  script is run.</p>
+  <hr />
+  <h3 id="fComCheckDeps-pRequired-List-pOptional-List">fComCheckDeps
+  "pRequired List" "pOptional List"</h3>
+  <p>Check for required and optional programs or scripts used by this script.
+  If any required programs are missing, exit the script.</p>
+  <hr />
+  <h3 id="fComInternalDoc">fComInternalDoc</h3>
+  <p>This function collects all of the "internal-pod" documentation from
+  stdin and it outputs to stdout.</p>
+  <hr />
+  <h3 id="fComUsage--f-pFileList--s-pStyle--t-pTitle--i--a">fComUsage -f
+  pFileList -s pStyle [-t pTitle] [-i] [-a]</h3>
+  <dl>
+    <dt id="f-pFileList---list-of-file-names"><b>-f pFileList</b> - list of
+    file names</dt>
+    <dd></dd>
+    <dt id="s-pStyle---output-style"><b>-s pStyle</b> - output style</dt>
+    <dd>
+      <pre><code> short|usage - usage only (does not work with -i or -a)
+ man         - all, man format (does not work with -i or -a)
+ long|text   - all text format
+ html        - all, html format (see -t)
+ md          - all, markdown format</code></pre>
+    </dd>
+    <dt id="t---title-for-HTML-style"><b>-t</b> - title for HTML style</dt>
+    <dd></dd>
+    <dt id="i---internal-doc-only-see-fComInternalDoc"><b>-i</b> - internal
+    doc only (see fComInternalDoc)</dt>
+    <dd></dd>
+  </dl>
+  <hr />
+  <h3 id="fComYesNo-pPrompt">fComYesNo pPrompt</h3>
+  <p>If gpYesNo = "Yes", set gResponse to "y", and return 0.</p>
+  <p>If gpYesNo = "No", set gResponse to "n", and return 1.</p>
+  <p>If gpYesNo is not set, output the pPrompt, then "read" the response.</p>
+  <p>If the response begins with a "y", then that is the same as gpYesNo =
+  "Yes"</p>
+  <p>If the response is not a "y", then that is the same as gpYesNo =
+  "No"</p>
+  <hr />
+  <h3 id="fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog pLevel "pMsg" pLine
+  pErr</h3>
+  <p>This function formats and outputs a consistent log message output. See:
+  fLog and fError.</p>
+  <hr />
+  <h3 id="fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr">fLog -m pMsg [-p pLevel]
+  [-l $LINENO] [-e pErr]</h3>
+  <p>pLevel - emerg alert crit err warning notice info debug debug-N</p>
+  <pre><code> if gpVerbose = 0, don't output notice or info
+ if gpVerbose = 1, don't output info
+ if gpVerbose &gt;= 2, output all logs</code></pre>
+  <p>See Globals: gpSysLog, gpFacility, gpVerbose, gpDebug</p>
+  <h4 id="fLog-Examples">fLog Examples:</h4>
+  <pre><code> fLog -p warning -m "Missing awk" -l $LINENO -e 8
+ fLog -p notice -m "Output only if -v"  -e 8 -l $LINENO
+ fLog -p info -m "Output only if -vv" -l $LINENO
+ fLog -p debug -m "Output only if $gpDebug &gt; 0" -l $LINENO
+ fLog -p debug-3 -m "Output only if $gpDebug &gt; 0 and $gpDebug &lt;= 3" -l $LINENO</code></pre>
+  <hr />
+  <h3 id="fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg [-l $LINENO]
+  [-e pErr] [-i]</h3>
+  <p>This will call: fLog -p crit -m "pMsg" -l pLine -e pErr</p>
+  <p>If no -i, then "fUsage short", will be called.</p>
+  <hr />
+  <h3 id="fComGit-pArgs">fComGit [pArgs...]</h3>
+  <p>This is a wrapper for "git". If gpVerbose is &gt;= 2, the git call will
+  will be echoed. If the git call exits with a non-0, then an error message
+  is output and the script exits (if not called in a sub-shell).</p>
+  <p>This is used to make the code look "clean". You don't need to clutter
+  the code with if statements with every git command. I.e. this supports the
+  "design pattern" where, if a command exits, it is assumed all is OK,
+  because if it failed, the script would exit.</p>
+  <hr />
+  <h3 id="fComGetConfig">fComGetConfig</h3>
+  <h4 id="Synopsis">Synopsis</h4>
+  <pre><code>    fComSetConfig -k pKey -v pValue [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-a]</code></pre>
+  <h4 id="Description">Description</h4>
+  <h4 id="Options">Options</h4>
+  <p>Only one of these will be used: -g, -l, -L, -H -f. The last one in the
+  list of options will be used if there is more than one. If none, then -l is
+  the default.</p>
+  <p>Only one or none of these can be specified: -b, -i. If more than one,
+  then the last one will be used.</p>
+  <dl>
+    <dt id="k-pKey"><b>-k pKey</b></dt>
+    <dd>
+      <p>This option is required.</p>
+    </dd>
+    <dt id="v-pValue"><b>-v pValue</b></dt>
+    <dd>
+      <p>This option is required.</p>
+    </dd>
+    <dt id="g"><b>-g</b></dt>
+    <dd>
+      <p>Write to ~/.gitconfig</p>
+    </dd>
+    <dt id="l"><b>-l</b></dt>
+    <dd>
+      <p>You must be in a git workspace for this option to work.</p>
+      <p>Write to GIT_DIR/.git/config</p>
+    </dd>
+    <dt id="L"><b>-L</b></dt>
+    <dd>
+      <p>Write to GIT_DIR/$cConfigLocal</p>
+    </dd>
+    <dt id="H"><b>-H</b></dt>
+    <dd>
+      <p>Write to GIT_DIR/$cConfigHost</p>
+    </dd>
+    <dt id="f-pFile"><b>-f pFile</b></dt>
+    <dd>
+      <p>Write to pFile.</p>
+    </dd>
+    <dt id="b"><b>-b</b></dt>
+    <dd>
+      <p>The value will be normalized to "true" or "false".</p>
+    </dd>
+    <dt id="i"><b>-i</b></dt>
+    <dd>
+      <p>The value will be converted to a single "byte" value, based on its
+      suffix.</p>
+      <p>Valid suffixes: k, K, m, M, g, G</p>
+      <p>These will be converted to lowercase before being sent to "git
+      config".</p>
+    </dd>
+    <dt id="a"><b>-a</b></dt>
+    <dd>
+      <p>Use this option if you need to specify a key with multiple values.
+      If not specified, then any matching key in the file, being written to,
+      will replace the value.</p>
+    </dd>
+  </dl>
+  <hr />
+  <h3 id="fComGetConfig1">fComGetConfig</h3>
+  <h4 id="Synopsis1">Synopsis</h4>
+  <pre><code>    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
+                  [-d pDefault] [-e] [-v pFilter]</code></pre>
+  <h4 id="Description1">Description</h4>
+  <p>If pKey is found, the last defined value is echoed. And the value is
+  saved in global gGetConfigValue. And the file location of the value is
+  saved in gGetConfigOrigin.</p>
+  <p>If the key is not found, and -d pDefault is set then gGetConfigValue is
+  set to pDefault, and gGetConfigOrigin is set to "default".</p>
+  <p>If the key is not found, and there is no -d option, then gGetConfigValue
+  is set to "", and gGetConfigOrigin is set to "not-found", and "" is
+  returned.</p>
+  <p>Command Returns</p>
+  <pre><code>    0 - OK (even for no value found)
+    1 - Errors</code></pre>
+  <h4 id="Options1">Options</h4>
+  <p>Only one of these will be used: -g, -l, -f. The last one in the list of
+  options will be if there is more than one. If none, then all the config
+  files will be used.</p>
+  <p>Only one or none of these can be specified: -b, -i. If more than one,
+  then the last one will be used.</p>
+  <dl>
+    <dt id="k-pKey1"><b>-k pKey</b></dt>
+    <dd>
+      <p>This option is required. The last file were this key is found will
+      be used to set the value returned.</p>
+    </dd>
+    <dt id="g1"><b>-g</b></dt>
+    <dd>
+      <p>Look in ~/.gitconfig Includes are followed so
+      ~/gitproj.config.global will be included.</p>
+    </dd>
+    <dt id="l1"><b>-l</b></dt>
+    <dd>
+      <p>You must be in a git workspace for this option to work.</p>
+      <p>Look in GIT_DIR/.git/config Includes are followed so these files
+      will be included: GIT_DIR/$cConfigLocal and GIT_DIR/$cConfigHost</p>
+    </dd>
+    <dt id="f-pFile1"><b>-f pFile</b></dt>
+    <dd>
+      <p>This will look in pFile for pKey. Includes will be followed.</p>
+    </dd>
+    <dt id="b1"><b>-b</b></dt>
+    <dd>
+      <p>The value will be normalized to "true" or "false".</p>
+      <p>Valid values in the files:</p>
+    </dd>
+    <dt id="i1"><b>-i</b></dt>
+    <dd>
+      <p>The value will be converted to a single "byte" value, based on its
+      suffix.</p>
+      <p>Valid suffixes: k, m, g</p>
+      <p>Note: fComSetConf with -i will allow: [kKmMgG]. It will convert the
+      values to lower-case, when saving them in the config files.</p>
+    </dd>
+    <dt id="d-pDefault"><b>-d pDefault</b></dt>
+    <dd>
+      <p>If pKey is not found, then pDefault will be returned, and
+      gGetConfigOrigin will be set to "default".</p>
+    </dd>
+    <dt id="e"><b>-e</b></dt>
+    <dd>
+      <p>If -e, then do some simple validation checks:</p>
+      <p>* if the pKey is not found, then fError will be called and the
+      script will terminate. I.e. the config var is required.</p>
+      <p>* or if the value for pKey is equal to pDefault, fError will be
+      called and the script will terminate. I.e. the config var is still set
+      to it's intitial "undefined" value.</p>
+      <p>* or if the value for pKey is equal to "TBD" or "not-defined",
+      fError will be called and the script will terminate. I.e. the config
+      var is still set to it's intitial "undefined" value.</p>
+      <p>Note: -e will only exit the whole script if it is not in a subshell.
+      I.e. don't use var=\$(cmd) style.</p>
+    </dd>
+    <dt id="v-pFilter"><b>-v pFilter</b></dt>
+    <dd>
+      <p>pFilter is used as a pattern match for the value found. This is
+      useful for times when there could be duplicate pKeys with different
+      values. For example there could be multiple "include.path" keys.</p>
+    </dd>
+  </dl>
+</body>
+</html>

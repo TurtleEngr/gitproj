@@ -3,9 +3,13 @@
 # TBD add missing tar file rules
 # TBD add tar file deps to the tests scripts
 
+# --------------------
+# Config
+
 mCore = ../git-core
 
-# Note: the order matters
+# Note: the order matters, when *recreating* these files.
+# The order of tests do not matter when *using* thise files.
 mTestEnvFiles = \
 	test-env_HomeAfterBMove.tgz \
 	test-env_ProjAfterGInit.tgz \
@@ -37,6 +41,7 @@ mCmdList = \
 	test-clone.log \
 	test-status.log
 
+# The might be implemented later
 mCmdToDo = \
 	add \
 	move \
@@ -45,17 +50,31 @@ mCmdToDo = \
 	check
 
 # --------------------
+# Test
+
+# Only run tests where the dependencies have changed
 test : $(mDepList) $(mBaseList) $(mCmdList)
 
+# Use this for *force* all tests to be run
 test-all : clear-logs test
 
 clear-logs :
 	rm test-*.log
 
+# Get project statistics
 stats :
 	./stats.sh
 
+gen-dev-doc :
+	-$(mCore)/git-proj -H int-md >dev-doc/git-proj.md
+	-$(mCore)/git-proj -H int-html >dev-doc/git-proj.html
+
+# ========================================
+# Tests for each of the commands
+
 # --------------------
+# Special non-CMD tests
+
 test-com.log : $(mDepList) test-com.sh
 	./test-com.sh 2>&1 | tee $@
 
@@ -69,6 +88,14 @@ test-gitproj.log : $(mDepList) test-gitproj.sh $(mCore)/git-proj
 	./test-gitproj.sh 2>&1 | tee $@
 
 # --------------------
+# If a CMD log file is old, updated it by running its test script
+
+test-%.log : test-%.sh $(mDepList) $(mCore)/gitproj-%.inc $(mCore)/git-proj-%
+	./$< 2>&1 | tee $@
+
+# --------------------
+# Define the test-env*.tgz dependencies here
+
 test-init.sh : test-env_HomeAfterBMove.tgz test-env_ProjAfterGInit.tgz
 
 test-remote.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
@@ -78,10 +105,6 @@ test-push.sh : test-env_TestDestDirAfterRemoteReport.tgz test-env_ProjLocalDefin
 test-pull.sh : test-env_ProjLocalDefined.tgz
 
 test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
-
-# --------------------
-test-%.log : test-%.sh $(mDepList) $(mCore)/gitproj-%.inc $(mCore)/git-proj-%
-	./$< 2>&1 | tee $@
 
 # --------------------
 test-env.tgz :
@@ -95,6 +118,9 @@ test-env.tgz :
 	@echo "Now you should update the other test-env tar files."
 
 # --------------------
+# Define the tests that create the test-env*.tgz files.
+# New files are manually moved and symlinks added.
+
 test-env : $(mTestEnvFiles)
 	@echo "To update the test-env files:"
 	@echo "$^"

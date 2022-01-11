@@ -4,31 +4,23 @@
 
 This is still under development.
 
-## Outline
+## Documentation
 
-The Usage help text in the main sub-command files have the most up-to-date
-descriptions.
+The Usage help for git-proj sub-command can be found in the
+doc/user-doc/*.md files. The git-proj.md file gives and overview of
+how git proj works and it also has the usage help for all of the
+subcommands. Or you can look at each sub command files individually.
 
-For a more complete outline, see: doc/test/outline.md
+### git proj sub-commands
 
-### Main sub-commands, in git-core/
-
-* git-proj - general help - mostly implemented
-* git-proj-init - initialize a local git-proj repo - mostly implemented
-* git-proj-remote - initialize new remote repo from a local one - mostly implemented
-* git-proj-push - git push and push proj.raw files (rsync or rclone)
-* git-proj-pull - git pull and pull proj.raw files (rsync or rclone)
-* git-proj-status - git status and status of binary files
-* git-proj-clone - create a git workspace and raw workspace from a remote
-* git-proj-add - add a binary file to raw/
-* git-proj-config - mainly for managing new "mount-dirs" or different hosts
-* git-proj-check - maybe move this to git-proj-status
-
-### Library functions in git-core/
-
-* gitproj-com.inc
-* gitproj-init.inc
-* gitproj-remote.inc
+* git proj - general help - mostly implemented
+* git proj init - initialize a local git-proj repo
+* git proj-remote - initialize a new "remote repo" from the local one
+* git proj push - push files in raw/ to the remote repo (and do a regular git push)
+* git proj pull - pull raw/ files from the remote repo (and do a regular git pull)
+* git proj status - git status and status of binary files in raw/ compared to remote raw/
+* git proj clone - create a git workspace and raw/ workspace from a remote
+* git proj config - TBD. This fixup or change the git-proj configuration
 
 ### Config files in doc/config/
 
@@ -40,34 +32,46 @@ For a more complete outline, see: doc/test/outline.md
 * gitproj.config.HOSTNAME - copy to PROJ/.gitproj.config.HOSTNAME
   included by .git/config
 
+## For Developers
+
+An outline of the directory strucure and files in git-proj can be
+found at: doc/test/outline.md
+
+### Library functions in git-core/
+
+* gitproj-com.inc - common functions used across many of the scripts
+* gitproj-[CMD].inc - the main function are put in these files, so testing is easier
+* git-proj-[CMD] - these files only get the arguments and call the functions in the corrsponding gitproj-[CMD].inc
+
 ### Test scripts in doc/test/
 
-test-com.sh
-test-com2.sh
-test-gitproj.sh
-test-init.sh
-test-remote.sh
+* test-com.sh
+* test-com2.sh
+* test-gitproj.sh
+* test-[CMD].sh
 
-### Test Environment files
+* test-[CMD].log - these file are used by the Makefile to collect the
+output from a test-[CMD].sh script. If the log file is older than any
+of its depenencies, then the corresponding test-[CMD].sh script will
+be run.
+
+### Test Environment files (test-env*.tgz)
 
 Currently these are symlinks to the directory above the git workspace.
 These will be moved to a public space when the tool is mostly done, or
-when automated testing is setup.
+when automated testing is setup. An rsync or rclone step will be added when
+the space is setup.
 
-See the Makefile for how these are built.
+See the Makefile for how the tar-env*.tgz files are created and rebuilt.
 
-* test-env.tgz@ - manually built
-* test-env_HomeAfterBMove.tgz@
-* test-env_ProjAfterGInit.tgz@
-* test-env_ProjLocalDefined.tgz@
-* test-env_TestDestDirAfterMkRemote.tgz@
+* test-env.tgz@ - is manually built
 
 ----
 
 ## Notes
 
-These are just some of the initial design notes. The tool is very
-different from this now.
+These are just some of the initial design notes that helped with
+the implementation of this tool.
 
 https://coderwall.com/p/bt93ia/extend-git-with-custom-commands
 
@@ -85,11 +89,15 @@ https://github.com/nvie/gitflow
 https://github.com/nvie/gitflow/blob/develop/git-flow-init
 
 https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks
+
 https://git-scm.com/docs/githooks
 
 ## Design
 
 ### Move existing files to PROJ.raw/DIRS and make symlinks
+
+This is an example of moving files in an existing structure and
+creating symlinks so it looks like the files are still there.
 
     cd /home/video/seal
     mkdir ../seal.raw
@@ -99,47 +107,7 @@ https://git-scm.com/docs/githooks
     mv *.MP4 *.JPG *.jpg  ../../../../../seal.raw/edit/src/own/video
     ln -s ../../../../../seal.raw/edit/src/own/video/* .
 
-### Best starting structure (only one symlink to manage)
-
-    PROJ.raw/
-            DIRS/
-                    *.MP4
-    PROJ/
-            .git/
-            PROJ.raw/ -> ../PROJ.raw/
-
-### proj-new-local
-        mkdir ../seal.raw
-        ln -s ../seal.raw .
-        git add *
-        git ci -m Added
-
-### proj-new-remote /mnt/usb-video/video-2021-10-22
-
-    proj-new-remote /mnt/usb-video/video-2021-10-22
-
-### git-push-raw
-
-        mkdir /mnt/usb-video/video-2021-10-22/seal.raw
-        rsync -rCP $cTop/../seal.raw/* /mnt/usb-video/video-2021-10-22/seal.raw
-
-### pushes:
-
-    git push origin develop
-    git-push-raw
-        mkdir /mnt/usb-video/video-2021-10-22/seal.raw
-        rsync -rCP $cTop/../seal.raw/* /mnt/usb-video/video-2021-10-22/seal.raw
-
-### Get local
-
-    proj-get-local /mnt/usb-video/video-2021-10-22/seal.git
-    cd seal
-    mkdir ../seal.raw
-    rsync -rCP /mnt/usb-video/video-2021-10-22/seal.raw/* $cTop/../seal.raw
-
-### Pulls
-
-    git pull origin develop
-    git-pull-raw
-        mkdir ../seal.raw
-        rsync -rCP /mnt/usb-video/video-2021-10-22/seal.raw/* $cTop/../seal.raw
+Yuck. Just put all large binary files in PROJ/raw/ and fix the
+references to them. If you really need to have files in some other
+location, then make your own symnlinks to point the files in
+raw/. Directories can be in raw/.
