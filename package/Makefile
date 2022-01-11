@@ -1,9 +1,11 @@
 # Directions
 
-# Run this first to check for dependencies and to setup meta-date for packaging
+# Run this first to check for dependencies and to setup meta-data for
+# packaging (see ver.sh and mkver.sh)
 # make first
 
-# Collect the files for the package into pseudo root dist/
+# Collect the files for the package into pseudo root dist/ and create
+# list of files for epm packager.
 # make build
 
 # Use this to start with a fresh build (build always runs this)
@@ -110,7 +112,7 @@ test-package : epm.list $(ProdOSDist).require
 
 test-release : TBD
 
-clean-test-release :
+clean-test-release : TBD
 	# Remove all $(ProdName) packages from repo
 
 package : epm.list $(ProdOSDist).require
@@ -128,6 +130,9 @@ release : ver.env ver.mak
 	. ./ver.env; ssh $(ProdRelServer) test -d $(ProdRelDir)
 	. ./ver.env; rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
 
+clean-rc-release : TBD
+	# Remove all $(ProdName) Release Candidates from repo
+
 tag : ver.env ver.mak
 	-git commit -am Updated
 	. ./ver.env; git tag -f -a -m "Released to: $(ProdRelServer):$(ProdRelDir)" $(ProdTag)
@@ -139,9 +144,7 @@ tag : ver.env ver.mak
 	#git commit -am Updated
 	#git push origin develop
 	#git push --tags -f
-
-clean-rc-release :
-	# Remove all $(ProdName) Release Candidates from repo
+	#put tag in CHANGES.md and add 'git log' messages
 
 # --------------------
 # Work Targets
