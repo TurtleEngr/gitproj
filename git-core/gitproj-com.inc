@@ -300,7 +300,7 @@ fComSetGlobals()
     # -v
     gpVerbose=${gpVerbose:-0}
     # -l
-    gpSysLog=${gpSysLog:-true}
+    gpSysLog=${gpSysLog:-false}
     gpFacility=${gpFacility:-user}
     gErr=0
 
@@ -332,7 +332,7 @@ fComPreProjSetGlobals()
 
     gpVer=$cGitProjVersion
 
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
     gpAuto=0
@@ -603,7 +603,7 @@ fComStackTrace()
         return 0
     fi
 
-    if [ "${gpSysLog:-true}" = "true" ]; then
+    if [ "${gpSysLog:-false}" = "true" ]; then
         tOutput="logger -s -t ${gpCmdName:-fComStackTrace} -p ${gpFacility:-user}.debug"
     else
         tOutput="cat"
@@ -738,7 +738,7 @@ fComFmtLog()
     local tPID_Opt=""
 
     # Set any missing globals
-    gpSysLog=${gpSysLog:-true}
+    gpSysLog=${gpSysLog:-false}
     gpFacility=${gpFacility:-user}
     gpVerbose=${gpVerbose:-0}
     gpDebug=${gpDebug:-0}
@@ -1648,7 +1648,7 @@ fComGetProjGlobals()
         exit 1
     fi
 
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true" 2>&1)
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false" 2>&1)
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
     gpLocalTopDir=$($cGetTopDir 2>/dev/null)
 

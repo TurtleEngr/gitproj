@@ -23,7 +23,7 @@ fRemoteSetGlobals()
 
     gpAuto=${gpAuto:-0}
     gpMountDir=""
-    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "true")
+    gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
     gpLocalTopDir=$($cGetTopDir 2>/dev/null)
     if [ -z "$gpLocalTopDir" ]; then

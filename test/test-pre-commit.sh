@@ -82,6 +82,10 @@ setUp()
 {
     local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
     local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tVer=$(cat $gpDoc/VERSION)
+    tVer=$(echo $tVer)
+    local tConf
+
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
@@ -115,6 +119,15 @@ setUp()
     # git proj to be cloned:
     HOME=$cDatHome3
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+
+    # Patch the version that was set in the tar file
+    for tConf in \
+        $cDatHome3/project/george/.gitproj.config.testserver \
+        $cDatHome3/project/george/.gitproj.config.testserver2 \
+        $cDatHome3/project/george/.gitproj.config.local \
+      ; do
+	git config -f $tConf gitproj.config.ver $tVer
+    done
 
     cd $HOME/project/george >/dev/null 2>&1
     fComGetProjGlobals

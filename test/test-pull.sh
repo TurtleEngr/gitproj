@@ -110,6 +110,10 @@ NAoneTimeTearDown()
 # --------------------------------
 setUp()
 {
+    local tVer=$(cat $gpDoc/VERSION)
+    tVer=$(echo $tVer)
+    local tConf
+
     # Restore default global values, before each test
 
     unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
@@ -125,6 +129,20 @@ setUp()
     cd $cTestDestDir >/dev/null 2>&1
     tar -xzf $gpTest/test-env_Home2AfterPush.tgz
     cd - >/dev/null 2>&1
+
+    # Patch the version that was set in the tar file
+    for tConf in \
+        $cDatHome/$cDatProj1/.gitproj.config.testserver \
+        $cDatHome/$cDatProj1/.gitproj.config.local \
+        $cDatHome2/$cDatProj1/.gitproj.config.testserver \
+        $cDatHome2/$cDatProj1/.gitproj.config.local \
+      ; do
+	git config -f $tConf gitproj.config.ver $tVer
+    done
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    git ci -am "Updated" >/dev/null 2>&1
+    cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
+    git ci -am "Updated" >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     . $gpBin/gitproj-pull.inc

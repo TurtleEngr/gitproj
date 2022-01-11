@@ -185,7 +185,7 @@ testComInitialConfig()
 
     assertEquals "$LINENO" "0" "$gpDebug"
     assertEquals "$LINENO" "0" "$gpVerbose"
-    assertEquals "$LINENO" "true" "$gpSysLog"
+    assertEquals "$LINENO" "false" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" "$gErr"
     assertNull "$LINENO" "$(echo $gpCmdVer | tr -d '.[:digit:]')"
@@ -240,7 +240,7 @@ testComPreProjSetGlobals()
 
     assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
 
-    assertEquals "$LINENO" "true" "$gpSysLog"
+    assertEquals "$LINENO" "false" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" "$gpAuto"
     assertEquals "$LINENO" "${PWD##*/}" "$gpProjName"

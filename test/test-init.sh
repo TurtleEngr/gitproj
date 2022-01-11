@@ -823,7 +823,7 @@ testInitSaveVarsToConfigs()
     fTestCheckConfig2Var $tFile $tS.doc gpDoc "${gDoc#$gpLocalTopDir/}" $LINENO
     fTestCheckConfig2Var $tFile $tS.test gpTest "${gTest#$gpLocalTopDir/}" $LINENO
     fTestCheckConfig2Var $tFile $tS.facility gpFacility user $LINENO
-    fTestCheckConfig2Var $tFile $tS.syslog gpSysLog true $LINENO
+    fTestCheckConfig2Var $tFile $tS.syslog gpSysLog false $LINENO
 
     for tFile in $gpLocalTopDir/$cConfigLocal \
         $gpLocalTopDir/$cConfigHost; do
