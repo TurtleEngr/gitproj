@@ -1753,5 +1753,4 @@ fComFmt()
 } # fComFmt
 
 # ========================================
-export tSrc=${BASH_SOURCE##*/}
 fComSetGlobals

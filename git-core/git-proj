@@ -514,6 +514,14 @@ fi
 # -------------------
 # Get Args Section
 
+# Is this a sub-command?
+tCmd=$gpBin/git-proj-$1
+if [ -x $tCmd ]; then
+    shift
+    $tCmd $*
+    exit $?
+fi
+
 while getopts :vVhH:x-: tArg; do
     case $tArg in
         v)

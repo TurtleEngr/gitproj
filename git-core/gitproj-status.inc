@@ -66,5 +66,4 @@ fStatusOutput()
 } # fStatusOutput
 
 # ========================================
-export tSrc=${BASH_SOURCE##*/}
 fComGetProjGlobals

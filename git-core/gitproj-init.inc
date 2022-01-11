@@ -628,5 +628,4 @@ EOF
 } # fInitCreateLocalGit
 
 # ========================================
-export tSrc=${BASH_SOURCE##*/}
 fComPreProjSetGlobals

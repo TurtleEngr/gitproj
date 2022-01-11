@@ -1,8 +1,11 @@
 # TODO
 
-* Add a CHANGES.md file
+* Add a CHANGES.md file - done
 
 * Fix -h so it works with "git proj CMD" CLI
+Defect in the design 'git proj CMD ARGS' calls: git-proj CMD ARGS
+Fix: look for first arg so see if it is a CMD.
+Test each CMD to be sure the ARGS are passed correctly.
 
 * Fixup the github README.md so that it can be used in the dist package too.
 

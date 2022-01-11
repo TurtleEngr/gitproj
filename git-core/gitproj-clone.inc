@@ -399,5 +399,4 @@ fCloneFromRemoteDir()
 } # fCloneFromRemoteDir
 
 # ========================================
-export tSrc=${BASH_SOURCE##*/}
 fComPreProjSetGlobals
