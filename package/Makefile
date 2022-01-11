@@ -125,7 +125,7 @@ package : epm.list $(ProdOSDist).require
 release : ver.env ver.mak
 	+. ./ver.env; echo ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
 	-. ./ver.env; ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
-	. ./ver.env; ssh $(ProdRelServer test -d $(ProdRelDir)
+	. ./ver.env; ssh $(ProdRelServer) test -d $(ProdRelDir)
 	. ./ver.env; rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
 
 tag : ver.env ver.mak
