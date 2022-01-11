@@ -1,59 +1,51 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
+  <title></title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
 </head>
-
 <body id="_podtop_">
-
-
-
-<hr/>
-
-<pre><code> git proj config [-e pExternalPath] [-r pRawPath]
+  <hr />
+  <pre><code> git proj config [-e pExternalPath] [-r pRawPath]
 
     Define or redefine the gitproj options.
 
     -e pExternalPath
 
        If the external repo is mounted at a different path than the
-       original &quot;origin&quot;, then use this command to set the origin to
+       original "origin", then use this command to set the origin to
        the new mount point.
 
     -r pRawPath
 
-       Redefine the location of the local raw file dir. The &quot;raw&quot;
+       Redefine the location of the local raw file dir. The "raw"
        symlink will be updated.
 
     -c on/off
 
-       Set a commit hook to not allow commits for &quot;large&quot; binary files.
+       Set a commit hook to not allow commits for "large" binary files.
 
     -s pMaxSize
 
        Set the max size for commits of binary files.</code></pre>
-
-<p>Usage: proj-set-remote pPath</p>
-
-<p>Description Use this script if the mount path is different from the origin remote. pPath is the path pointing the current repo&#39;s remote repo on an external drive.</p>
-
-<pre><code>        Setup a different host.
+  <p>Usage: proj-set-remote pPath</p>
+  <p>Description Use this script if the mount path is different from the
+  origin remote. pPath is the path pointing the current repo's remote repo on
+  an external drive.</p>
+  <pre><code>        Setup a different host.
 
         Review and change the current settings interactively.</code></pre>
-
-<p>Example The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git But the drive is now mounted at /mnt/usb-drive, use:</p>
-
-<pre><code>            proj-set-remote /mnt/usb-drive/video-2019-04-01
+  <p>Example The origin is currently set to:
+  /mnt/usb-video/video-2019-04-01/trip.git But the drive is now mounted at
+  /mnt/usb-drive, use:</p>
+  <pre><code>            proj-set-remote /mnt/usb-drive/video-2019-04-01
 
         will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
         if trip.git is found at the specified path.</code></pre>
-
-
 </body>
-
 </html>
-
-

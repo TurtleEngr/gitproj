@@ -1,117 +1,96 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title></title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
+  <title></title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
 </head>
-
 <body id="_podtop_">
-
-
-
-<ul id="index">
-  <li><a href="#NAME-git-proj-init">NAME git proj init</a></li>
-  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
-  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
-  <li><a href="#OPTIONS">OPTIONS</a></li>
-  <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
-  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
-  <li><a href="#AUTHOR">AUTHOR</a></li>
-  <li><a href="#HISTORY">HISTORY</a></li>
-</ul>
-
-<hr/>
-
-<a href="#_podtop_"><h1 id="NAME-git-proj-init">NAME git proj init</h1></a>
-
-<a href="#_podtop_"><h1 id="SYNOPSIS">SYNOPSIS</h1></a>
-
-<pre><code>    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [common-options]
+  <ul id="index">
+    <li><a href="#NAME-git-proj-init">NAME git proj init</a></li>
+    <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+    <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+    <li><a href="#OPTIONS">OPTIONS</a></li>
+    <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
+    <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+    <li><a href="#AUTHOR">AUTHOR</a></li>
+    <li><a href="#HISTORY">HISTORY</a></li>
+  </ul>
+  <hr />
+  <h1 id="NAME-git-proj-init"><a href="#_podtop_">NAME git proj init</a></h1>
+  <h1 id="SYNOPSIS"><a href="#_podtop_">SYNOPSIS</a></h1>
+  <pre><code>    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [common-options]
 
     Defaults: [-l $PWD] [-s 10K]</code></pre>
-
-<a href="#_podtop_"><h1 id="DESCRIPTION">DESCRIPTION</h1></a>
-
-<p>This will create a local git repo with branches. If git-flow is installed can will optionally be setup too. After this setup the remote git repo with &quot;git proj init remote&quot;</p>
-
-<p>If there is a -a option, &quot;git proj init local&quot; will be run with all the default options, which can be overridden with the options.</p>
-
-<p>If there is no -a option, you will be prompted for the settings. See the OPTION section for details.</p>
-
-<p>When the local and remote git repos are setup, all the setings will be saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME. Includes are put in ~/.gitconfig and [project].git/config to point to the gitproj config files.</p>
-
-<a href="#_podtop_"><h1 id="OPTIONS">OPTIONS</h1></a>
-
-<dl>
-
-<dt id="a"><b>-a</b></dt>
-<dd>
-
-<p>The -a option will automattically run the whole init process with default settings. The options can be defined to override the default settings.</p>
-
-</dd>
-<dt id="l-pLocalDir"><b>-l pLocalDir</b></dt>
-<dd>
-
-<p>Define the existing project directory. The last directory will be used for the name of the project. Default: current directory</p>
-
-<pre><code>    Dir (-l) [$PWD]? $gpLocalTopDir
+  <h1 id="DESCRIPTION"><a href="#_podtop_">DESCRIPTION</a></h1>
+  <p>This will create a local git repo with branches. If git-flow is
+  installed can will optionally be setup too. After this setup the remote git
+  repo with "git proj init remote"</p>
+  <p>If there is a -a option, "git proj init local" will be run with all the
+  default options, which can be overridden with the options.</p>
+  <p>If there is no -a option, you will be prompted for the settings. See the
+  OPTION section for details.</p>
+  <p>When the local and remote git repos are setup, all the setings will be
+  saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME. Includes
+  are put in ~/.gitconfig and [project].git/config to point to the gitproj
+  config files.</p>
+  <h1 id="OPTIONS"><a href="#_podtop_">OPTIONS</a></h1>
+  <dl>
+    <dt id="a"><b>-a</b></dt>
+    <dd>
+      <p>The -a option will automattically run the whole init process with
+      default settings. The options can be defined to override the default
+      settings.</p>
+    </dd>
+    <dt id="l-pLocalDir"><b>-l pLocalDir</b></dt>
+    <dd>
+      <p>Define the existing project directory. The last directory will be
+      used for the name of the project. Default: current directory</p>
+      <pre><code>    Dir (-l) [$PWD]? $gpLocalTopDir
         So the project Name will be: ${gpLocalTopDir##*/}</code></pre>
-
-</dd>
-<dt id="s-pMaxSize"><b>-s pMaxSize</b></dt>
-<dd>
-
-<p>Define the &quot;size&quot; for large binary files. Default 10K</p>
-
-<pre><code>    Size (-s) [10K]?</code></pre>
-
-</dd>
-<dt id="m"><b>-m</b></dt>
-<dd>
-
-<p>These binary files greater than [pSize] were found in your project dir:</p>
-
-<pre><code>    [file list]</code></pre>
-
-<p>The listed files can be moved to the project&#39;s &quot;raw&quot; directory. Dirs will be created in the raw directory that correspond to the project&#39;s directory. A symlink will replace the moved file. The symlink will point to [raw].</p>
-
-<p>The symlinks are only provided for backward compatability; it would be best to remove those links and modifiy your code and apps to access the file directly from the raw directories.</p>
-
-<pre><code>    Move the files (-m) [y/n]?</code></pre>
-
-</dd>
-<dt id="f"><b>-f</b></dt>
-<dd>
-
-<p>[If git-flow is installed]</p>
-
-<pre><code>    Setup git-flow (-f) [y/n]?</code></pre>
-
-</dd>
-<dt id="common-options"><b>[common-options]</b></dt>
-<dd>
-
-<pre><code> -h
+    </dd>
+    <dt id="s-pMaxSize"><b>-s pMaxSize</b></dt>
+    <dd>
+      <p>Define the "size" for large binary files. Default 10K</p>
+      <pre><code>    Size (-s) [10K]?</code></pre>
+    </dd>
+    <dt id="m"><b>-m</b></dt>
+    <dd>
+      <p>These binary files greater than [pSize] were found in your project
+      dir:</p>
+      <pre><code>    [file list]</code></pre>
+      <p>The listed files can be moved to the project's "raw" directory. Dirs
+      will be created in the raw directory that correspond to the project's
+      directory. A symlink will replace the moved file. The symlink will
+      point to [raw].</p>
+      <p>The symlinks are only provided for backward compatability; it would
+      be best to remove those links and modifiy your code and apps to access
+      the file directly from the raw directories.</p>
+      <pre><code>    Move the files (-m) [y/n]?</code></pre>
+    </dd>
+    <dt id="f"><b>-f</b></dt>
+    <dd>
+      <p>[If git-flow is installed]</p>
+      <pre><code>    Setup git-flow (-f) [y/n]?</code></pre>
+    </dd>
+    <dt id="common-options"><b>[common-options]</b></dt>
+    <dd>
+      <pre><code> -h
  -H pStyle
  -v, -vv
  -x, -xx</code></pre>
-
-<p>Run &quot;git proj -h&quot; for details.</p>
-
-</dd>
-</dl>
-
-<a href="#_podtop_"><h1 id="RETURN-VALUE">RETURN VALUE</h1></a>
-
-<pre><code> 0 - if OK
+      <p>Run "git proj -h" for details.</p>
+    </dd>
+  </dl>
+  <h1 id="RETURN-VALUE"><a href="#_podtop_">RETURN VALUE</a></h1>
+  <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-
-<a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
-
-<pre><code> git proj
+  <h1 id="SEE-ALSO"><a href="#_podtop_">SEE ALSO</a></h1>
+  <pre><code> git proj
  git proj remote
  git proj clone
  git proj add
@@ -120,18 +99,9 @@
  git proj set
  git proj status
  git flow</code></pre>
-
-<a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
-
-<p>TurtleEngr</p>
-
-<a href="#_podtop_"><h1 id="HISTORY">HISTORY</h1></a>
-
-<p>GPLv3 Copyright 2021 by TurtleEngr</p>
-
-
+  <h1 id="AUTHOR"><a href="#_podtop_">AUTHOR</a></h1>
+  <p>TurtleEngr</p>
+  <h1 id="HISTORY"><a href="#_podtop_">HISTORY</a></h1>
+  <p>GPLv3 Copyright 2021 by TurtleEngr</p>
 </body>
-
 </html>
-
-

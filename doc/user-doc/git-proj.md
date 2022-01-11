@@ -371,3 +371,379 @@ TurtleEngr
 # HISTORY
 
 (c) Copyright 2021 by TurtleEngr
+
+<div>
+    <hr/>
+</div>
+
+# NAME git proj init
+
+# SYNOPSIS
+
+    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [common-options]
+
+    Defaults: [-l $PWD] [-s 10K]
+
+# DESCRIPTION
+
+This will create a local git repo with branches. If git-flow is
+installed can will optionally be setup too. After this setup the
+remote git repo with "git proj init remote"
+
+If there is a -a option, "git proj init local" will be run with all
+the default options, which can be overridden with the options.
+
+If there is no -a option, you will be prompted for the settings.  See
+the OPTION section for details.
+
+When the local and remote git repos are setup, all the setings
+will be saved to ~/.gitproj.config and
+\[project\]/gitproj/config.$HOSTNAME. Includes are put in ~/.gitconfig
+and \[project\].git/config to point to the gitproj config files.
+
+# OPTIONS
+
+- **-a**
+
+    The -a option will automattically run the whole init process with
+    default settings. The options can be defined to override the default
+    settings.
+
+- **-l pLocalDir**
+
+    Define the existing project directory. The last directory will be used
+    for the name of the project. Default: current directory
+
+        Dir (-l) [$PWD]? $gpLocalTopDir
+            So the project Name will be: ${gpLocalTopDir##*/}
+
+- **-s pMaxSize**
+
+    Define the "size" for large binary files. Default 10K
+
+        Size (-s) [10K]?
+
+- **-m**
+
+    These binary files greater than \[pSize\]  were found in your project dir:
+
+        [file list]
+
+    The listed files can be moved to the project's "raw" directory. Dirs
+    will be created in the raw directory that correspond to the project's
+    directory. A symlink will replace the moved file. The symlink will
+    point to \[raw\].
+
+    The symlinks are only provided for backward compatability; it would be
+    best to remove those links and modifiy your code and apps to access
+    the file directly from the raw directories.
+
+        Move the files (-m) [y/n]?
+
+- **-f**
+
+    \[If git-flow is installed\]
+
+        Setup git-flow (-f) [y/n]?
+
+- **\[common-options\]**
+
+        -h
+        -H pStyle
+        -v, -vv
+        -x, -xx
+
+    Run "git proj -h"  for details.
+
+# RETURN VALUE
+
+    0 - if OK
+    !0 - if errors
+
+# SEE ALSO
+
+    git proj
+    git proj remote
+    git proj clone
+    git proj add
+    git proj push
+    git proj pull
+    git proj set
+    git proj status
+    git flow
+
+# AUTHOR
+
+TurtleEngr
+
+# HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
+
+<div>
+    <hr/>
+</div>
+
+# NAME git proj remote
+
+# SYNOPSIS
+
+    git proj remote [-a] [-d pMountDir] [common-options]
+
+# DESCRIPTION
+
+This will create a remote git repo on an external drive.
+
+(Future versions may support repos on remote computers, where you have
+rsync access.)
+
+# OPTIONS
+
+- **-d pMountDir**
+
+    Export the git repo to an external drive (or another local dir) This
+    is usually the removable drive's "top" directory.  Ideally the top
+    directory should be different across a set of external drives, so that the
+    local "origin" can be used to make sure the proper git repo is found
+    on the drive. "origin" will be set to $pMountDir/ProjName.git
+
+    After adding and committing files, run this script to copy this git
+    repo to a mounted drive (or to another local directory).
+
+    A mounted drive should have top directory that is different from other
+    drives so that the repo can be found with it's "origin" name.
+
+    For example, with a mount point: /mnt/usb-video create the remote git
+    at the top directory video-2019-04-01, with:
+
+        git proj init -e /mnt/usb-video/video-2019-04-01
+
+- **\[common-options\]**
+
+        -h
+        -H pStyle
+        -v, -vv
+        -x, -xx
+
+    Run "git proj -h"  for details.
+
+# RETURN VALUE
+
+    0 - if OK
+    !0 - if errors
+
+# SEE ALSO
+
+    git proj
+    git proj init
+    git proj clone
+    git proj add
+    git proj push
+    git proj pull
+    git proj config
+    git proj status
+    git flow
+
+# AUTHOR
+
+TurtleEngr
+
+# HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
+
+<div>
+    <hr/>
+</div>
+
+# NAME git proj clone
+
+# SYNOPSIS
+
+    git proj clone -d pRemoteDir [-y|-n] [common-options]
+
+# DESCRIPTION
+
+Clone a local git repo from the external pRemoteDir.
+
+Use this script get a local copy of the remote git repo frome a
+mounted drive.
+
+# OPTIONS
+
+- **-d pRemoteDir**
+
+    TBD
+
+- **-y|-n**
+
+    If -y, then default to "yes" to all prompts to continue.
+
+    If -n, then default to "no" to all prompts to continue.
+
+- **\[common-options\]**
+
+        -h
+        -H pStyle
+        -v, -vv
+        -x, -xx
+
+    Run "git proj -h"  for details.
+
+# RETURN VALUE
+
+    0 - if OK
+    !0 - if errors
+
+# EXAMPLES
+
+The drive is mounted at: /mnt/usb-video and the the repo is
+at: video-2019-04-01/trip.git So use this to get a local copy.
+
+proj-get-local -d /mnt/usb-video/video-2019-04-01/trip.git
+
+# SEE ALSO
+
+    git proj
+    git proj remote
+    git proj clone
+    git proj add
+    git proj push
+    git proj pull
+    git proj set
+    git proj status
+    git flow
+
+# AUTHOR
+
+TurtleEngr
+
+# HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
+
+<div>
+    <hr/>
+</div>
+
+# NAME git proj push
+
+# SYNOPSIS
+
+    git proj push [-b] [-y|-n] [common-options]
+
+# DESCRIPTION
+
+    rsync will be used top copy the '[ProjName]/raw/' files to
+    [remote-raw-dir]/[ProjName].raw.
+
+If the -b option is given then run:
+
+    "git push origin [current-branch]"
+
+# OPTIONS
+
+- **-b**
+- **-y|-n**
+
+    If -y, then default to "yes" to all prompts to continue.
+
+    If -n, then default to "no" to all prompts to continue.
+
+- **\[common-options\]**
+
+        -h
+        -H pStyle
+        -v, -vv
+        -x, -xx
+
+    Run "git proj -h" for details.
+
+# RETURN VALUE
+
+    0 - if OK
+    !0 - if errors
+
+# SEE ALSO
+
+    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj add
+    git proj push
+    git proj pull
+    git proj config
+    git proj status
+    git flow
+
+# AUTHOR
+
+TurtleEngr
+
+# HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
+
+<div>
+    <hr/>
+</div>
+
+# NAME git proj push
+
+# SYNOPSIS
+
+    git proj pull [-b] [-y|-n] [common-options]
+
+# DESCRIPTION
+
+rsync will be used top copy the \[remote-raw-dir\]/\[ProjName\].raw/ files
+to '\[ProjName\]/raw/'.
+
+If the -b option is given then run:
+
+    "git pull origin [current-branch]"
+
+# OPTIONS
+
+- **-b**
+- **-y|-n**
+
+    If -y, then default to "yes" to all prompts to continue.
+
+    If -n, then default to "no" to all prompts to continue.
+
+- **\[common-options\]**
+
+        -h
+        -H pStyle
+        -v, -vv
+        -x, -xx
+
+    Run "git proj -h" for details.
+
+# RETURN VALUE
+
+    0 - if OK
+    !0 - if errors
+
+# SEE ALSO
+
+    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj add
+    git proj push
+    git proj pull
+    git proj config
+    git proj status
+    git flow
+
+# AUTHOR
+
+TurtleEngr
+
+# HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr

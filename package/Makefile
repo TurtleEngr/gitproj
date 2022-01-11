@@ -66,9 +66,9 @@ build epm.list : clean ver.mak ver.epm ver.env
 	echo $(ProdVer) >../doc/VERSION
 	cp ../git-core/* dist/usr/lib/git-core
 	rsync -a ../doc/* dist/usr/share/doc/git-proj
-	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-core.1
-	gzip dist/usr/share/man/man1/git-core.1
-	ln dist/usr/share/man/man1/git-core.1.gz dist/usr/share/man/man1/gitcore.1.gz
+	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
+	gzip dist/usr/share/man/man1/git-proj.1
+	ln dist/usr/share/man/man1/git-proj.1.gz dist/usr/share/man/man1/gitproj.1.gz
 	chmod -R a+r dist
 	find dist -executable -exec chmod a+rx {} \;
 	mkepmlist -u root -g root --prefix / dist | patch-epm-list -f ./epm.patch >epm.list

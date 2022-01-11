@@ -17,6 +17,7 @@
 # Config
 
 mHtmlOpt = --cachedir=/tmp --index --backlink
+mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
 
 # --------------------
 check : doc git-core package test
@@ -27,9 +28,12 @@ clean : check
 
 gen-doc :
 	-mkdir doc/user-doc
-	for tCmd in git-core/git-proj git-core/git-proj-*; do \
+	-git-core/git-proj -H md >doc/user-doc/git-proj.md
+	-git-core/git-proj -H html >doc/user-doc/git-proj.html
+	-for tCmd in git-core/git-proj-*; do \
 		pod2markdown $$tCmd >doc/user-doc/$${tCmd##*/}.md; \
 		pod2html $(mHtmlOpt) $$tCmd >doc/user-doc/$${tCmd##*/}.html; \
+		$(mTidy) doc/user-doc/$${tCmd##*/}.html 2>/dev/null; \
 	done
 
 fmt : clean

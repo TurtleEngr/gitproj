@@ -38,7 +38,7 @@ fUsage()
 
     case $pStyle in
         short | usage | man)
-            fComUsage -s $pStyle -f $gpBin/$gpCmdName
+            fComUsage -s $pStyle -f $gpBin/git-proj
             ;;
         long | text | md)
             fComUsage -s $pStyle $tFileList
