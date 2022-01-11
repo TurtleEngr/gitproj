@@ -1,3 +1,4 @@
+%requires git
 %requires bash
 %requires coreutils
 	# includes: fmt, tr

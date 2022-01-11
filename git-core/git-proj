@@ -514,12 +514,15 @@ fi
 # -------------------
 # Get Args Section
 
-# Is this a sub-command?
-tCmd=$gpBin/git-proj-$1
-if [ -x $tCmd ]; then
-    shift
-    $tCmd $*
-    exit $?
+# Is this a sub-command? I.e. first option is not a flag.
+if [ "x${1#-}" = "x$1" ]; then
+    tCmd=$gpBin/git-proj-$1
+    if [ -x $tCmd ]; then
+        shift
+        $tCmd $*
+        exit $?
+    fi
+    fError -m "Unknown sub-command: $*" -l $tSrc:$LINENO
 fi
 
 while getopts :vVhH:x-: tArg; do
