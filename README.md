@@ -12,23 +12,23 @@ subcommands. Or you can look at each sub command files individually.
 
 ### git proj sub-commands
 
-* __git proj__ - general help
-* __git proj init__ - initialize a local git-proj repo
-* __git proj-remote__ - initialize a new "remote repo" from the local one
-* __git proj push__ - push files in raw/ to the remote repo (and do a regular git push)
-* __git proj pull__ - pull raw/ files from the remote repo (and do a regular git pull)
-* __git proj status__ - git status and status of binary files in raw/ compared to remote raw/
-* __git proj clone__ - create a git workspace and raw/ workspace from a remote
-* __git proj config__ - TBD. This fixup or change the git-proj configuration
+* `git proj` - general help
+* `git proj init` - initialize a local git-proj repo
+* `git proj-remote` - initialize a new "remote repo" from the local one
+* `git proj push` - push files in raw/ to the remote repo (and do a regular git push)
+* `git proj pull` - pull raw/ files from the remote repo (and do a regular git pull)
+* `git proj status` - git status and status of binary files in raw/ compared to remote raw/
+* `git proj clone` - create a git workspace and raw/ workspace from a remote
+* `git proj config` - TBD. This fixup or change the git-proj configuration
 
 ### Getting usage help
 
-__man git-proj__ - this will give you an overview of git-proj
+`man git-proj` - this will give you an overview of git-proj
 
-__git proj -h | more__ - output the overview and the usage help for all
+`git proj -h | more` - output the overview and the usage help for all
 of the subcommands
 
-__git proj [CMD] -h | more__ - only output the help for "git proj CMD".
+`git proj [CMD] -h | more` - only output the help for "git proj CMD".
 For example: git proj init -h | more
 
 html and markdown help files can also be found in:
@@ -53,7 +53,7 @@ html and markdown help files can also be found in:
 ### pre-commit hooks
 
 The file /usr/share/doc/git-proj/hook/pre-commit file will be copied
-to PROJ/.git/hooks/ by __git proj init__ or __git proj clone__
+to PROJ/.git/hooks/ by `git proj init` or `git proj clone`
 
 See the vars in the [gitproj "hook"] section in PROJ/.gitproj.config.HOSTNAME
 for controlling the pre-commit hooks.
