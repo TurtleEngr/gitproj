@@ -2,6 +2,14 @@
 
 ----------
 
+## tag-?
+
+Date: ?
+
+* INT: Make sure first option is not a flag, in git-proj
+
+----------
+
 ## tag-0-2-0-1
 
 Date:   Tue Jan 11 12:03:36 2022 -0800
