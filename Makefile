@@ -20,9 +20,9 @@ mHtmlOpt = --cachedir=/tmp --index --backlink
 mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
 
 # --------------------
-check : doc git-core package test
+check : clean doc/user-doc git-core package test/dev-doc gen-doc
 
-clean : check
+clean :
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
 
