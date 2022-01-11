@@ -26,10 +26,7 @@ clean : check
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
 
-gen-doc : doc/CHANGES.md
-	-mkdir doc/user-doc
-	-git-core/git-proj -H md >doc/user-doc/git-proj.md
-	-git-core/git-proj -H html >doc/user-doc/git-proj.html
+gen-doc : doc/CHANGES.md doc/README.md doc/user-doc/git-proj.md doc/user-doc/git-proj.html
 	-for tCmd in git-core/git-proj-*; do \
 		pod2markdown $$tCmd >doc/user-doc/$${tCmd##*/}.md; \
 		pod2html $(mHtmlOpt) $$tCmd >doc/user-doc/$${tCmd##*/}.html; \
@@ -44,6 +41,14 @@ doc/README.md : README.md
 	    /^## For Developers/ { exit 0 } \
 	    { print $$0 } \
 	' >$@
+
+doc/user-doc/git-proj.md : git-core/git-proj
+	-mkdir doc/user-doc 2>/dev/null
+	-$? -H md >$@
+
+doc/user-doc/git-proj.html : git-core/git-proj
+	-mkdir doc/user-doc 2>/dev/null
+	-$? -H md >$@
 
 # Remove internal doc. Any line with 'INT:' in it.
 # "uniq" is a quick way of removing any extra blank lines
