@@ -6,6 +6,10 @@
 
 Date: ?
 
+* Changed syslog default to `false`
+
+* INT: Patch VERSION in config files, for test setup..
+
 * INT: Make sure first option is not a flag, in git-proj
 
 ----------
