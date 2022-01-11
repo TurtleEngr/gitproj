@@ -26,7 +26,7 @@ clean : check
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
 
-gen-doc :
+gen-doc : doc/CHANGES.md
 	-mkdir doc/user-doc
 	-git-core/git-proj -H md >doc/user-doc/git-proj.md
 	-git-core/git-proj -H html >doc/user-doc/git-proj.html
@@ -36,13 +36,25 @@ gen-doc :
 		$(mTidy) doc/user-doc/$${tCmd##*/}.html 2>/dev/null; \
 	done
 
+doc/CHANGES.md : CHANGES.md
+	grep -Ev 'INT:' <$? | uniq >$@
+
+doc/README.md : README.md
+	grep -Ev 'INT:' <$? | uniq | awk ' \
+	    /^## For Developers/ { exit 0 } \
+	    { print $$0 } \
+	' >$@
+
+# Remove internal doc. Any line with 'INT:' in it.
+# "uniq" is a quick way of removing any extra blank lines
+
 fmt : clean
 	which shfmt
 	which $(mTestDir)/rm-trailing-sp
 	-rm fmt-err.tmp
 	rm-trailing-sp doc/config/* doc/hooks/* git-core/* test/*.sh
-	rm-trailing-sp doc/LICENSE doc/VERSION doc/README
-	rm-trailing-sp Makefile README.md TODO.md
+	rm-trailing-sp doc/LICENSE doc/VERSION
+	rm-trailing-sp Makefile README.md TODO.md CHANGES.md
 	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
 		if ! bash -n $$i; then \

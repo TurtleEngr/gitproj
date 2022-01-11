@@ -1,19 +1,13 @@
 # TODO
 
-* Code git-proj-status
+* Add a CHANGES.md file
 
-* Code and test pre-commit checks.
+* Fix -h so it works with "git proj CMD" CLI
 
-* Move "auto-move" out of hooks config.  Use this in git-proj-add (or move)
-  add: find binary files that are greater than binary-file-size-limit
-  add: move and create symlink, or just move to raw/
+* Fixup the github README.md so that it can be used in the dist package too.
 
-* Create install.sh to install directly from development git
-  dir. Implement it with a pseudo root var, so that the script can be
-  used to create the dist/ dir that EPM will use.
-
-* Make OS installers. Use EPM to make a portable installer and a native
-  deb installer.
+* Change the logging messages so that they don't output the
+  timestamp. Maybe don't log to syslog? Default with syslog off?
 
 * Code git-proj-config
 
@@ -24,11 +18,12 @@
 
 * Code git-proj-add (support adding whole directory trees)
 
-* Remove the need for cCurDir ?
+* Remove the need for the cCurDir variable (has it ever been used?)
 
-* Refactor the test setup so it is simpler
+* Refactor the test setup so it is simpler.
 
-* Copy the test-env tar files to a "public" place.
+* Copy the test-env tar files to a "public" place. And implement the
+Makefile targets for managing them.
 
 * Get travis-ci working. Run tests.
 
@@ -65,6 +60,10 @@
     number in a git config variable. That means the git config file
     and variable key needs to be defined. Use: FILE:KEY For example:
     .gitproj.config.local:gitproj.config.proj-ver
+
+    Note: epm uses "-BUILD" not "+BUILD". The mkver.pl ver.sh process
+    supports "-rc.N.N" part (but the build # would not be after that.
+    The mkver.pl create a -BuildTime which is: -test.YYYY.MM.DD.hh.mm
 
 * Cleanup the user docs. (bump the "patch" number for doc-only changes)
 
@@ -165,4 +164,20 @@
 * Code git-proj-clone - done
 
 * Make a fComYesNo() function with fComSelect - done
+
+* Code git-proj-status - done
+
+* Code and test pre-commit checks. - done
+
+* Move "auto-move" out of hooks config.  Use this in git-proj-add (or move)
+  add: find binary files that are greater than binary-file-size-limit
+  add: move and create symlink, or just move to raw/ - done
+
+* Create install.sh to install directly from development git
+  dir. Implement it with a pseudo root var, so that the script can be
+  used to create the dist/ dir that EPM will use.
+  NO - instead created a make install target. - done
+
+* Make OS installers. Use EPM to make a portable installer and a native
+  deb installer. - done
 
