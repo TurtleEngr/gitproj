@@ -1,5 +1,28 @@
 # TODO
 
+* Imp a command that with show the files in REMOTE-PATH/PROJ.raw
+  git proj status does a diff, which is good, maybe just add the
+  option to have th diff show the files that are the same.
+
+* in git-proj-remote Testing Results:
+
+    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
+    maybe limit it to only one level (DIR1)?
+
+* in git-proj-init Testing Results:
+
+    In help: saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME.
+    In usage: isn't -l required?
+    The -s, -m, -f options seem to only be needed if using the -a option,
+    otherwise they can be prompted for.
+    The -l option assumes you have a dir with content already in it. Is fill path needed, or can it just...
+    Project Path (-l) [/home/bruce/test/seal/quit]?
+    	huh, quit? s/b
+	Project Path (-l) [/home/bruce/test/seal]
+	Project Name [seal] Continue [y/n]?
+    Move the [gitproj ] sections in in .gitproj.config.global to .gitconfig
+    so the include.path does not need to be maintained?
+
 * Add a CHANGES.md file - done
 
 * Fix -h so it works with "git proj CMD" CLI
