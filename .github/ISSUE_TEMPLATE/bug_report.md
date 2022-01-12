@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+[A clear and concise description of what the bug is.]
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -18,15 +18,15 @@ Steps to reproduce the behavior:
 4. See error
 
 **Expected behavior**
-A clear and concise description of what you expected to happen.
+[A clear and concise description of what you expected to happen.]
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Logs or Text**
+[If applicable, add log files or text output to help explain your problem.]
 
 **Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+ - OS and OS Version: [e.g. ubuntu 18.04]
+ - Version: [e.g. 1.2.3-4]
 
 **Additional context**
-Add any other context about the problem here.
+[Add any other context about the problem here.]
+[e.g. gitprog config changes or files]

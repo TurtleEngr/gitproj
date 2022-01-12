@@ -1,13 +1,10 @@
 # TODO
 
-* Imp a command that with show the files in REMOTE-PATH/PROJ.raw
-  git proj status does a diff, which is good, maybe just add the
-  option to have th diff show the files that are the same.
+After 1.0, move these to github issues.
 
-* in git-proj-remote Testing Results:
+--------------------
 
-    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
-    maybe limit it to only one level (DIR1)?
+## bug (defect, fix, needs to be changed)
 
 * in git-proj-init Testing Results:
 
@@ -23,26 +20,28 @@
     Move the [gitproj ] sections in in .gitproj.config.global to .gitconfig
     so the include.path does not need to be maintained?
 
-* Add a CHANGES.md file - done
+* in git-proj-remote Testing Results:
 
-* Fix -h so it works with "git proj CMD" CLI
-Defect in the design 'git proj CMD ARGS' calls: git-proj CMD ARGS
-Fix: look for first arg so see if it is a CMD.
-Test each CMD to be sure the ARGS are passed correctly.
-
-* Fixup the github README.md so that it can be used in the dist package too.
-
-* Change the logging messages so that they don't output the
-  timestamp. Maybe don't log to syslog? Default with syslog off?
-
-* Code git-proj-config
+    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
+    maybe limit it to only one level (DIR1)?
 
 * Remove the duplicate path, in .git/config (introduced by git-proj-clone)
   [include]
         path = ../.gitproj.config.testserver2
         path = ../.gitproj.config.testserver2
 
-* Code git-proj-add (support adding whole directory trees)
+
+--------------------
+
+## documentation
+
+* Cleanup the user docs. (bump the "patch" number for doc-only changes)
+
+* Make and cleanup the internal docs.
+
+--------------------
+
+## infrastructure (development, cleanup code, tests, build, package, etc)
 
 * Remove the need for the cCurDir variable (has it ever been used?)
 
@@ -53,82 +52,50 @@ Makefile targets for managing them.
 
 * Get travis-ci working. Run tests.
 
-* Make a script to inc version tag "major.minor.fix-rc.N+build" parts
-  See: https://semver.org/ for a RegEx pattern matcher (so imp. with Perl)
-  This supports a proper sub-set of semver.
-
-        sem-ver [-M] [-m] [-p] [-b] [-d ver] FILE[:key]
-            If FILE does not exist, create file with 0.1.0
-            If no option, output the full version
-            -M inc major, set minor, see -m (if rc, inc it, set all others to 0)
-            -m inc minor, set patch to 0, see -p (if rc, inc it, set all others to 0)
-            -p inc patch (if rc, inc it, clear all after +)
-            -r inc the release number, if none, inc patch, then insert
-               "-rc.1" after "patch", clear all after +
-            -b inc build, if none, append "+1"
-	    -B datestamp build, clear all after + then add:
-	    	date ++%Y.%m.%d.%H.%M
-		     +2021.12.31.15.06
-            -c clear release and build parts (do this after a "release")
-            -v output with no build part
-            -V output just the major.minor.fix parts
-            -d "ver" - only compare major, minor, and patch parts. Ignore the rest.
-            Difference compare with expected "ver"
-                -3 if ver < FILE if Major part is <
-                -2 if ver < FILE if minor part is <
-                -1 if ver < FILE if patch part is <
-                 0 if ver = FILE
-                 1 if ver > FILE if patch part is >
-                 2 if ver > FILE if minor part is >
-                 3 if ver > FILE if Major part is >
-
-    Rather than FILE, support reporting and updating the version
-    number in a git config variable. That means the git config file
-    and variable key needs to be defined. Use: FILE:KEY For example:
-    .gitproj.config.local:gitproj.config.proj-ver
-
-    Note: epm uses "-BUILD" not "+BUILD". The mkver.pl ver.sh process
-    supports "-rc.N.N" part (but the build # would not be after that.
-    The mkver.pl create a -BuildTime which is: -test.YYYY.MM.DD.hh.mm
-
-* Cleanup the user docs. (bump the "patch" number for doc-only changes)
-
-* Make and cleanup the internal docs.
-
-* Verify install with gitproj-com.test - NO!
-
-* Fix-up gitproj-com.test so it can be run from /usr/share/doc/git-proj
-  or from gitproj working dir. - NO!
-
 * More travis-ci.
     * Run tests with changes to develop or main branches.
     * Build the package.
     * Install the package.
     * Verify the install.
 
+--------------------
+
+## enhancement
+
+* Imp a command that with show the files in REMOTE-PATH/PROJ.raw
+  git proj status does a diff, which is good, maybe just add the
+  option to have th diff show the files that are the same.
+
+* Code git-proj-config.
+
+* Code git-proj-add (support adding whole directory trees of raw files)
+
 ----
 
-## Future
+## Enhancement Major
+
+* Version increment wizard script. Increment the
+  major/minor/path/rc/build vars based on Q/A. See
+  `test/dev-doc/enh-ver-wizard.md`
+
+* Decided on which remote network service to implement. Do all, only
+  do one or two? Some methods are not compatable.
 
 * Future feature: manage different versions of binary files with a
-  process similar to rsnapshot. Use rsync's 3-way link feature, when
-  there are differences. A date-stamped dir can be used for the
-  different version "snapshots". Requires Linux formatted file-systems
-  that support hard-links. May only work well with "mounted" disks.
+  process similar to rsnapshot. See `test/dev-doc/enh-raw-rsnapshot.md`
+  and `test/dev-doc/enh-raw-ssh.md`
 
-* Or manage different versions of large binary files with "cvs". cvs
-  will track different versions of binary files as needed. If you want
-  to reduce the size of a versioned binary file, cvs has a very easy
-  way of removing the older versions. (A process that is very hard
-  with git.) This script shows one way that I am already using:e
-  https://github.com/TurtleEngr/my-utility-scripts/blob/develop/bin/vid-rm-ver
+* Manage the different versions of large binary files with "cvs".
+  See `test/dev-doc/enh-raw-cvs.md`
 
-* Future feature: support remote large files across the network. Also
-  support alternate remote sources, not just "origin".
+* To use a true remote (over network) with cvs and git, use ssh protocol.
+  Requires: ssh-client and ssh-server. See `test/dev-doc/enh-raw-ssh.md`
+
+* Use rclone for raw/ files. See `test/dev-doc/enh-raw-rclone.md`
 
 ----
 
-## Done
+## done (closed)
 
 * Code test-com.sh, gitproj-com.inc - mostly done
 
@@ -207,3 +174,13 @@ Makefile targets for managing them.
 * Make OS installers. Use EPM to make a portable installer and a native
   deb installer. - done
 
+* Add a CHANGES.md file - done
+
+* Fix -h so it works with "git proj CMD" CLI
+Defect in the design 'git proj CMD ARGS' calls: git-proj CMD ARGS
+Fix: look for first arg so see if it is a CMD. - done
+
+* Fixup the github README.md so that it can be used in the dist package too. - done
+
+* Change the logging messages so that they don't output the
+  timestamp. Maybe don't log to syslog? Change default syslog to false. - done
