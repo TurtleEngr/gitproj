@@ -5,7 +5,9 @@
 %requires gawk
 %requires libpod-markdown-perl
 	# includes: pod2markdown
+%requires openssh-client
 %requires perl
 	# includes: pod2html, pod2man, pod2usage
+%requires rsync
 %requires sed
 %requires tidy
