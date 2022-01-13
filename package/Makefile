@@ -68,6 +68,7 @@ build epm.list : clean ver.mak ver.epm ver.env
 	echo $(ProdVer) >../doc/VERSION
 	cp ../git-core/* dist/usr/lib/git-core
 	rsync -a ../doc/* dist/usr/share/doc/git-proj
+	cp ../LICENSE dist/usr/share/doc/git-proj
 	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
 	gzip dist/usr/share/man/man1/git-proj.1
 	ln dist/usr/share/man/man1/git-proj.1.gz dist/usr/share/man/man1/gitproj.1.gz
