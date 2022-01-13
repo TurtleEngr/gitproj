@@ -72,7 +72,6 @@ fCheckFileNames()
 {
     local tFile
     local tResult
-    local tPart
 
     tResult=$(git config --get --bool --default=false gitproj.hook.check-file-names)
     if [ "$tResult" != "true" ]; then
