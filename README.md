@@ -85,7 +85,7 @@ functions in the corresponding `gitproj-[CMD].inc` file. These files
 are the main entry point for git sub-commands. For example:
 `git-proj-init` is run, on the command line, with `git proj init`
 
-### Test scripts in doc/test/
+### Test scripts in test/
 
 Every function should have unit-tests that check the inputs and
 outputs of functions. Valid inputs and error states should be checked.
