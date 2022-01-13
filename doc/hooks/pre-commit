@@ -58,7 +58,7 @@ fReport()
 # --------------------
 fEnabled()
 {
-    tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
+    tEnabled=$(git config --get --bool --default=false gitproj.hook.pre-commit-enabled)
     if [ "$tEnabled" != "true" ]; then
         echo "Skipping pre-commit"
         exit 0
@@ -74,7 +74,7 @@ fCheckFileNames()
     local tResult
     local tPart
 
-    tResult=$(git config --get --bool gitproj.hook.check-file-names)
+    tResult=$(git config --get --bool --default=false gitproj.hook.check-file-names)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
@@ -123,7 +123,7 @@ fCheckWhiteSpace()
     local tFile
     # Note: DOS EOL files will give a false report.
 
-    tResult=$(git config --get --bool gitproj.hook.check-whitespace)
+    tResult=$(git config --get --bool --default=false gitproj.hook.check-whitespace)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
@@ -149,7 +149,7 @@ fCheckNotRaw()
     local tFile
     local tResult
 
-    tResult=$(git config --get --bool gitproj.hook.check-in-raw)
+    tResult=$(git config --get --bool --default=false gitproj.hook.check-in-raw)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
@@ -162,14 +162,14 @@ fCheckNotRaw()
 
     if [ -n "$gFileList" ]; then
         let ++gErr
-        tResult=$(git config --get gitproj.config.remote-raw-dir)
         echo
         echo "These files should not be managed in git:"
         echo "$gFileList" | fmt -w 10
+        tResult=$(git config --get gitproj.config.remote-raw-dir)
         cat <<EOF | fmt
 
 Use "git proj push" to save binary files, in raw/, to $tResult
-Also, run "git proj -h | less" for a description of how git-proj
+Run "git proj -h | less" for a description of how git-proj
 can manage large binary files and keep your git repo nimble.
 
 EOF
@@ -186,12 +186,15 @@ fCheckBigFiles()
     local tFile
     local tResult
 
-    tResult=$(git config --get --bool gitproj.hook.check-for-big-files)
+    tResult=$(git config --get --bool --default=false gitproj.hook.check-for-big-files)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
 
-    tMaxSize=$(git config --get --int gitproj.hook.binary-file-size-limit)
+    tMaxSize=$(git config --get --int --default=0 gitproj.hook.binary-file-size-limit)
+    if [ $tMaxSize -le 1000 ]; then
+        return 0
+    fi
 
     gFileList=""
     for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
