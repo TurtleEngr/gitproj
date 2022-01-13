@@ -17,8 +17,19 @@ After 1.0, move these to github issues.
     	huh, quit? s/b
 	Project Path (-l) [/home/bruce/test/seal]
 	Project Name [seal] Continue [y/n]?
-    Move the [gitproj ] sections in in .gitproj.config.global to .gitconfig
-    so the include.path does not need to be maintained?
+
+* Move the [gitproj] sections in in .gitproj.config.global to
+  .gitconfig so the include.path does not need to be maintained? Also
+  removing the include path from PROJ/.git/config will make is easer
+  to not forget to include the --include option to "git config". Also
+  there will be fewer files for the user to manage.
+
+* Maybe copy [gitproj] sections from PROJ/.gitproj.config.local to
+  PROJ/.git/config and update the values needed for the host? That way
+  the include path can be removed. The file is usually only changed when
+  it is crated by init or clone. The HOST option can be removed from
+  the fComConfigGet/Set functions. .gitproj.config.local should remain
+  as a template for new hosts.
 
 * in git-proj-remote Testing Results:
 
