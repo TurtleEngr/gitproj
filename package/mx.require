@@ -3,9 +3,11 @@
 %requires coreutils
 	# includes: fmt, tr
 %requires gawk
+%requires git-flow
 %requires libpod-markdown-perl
 	# includes: pod2markdown
 %requires openssh-client
+%requires openssh-server
 %requires perl
 	# includes: pod2html, pod2man, pod2usage
 %requires rsync

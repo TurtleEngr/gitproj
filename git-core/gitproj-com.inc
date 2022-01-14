@@ -1483,6 +1483,37 @@ fComSaveVar2Config()
     fi
 } # fComSaveVar2Config
 
+fComConfigSetupGlobal()
+{
+    local pSrc=$1
+    local pDst=$2
+    local pList=" $3 "
+    local tSrcConfig
+    local tDstConfig
+    local tVar
+    local tValue
+
+    if [ ! -f $pDst ]; then
+        cp $pSrc $pDst
+	return $?
+    fi
+
+    git config -f $pSrc --list | while read tSrcConfig; do
+    	tVar=${tSrcConfig%=*}
+	tValue="${tSrcConfig#*=}"
+	if [ "$pList" != "${pList#* $tVar }" ]; then
+	    git config -f $pDst $tVar TBD
+	    continue
+	fi
+        if git config -f $pDst --get $tVar >/dev/null 2>&1; then
+	    continue
+	fi
+	git config -f $pDst $tVar "$tValue"
+    done
+
+    return 0
+} # fComConfigSetupGlobal
+
 fComCheckPkg()
 {
     local pPkg=$1

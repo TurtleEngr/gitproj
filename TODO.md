@@ -41,6 +41,7 @@ After 1.0, move these to github issues.
         path = ../.gitproj.config.testserver2
         path = ../.gitproj.config.testserver2
 
+* Remove "gitproj.hook.source" and "gpHookSource" from configs, code, tests
 
 --------------------
 

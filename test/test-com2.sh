@@ -125,6 +125,8 @@ setUp()
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
 
+    cp $gpDoc/config/gitconfig $gpDoc/config/gitconfig.sav
+
     gpUnitDebug=0
     return 0
 
@@ -148,6 +150,7 @@ tearDown()
         HOME=$cHome
     fi
     cd $gpTest >/dev/null 2>&1
+    mv $gpDoc/config/gitconfig.sav $gpDoc/config/gitconfig
     return 0
 } # tearDown
 
@@ -277,6 +280,124 @@ testComSetConfigMore()
 
     return 0
 } # testComSetConfigMore
+
+# --------------------------------
+testComConfigSetupGlobal()
+{
+    local tResult
+    local tSrc=$gpDoc/config/gitconfig
+    local tDst=$HOME/.gitconfig
+    local tKey
+    local tValue
+    local tList
+    local tKeyList
+
+    # fComConfigSetupGlobal [source] [dest]
+    #    if no dest
+    # 	     cp source dest
+    #	     return 0
+    # 	 if dest
+    #        cp --backup=t dest dest.bak
+    #        cp-content source dest - (only copy if var not set in dest)
+    # Note these gitproj.config vars should always be TBD:
+    # local-status, proj-name, remote-status, remote-raw-dir
+    # In UI, after call, do a "diff dist.bak dist"
+
+    #----------
+    # tDst file is missing so just cp tSrc
+    assertTrue "$LINENO $tSrc" "[ -f $tSrc ]"
+    assertTrue "$LINENO $tDst" "[ -f $tDst ]"
+    rm $tDst
+    assertTrue "$LINENO $tDst" "[ ! -f $tDst ]"
+
+    tResult=$(fComConfigSetupGlobal $tSrc $tDst 2>&1)
+    assertTrue "$LINENO $tResult $?" "$?"
+    assertTrue "$LINENO $tDst" "[ -f $tDst ]"
+
+    #----------
+    # Missing values in tDst file s/b replaced from tSrc
+    assertTrue "$LINENO $tDst" "[ -f $tDst ]"
+    git config -f $tDst --unset alias.br
+    git config -f $tDst --unset alias.st
+    assertFalse "$LINENO br" "grep 'br = branch' $tDst"
+    assertFalse "$LINENO st" "grep 'st = status' $tDst"
+
+    tResult=$(fComConfigSetupGlobal $tSrc $tDst 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO $tResult br" "grep 'br = branch' $tDst"
+    assertTrue "$LINENO st" "grep 'st = status' $tDst"
+
+    #----------
+    # Values in tList s/b TBD in tDst file
+    tList="local-status proj-name remote-status remote-raw-dir"
+    tKeyList=""
+    for tKey in $tList; do
+        git config -f $tDst gitproj.config.$tKey false
+	tKeyList="$tKeyList gitproj.config.$tKey"
+    done
+
+    tResult=$(fComConfigSetupGlobal $tSrc $tDst "$tKeyList" 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    for tVar in $tList; do
+        tValue=$(git config -f $tDst --get gitproj.config.$tKey)
+	assertTrue "$LINENO $tVar" "$?"
+	assertEquals "$LINENO $tVar" "TBD" "$tValue"
+    done
+
+    return 0
+} # testComConfigSetupGlobal
+
+testComConfigSetupLocal()
+{
+    local tResult
+    local tSrc=$HOME/gitconfig
+    local tDst1=$HOME/$cDatProj1/.gitproj
+    local tDst2=$HOME/$cDatProj1/.git/config
+
+    # PROJ = $HOME/$cDatProj1
+
+    # fComConfigSetupLocal [force] [source] [dest-1] [dest-2]
+    #    force  = 0|1
+    #    source = $HOME/gitconfig
+    #    dest-1   = PROJ/.gitproj
+    #    dest-2   = PROJ/.git/config
+    # 	 if not in a gitdir
+    #        return 1
+    #    if no dest-1
+    #	     cp-content source dest1
+    # 	     * copy [gitproj] sections
+    #    cp --backup=t dest-2 dest-2.bak
+    #    if force=1
+    #	     cp-force dest-1 dest-2
+    #	     * copy all vars from dest-1, but
+    #	     * skip remote-raw-dir, if set in dist-2
+    #    else
+    #	     cp-content dest-1 dest-2
+    #	     * copy all vars from dest-1, where dest-2 var not set
+    #    In UI, do a "diff dist-2.bak dist-2"
+
+    cp $gpDoc/config/gitconfig $tSrc
+
+    return 1
+} # testComConfigSetupLocal
+
+testfComConfigUpdateLocal()
+{
+    local tResult
+
+    # PROJ = $HOME/$cDatProj1
+
+    # fComConfigUpdateLocal [source] [dest]
+    #	 source = PROJ/.git/config
+    # 	 dest   = PROJ/.gitproj
+    #    cp --backup=t dest dest.bak
+    #    cp-force source dest
+    # 	 * only copy the gitproj sections
+    # In UI "diff dist.bak dist"
+
+    startSkipping
+
+} # testfComConfigUpdateLocal
 
 # --------------------------------
 testComGetConfigMore()
