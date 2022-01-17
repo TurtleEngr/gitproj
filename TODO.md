@@ -50,8 +50,6 @@ After 1.0, move these to github issues.
 
 * Cleanup: remove gpMountDir. Is gpGitFlowPkg used?
 
-* Remove the need for the cCurDir variable (has it ever been used?)
-
 * Refactor the test setup so it is simpler.
 
 * Copy the test-env tar files to a "public" place. And implement the
@@ -213,3 +211,5 @@ Fix: look for first arg so see if it is a CMD. - done
 
 * Change the logging messages so that they don't output the
   timestamp. Maybe don't log to syslog? Change default syslog to false. - done
+
+* Remove the need for the cCurDir variable (has it ever been used?) - done

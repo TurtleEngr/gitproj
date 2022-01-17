@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------------------
-export cConfigGlobal cConfigLocal cConfigHost cCurDir cGitProjVersion \
+export cConfigGlobal cConfigLocal cConfigHost cGitProjVersion \
     cGetOrigin cGetTopDir cGetCurBranch cPID
 
 export PWD gErr gGetConfigOrigin gGetConfigValue gResponse gpAuto \
@@ -118,7 +118,6 @@ For more help, see the Globals section in fUsage.
  gpTest - -t
  gErr - error code (0 = no error)
  gpCmdName - script's name taken from $0
- cCurDir - current directory
  gpBin - directory where the script is executing from
  gpDoc - directory for config/, hooks/, test/
 
@@ -225,13 +224,10 @@ fComSetGlobals()
     local tSrc=${BASH_SOURCE##*/}
 
     # -------------------
-    # Set current directory location in PWD and cCurDir, because with cron
-    # jobs PWD is not set.
+    # Set current directory location in PWD, because with cron jobs PWD
+    # is not set.
     if [ -z "$PWD" ]; then
         PWD=$(pwd)
-    fi
-    if [ -z "$cCurDir" ]; then
-        cCurDir=$PWD
     fi
 
     # -------------------

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export gpCmdName gpBin cCurDir gpShort
+export gpCmdName gpBin gpShort
 
 #--------------------
 fUsage()
@@ -40,17 +40,16 @@ EOF
 # ========================================
 # Main
 
-export cCurDir gpBin gpCmdName tSrc
+export gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
 tSrc=${BASH_SOURCE##*/}
 
 # -------------------
-# Set current directory location in PWD and cCurDir
+# Set current directory location in PWD
 if [ -z "$PWD" ]; then
     PWD=$(pwd)
 fi
-cCurDir=$PWD
 
 # -------------------
 # Define the location of this script

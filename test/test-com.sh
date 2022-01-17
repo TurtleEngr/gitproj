@@ -107,7 +107,7 @@ NAoneTimeTearDown()
 setUp()
 {
     # Restore default global values, before each test
-    unset gpBin cCurDir cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
+    unset gpBin cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
     fTestSetupEnv
     fTestCreateEnv
     gpUnitDebug=0
@@ -175,7 +175,6 @@ testComInitialConfig()
     local tProg
     local tResult
 
-    assertTrue "$LINENO -d $cCurDir" "[ -d $cCurDir ]"
     assertNotNull "$LINENO $gpBin" "$gpBin"
     assertTrue "$LINENO -d $gpBin" "[ -d $gpBin ]"
     assertTrue "$LINENO -x $gpBin/gitproj-com.inc" "[ -x $gpBin/gitproj-com.inc ]"

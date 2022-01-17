@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------
-export cCurDir cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpBranch gpCheckFileNames \
     gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
