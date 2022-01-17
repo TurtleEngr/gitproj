@@ -3,8 +3,6 @@
 	autocrlf = false
 	ignorecase = true
 	excludesFile = ~/.gitignore
-	#editor = /usr/bin/emacs
-	#editor = /usr/bin/vi
 	logAllRefUpdates = true
 	quotePath = false
 	trustctime = false

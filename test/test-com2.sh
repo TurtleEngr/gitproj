@@ -145,12 +145,12 @@ EOF
 tearDown()
 {
     # fTestRmEnv
+    cp $gpDoc/config/gitconfig.sav $gpDoc/config/gitconfig
     gpUnitDebug=0
     if [ -n "$cHome" ]; then
         HOME=$cHome
     fi
     cd $gpTest >/dev/null 2>&1
-    mv $gpDoc/config/gitconfig.sav $gpDoc/config/gitconfig
     return 0
 } # tearDown
 
@@ -282,6 +282,44 @@ testComSetConfigMore()
 } # testComSetConfigMore
 
 # --------------------------------
+testComConfigCopy()
+{
+    local tResult
+    local tSrc=$gpDoc/config/gitconfig
+    local tDstDir=$HOME/project/test
+    local tDst=$HOME/project/test/config.test
+
+    # fComConfigCopy [-f] [-s pSrc] [-d pDst] [-i pInclPat] [-e pExclPat]
+
+    gpVerbose=1
+
+    tResult=$(fComConfigCopy 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "is missing or not readable"
+
+    tResult=$(fComConfigCopy -s foo 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "foo is missing or not readable"
+
+    tResult=$(fComConfigCopy -s $tSrc 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "is missing or not writable"
+
+    tResult=$(fComConfigCopy -s $tSrc -d $tDst 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "$tDst is missing or not writable"
+
+    mkdir $tDstDir
+    touch $tDst
+
+    tResult=$(fComConfigCopy -s $tSrc -d $tDst 2>&1)
+    assertTrue "$LINENO" "$?"
+    assertTrue "$LINENO" "[ -f $tDst.bak ]"
+    assertTrue "$LINENO $(diff -ibBwZ $tSrc $tDst)" "diff -qibBwZ $tSrc $tDst"
+
+} # testComConfigCopy
+
+# --------------------------------
 testComConfigSetupGlobal()
 {
     local tResult
@@ -292,16 +330,7 @@ testComConfigSetupGlobal()
     local tList
     local tKeyList
 
-    # fComConfigSetupGlobal [source] [dest]
-    #    if no dest
-    # 	     cp source dest
-    #	     return 0
-    # 	 if dest
-    #        cp --backup=t dest dest.bak
-    #        cp-content source dest - (only copy if var not set in dest)
-    # Note these gitproj.config vars should always be TBD:
-    # local-status, proj-name, remote-status, remote-raw-dir
-    # In UI, after call, do a "diff dist.bak dist"
+    startSkipping
 
     #----------
     # tDst file is missing so just cp tSrc
@@ -310,7 +339,7 @@ testComConfigSetupGlobal()
     rm $tDst
     assertTrue "$LINENO $tDst" "[ ! -f $tDst ]"
 
-    tResult=$(fComConfigSetupGlobal $tSrc $tDst 2>&1)
+    tResult=$(fComConfigSetupGlobal 2>&1)
     assertTrue "$LINENO $tResult $?" "$?"
     assertTrue "$LINENO $tDst" "[ -f $tDst ]"
 
@@ -324,6 +353,7 @@ testComConfigSetupGlobal()
 
     tResult=$(fComConfigSetupGlobal $tSrc $tDst 2>&1)
     assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO $tDst.bak" "[ -f $tDst.bak ]"
     assertTrue "$LINENO $tResult br" "grep 'br = branch' $tDst"
     assertTrue "$LINENO st" "grep 'st = status' $tDst"
 
@@ -338,6 +368,7 @@ testComConfigSetupGlobal()
 
     tResult=$(fComConfigSetupGlobal $tSrc $tDst "$tKeyList" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO $tDst.bak" "[ -f $tDst.bak ]"
     for tVar in $tList; do
         tValue=$(git config -f $tDst --get gitproj.config.$tKey)
 	assertTrue "$LINENO $tVar" "$?"
@@ -350,54 +381,57 @@ testComConfigSetupGlobal()
 testComConfigSetupLocal()
 {
     local tResult
-    local tSrc=$HOME/gitconfig
+    local tSrc=$gpDoc/config/gitconfig
     local tDst1=$HOME/$cDatProj1/.gitproj
     local tDst2=$HOME/$cDatProj1/.git/config
 
-    # PROJ = $HOME/$cDatProj1
-
-    # fComConfigSetupLocal [force] [source] [dest-1] [dest-2]
-    #    force  = 0|1
-    #    source = $HOME/gitconfig
-    #    dest-1   = PROJ/.gitproj
-    #    dest-2   = PROJ/.git/config
-    # 	 if not in a gitdir
-    #        return 1
-    #    if no dest-1
-    #	     cp-content source dest1
-    # 	     * copy [gitproj] sections
-    #    cp --backup=t dest-2 dest-2.bak
-    #    if force=1
-    #	     cp-force dest-1 dest-2
-    #	     * copy all vars from dest-1, but
-    #	     * skip remote-raw-dir, if set in dist-2
-    #    else
-    #	     cp-content dest-1 dest-2
-    #	     * copy all vars from dest-1, where dest-2 var not set
-    #    In UI, do a "diff dist-2.bak dist-2"
-
-    cp $gpDoc/config/gitconfig $tSrc
-
-    return 1
-} # testComConfigSetupLocal
-
-testfComConfigUpdateLocal()
-{
-    local tResult
-
-    # PROJ = $HOME/$cDatProj1
-
-    # fComConfigUpdateLocal [source] [dest]
-    #	 source = PROJ/.git/config
-    # 	 dest   = PROJ/.gitproj
-    #    cp --backup=t dest dest.bak
-    #    cp-force source dest
-    # 	 * only copy the gitproj sections
-    # In UI "diff dist.bak dist"
-
     startSkipping
 
-} # testfComConfigUpdateLocal
+    # PROJ = $HOME/$cDatProj1
+
+    # ----------
+    # No force, and create
+    rm $tDst1 >/dev/null 2>&1
+    assertTrue "$LINENO missing $tSrc" "[ -f $tSrc ]"
+    assertTrue "$LINENO missing $tDst2" "[ -f $tDst2 ]"
+
+    tResult=$(fComConfigSetupLocal no-force $tSrc $tDst1 $tDst2 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO missing $tDst1" "[ -f $tDst1 ]"
+    assertTrue "$LINENO missing $tDst2.bak" "[ -f $tDst2.bak ]"
+    assertEquals "$LINENO $tDst1 proj-name" "TBD" "$(git config -f $tDst1 --get gitproj.config.proj-name)"
+    assertEquals "$LINENO $tDst2 proj-name" "TBD" "$(git config -f $tDst2 --get gitproj.config.proj-name)"
+
+    # ----------
+    # No force, and update. Depends on previous test working
+    git config -f $tDst2 --unset gitproj.config.syslog
+    git config -f $tDst2 --unset gitproj.config.remote-raw-dir
+    git config -f $tDst2 --unset gitproj.config.proj-name
+    git config -f $tDst1 gitproj.config.proj-name TestName
+    git config -f $tDst1 gitproj.config.remote-raw-dir /mnt/test
+
+    tResult=$(fComConfigSetupLocal no-force $tSrc $tDst1 $tDst2 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO missing $tDst2.bak" "[ -f $tDst2.bak ]"
+    assertEquals "$LINENO Dst2 proj-name" "TestName" "$(git config -f $tDst2 --get gitproj.config.proj-name)"
+    assertEquals "$LINENO Dst2 syslog" "false" "$(git config -f $tDst2 --get gitproj.config.syslog)"
+    assertEquals "$LINENO Dst2 remote-raw-dir" "/mnt/test" "$(git config -f $tDst2 --get gitproj.config.remote-raw-dir)"
+
+    # ----------
+    # No force, and update. Depends on previous test working
+    git config -f $tDst1 gitproj.config.remote-raw-dir raw-dst1
+    git config -f $tDst2 gitproj.config.remote-raw-dir raw-dst2
+    git config -f $tDst1 gitproj.config.proj-name proj-dst1
+    git config -f $tDst2 gitproj.config.proj-name proj-dst2
+
+    tResult=$(fComConfigSetupLocal force $tSrc $tDst1 $tDst2 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO missing $tDst2.bak" "[ -f $tDst2.bakx ]"
+    assertEquals "$LINENO Dst2 remote-raw-dir" "raw-dst2" "$(git config -f $tDst2 --get gitproj.config.remote-raw-dir)"
+    assertEquals "$LINENO Dst2 proj-name" "proj-dst1" "$(git config -f $tDst2 --get gitproj.config.proj-name)"
+
+    return 0
+} # testComConfigSetupLocal
 
 # --------------------------------
 testComGetConfigMore()
@@ -405,6 +439,7 @@ testComGetConfigMore()
     startSkipping
     fail "TBD"
     # untar a git env., test in and out of git dir
+    return 0
 } # testComGetConfigMore
 
 # --------------------------------
@@ -412,7 +447,7 @@ testComUnsetConfigMore()
 {
     startSkipping
     fail "TBD"
-    # untar a git env., test in and out of git dir
+    return 0
 } #testComUnsetConfigMore
 
 # ========================================

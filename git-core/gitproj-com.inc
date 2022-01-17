@@ -205,7 +205,7 @@ fComFirstTimeSet()
     tUserName=$(fComGetConfig -g -k "user.name")
     tUserEmail=$(fComGetConfig -g -k "user.email")
     if [ -z "$tUserName" ] || [ -z "$tUserEmail" ]; then
-        fError -m "user.name and user.email must be in your ~/.gitconfig file. See $cgDoc/config/gitconfig.default for some other useful settings." -l $tSrc:$LINENO
+        fError -m "user.name and user.email must be in your ~/.gitconfig file. See $gpDoc/config/gitconfig for some other useful settings." -l $tSrc:$LINENO
     fi
 
     if [ ! -f $HOME/cConfigGlobal ]; then
@@ -272,9 +272,11 @@ fComSetGlobals()
 
     # This is put in cTop, project dir. (Use -L to set config vars to this)
     cConfigLocal='.gitproj.config.local'
+#TBD    cConfigLocal='.gitproj'
 
     # This is put in cTop, project dir. (Use -H to set config vars to this)
     # This is included by .git/config
+#TBD remove the nedn for:
     cConfigHost=".gitproj.config.$HOSTNAME"
 
     # cConfigGlobal, cConfigLocal, and $cConfigLocal should be
@@ -1036,6 +1038,7 @@ fComSetConfig()
                 fi
                 ;;
             G)
+#TBD remove
                 if [ ! -f $HOME/$cConfigGlobal ]; then
                     fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
                     return 1
@@ -1055,11 +1058,14 @@ fComSetConfig()
             f) pScope="--file ${OPTARG}" ;;
             g) pScope="--global" ;;
             G) pScope="--file $HOME/$cConfigGlobal" ;;
+#TBD            G) pScope="--global" ;;
             H) pScope="--file $tTopDir/$cConfigHost" ;;
+#TBD            H) pScope="--local" ;;
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
             L) pScope="--file $tTopDir/$cConfigLocal" ;;
+#TBD            L) pScope="--file $tTopDir/.gitproj" ;;
             v) pValue="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1193,6 +1199,7 @@ fComGetConfig()
                 fi
                 ;;
             G)
+#TBD remove
                 if [ ! -f $HOME/$cConfigGlobal ]; then
                     fError $tExit -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
                     return 1
@@ -1214,13 +1221,16 @@ fComGetConfig()
                 tExit=""
                 ;;
             f) pScope="--file ${OPTARG}" ;;
-            g) pScope=--global ;;
+            g) pScope="--global" ;;
             G) pScope="--file $HOME/$cConfigGlobal" ;;
+#TBD            G) pScope="--global" ;;
             H) pScope="--file $tTopDir/$cConfigHost" ;;
+#            H) pScope="--local" ;;
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
-            l) pScope=--local ;;
+            l) pScope="--local" ;;
             L) pScope="--file $tTopDir/$cConfigLocal" ;;
+#            L) pScope="--file $tTopDir/.gitproj" ;;
             v) pFilter="${OPTARG}" ;;
             :)
                 fError $tExit -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1396,6 +1406,7 @@ fComUnsetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
+
     while getopts :af:gGHk:lL tArg; do
         # shellcheck disable=SC2213,SC2220
         case $tArg in
@@ -1443,11 +1454,11 @@ fComUnsetConfig()
             l) pScope=--local ;;
             L) pScope="--file $tTopDir/$cConfigLocal" ;;
             :)
-                fError -n -i -m "Internal fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                fError -n -i -m "fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
                 ;;
             \?)
-                fError -n -i -m "Internal fComUnsetConfig: Unknown option: $OPTARG" -l $tSrc:$LINENO
+                fError -n -i -m "ComUnsetConfig: Unknown option: $OPTARG" -l $tSrc:$LINENO
                 return 1
                 ;;
         esac
@@ -1483,36 +1494,180 @@ fComSaveVar2Config()
     fi
 } # fComSaveVar2Config
 
+fComConfigCopy()
+{
+    local pForce=0
+    local pSource=""
+    local pDest=""
+    local pIncPat=""
+    local pExcPat="@@"
+    local tSrc=${BASH_SOURCE##*/}
+    local tVerbose
+    declare -l tVar
+    local tValue
+    local tFound
+    local OPTIND=1
+    local OPTARG
+    local tArg
+
+    if [ $gpVerbose -gt 0 ]; then
+        tVerbose='-v'
+    fi
+
+    while getopts :fs:d:i:e: tArg; do
+        # shellcheck disable=SC2213,SC2220
+        case $tArg in
+	    f) pForce=1 ;;
+	    s) pSource="${OPTARG}" ;;
+	    d) pDest="${OPTARG}" ;;
+	    i) pIncPat="${OPTARG}" ;;
+	    e) pExcPat="${OPTARG}" ;;
+            :)
+                fError -n -i -m "fComConfigCopy: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+            \?)
+                fError -n -i -m "ComConfigCopy: Unknown option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+	esac
+    done
+
+    if [ -z "$pSource" ] || [ ! -r $pSource ]; then
+        fError -n -i -m "fComConfigCopy: -s $pSource is missing or not readable" -l $tSrc:$LINENO
+	return 1
+    fi
+    if [ -z "$pDest" ] || [ ! -w $pDest ]; then
+        fError -n -i -m "fComConfigCopy: -d $pDest is missing or not writable" -l $tSrc:$LINENO
+	return 1
+    fi
+
+    cp "$tVerbose" --backup=t $pDest $pDest.bak
+    if [ $? -ne 0 ]; then
+        fError -n -i -m "fComConfigCopy: " -l $tSrc:$LINENO
+	return 1
+    fi
+
+    git config -f $pSource --list | while read tSrcConfig; do
+    	tVar=${tSrcConfig%=*}
+	tValue="${tSrcConfig#*=}"
+	tFound=$(echo $tVar | grep -E "$pIncPat" | grep -Ev "$pExcPat")
+	if [ -z "$tFound" ]; then
+	    continue
+	fi
+	if [ $pForce -ne 0 ]; then
+    	    git config -f $pDest $tVar $tValue
+	    continue
+	fi
+        if git config -f $pDest --get $tVar >/dev/null 2>&1; then
+	    continue
+	fi
+	git config -f $pDest $tVar "$tValue"
+    done
+
+    return 0
+    # ----------------------
+    cat <<EOF >/dev/null
+=internal-pod
+
+=internal-for html <hr/>
+
+=internal-head3 fComConfigUpdate
+
+=internal-head4 Synopsis
+
+    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]
+
+=internal-head4 Description
+
+Copy values from git config file pSource to pDest. If -f (force), the pSource
+values will override the pDest values, otherwise the pSource value will
+only be copied to pDest if it does not exist there.
+
+The -i pIncPat is a "grep" pattern that only selects the variable
+names that match the pattern. For example:
+S<-i 'gitproj\.config\.|gitflow\.'>
+
+The -e pExcPat is a "grep" pattern that removes variable names that
+match the pattern. For example: S<-e 'gitproj.config.remote-raw-dir'>
+pExcPat is applied after pIncPat.
+
+pSource and pDest files must exist. pSource must be readable, and
+pDest must be writable.
+
+A backup copy of pDest is made with this command:
+S<cp -backup=t $pDest $pDest.bak>
+
+=internal-cut
+EOF
+} # fComConfigCopy
+
+
 fComConfigSetupGlobal()
 {
-    local pSrc=$1
-    local pDst=$2
-    local pList=" $3 "
-    local tSrcConfig
-    local tDstConfig
+    local tSrc=${BASH_SOURCE##*/}
+    local tSource=$gpDoc/config/gitconfig
+    local tDest=$HOME/.gitconfig
     local tVar
-    local tValue
+    local tList='local-status proj-name remote-status remote-raw-dir'
 
-    if [ ! -f $pDst ]; then
-        cp $pSrc $pDst
+    if [ ! -w $HOME ]; then
+        fError -i -m "Cannot write to $HOME" -l $tSrc:$LINENO
+    fi
+    if [ ! -r $tSource ]; then
+        fError -i -m "Cannot read $tSource" -l $tSrc:$LINENO
+    fi
+
+    if [ ! -f $pDest ]; then
+        cp $tSource $pDest
 	return $?
     fi
 
-    git config -f $pSrc --list | while read tSrcConfig; do
-    	tVar=${tSrcConfig%=*}
-	tValue="${tSrcConfig#*=}"
-	if [ "$pList" != "${pList#* $tVar }" ]; then
-	    git config -f $pDst $tVar TBD
-	    continue
-	fi
-        if git config -f $pDst --get $tVar >/dev/null 2>&1; then
-	    continue
-	fi
-	git config -f $pDst $tVar "$tValue"
+    cp --backup=t $tDest $tDest.bak
+    fComConfigCopy -s tSource -d $tDest -i 'gitproj\.config\.'
+    for tVar in $tList; do
+        git -f $tDest gitproj.config.$tVar TBD
     done
 
     return 0
 } # fComConfigSetupGlobal
+
+fComConfigSetupLocal()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tSource=$HOME/.gitconfig
+    local tDest1
+    local tDest2
+    local tVar
+    local tValue
+    local tList="gitproj.config.remote-raw-dir"
+
+    fComMustBeInGitRepo $PWD
+    tDest1=$(cGetTopDir)
+    tDest2=$($tDest1)/.git/config
+    tDest1=$($tDest1)/.gitproj
+
+    if [ ! -r $tSource ]; then
+        fError -i -m "$tSource is missing or not readable" -l $tSrc:$LINENO
+    fi
+
+    if [ ! -w $tDest2 ]; then
+        fError -i -m "$tDest2 is missing or not writable" -l $tSrc:$LINENO
+    fi
+
+    if [ ! -f $tDest1 ]; then
+        # Create tDest1 from tSourcee, only copy the gitproj sections
+	fComConfigCopy -f -s $tSource -d $tDest1 -i '^gitproj\.'
+    else
+	fComConfigCopy -s $tSource -d $tDest1 -i '^gitproj\.'
+    fi
+
+    # Update tDest2 from tDest1
+    cp --backup=t $tDest2 $tDest2.bak
+    fComConfigCopy -s $tDest1 -d $tDest2
+
+    return 0
+} # fComConfigSetupLocal
 
 fComCheckPkg()
 {
@@ -1721,7 +1876,7 @@ fComGetVer()
     tLocVer=$(fComGetConfig -k "gitproj.config.ver")
     if [ -z "$tLocVer" ]; then
         gpVer=$cGitProjVersion
-        fLog -i -p warning -m 'gitproj.config.ver was not found. Setting it to: $gpVer' -l "$tSrc:$LINENO"
+        fLog -i -p warning -m "gitproj.config.ver was not found. Setting it to: $gpVer" -l "$tSrc:$LINENO"
         return 1
         fComSetConfig -L -k "gitproj.config.ver" -v "$gpVer"
         fComSetConfig -H -k "gitproj.config.ver" -v "$gpVer"
