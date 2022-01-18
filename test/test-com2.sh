@@ -111,8 +111,7 @@ NAoneTimeTearDown()
 # --------------------------------
 setUp()
 {
-    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -176,12 +175,12 @@ testComSetConfigMore()
     # Files:
     # Relative to $HOME ($cDatHome)
     #     1) -g ~/.gitconfig (include.path = .gitproj.config.global)
-    #	  2) -G $HOME/$cConfigGlobal ($HOME/.gitproj.config.global)
+    #TBD	  2) -G $HOME/$c ConfigGlobal ($HOME/.gitproj.config.global)
     # Relative to $HOME/$cDatProj1 ($cDatHome/$cDatProj1)
     #     3) -l .git/config (include.path = ../.gitproj.config.HOSTNAME)
-    #	  4) -L .gitproj.config.local ($cConfigLocal)
-    #	  5) -H $cConfigLocal ($cConfigHost,
-    #	  	 	    include-path=$cConfigLocal)
+    #	  4) -L .gitproj.config.local (.gitproj)
+    #TBD	  5) -H .gitproj ($c ConfigHost,
+    #	  	 	    include-path=.gitproj)
 
     gpVerbose=2
 
@@ -189,11 +188,6 @@ testComSetConfigMore()
     tResult=$(fComSetConfig -g -k com.test.gvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO" "fLookFor gvar $HOME/.gitconfig"
-
-    # ----------
-    tResult=$(fComSetConfig -G -k com.test.Gvar -v "defined" 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Gvar $HOME/$cConfigGlobal"
 
     # ----------
     cd $HOME/$cDatProj1
@@ -211,7 +205,7 @@ testComSetConfigMore()
     cd $HOME/$cDatProj1
     tResult=$(fComSetConfig -L -k com.test.Lvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Lvar $cConfigLocal"
+    assertTrue "$LINENO" "fLookFor Lvar .gitproj"
 
     # ----------
     cd $HOME
@@ -223,7 +217,7 @@ testComSetConfigMore()
     cd $HOME/$cDatProj1
     tResult=$(fComSetConfig -H -k com.test.Hvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Hvar $cConfigHost"
+    assertTrue "$LINENO" "fLookFor Hvar $c ConfigHost"
 
     # ----------
     cd $HOME
@@ -273,7 +267,7 @@ testComSetConfigMore()
     assertContains "$LINENO $tResult" "$tResult" "fComSetConfig:: Unknown option"
 
     # ----------
-    rm $HOME/$cConfigGlobal
+    #rm $HOME/$c ConfigGlobal
     tResult=$(fComSetConfig -G -k com.test.Gvar -v "defined" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Could not find"

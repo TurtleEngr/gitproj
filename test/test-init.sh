@@ -112,8 +112,7 @@ setUp()
 {
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpLocalRawDir \
@@ -761,18 +760,14 @@ testInitMkLocalConfig()
     gpAuto=0
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    assertFalse $LINENO "[ -f $cConfigLocal ]"
-    assertFalse $LINENO "[ -f $cConfigHost ]"
+    assertFalse $LINENO "[ -f .gitproj ]"
+    assertFalse $LINENO "[ -f .git/config ]"
     assertFalse $LINENO "$(grep -q gitproj.config .git/config >/dev/null 2>&1); echo $?)"
 
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue $LINENO "$?"
-    assertTrue $LINENO "[ -f $cConfigLocal ]"
-    assertTrue $LINENO "[ -f $cConfigHost ]"
-
-    tResult=$(git config --local --list --show-origin --includes 2>&1)
-    assertTrue $LINENO "$?"
-    assertContains "$LINENO $tResult" "include.path=../$cConfigHost"
+    assertTrue $LINENO "[ -f .gitproj ]"
+    assertTrue $LINENO "[ -f .git/config ]"
 
 } # testInitMkLocalConfig
 
@@ -796,8 +791,8 @@ testInitSaveVarsToConfigs()
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue $LINENO "[ -f $cConfigLocal ]"
-    assertTrue $LINENO "[ -f $cConfigHost ]"
+    assertTrue $LINENO "[ -f .gitproj ]"
+    assertTrue $LINENO "[ -f .git/config ]"
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -825,15 +820,15 @@ testInitSaveVarsToConfigs()
     fTestCheckConfig2Var $tFile $tS.facility gpFacility user $LINENO
     fTestCheckConfig2Var $tFile $tS.syslog gpSysLog false $LINENO
 
-    for tFile in $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
+    for tFile in $gpLocalTopDir/.gitproj \
+        $gpLocalTopDir/.git/config; do
         tS=gitproj.config
         fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined $LINENO
         fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined $LINENO
         fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName $LINENO
     done
 
-    for tFile in ~/.gitproj.config.global $gpLocalTopDir/$cConfigLocal; do
+    for tFile in ~/.gitproj.config.global $gpLocalTopDir/.gitproj; do
         tS=gitproj.config
         fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true $LINENO
         tS=gitproj.hook

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # --------------------------------
-export cConfigGlobal cConfigLocal cConfigHost cGitProjVersion \
-    cGetOrigin cGetTopDir cGetCurBranch cPID
+export cGitProjVersion cGetOrigin cGetTopDir cGetCurBranch cPID
 
 export PWD gErr gGetConfigOrigin gGetConfigValue gResponse gpAuto \
     gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles gpCheckInRaw \
     gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
     gpHookSource gpHookVerbose gpLocalRawDir gpLocalStatus \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
-    gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpYesNo
+    gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpVerboseFlag \
+    gpYesNo
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -188,6 +188,114 @@ EOF
     return 0
 } # fComIntroText
 
+fComConfigCopy()
+{
+    local pForce=0
+    local pSource=""
+    local pDest=""
+    local pIncPat=""
+    local pExcPat="@@"
+    local tSrc=${BASH_SOURCE##*/}
+    local tVerbose
+    declare -l tVar
+    local tValue
+    local tFound
+    local OPTIND=1
+    local OPTARG
+    local tArg
+
+    if [ $gpVerbose -gt 0 ]; then
+        tVerbose='-v'
+    fi
+
+    while getopts :fs:d:i:e: tArg; do
+        # shellcheck disable=SC2213,SC2220
+        case $tArg in
+	    f) pForce=1 ;;
+	    s) pSource="${OPTARG}" ;;
+	    d) pDest="${OPTARG}" ;;
+	    i) pIncPat="${OPTARG}" ;;
+	    e) pExcPat="${OPTARG}" ;;
+            :)
+                fError -n -i -m "fComConfigCopy: Value required for option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+            \?)
+                fError -n -i -m "ComConfigCopy: Unknown option: $OPTARG" -l $tSrc:$LINENO
+                return 1
+                ;;
+	esac
+    done
+
+    if [ -z "$pSource" ] || [ ! -r $pSource ]; then
+        fError -n -i -m "fComConfigCopy: -s $pSource is missing or not readable" -l $tSrc:$LINENO
+	return 1
+    fi
+    if [ -z "$pDest" ] || [ ! -w $pDest ]; then
+        fError -n -i -m "fComConfigCopy: -d $pDest is missing or not writable" -l $tSrc:$LINENO
+	return 1
+    fi
+
+    cp "$tVerbose" --backup=t $pDest $pDest.bak
+    if [ $? -ne 0 ]; then
+        fError -n -i -m "fComConfigCopy: " -l $tSrc:$LINENO
+	return 1
+    fi
+
+    git config -f $pSource --list | while read tSrcConfig; do
+    	tVar=${tSrcConfig%=*}
+	tValue="${tSrcConfig#*=}"
+	tFound=$(echo $tVar | grep -E "$pIncPat" | grep -Ev "$pExcPat")
+	if [ -z "$tFound" ]; then
+	    continue
+	fi
+	if [ $pForce -ne 0 ]; then
+    	    git config -f $pDest $tVar $tValue
+	    continue
+	fi
+        if git config -f $pDest --get $tVar >/dev/null 2>&1; then
+	    continue
+	fi
+	git config -f $pDest $tVar "$tValue"
+    done
+
+    return 0
+    # ----------------------
+    cat <<EOF >/dev/null
+=internal-pod
+
+=internal-for html <hr/>
+
+=internal-head3 fComConfigCopy
+
+=internal-head4 Synopsis
+
+    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]
+
+=internal-head4 Description
+
+Copy values from git config file pSource to pDest. If -f (force), the pSource
+values will override the pDest values, otherwise the pSource value will
+only be copied to pDest if it does not exist there.
+
+The -i pIncPat is a "grep" pattern that only selects the variable
+names that match the pattern. For example:
+S<-i 'gitproj\.config\.|gitflow\.'>
+
+The -e pExcPat is a "grep" pattern that removes variable names that
+match the pattern. For example: S<-e 'gitproj.config.remote-raw-dir'>
+pExcPat is applied after pIncPat.
+
+pSource and pDest files must exist. pSource must be readable, and
+pDest must be writable.
+
+A backup copy of pDest is made with this command:
+S<cp -backup=t $pDest $pDest.bak>
+
+=internal-cut
+EOF
+} # fComConfigCopy
+
 # --------------------
 fComFirstTimeSet()
 {
@@ -198,7 +306,8 @@ fComFirstTimeSet()
 
     if [ ! -f $HOME/.gitconfig ]; then
         fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
-        cp $gpDoc/config/gitconfig.default $HOME/.gitconfig
+        cp $gpDoc/config/gitconfig $HOME/.gitconfig
+	return 0
     fi
 
     tUserName=$(fComGetConfig -g -k "user.name")
@@ -207,15 +316,8 @@ fComFirstTimeSet()
         fError -m "user.name and user.email must be in your ~/.gitconfig file. See $gpDoc/config/gitconfig for some other useful settings." -l $tSrc:$LINENO
     fi
 
-    if [ ! -f $HOME/cConfigGlobal ]; then
-        fLog -p info -m "Create: ~/$cConfigGlobal" -l $tSrc:$LINENO
-        cp $gpDoc/config/gitproj.config.global $HOME/$cConfigGlobal
-    fi
-    tInclude=$(fComGetConfig -g -k "include.path" -v $cConfigGlobal)
-    if [ -z "$tInclude" ]; then
-        fLog -p info -m "include.path=$cConfigGlobal" -l $tSrc:$LINENO
-        fComSetConfig -a -g -k "include.path" -v $cConfigGlobal
-    fi
+    fComConfigCopy -s $gpDoc/config/gitconfig -d $HOME/.gitconfig
+    return 0
 } # fComFirstTimeSet
 
 # -------------------
@@ -245,9 +347,7 @@ fComSetGlobals()
     # -------------------
     # Constants
 
-    if [ -z "$gpDoc" ]; then
-        gpDoc=/usr/share/doc/git-proj
-    fi
+    gpDoc=${gpDoc:-/usr/share/doc/git-proj}
     if [ ! -d $gpDoc ]; then
         gpDoc=$gpBin/../doc
     fi
@@ -261,48 +361,42 @@ fComSetGlobals()
     cGitProjVersion=$(cat $gpDoc/VERSION)
 
     # Included in ~/.gitproj.config (Use -G to set config vars to this)
-    # Note: ~/$cConfigGlobal does not work all the time, so use:
-    # $HOME/$cConfigGlobal  However ~ is OK for use in literals.
-    # shellcheck disable=SC2088
-    cConfigGlobal='.gitproj.config.global'
+    # Note: ~/.gitconfig does not work all the time, so use:
+    # $HOME/.gitconfig or use --global
 
-    # This is put in cTop, project dir. (Use -L to set config vars to this)
-    cConfigLocal='.gitproj.config.local'
-#TBD    cConfigLocal='.gitproj'
+    # Depreciated
+    # cConfigGlobal -> .gitconfig
+    # cConfigLocal -> .gitproj
+    # cConfigHost -> .git/config
 
-    # This is put in cTop, project dir. (Use -H to set config vars to this)
-    # This is included by .git/config
-#TBD remove the nedn for:
-    cConfigHost=".gitproj.config.$HOSTNAME"
-
-    # cConfigGlobal, cConfigLocal, and $cConfigLocal should be
-    # versioned.
-
-    # Use:
-    #     tOrigin=$($cGetOrigin)
-    #     if $cGetOrigin >/dev/null 2>&1; then echo "In a git dir"; fi
     cGetOrigin='git config --get remote.origin.url'
+    # Use: tOrigin=$($cGetOrigin)
+    #      if $cGetOrigin >/dev/null 2>&1; then echo "In a git dir"; fi
 
-    # Use:
-    #     tTop=$($cGetTopDir); cd $tTop
     cGetTopDir='git rev-parse --show-toplevel'
+    # Use: tTop=$($cGetTopDir); cd $tTop
 
-    # Use:
-    #     tBranch=$($cGetCurBranch)
     cGetCurBranch='git rev-parse --abbrev-ref HEAD'
+    # Use: tBranch=$($cGetCurBranch)
 
     # -------------------
     # Setup log variables
     # -x
     gpDebug=${gpDebug:-0}
+
     # -v
     gpVerbose=${gpVerbose:-0}
+    if [ $gpVerbose -gt 0 ]; then
+        gpVerboseFlag='-v'
+    fi
+
     # -l
     gpSysLog=${gpSysLog:-false}
     gpFacility=${gpFacility:-user}
+
     gErr=0
 
-    return
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -1034,16 +1128,17 @@ fComSetConfig()
                 fi
                 ;;
             G)
-#TBD remove
-                if [ ! -f $HOME/$cConfigGlobal ]; then
-                    fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
-                    return 1
-                fi
+                fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
+            	pScope="--global"
                 ;;
-            H | l | L)
+            H)
+                fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
+            	pScope="--local"
+		;;
+            l | L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+                    fError -n -i -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
                     return 1
                 fi
                 ;;
@@ -1053,15 +1148,14 @@ fComSetConfig()
             b) pType="--bool" ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope="--global" ;;
-            G) pScope="--file $HOME/$cConfigGlobal" ;;
-#TBD            G) pScope="--global" ;;
-            H) pScope="--file $tTopDir/$cConfigHost" ;;
-#TBD            H) pScope="--local" ;;
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
-            L) pScope="--file $tTopDir/$cConfigLocal" ;;
-#TBD            L) pScope="--file $tTopDir/.gitproj" ;;
+            L) pScope="--file $tTopDir/.gitproj"
+	       if [ ! -f $tTopDir/.gitproj ]; then
+                   fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
+	       fi
+	       ;;
             v) pValue="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1095,13 +1189,13 @@ fComSetConfig()
 
 =internal-head4 Synopsis
 
-    fComSetConfig -k pKey -v pValue [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-a]
+    fComSetConfig -k pKey -v pValue [-g|-l|-L|-f pFile] [-b|-i] [-a]
 
 =internal-head4 Description
 
 =internal-head4 Options
 
-Only one of these will be used: -g, -l, -L, -H -f. The last one in the
+Only one of these will be used: -g, -l, -L, -f. The last one in the
 list of options will be used if there is more than one.  If none, then
 -l is the default.
 
@@ -1120,21 +1214,17 @@ This option is required.
 
 =internal-item B<-g>
 
-Write to ~/.gitconfig
+Write to ~/.gitconfig (--global)
 
 =internal-item B<-l>
 
-You must be in a git workspace for this option to work.
+You must be in a git workspace for this option to work. (--local)
 
 Write to GIT_DIR/.git/config
 
 =internal-item B<-L>
 
-Write to GIT_DIR/$cConfigLocal
-
-=internal-item B<-H>
-
-Write to GIT_DIR/$cConfigHost
+Write to GIT_DIR/.gitproj
 
 =internal-item B<-f pFile>
 
@@ -1195,13 +1285,14 @@ fComGetConfig()
                 fi
                 ;;
             G)
-#TBD remove
-                if [ ! -f $HOME/$cConfigGlobal ]; then
-                    fError $tExit -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
-                    return 1
-                fi
+                fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
+            	pScope="--global"
                 ;;
-            H | l | L)
+            H)
+                fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
+            	pScope="--local"
+		;;
+            l | L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
                     fError $tExit -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
@@ -1218,15 +1309,14 @@ fComGetConfig()
                 ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope="--global" ;;
-            G) pScope="--file $HOME/$cConfigGlobal" ;;
-#TBD            G) pScope="--global" ;;
-            H) pScope="--file $tTopDir/$cConfigHost" ;;
-#            H) pScope="--local" ;;
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
-            L) pScope="--file $tTopDir/$cConfigLocal" ;;
-#            L) pScope="--file $tTopDir/.gitproj" ;;
+            L) pScope="--file $tTopDir/.gitproj"
+	       if [ ! -f $tTopDir/.gitproj ]; then
+                   fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
+	       fi
+	       ;;
             v) pFilter="${OPTARG}" ;;
             :)
                 fError $tExit -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1287,7 +1377,7 @@ fComGetConfig()
 
 =internal-head4 Synopsis
 
-    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
+    fComGetConfig -k pKey [-g|-l|-L|-f pFile] [-b|-i]
                   [-d pDefault] [-e] [-v pFilter]
 
 =internal-head4 Description
@@ -1310,7 +1400,7 @@ Command Returns
 
 =internal-head4 Options
 
-Only one of these will be used: -g, -l, -f. The last one in the list
+Only one of these will be used: -g, -l, -L, -f. The last one in the list
 of options will be if there is more than one.  If none, then all the
 config files will be used.
 
@@ -1334,8 +1424,8 @@ will be included.
 You must be in a git workspace for this option to work.
 
 Look in GIT_DIR/.git/config Includes are followed so these files will
-be included: GIT_DIR/$cConfigLocal and
-GIT_DIR/$cConfigHost
+be included: GIT_DIR/.gitproj and
+GIT_DIR/.git/config
 
 =internal-item B<-f pFile>
 
@@ -1413,26 +1503,14 @@ fComUnsetConfig()
                 fi
                 ;;
             G)
-                if [ ! -f $HOME/$cConfigGlobal ]; then
-                    fError -n -m "Could not find ~/$cConfigGlobal. See 'git proj init'" -l "$tSrc:$LINENO"
-                    return 1
-                fi
+                fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
+            	pScope="--global"
                 ;;
             H)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-                    return 1
-                fi
+                fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
+            	pScope="--local"
                 ;;
-            l)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
-                    return 1
-                fi
-                ;;
-            L)
+            l|L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
                     fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
@@ -1444,11 +1522,13 @@ fComUnsetConfig()
             a) pAll="--unset-all" ;;
             f) pScope="--file ${OPTARG}" ;;
             g) pScope=--global ;;
-            G) pScope="--file $HOME/$cConfigGlobal" ;;
-            H) pScope="--file $tTopDir/$cConfigHost" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
-            L) pScope="--file $tTopDir/$cConfigLocal" ;;
+            L) pScope="--file $tTopDir/.gitproj"
+	       if [ ! -f $tTopDir/.gitproj ]; then
+                   fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
+	       fi
+	        ;;
             :)
                 fError -n -i -m "fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
@@ -1489,115 +1569,6 @@ fComSaveVar2Config()
         gErr=1
     fi
 } # fComSaveVar2Config
-
-fComConfigCopy()
-{
-    local pForce=0
-    local pSource=""
-    local pDest=""
-    local pIncPat=""
-    local pExcPat="@@"
-    local tSrc=${BASH_SOURCE##*/}
-    local tVerbose
-    declare -l tVar
-    local tValue
-    local tFound
-    local OPTIND=1
-    local OPTARG
-    local tArg
-
-    if [ $gpVerbose -gt 0 ]; then
-        tVerbose='-v'
-    fi
-
-    while getopts :fs:d:i:e: tArg; do
-        # shellcheck disable=SC2213,SC2220
-        case $tArg in
-	    f) pForce=1 ;;
-	    s) pSource="${OPTARG}" ;;
-	    d) pDest="${OPTARG}" ;;
-	    i) pIncPat="${OPTARG}" ;;
-	    e) pExcPat="${OPTARG}" ;;
-            :)
-                fError -n -i -m "fComConfigCopy: Value required for option: $OPTARG" -l $tSrc:$LINENO
-                return 1
-                ;;
-            \?)
-                fError -n -i -m "ComConfigCopy: Unknown option: $OPTARG" -l $tSrc:$LINENO
-                return 1
-                ;;
-	esac
-    done
-
-    if [ -z "$pSource" ] || [ ! -r $pSource ]; then
-        fError -n -i -m "fComConfigCopy: -s $pSource is missing or not readable" -l $tSrc:$LINENO
-	return 1
-    fi
-    if [ -z "$pDest" ] || [ ! -w $pDest ]; then
-        fError -n -i -m "fComConfigCopy: -d $pDest is missing or not writable" -l $tSrc:$LINENO
-	return 1
-    fi
-
-    cp "$tVerbose" --backup=t $pDest $pDest.bak
-    if [ $? -ne 0 ]; then
-        fError -n -i -m "fComConfigCopy: " -l $tSrc:$LINENO
-	return 1
-    fi
-
-    git config -f $pSource --list | while read tSrcConfig; do
-    	tVar=${tSrcConfig%=*}
-	tValue="${tSrcConfig#*=}"
-	tFound=$(echo $tVar | grep -E "$pIncPat" | grep -Ev "$pExcPat")
-	if [ -z "$tFound" ]; then
-	    continue
-	fi
-	if [ $pForce -ne 0 ]; then
-    	    git config -f $pDest $tVar $tValue
-	    continue
-	fi
-        if git config -f $pDest --get $tVar >/dev/null 2>&1; then
-	    continue
-	fi
-	git config -f $pDest $tVar "$tValue"
-    done
-
-    return 0
-    # ----------------------
-    cat <<EOF >/dev/null
-=internal-pod
-
-=internal-for html <hr/>
-
-=internal-head3 fComConfigUpdate
-
-=internal-head4 Synopsis
-
-    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]
-
-=internal-head4 Description
-
-Copy values from git config file pSource to pDest. If -f (force), the pSource
-values will override the pDest values, otherwise the pSource value will
-only be copied to pDest if it does not exist there.
-
-The -i pIncPat is a "grep" pattern that only selects the variable
-names that match the pattern. For example:
-S<-i 'gitproj\.config\.|gitflow\.'>
-
-The -e pExcPat is a "grep" pattern that removes variable names that
-match the pattern. For example: S<-e 'gitproj.config.remote-raw-dir'>
-pExcPat is applied after pIncPat.
-
-pSource and pDest files must exist. pSource must be readable, and
-pDest must be writable.
-
-A backup copy of pDest is made with this command:
-S<cp -backup=t $pDest $pDest.bak>
-
-=internal-cut
-EOF
-} # fComConfigCopy
-
 
 fComConfigSetupGlobal()
 {
@@ -1749,26 +1720,13 @@ fComMustBeInProjRepo()
         return 1
     fi
 
-    if [ ! -f $HOME/$cConfigGlobal ]; then
-        fError -n -m "Missing ~/$cConfigGlobal, run 'git proj init'" -l $tSrc:$LINENO
-        if [ $gpDebug -ge 2 ]; then
-            fComStackTrace
-        fi
-        return 1
-    fi
-
     tTopDir=$($cGetTopDir)
 
-    if [ ! -f $tTopDir/$cConfigLocal ]; then
+    if [ ! -f $tTopDir/.gitproj ]; then
         fError -n -m "This git workspace is not setup for gitproj." -l $tSrc:$LINENO
         if [ $gpDebug -ge 2 ]; then
             fComStackTrace
         fi
-        return 1
-    fi
-
-    if [ ! -f $tTopDir/$cConfigHost ]; then
-        fError -n -m "Missing $cConfigHost, run 'git proj config'" -l $tSrc:$LINENO
         return 1
     fi
 

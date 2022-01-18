@@ -148,8 +148,7 @@ testSetup()
     assertTrue "$LINENO" "[ -d $cTestSrcDirg ]"
     assertTrue "$LINENO" "[ -d $cTestDestDir ]"
     assertNotEquals "$LINENO" "$cHome" "$HOME"
-    assertTrue "$LINENO" "[ -r $HOME/$cConfigGlobal ]"
-    assertTrue "$LINENO" "[ -r $HOME/.gitproj-test.config ]"
+    assertFalse "$LINENO" "[ -r $HOME/.gitconfig ]"
 
     for i in $cDatMount1 $cDatMount2 $cDatMount3; do
         fTestDebug "i=$i"
@@ -167,7 +166,7 @@ testSetup()
         fTestDebug "i=$i"
         assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj2/$i ]"
     done
-}
+} # testSetup
 
 # --------------------------------
 testComInitialConfig()
@@ -217,16 +216,14 @@ testComFirstTimeSet()
 
     # source gitproj-init.inc calls fInitSetGlobals, which calls
     # fComFirstTimeSet, which creates these files.
-    #assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
-    #assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+    # Intially not defined:
+    assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
+    # Old
+    assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
 
     fComFirstTimeSet
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
-    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
-    assertTrue "$LINENO" "$(
-        grep -q path $HOME/.gitconfig
-        echo $?
-    )"
+
     return 0
 } # testComFirstTimeSet
 

@@ -95,24 +95,18 @@ fCloneCheckLocalConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ -f $cConfigLocal ]; then
+    if [ -f .gitproj ]; then
         return 0
     fi
-    fLog -p warning -m "Missing file: $cConfigLocal It should have been versioned. Will try to recreate it from a host config file." -l $tSrc:$LINENO
+    fLog -p warning -m "Missing file: .gitproj It should have been versioned. Will try to recreate it from a host config file." -l $tSrc:$LINENO
 
-    # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
-    tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
-    if [ -z "$tHost" ]; then
-        fError -i -m "There are not host file to copy from." -l $tSrc:$LINENO
-    fi
+    touch .gitproj
+    fComConfigCopy -s .git/config -d .gitproj -i 'gitproj\.'
 
-    fLog -p debug-2 -m "cp $tHost $cConfigLocal" -l $tSrc:$LINENO
-    cp $tHost $cConfigLocal
+    # Adjust the values
+    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v TBD
 
-    # Adjust the host var values
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    git add $cConfigLocal
+    git add .gitproj
 
     return 0
 } # fCloneCheckLocalConfig
@@ -123,25 +117,18 @@ fCloneCheckHostConfig()
     local tSrc=${BASH_SOURCE##*/}
     local tHost
 
-    if [ -f $cConfigHost ]; then
-        return 0
+    tHost=$(fComGetConfig -l -k "gitproj.config.local-host")
+    if [ "$tHost" = "$HOSTNAME" ]; then
+        return 0;
     fi
-    fLog -p warning -m "Missing host file: $cConfigHost  It will be created for this new host" -l $tSrc:$LINENO
 
-    # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
-    tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
-    if [ -n "$tHost" ]; then
-        fLog -p debug-2 -m "cp $tHost $cConfigHost" -l $tSrc:$LINENO
-        cp $tHost $cConfigHost
-    else
-        fLog -p debug-2 -m "cp $cConfigLocal $cConfigHost" -l $tSrc:$LINENO
-        cp $cConfigLocal $cConfigHost
-    fi
+    fLog -p warning -m "Missing host values. They will be created for this new host" -l $tSrc:$LINENO
+
+    fComConfigCopy -f -s .gitproj -d .git/config
+    fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
     # Adjust the host var values
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    git add $cConfigHost
+    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
 
     return 0
 } # fCloneCheckHostConfig
@@ -150,35 +137,35 @@ fCloneCheckHostConfig()
 fCloneCheckProjConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
-    declare -a tHostList
+    local tHost
     local tC
 
-    tHostList=(.gitproj.config.*)
-    if [ "${tHostList[0]}" != ".gitproj.config.*" ]; then
+    tHost=$(fComGetConfig -l -k "gitproj.config.local-host")
+    if [ -f .gitproj ] && [ "$tHost" = "$HOSTNAME" ]; then
         return 0
     fi
 
     fLog -p warning -m "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values." -l $tSrc:$LINENO
 
-    # Get a raw local file from $gpDoc
-    fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal"
-    cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal
-    fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigHost"
-    cp $gpDoc/config/${cConfigLocal#.} $cConfigHost
+    # Get a raw local file from ~/.gitconfig
+    if [ ! -f .gitproj ]; then
+        fComConfigCopy -f -s .gitconfig -d .gitproj -i 'gitproj\.'
+    fi
+
+    fComConfigCopy -s .gitproj -d .git/config
+    fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
     # Fix up the vars, making some assumptions.
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
+    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v "TBD"
+    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
 
-    for tC in L H; do
+    for tC in L l; do
         fComSetConfig -$tC -k "gitproj.config.local-status" -v "defined"
         fComSetConfig -$tC -k "gitproj.config.remote-status" -v "defined"
         fComSetConfig -$tC -k "gitproj.config.proj-name" -v "$gpProjName"
-        fComSetConfig -$tC -k "gitproj.config.git-flow-pkg" -v "git-flow"
     done
 
-    git add $cConfigLocal
-    git add $cConfigHost
+    git add .gitproj
 
     return 0
 } # fCloneCheckProjConfig
@@ -233,8 +220,6 @@ fCloneMkGitDir()
     fCloneCheckHostConfig
     fCloneCheckLocalConfig
 
-    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
     cp $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
 
     git commit -am "Updating configs for this host."
@@ -284,17 +269,7 @@ fCloneUpdateHostConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
-    if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, include.path is alredy set." -l $tSrc:$LINENO
-    fi
-
-    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
-
-    git add $cConfigHost
+    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
 
     return 0
 } # fCloneUpdateHostConfig
@@ -327,16 +302,14 @@ Summary
     (verbose)  $gpVerbose
     (debug)  $gpDebug
     ($(flExists $HOME/.gitconfig))  HOME/.gitconfig
-    ($(flExists $HOME/$cConfigGlobal))  HOME/$cConfigGlobal
     ($(flExists $HOME/.gitignore))  HOME/.gitignore
-    ($(flExists $cConfigLocal))  $gpProjName/$cConfigLocal
-    ($(flExists $cConfigHost))  $gpProjName/$cConfigHost
+    ($(flExists .gitproj))  $gpProjName/.gitproj
     ($(flExists .gitignore))  $gpProjName/.gitignore
     (branch)  $gpBranch
     (remote-git-dir $(flExists $tOrigin))  $tOrigin
     (local-raw-dir $(flExists $gpLocalRawDir))  $gpLocalRawDir
 
-Global Config ~/$cConfigGlobal
+Global Config ~/.gitconfig
 [gitproj "config"]
     proj-status = $(fComGetConfig -k "gitproj.config.proj-status")
     syslog = $(fComGetConfig -k "gitproj.config.syslog")
@@ -345,24 +318,15 @@ Global Config ~/$cConfigGlobal
     doc = $(fComGetConfig -k "gitproj.config.doc")
     test = $(fComGetConfig -k "gitproj.config.test")
 
-Local Config $gpProjName/$cConfigHost
+Local Proj Config $gpProjName/.gitproj
 [gitproj "config"]
-    local-status = $(fComGetConfig -k "gitproj.config.local-status")
-    remote-status = $(fComGetConfig -k "gitproj.config.remote-status")
-    ver = $(fComGetConfig -k "gitproj.config.ver")
-    proj-name = $(fComGetConfig -k "gitproj.config.proj-name")
-    git-flow-pkg = $(fComGetConfig -k "gitproj.config.git-flow-pkg")
-    remote-raw-dir = $(fComGetConfig -k "gitproj.config.remote-raw-dir")
-    remote-min-size = $(fComGetConfig -k "gitproj.config.remote-min-size")
+$(git config -f .gitproj --list | grep gitproj.config | sed 's/gitproj\.config\.//')
+
 [gitproj "hook"]
-    verbose = $(fComGetConfig -k "gitproj.hook.verbose")
-    pre-commit-enabled = $(fComGetConfig -k "gitproj.hook.pre-commit-enabled")
-    check-file-names = $(fComGetConfig -k "gitproj.hook.check-file-names")
-    check-in-raw = $(fComGetConfig -k "gitproj.hook.check-in-raw")
-    check-whitespace = $(fComGetConfig -k "gitproj.hook.check-whitespace")
-    check-for-big-files = $(fComGetConfig -k "gitproj.hook.check-for-big-files")
-    binary-file-size-limit = $(fComGetConfig -k "gitproj.hook.binary-file-size-limit")
-    source = $(fComGetConfig -k "gitproj.hook.source")
+$(git config -f .gitproj --list | grep gitproj.hook | sed 's/gitproj\.hook\.//')
+
+Other vars in $gpProjName/.gitproj
+$(git config -f .gitproj --list | grep -v gitproj)
 
 Modified files:
 $(git status)
@@ -373,7 +337,8 @@ EOF
         return 1
     fi
     fLog -p notice -m "Committing changes" -l $tSrc:$LINENO
-    git commit -am "Updated $cConfigHost"
+    git commit -am "Updated .gitproj"
+
     return 0
 } # fCloneSummary
 

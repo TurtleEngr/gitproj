@@ -45,6 +45,7 @@
 	git-flow-pkg = git-flow
 	git-flow = true
 	local-status=TBD
+	local-host=TBD
 	proj-name = TBD
 	remote-status=TBD
 	remote-raw-dir=TBD

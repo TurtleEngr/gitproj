@@ -306,7 +306,7 @@ Summary
     (verbose) = $gpVerbose
     (debug) = $gpDebug
     (exits)   HOME/.gitconfig
-    (created)   HOME/$cConfigGlobal
+    (created)   HOME/.gitconfig
     (local-raw-dir) = $gpLocalRawDir
     (git-flow init) = $gpGitFlow
 
@@ -513,19 +513,12 @@ fInitMkLocalConfig()
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    fLog -p info -m "Create: $cConfigLocal" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.local $cConfigLocal
-    fLog -p info -m "Create: $cConfigHost" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.local $cConfigHost
 
-    tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
-    if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, $cConfigHost is already included" -l $tSrc:$LINENO
-        return 0
-    fi
+    fLog -p info -m "Create: .gitproj" -l $tSrc:$LINENO
+    fComConfigCopy -s $gpDoc/config/gitconfig -d .gitproj -i 'gitproj\.'
 
-    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
+    fLog -p info -m "Create: host values in --local" -l $tSrc:$LINENO
+    fComConfigCopy -s .gitproj -d .git/config
 
     return 0
 } # fInitMkLocalConfig
@@ -539,7 +532,7 @@ fInitSaveVarsToConfigs()
 
     gErr=0
 
-    tFile=$HOME/$cConfigGlobal
+    tFile=$HOME/.gitconfig
     tS=gitproj.config
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
     fComSaveVar2Config $tFile $tS.bin gpBin
@@ -558,7 +551,7 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
     done
 
-    for tFile in $HOME/$cConfigGlobal \
+    for tFile in $HOME/.gitconfigl \
         $gpLocalTopDir/$cConfigLocal \
         $gpLocalTopDir/$cConfigHost; do
         tS=gitproj.config

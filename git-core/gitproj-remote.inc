@@ -58,7 +58,7 @@ fRemoteVerifyState()
     if [ "$gpRemoteStatus" = "defined" ]; then
         fLog -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
         if [ $gpAuto -ne 0 ]; then
-            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
+            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in --local config" -l $tSrc:$LINENO
         fi
     fi
 
@@ -396,7 +396,7 @@ EOF
 fRemoteCommit()
 {
     cd $gpLocalTopDir >/dev/null 2>&1
-    fComGit add $cConfigLocal $cConfigHost
+    fComGit add .gitproj
     fComGit commit -am "git proj remote has been setup"
     fComGit push origin develop
     fComGit checkout main
