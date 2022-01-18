@@ -337,3 +337,390 @@ Creates:
             |   |   |   |   |   |   |   |MOV001.MP3 - $cDatProj2Big
             |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj2Big
             |   |   |   |   |   |README.html
+
+## Function Call Map
+
+### git-proj
+
+```
+fUsage()
+	fComUsage
+	fComSetGlobals
+```
+
+### git-proj-add
+
+```
+fUsage()
+```
+
+### git-proj-check
+
+### git-proj-clone
+
+```
+fUsage()
+	fComUsage
+	fCloneFromRemoteDir
+```
+
+### git-proj-config
+
+```
+fUsage()
+
+fCheckForGit()
+
+fFindRemote()
+```
+
+### git-proj-init
+
+```
+
+fUsage()
+	fComUsage
+	fInitCreateLocalGit
+```
+
+### git-proj-pull
+
+```
+fUsage()
+	fComUsage
+	fComGetProjGlobals
+	fPullFromOrigin
+```
+
+### git-proj-push
+
+```
+fUsage()
+	fComUsage
+	rsync
+	fComGetProjGlobals
+	fPushToOrigin
+```
+
+### git-proj-remote
+
+```
+fUsage()
+	fComUsage
+	fRemoteSetGlobals
+	fRemoteCreateRemoteGit
+```
+
+### git-proj-status
+
+```
+fUsage()
+	fComGetVer
+	fStatusOutput
+```
+
+### gitproj-clone.inc
+
+```
+fCloneGettingStarted()
+
+fCloneValidRemoteDir()
+
+fCloneCheckLocalConfig()
+	fComConfigCopy
+	fComSetConfig
+
+fCloneCheckHostConfig()
+	tHost=$(fComGetConfig
+	fComConfigCopy
+	fComSetConfig
+	fComSetConfig
+
+fCloneCheckProjConfig()
+	tHost=$(fComGetConfig
+	fComConfigCopy
+	fComSetConfig
+
+fCloneMkGitDir()
+	fCloneCheckProjConfig
+	fCloneCheckHostConfig
+	fCloneCheckLocalConfig
+
+fCloneMkRawDir()
+
+fCloneUpdateHostConfig()
+	fComSetConfig
+
+fCloneSummary()
+
+fCloneFromRemoteDir()
+	fCloneGettingStarted
+	fCloneValidRemoteDir
+	fCloneMkGitDir
+	fCloneMkRawDir
+	fCloneUpdateHostConfig
+	fCloneSummary
+	fComIntroText
+	fComPreProjSetGlobals
+```
+
+### gitproj-com.inc
+
+```
+
+fComGitProjInternalDoc()
+
+fComIntroText()
+
+fComConfigCopy()
+	fError
+	fComConfigCopy
+
+fComFirstTimeSet()
+	fComGetConfig
+	fComConfigCopy
+
+fComSetGlobals()
+
+fComPreProjSetGlobals()
+	fComFirstTimeSet
+	fComGetConfig
+
+fComCheckDeps()
+
+fComInternalDoc()
+	awk
+
+fComUsage()
+	fComInternalDoc
+	fError
+	pod2html
+	pod2man
+	pod2markdown
+	pod2text
+	pod2usage
+	tidy
+
+fComStackTrace()
+
+fComSelect()
+
+fComYesNo()
+
+fComFmtLog()
+
+fLog()
+	fComFmtLog
+
+fError()
+	fComStackTrace
+
+fComGit()
+
+fComSetConfig()
+	fError
+	fComSetConfig
+
+fComGetConfig()
+	fError
+	fComGetConfig
+
+fComUnsetConfig()
+	fError
+
+fComSaveVar2Config()
+
+fComConfigSetupGlobal()
+	fComConfigCopy
+
+fComConfigSetupLocal()
+	fComMustBeInGitRepo
+	fComConfigCopy
+
+fComCheckPkg()
+	fLog
+
+fComMustBeInGitRepo()
+
+fComMustNotBeInGit()
+
+fComMustBeInProjRepo()
+	fComStackTrace
+
+fComAllMustBeReadable()
+
+fComIsRemoteMounted()
+	fComGetConfig
+
+fComGetProjGlobals()
+	fComGetConfig
+	fComGetVer
+
+fComGetVer()
+	fComGetConfig
+	fComSetConfig
+
+fComFmt()
+	fmt
+	fComSetGlobals
+```
+
+### gitproj-init.inc
+
+```
+
+fInitGettingStarted()
+	fLog
+
+fInitValidLocalPath()
+
+fInitGetLocalPath()
+
+fInitValidSize()
+
+fInitGetSize()
+
+fInitGetBinaryFiles()
+
+fInitGetMoveFiles()
+
+fInitGetGitFlow()
+	fComCheckPkg
+
+fInitSummary()
+
+fInitMkRaw()
+
+fInitMoveBinaryFiles()
+	fInitGetBinaryFiles
+
+fInitMkGitFlow()
+	fComSetConfig
+
+fInitMkGitDir()
+	fInitMkGitFlow
+
+fInitMkLocalConfig()
+	fComConfigCopy
+
+fInitSaveVarsToConfigs()
+	fComSaveVar2Config
+
+fInitCreateLocalGit()
+	fInitGettingStarted
+	fInitGetLocalPath
+	fInitGetSize
+	fInitGetMoveFiles
+	fInitGetGitFlow
+	fInitSummary
+	fInitMkRaw
+	fInitMoveBinaryFiles
+	fInitMkGitDir
+	fInitMkLocalConfig
+	fInitSaveVarsToConfigs
+	fComIntroText
+	fComPreProjSetGlobals
+```
+
+### gitproj-pull.inc
+
+```
+
+fPullRawFiles()
+	fComSelect
+
+fPullGit()
+	fComGit
+
+fPullFromOrigin()
+	fComGetProjGlobals
+	fComIsRemoteMounted
+	fPullRawFiles
+	fPullGit
+```
+
+### gitproj-push.inc
+
+```
+
+fPushRawFiles()
+	fComSelect
+
+fPushGit()
+	fComGit
+
+fPushToOrigin()
+	fComGetProjGlobals
+	fComIsRemoteMounted
+	fPushRawFiles
+	fPushGit
+```
+
+### gitproj-remote.inc
+
+```
+
+fRemoteSetGlobals()
+	fComGetConfig
+	fComGetVer
+
+fRemoteCheckDir()
+
+fRemoteCheckDirSpace()
+
+fRemoteGetDirList()
+
+fRemoteGetAnotherMountDir()
+
+fRemoteGetMountDir()
+	fRemoteGetDirList
+	fComSelect
+	fRemoteGetAnotherMountDir
+	fRemoteGetDirList
+
+fRemoteGetRemoteRawDir()
+
+fRemoteMkRemote()
+	fComSetConfig
+
+fRemoteReport()
+	fComGetConfig
+	fComSetConfig
+
+fRemoteCommit()
+	fComGit
+
+fRemoteCreateRemoteGit()
+	fRemoteGetMountDir
+	fRemoteGetRemoteRawDir
+	fRemoteMkRemote
+	fRemoteReport
+	fRemoteCommit
+```
+
+### gitproj-status.inc
+
+```
+
+fStatusGit()
+
+fStatusRaw()
+
+fStatusOutput()
+	fStatusGit
+	fStatusRaw
+	fComGetProjGlobals
+
+### Get List
+
+```bash
+cd git-core
+for i in git-proj* gitproj-*.inc; do
+    echo '```'
+    echo
+    echo "### $i"
+    echo
+    echo '```'
+    grep -E '\(\)| \$tTidy | awk | tr | rsync |fCom|fInit|fRemote|fPush|fPull|fStatus|fClone|fmt|pod2|git config ' $i | grep -Ev '\}|if|#|^=| local ' | awk '/\(\)/ {print "\n" $1; next} {print "\t" $1}'
+done >t.txt
+```
