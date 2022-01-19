@@ -7,8 +7,8 @@ export PWD gErr gSavedOptE gGetConfigOrigin gGetConfigValue gResponse
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
     gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
-    gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus \
-    gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
+    gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus gpLocalTopDir \
+    gpMaxSize gpMountDir gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpVerboseFlag \
     gpYesNo
 
@@ -1276,7 +1276,7 @@ fComSetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :abf:gGHik:lLv: tArg; do
+    while getopts :abf:gik:lLv: tArg; do
         # shellcheck disable=SC2213,SC2220
         case $tArg in
             f)
@@ -1432,7 +1432,7 @@ fComGetConfig()
     local OPTIND=1
     local OPTARG
     local tArg
-    while getopts :bd:ef:gGHik:lLv: tArg; do
+    while getopts :bd:ef:gik:lLv: tArg; do
         # shellcheck disable=SC2213,SC2220
         case $tArg in
             f)

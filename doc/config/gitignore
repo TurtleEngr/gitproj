@@ -1,8 +1,9 @@
-# Large binary files are put in this "top" dir
-# This is managed by the "git proj" subcommand
+# Large binary files are put in this "top" dir. DO NOT version with git!
+# These files are managed by the "git proj" subcommand
 /raw/
 
 # Temporary files
+*.bak
 *.tmp
 *.swp
 *.swo
