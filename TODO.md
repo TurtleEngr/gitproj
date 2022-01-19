@@ -55,9 +55,12 @@ After 1.0, move these to github issues.
 
 * Cleanup: fixup gpVar settings to follow the precedence rules (see
   git-proj) Imp:
+
   ** if env. var not set, read var from ~/.gitconfig, PROJ/.git/config,
      giving a "default" if var is not defined.
+
   ** CLI option will override env. var.
+
   ** Validate the settings, if any error, exit
 
 * Refactor the test setup so it is simpler.
