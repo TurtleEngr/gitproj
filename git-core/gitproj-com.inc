@@ -3,10 +3,11 @@
 # --------------------------------
 export cGitProjVersion cGetOrigin cGetTopDir cGetCurBranch cPID
 
-export PWD gErr gGetConfigOrigin gGetConfigValue gResponse gpAuto \
-    gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles gpCheckInRaw \
-    gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
-    gpHookSource gpHookVerbose gpLocalRawDir gpLocalStatus \
+export PWD gErr gSavedOptE gGetConfigOrigin gGetConfigValue gResponse
+
+export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
+    gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
+    gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpVerboseFlag \
     gpYesNo
@@ -110,20 +111,20 @@ where the variables are set.
 
 =internal-head3 Global Variables
 
-For more help, see the Globals section in fUsage.
-
  gpSysLog - -l
- gpVerbose - -v, -vv
- gpDebug - -x, -xx, ...
- gpTest - -t
+ gpVerbose - -q, -v, -vv, -V N (default: 2)
+ gpDebug - -x, -xx..., -X N (default: 0)
  gErr - error code (0 = no error)
  gpCmdName - script's name taken from $0
  gpBin - directory where the script is executing from
- gpDoc - directory for config/, hooks/, test/
+ gpDoc - directory for config/, hooks/
+ gpTest - $gBin/../test (only set if in dev dir)
+
+For more help, see the Globals section in git-proj fUsage.
 
 =internal-head3 Documentation Format
 
-POD is use to format the script's documentation. Sure MarkDown could
+POD is used to format the script's documentation. Sure MarkDown could
 have been used, but it didn't exist 20 years ago. POD text can be
 output as text, man, html, pdf, texi, just usage, and even MarkDown
 
@@ -145,6 +146,42 @@ See fComInternalDoc() for how this is used.
 
 =internal-head2 Common Script Functions
 
+=internal-head3 fTry/fCatch/fThrow/tThrowErrors/fIgnoreErrors
+
+These functions came from:
+https://gist.github.com/e7d/e43e6586c1c2ecb67ae2
+
+Notice fTry is called with a sub-shell, so any env. var. changes will
+NOT be "remembered" after when the sub-shell is done. So use
+carefully.
+
+Sample use:
+
+    export cFatal=100
+    export cWarn=101
+
+    fTry (
+        # Now commands will go to fCatch if non-zero return
+        fThrowErrors
+
+        cmds-that-return-0-for-OK
+
+        # Now any non-0 return will be ignored, but throws can be done
+        fIgnoreErrors
+
+        if [ some error ]; then
+            fThrow $cFatal
+        fi
+    )
+    fCatch || {
+        case $gErr in
+            1) echo "A regular error." ;;
+            $cFatal) fError -m Exit ;;
+            $cWarn)  fLog -p warning -m warn ;;
+            *) fError -i -m Unknown;;
+        esac
+    }
+
 =internal-cut
 
 EOF
@@ -152,6 +189,35 @@ EOF
 
 # ========================================
 # Common Functions
+
+# --------------------
+fTry()
+{
+    [[ $- = *e* ]]; gSavedOptE=$?
+    set +e
+}
+
+fThrow()
+{
+    exit $1
+}
+
+fCatch()
+{
+    export gErr=$?
+    (( $gSavedOptE )) && set +e
+    return $gErr
+}
+
+fThrowErrors()
+{
+    set -e
+}
+
+ignoreErrors()
+{
+    set +e
+}
 
 # --------------------
 fComIntroText()
@@ -211,11 +277,11 @@ fComConfigCopy()
     while getopts :fs:d:i:e: tArg; do
         # shellcheck disable=SC2213,SC2220
         case $tArg in
-	    f) pForce=1 ;;
-	    s) pSource="${OPTARG}" ;;
-	    d) pDest="${OPTARG}" ;;
-	    i) pIncPat="${OPTARG}" ;;
-	    e) pExcPat="${OPTARG}" ;;
+            f) pForce=1 ;;
+            s) pSource="${OPTARG}" ;;
+            d) pDest="${OPTARG}" ;;
+            i) pIncPat="${OPTARG}" ;;
+            e) pExcPat="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComConfigCopy: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
@@ -224,39 +290,39 @@ fComConfigCopy()
                 fError -n -i -m "ComConfigCopy: Unknown option: $OPTARG" -l $tSrc:$LINENO
                 return 1
                 ;;
-	esac
+        esac
     done
 
     if [ -z "$pSource" ] || [ ! -r $pSource ]; then
         fError -n -i -m "fComConfigCopy: -s $pSource is missing or not readable" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     if [ -z "$pDest" ] || [ ! -w $pDest ]; then
         fError -n -i -m "fComConfigCopy: -d $pDest is missing or not writable" -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
 
-    cp "$tVerbose" --backup=t $pDest $pDest.bak
+    cp $tVerbose --backup=t $pDest $pDest.bak
     if [ $? -ne 0 ]; then
         fError -n -i -m "fComConfigCopy: " -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
 
     git config -f $pSource --list | while read tSrcConfig; do
-    	tVar=${tSrcConfig%=*}
-	tValue="${tSrcConfig#*=}"
-	tFound=$(echo $tVar | grep -E "$pIncPat" | grep -Ev "$pExcPat")
-	if [ -z "$tFound" ]; then
-	    continue
-	fi
-	if [ $pForce -ne 0 ]; then
-    	    git config -f $pDest $tVar $tValue
-	    continue
-	fi
+        tVar=${tSrcConfig%=*}
+        tValue="${tSrcConfig#*=}"
+        tFound=$(echo $tVar | grep -E "$pIncPat" | grep -Ev "$pExcPat")
+        if [ -z "$tFound" ]; then
+            continue
+        fi
+        if [ $pForce -ne 0 ]; then
+            git config -f $pDest $tVar $tValue
+            continue
+        fi
         if git config -f $pDest --get $tVar >/dev/null 2>&1; then
-	    continue
-	fi
-	git config -f $pDest $tVar "$tValue"
+            continue
+        fi
+        git config -f $pDest $tVar "$tValue"
     done
 
     return 0
@@ -307,7 +373,7 @@ fComFirstTimeSet()
     if [ ! -f $HOME/.gitconfig ]; then
         fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
         cp $gpDoc/config/gitconfig $HOME/.gitconfig
-	return 0
+        return 0
     fi
 
     tUserName=$(fComGetConfig -g -k "user.name")
@@ -386,6 +452,7 @@ fComSetGlobals()
 
     # -v
     gpVerbose=${gpVerbose:-0}
+    gpVerboseFlag=''
     if [ $gpVerbose -gt 0 ]; then
         gpVerboseFlag='-v'
     fi
@@ -426,6 +493,8 @@ fComPreProjSetGlobals()
 
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
+
+   gpVerbose=$(fComGetConfig -k "gitproj.config.verbose" -i -d 2)
 
     gpAuto=0
     gpLocalTopDir=$PWD
@@ -506,7 +575,7 @@ fComCheckDeps()
     if [ $tErr -eq 1 ]; then
         fLog -p warning -m "Missing some some optional programs." -l $LINENO
     fi
-    return
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -629,11 +698,15 @@ fComUsage()
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | $tProg --title="$pTitle" $tHtmlOpt  | $tTidy 2>/dev/null
+            cat $pFileList | \
+            $tProg --title="$pTitle" $tHtmlOpt  | \
+            $tTidy 2>/dev/null
         else
             if [ "$pStyle" = "short" ]; then
                 # shellcheck disable=SC2002
-                cat $pFileList | pod2text | head -n 10
+                cat $pFileList | \
+                pod2text | \
+                head -n 10
             else
                 # shellcheck disable=SC2002
                 cat $pFileList | $tProg
@@ -642,10 +715,15 @@ fComUsage()
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | fComInternalDoc | $tProg --title="$pTitle" $tHtmlOpt | $tTidy 2>/dev/null
+            cat $pFileList | \
+            fComInternalDoc | \
+            $tProg --title="$pTitle" $tHtmlOpt | \
+            $tTidy 2>/dev/null
         else
             # shellcheck disable=SC2002
-            cat $pFileList | fComInternalDoc | $tProg
+            cat $pFileList | \
+            fComInternalDoc | \
+            $tProg
         fi
     fi
 
@@ -790,6 +868,7 @@ fComYesNo()
     fi
     gResponse="No"
     return 1
+
     cat <<EOF >/dev/null
 =internal-pod
 
@@ -824,7 +903,7 @@ fComFmtLog()
     local tLine
     local tErr
 
-    # Use this to turn PID on/off in logs
+    # Use this to turn PID on/off in logs (hard-coded)
     local tPID_Flag=0
     local tPID=""
     local tPID_Opt=""
@@ -835,51 +914,58 @@ fComFmtLog()
     gpVerbose=${gpVerbose:-0}
     gpDebug=${gpDebug:-0}
 
+    tLevel=$pLevel
     case $pLevel in
         emerg | emergency)
             pLevel=emerg
+    	    tLevel=$pLevel
             ;;
         alert)
             :
             ;;
         crit | critical)
             pLevel=crit
+    	    tLevel=$pLevel
             ;;
         err | error)
             pLevel=err
+    	    tLevel=$pLevel
             ;;
         warning | warn)
+	    if [ $gpVerbose -eq 0 ]; then
+	        return
+	    fi
             pLevel=warning
+    	    tLevel=$pLevel
             ;;
-        notice | info | debug | debug-*)
-            :
+        notice)
+	    if [ $gpVerbose -lt 2 ]; then
+	        return
+	    fi
+	    ;;
+	info)
+	    if [ $gpVerbose -lt 3 ]; then
+	        return
+	    fi
+	    ;;
+	debug | debug-*)
+            tLevel=debug
+    	    if [ $gpDebug -eq 0 ]; then
+	        return
+	    fi
+    	    if [ $gpDebug -ne 0 ] && [ "${pLevel%%-*}" != "$pLevel" ]; then
+                tDebugLevel=${pLevel##*-}
+            	if [ $tDebugLevel -gt $gpDebug ]; then
+                    return
+            	fi
+    	    fi
             ;;
         *)
             pMsg="Internal: (Unknown: $pLevel [$tSrc:$LINENO]) $pMsg"
             pLevel=err
+    	    tLevel=$pLevel
             ;;
     esac
-    tLevel=$pLevel
-
-    # Check debug
-    if [ $gpDebug -eq 0 ] && [ "${pLevel%-*}" = "debug" ]; then
-        return
-    fi
-    if [ $gpDebug -ne 0 ] && [ "${pLevel%%-*}" != "$pLevel" ]; then
-        tDebugLevel=${pLevel##*-}
-        if [ $tDebugLevel -gt $gpDebug ]; then
-            return
-        fi
-        tLevel=debug
-    fi
-
-    # Check verbose
-    if [ $gpVerbose -eq 0 ] && ([ "$pLevel" = "notice" ] || [ "$pLevel" = "info" ]); then
-        return
-    fi
-    if [ $gpVerbose -eq 1 ] && [ "$pLevel" = "info" ]; then
-        return
-    fi
 
     # LineNo format
     tLine=""
@@ -904,7 +990,7 @@ fComFmtLog()
     else
         logger -s $tPID_Opt -t $gpCmdName -p $gpFacility.$tLevel "$pLevel: $pMsg $tLine$tErr"
     fi
-    return
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -954,7 +1040,7 @@ fLog()
     fi
 
     fComFmtLog $pLevel "$pMsg" $pLine $pErr
-    return
+    return 0
 
     cat <<EOF >/dev/null
 =internal-pod
@@ -965,19 +1051,97 @@ fLog()
 
 pLevel - emerg alert crit err warning notice info debug debug-N
 
- if gpVerbose = 0, don't output notice or info
- if gpVerbose = 1, don't output info
- if gpVerbose >= 2, output all logs
+ emerg, alert, crit, and err levels will always be output.
+
+ emerg, alert, crit - exit gErr (or 1 if gErr=0, or not -e)
+ err - return gErr (or 1 if gErr=0, or not -e)
+ all other levels - return 0
+
+ (fError defaults to "crit". -n changes it too "err")
+ (-i adds "Internal: to message, an it calls fComStackTrace)
+
+ -q   set gpVerbose=0
+ -v   set gpVerbose=2 (default)
+ -V N set gpVerbose=N (0..4)
+ gitproj.config.verbose=N set gpVerbose=N
+
+ if gpVerbose = 0, don't output warning, notice or info
+ if gpVerbose = 1, don't output notice, info
+ if gpVerbose = 2, don't output info (default verbose level)
+ if gpVerbose >= 3, output all non-debug levels
+
+ -x - set gpDebug=1
+ -xx - set gpDebug=2
+ -X N - set gpDebug=N (0..100)
+
+ if gpDebug = 0, don't output andy debug msgs
+ if gpDebug > 0, output any "debug" msgs, or
+ if gpDebug = N1, output "debug-N2" msgs, if N1 >= N2
 
 See Globals: gpSysLog, gpFacility, gpVerbose, gpDebug
 
 =internal-head4 fLog Examples:
 
- fLog -p warning -m "Missing awk" -l $LINENO -e 8
- fLog -p notice -m "Output only if -v"  -e 8 -l $LINENO
- fLog -p info -m "Output only if -vv" -l $LINENO
+ local tFile=${BASH_SOURCE##*/}
+ local tFile=file.inc
+ gpCmdName=program.sh
+
+ fError -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh crit: Error: Message [file.inc:234](8)
+    gErr=8
+    exit 8
+
+ fError -n -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Error: Message [file.inc:234](8)
+    gErr=8
+    return 8
+
+ fError -i [-n] -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Internal: Error: Message [file.inc:234](8)
+    gErr=8
+    call: fComStackTrace
+    return 8, if -n
+    exit 8, if ! -n
+
+ fLog -p err -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Message [file.inc:234](8)
+    gErr=8
+    return 8
+
+ fLog -p warning -m "Output if gpVerbose" -e 8
+
+    if gpVerbose >= 1
+    Output: program.sh warning: Message (8)
+    gErr=8
+    return 0
+
+ fLog -p notice -m "Notice msg"  -e 8 -l $LINENO
+
+    if gpVerbose >= 2
+    Output: program.sh notice: Notice msg [234]
+    gErr=0
+    return 0
+
+ fLog -p info -m "Info message"
+
+    if gpVerbose >= 3
+    Output: program.sh info: Info message
+    gErr=0
+    return 0
+
  fLog -p debug -m "Output only if $gpDebug > 0" -l $LINENO
- fLog -p debug-3 -m "Output only if $gpDebug > 0 and $gpDebug <= 3" -l $LINENO
+
+    Output: program.sh debug: Output only if $gpDebug > 0 [234]
+    return 0
+
+ fLog -p debug-3 -m "Output only if $gpDebug >= 3" -l $LINENO
+
+    Output: program.sh debug-3: Output only if $gpDebug >= 3 [234]
+    return 0
 
 =internal-cut
 EOF
@@ -989,9 +1153,10 @@ fError()
     local pMsg="Error"
     local pLine=""
     local pErr=1
-    local pInt=0
+    local pInt=""
     local pNoExit=0
     local tSrc=${BASH_SOURCE##*/}
+    local tLevel=crit
     local OPTIND=1
     local OPTARG
     local tArg
@@ -1001,8 +1166,10 @@ fError()
             m) pMsg="${OPTARG}" ;;
             l) pLine="${OPTARG}" ;;
             e) pErr="${OPTARG}" ;;
-            i) pInt=1 ;;
-            n) pNoExit=1 ;;
+            i) pInt="-i" ;;
+            n) pNoExit=1
+               tLevel=err
+               ;;
             :)
                 echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]"
                 fComStackTrace
@@ -1021,21 +1188,23 @@ fError()
         shift $#
     fi
 
-    if [ $pInt -eq 1 ]; then
-        pMsg="Internal: $pMsg"
-    fi
-    fLog -p crit -l $pLine -e $pErr -m "$pMsg"
-    if [ $pInt -eq 1 ] || [ $gpDebug -ge 2 ]; then
+    pMsg="Error: $pMsg"
+    fLog -p $tLevel $pInt -m "$pMsg" -l $pLine -e $pErr
+
+    if [ -n "$pInt" ] || [ $gpDebug -ge 2 ]; then
         fComStackTrace
     fi
-    if [ $pInt -eq 0 ] && [ $pNoExit -eq 0 ]; then
+
+    if [ -z "$pInt" ] && [ $pNoExit -eq 0 ]; then
         fUsage usage
+        exit 1
     fi
 
     if [ $pNoExit -eq 0 ]; then
         exit 1
     fi
-    return 1
+    return $gErr
+
     cat <<EOF >/dev/null
 =internal-pod
 
@@ -1074,6 +1243,8 @@ fComGit()
 
 =internal-head3 fComGit [pArgs...]
 
+TBD: replace this with set/try/catch
+
 This is a wrapper for "git". If gpVerbose is >= 2, the git call will
 will be echoed. If the git call exits with a non-0, then an error
 message is output and the script exits (if not called in a sub-shell).
@@ -1086,20 +1257,6 @@ OK, because if it failed, the script would exit.
 =internal-cut
 EOF
 } # fComGit
-
-# --------------------------------
-fComMkHostConfig()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tTop
-
-    tTop=$(git rev-parse --show-toplevel)
-    mkdir -p $tTop/gitproj 2>&1
-    touch $tTop/gitproj/config.$HOSTNAME
-    git config --local include.path $tTop/gitproj/config.$HOSTNAME
-    cd $tTop >/dev/null 2>&1
-    git add gitproj/config.$HOSTNAME
-} # fComMkHostConfig
 
 # --------------------------------
 fComSetConfig()
@@ -1129,12 +1286,12 @@ fComSetConfig()
                 ;;
             G)
                 fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
-            	pScope="--global"
+                pScope="--global"
                 ;;
             H)
                 fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
-            	pScope="--local"
-		;;
+                pScope="--local"
+                ;;
             l | L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
@@ -1152,10 +1309,10 @@ fComSetConfig()
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
             L) pScope="--file $tTopDir/.gitproj"
-	       if [ ! -f $tTopDir/.gitproj ]; then
+               if [ ! -f $tTopDir/.gitproj ]; then
                    fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
-	       fi
-	       ;;
+               fi
+               ;;
             v) pValue="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1286,12 +1443,12 @@ fComGetConfig()
                 ;;
             G)
                 fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
-            	pScope="--global"
+                pScope="--global"
                 ;;
             H)
                 fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
-            	pScope="--local"
-		;;
+                pScope="--local"
+                ;;
             l | L)
                 tTopDir="$($cGetTopDir 2>&1)"
                 if [ $? -ne 0 ]; then
@@ -1313,10 +1470,10 @@ fComGetConfig()
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
             L) pScope="--file $tTopDir/.gitproj"
-	       if [ ! -f $tTopDir/.gitproj ]; then
+               if [ ! -f $tTopDir/.gitproj ]; then
                    fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
-	       fi
-	       ;;
+               fi
+               ;;
             v) pFilter="${OPTARG}" ;;
             :)
                 fError $tExit -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1504,11 +1661,11 @@ fComUnsetConfig()
                 ;;
             G)
                 fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
-            	pScope="--global"
+                pScope="--global"
                 ;;
             H)
                 fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
-            	pScope="--local"
+                pScope="--local"
                 ;;
             l|L)
                 tTopDir="$($cGetTopDir 2>&1)"
@@ -1525,10 +1682,10 @@ fComUnsetConfig()
             k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
             L) pScope="--file $tTopDir/.gitproj"
-	       if [ ! -f $tTopDir/.gitproj ]; then
+               if [ ! -f $tTopDir/.gitproj ]; then
                    fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
-	       fi
-	        ;;
+               fi
+                ;;
             :)
                 fError -n -i -m "fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
@@ -1587,7 +1744,7 @@ fComConfigSetupGlobal()
 
     if [ ! -f $pDest ]; then
         cp $tSource $pDest
-	return $?
+        return $?
     fi
 
     cp --backup=t $tDest $tDest.bak
@@ -1624,9 +1781,9 @@ fComConfigSetupLocal()
 
     if [ ! -f $tDest1 ]; then
         # Create tDest1 from tSourcee, only copy the gitproj sections
-	fComConfigCopy -f -s $tSource -d $tDest1 -i '^gitproj\.'
+        fComConfigCopy -f -s $tSource -d $tDest1 -i '^gitproj\.'
     else
-	fComConfigCopy -s $tSource -d $tDest1 -i '^gitproj\.'
+        fComConfigCopy -s $tSource -d $tDest1 -i '^gitproj\.'
     fi
 
     # Update tDest2 from tDest1

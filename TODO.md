@@ -48,11 +48,21 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
-* Cleanup: remove gpMountDir. Is gpGitFlowPkg used?
+* Cleanup: remove gpMountDir. gpHookSource. Is gpGitFlowPkg used?
+
+* Cleanup: fixup log messages to follow the gpVerbose rules. (see flog
+  and git-proj)
+
+* Cleanup: fixup gpVar settings to follow the precedence rules (see
+  git-proj) Imp:
+  ** if env. var not set, read var from ~/.gitconfig, PROJ/.git/config,
+     giving a "default" if var is not defined.
+  ** CLI option will override env. var.
+  ** Validate the settings, if any error, exit
 
 * Refactor the test setup so it is simpler.
 
-* Copy the test-env tar files to a "public" place. And implement the
+* Copy the test-env*.tgz files to a "public" place. And implement the
 Makefile targets for managing them.
 
 * Get travis-ci working. Run tests.
@@ -104,6 +114,10 @@ Makefile targets for managing them.
 * Version increment wizard script. Increment the
   major/minor/path/rc/build vars based on Q/A. See
   `test/dev-doc/enh-ver-wizard.md`
+
+* Implement: allow-tabs pre-commit check. Also add "expand" to
+  rm-trailing-sp script (-t option). Put rm-trailing-sp script in
+  $gpDoc/contrib dir?
 
 * Decided on which remote network service to implement. Do all, only
   do one or two? Some methods are not compatable.

@@ -204,20 +204,13 @@ See: fLog Internal documentation for more details.
 
 =head2 ~/.gitconfig
 
-Source: gpDoc/config/gitconfig.default
+Source: gpDoc/config/gitconfig
 
-If this doesn't exist, git proj init will create it from "Source":
+If this doesn't exist, git proj init will create it from "Source"
 
-This will be put in ~/.gitconfig
+Section: [gitproj config]
 
-    [include]
-        path = ~/.gitproj.config.global
-
-=head2 ~/.gitproj.config.global
-
-Source: gpDoc/config/gitproj.config.global
-
-git proj init, will create the initial ~/.gitproj.config.global
+git proj init, will copy this... TBD
 
     remote-min-size = 20g
 
@@ -230,20 +223,23 @@ ProjName.raw.
 
 Default: -d pMountDir/ProjName.raw
 
+Section: [gitproj hook]
+
+TBD
+
+=head2 top-dir/.gitproj
+
+TBD
+
 =head2 top-dir/.git/config
 
-This will be put in the initial the local .git/config file:
-
-    [include]
-        path = ../.gitproj.config.HOSTNAME
+TBD
 
 Where HOSTNAME will be set to $HOSTNAME. This allows for different
 locations of file, based on the host. For example the remote-raw-url
 (mount point) could be very different between hosts.
 
-=head2 top-dir/.gitproj.config.$HOSTNAME
-
-Initial Source: gpDoc/config/gitproj.config.HOSTNAME
+Initial Source: ~/.gitconfig Sections [gitproj *]
 
 This will be created when git project repo is first created on a host.
 
@@ -252,10 +248,6 @@ project defaults can be defined. Then .gitproj.config.HOSTNAME can
 override variables. Any changed to the variables in
 .gitproj.config.local variables will be written to
 .gitproj.config.HOSTNAME
-
-=head2 top-dir/.gitproj.config.local
-
-Source: gpDoc/config/gitproj.config.local
 
 Uncomment the variables that should override ~/.gitconfig or
 ~/.gitproj.config.global. If the variables are host specific, then the
@@ -266,7 +258,7 @@ file.
 		# Expected version, only first N must be the same.
 		# Use backward compatible code, or exit.
 		# Warn if second N is different
-		ver = 0.1
+		ver = 0.1.2
 
 		# States: not-installed, installed, config-errors
 		proj-status = not-installed
@@ -320,18 +312,26 @@ file.
 		# End size with b, k, m, or g
 		binary-file-size-limit = 1k
 
-=head2 Env. Var. Config
+=head2 Global Env. Var. Config
 
 These are globals that may affect how the script runs. Just about all
 of these globals that begin with "gp" can be set and exported before
 the script is run. That way you can set your own defaults, by putting
 them in your ~/.bashrc or ~/.bash_profile files.
 
-The the "common" CLI flags will override the initial variable settings.
+Global variable precedence (the last one to set the gp variable, wins):
+
+ * internal hardcoded default
+ * variable in ~/.gitconfig
+ * variable in PROJ/.git/config
+ * env. var.
+ * command line option
+
+Notation below: gp[Var], -[cli-opt], [git.config.var], (default)
 
 =over 4
 
-=item B<gpSysLog>
+=item B<gpSysLog, -l, gitproj.config.syslog, (false)>
 
 If set to 0, log messages will only be sent to stderr.
 
@@ -339,9 +339,9 @@ If set to 1, log messages will be sent to stderr and syslog.
 
 See -l, fLog and fErr for details
 
-Default: 0
+Default: false
 
-=item B<gpFacility>
+=item B<gpFacility, NA, gitproj.config.facility, (user)>
 
 Log messages sent to syslog will be sent to the "facility" specified
 by by gpFacility.
@@ -380,33 +380,83 @@ These are some suggested uses for the localN facilities:
  local6 - available
  local7 - available
 
-=item B<gpVerbose>
+=item B<gpVerbose, -q, -v, -V N, gitproj.config.verbose, (2)>
 
-If set to 0, only log message at "warning" level and above will be output.
+ -q - gpVerbose=0
+ -v - gpVerbose=2
+ -v N - gpVerbose=N
 
-If set to 1, all non-debug messages will be output.
+ gpVerbose  = 0 - output error messages (corrections must be made)
+ gpVerbose >= 1 - output warnings messages (corrections may be needed)
+ gpVerbose >= 2 - output notice messages (important information)
+ gpVerbose >= 3 - output info messages (give more information)
 
-See -v, fLog
+Default: 2
+
+Normal log message:
+
+ Command [warning, notice, info]: Message [File:LineNo](ErrCode)
+
+Error messages (crit will exit, err might continue):
+
+ Command [crit, err]: Error: Message [File:LineNo](ErrCode)
+
+An internal error. This is probably a defect in the code (collect all
+the output for a bug report):
+
+ Command [crit, err]: Internal: Error: Message [File:LineNo](ErrCode)
+ StackTrace:
+
+=item B<gpDebug, -x, -X N, NA, (0)>
 
 Default: 0
 
-=item B<gpDebug>
+There is no config variable for gpDebug.
 
 If set to 0, all "debug" and "debug-N" level messages will be skipped.
 
 If not 0, all "debug" level messages will be output.
 
-Or if "debug-N" level is used, then if gpDebug is <= N, then the
-log message will be output, otherwise it is skipped.
+Or if "debug-N" level is used, then if gpDebug is >= N, then the log
+message will be output, otherwise it is skipped.
 
-See -x
+=item B<gpAuto, -a, NA, (false)>
 
-=item B<gpUnitDebug>
+=item B<gpYesNo, -y, -n, NA, (No)>
 
-If set to non-zero, then the fUDebug function calls will output
-the messages when in test functions.
+=item B<gpAutoMove, NA, NA, (false)>
 
-See gitproj-com.test
+=item B<gpBin, NA, gitproj.config.bin, (/usr/lib/git-core)>
+
+The location of the executing command will override this.
+
+=item B<gpDoc, NA, gitproj.config.doc, (/usr/share/doc/git-proj)>
+
+If not found, then set to: $gpBin/../doc
+
+=item B<gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)>
+
+=item B<gpCheckForBigFiles, NA, gitproj.hook.check-for-big-files, (true)>
+
+=item B<gpCheckInRaw, NA, gitproj.hook.check-in-raw, (true)>
+
+=item B<gpCheckWhitespace, NA, gitproj.hook.check-whitespace, (true)>
+
+See rm-trailing-sp to fix.
+
+=item B<gpAllowTabs, NA, gitproj.hook.allow-tabs, (false)>
+
+See rm-trailing-sp to fix (-t option)
+
+=item B<gpHookVerbose, NA, gitproj.hook.verbose, (true)>
+
+=item B<gpPreCommitEnabled, NA, gitproj.hook.pre-commit-enable, (true)>
+
+=item B<gpMaxSize, NA, gitproj.hook.binary-file-size-limit, (10k)>
+
+=item B<NA, NA, gitproj.config.remote-min-size, (20g)>
+
+=item B<gpGitFlow, NA, gitproj.config.flow, (true)>
 
 =back
 
@@ -522,7 +572,7 @@ if [ "x${1#-}" = "x$1" ]; then
     fError -m "Unknown sub-command: $*" -l $tSrc:$LINENO
 fi
 
-while getopts :vVhH:x-: tArg; do
+while getopts :vVhH:xX:-: tArg; do
     case $tArg in
         v)
             echo "Version: $cGitProjVersion"
@@ -543,6 +593,7 @@ while getopts :vVhH:x-: tArg; do
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
         x) let gpDebug=gpDebug+1 ;;
+        X) gpDebug=$OPTARG ;;
         # Problem arguments
         :) fError -m "Value required for option: $OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

@@ -185,7 +185,7 @@ fi
 . $gpBin/gitproj-init.inc
 # Calls: fInitSetGlobals
 
-while getopts :al:s:mfhH:vx tArg; do
+while getopts :al:s:mfhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
@@ -196,8 +196,11 @@ while getopts :al:s:mfhH:vx tArg; do
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-        v) let ++gpVerbose ;;
+        q) gpVerbose=0 ;;
+        v) gpVerbose=2 ;;
+        V) gpVerbose=$OPTARG" ;;
         x) let ++gpDebug ;;
+        X) gpDebug=$OPTARG" ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
