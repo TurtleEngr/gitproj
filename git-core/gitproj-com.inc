@@ -805,7 +805,11 @@ fComSelect()
     local tResponse
     local tStatus=1
     local tMaxLoop=30
+    local tSave=$gpVerbose
     export gResponse
+
+    # Set to 1 so warnings will be ouput
+    gpVerbose=1
 
     # Loop until a valid selection, or QUIT or OTHER
     select tResponse in QUIT HELP $pDirList; do
@@ -840,6 +844,7 @@ fComSelect()
 
     PS3=""
     gResponse=$tResponse
+    gpVerbose=$tSave
     return $tStatus
 } # fComSelect
 
@@ -1284,21 +1289,16 @@ fComSetConfig()
                     fi
                 fi
                 ;;
-            G)
-                fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
-                pScope="--global"
-                ;;
-            H)
-                fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
-                pScope="--local"
-                ;;
-            l | L)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -i -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+            l)
+                if ! fComMustBeInGitRepo $PWD; then
                     return 1
                 fi
                 ;;
+            L)
+		if ! fComMustBeInProjRepo $PWD; then
+		    return 1
+		fi
+		;;
         esac
         case $tArg in
             a) pAdd="--add" ;;
@@ -1441,21 +1441,16 @@ fComGetConfig()
                     return 1
                 fi
                 ;;
-            G)
-                fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
-                pScope="--global"
-                ;;
-            H)
-                fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
-                pScope="--local"
-                ;;
-            l | L)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError $tExit -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+            l)
+                if ! fComMustBeInGitRepo $PWD; then
                     return 1
                 fi
                 ;;
+	    L)
+		if ! fComMustBeInProjRepo $PWD; then
+                    return 1
+                fi
+		;;
         esac
         case $tArg in
             b) pType="--bool" ;;

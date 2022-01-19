@@ -477,7 +477,7 @@ fInitMkGitDir()
     cd $gpLocalTopDir >/dev/null 2>&1
 
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitignore.default .gitignore
+    cp $gpDoc/config/gitignore .gitignore
 
     fLog -p info -m "git init" -l $tSrc:$LINENO
     git init
@@ -485,7 +485,7 @@ fInitMkGitDir()
     fLog -p info -m "git add FILES" -l $tSrc:$LINENO
     git add .gitignore *
 
-    fLog -p info -m "git commit" -l $tSrc:$LINENO
+    fLog -p info -am "git commit" -l $tSrc:$LINENO
     git commit -am "Initial commit"
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
@@ -514,8 +514,10 @@ fInitMkLocalConfig()
 
     cd $gpLocalTopDir >/dev/null 2>&1
 
+    touch .gitproj
+
     fLog -p info -m "Create: .gitproj" -l $tSrc:$LINENO
-    fComConfigCopy -s $gpDoc/config/gitconfig -d .gitproj -i 'gitproj\.'
+    fComConfigCopy -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
 
     fLog -p info -m "Create: host values in --local" -l $tSrc:$LINENO
     fComConfigCopy -s .gitproj -d .git/config
@@ -537,13 +539,12 @@ fInitSaveVarsToConfigs()
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
     fComSaveVar2Config $tFile $tS.bin gpBin
     fComSaveVar2Config $tFile $tS.doc gpDoc
-    fComSaveVar2Config $tFile $tS.test gpTest
     fComSaveVar2Config $tFile $tS.facility gpFacility
     fComSaveVar2Config $tFile $tS.syslog gpSysLog
 
     for tFile in \
-        $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
+        $gpLocalTopDir/.gitproj \
+        $gpLocalTopDir/.git/config; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.ver gpVer
         fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
@@ -551,9 +552,9 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
     done
 
-    for tFile in $HOME/.gitconfigl \
-        $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
+    for tFile in $HOME/.gitconfig \
+        $gpLocalTopDir/.gitproj \
+        $gpLocalTopDir/.git/config; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
         tS=gitproj.hook
@@ -569,8 +570,8 @@ fInitSaveVarsToConfigs()
 
     if [ $gErr -eq 0 ]; then
         fLog -p info -m "Save local configs" -l $tSrc:$LINENO
-        git add .gitproj.config.*
-        git commit -am "Save gitproj.config"
+        git add .gitproj
+        git commit -am "Save .gitproj"
     fi
 
     return $gErr

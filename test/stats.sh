@@ -1,12 +1,14 @@
 #!/bin/bash
 
+cd ..
+
 tProjStart=2021-10-23
 tProjEnd=$(date +%F)
 tProjDuration=$(dateutils.ddiff $tProjStart $tProjEnd)
 
-tNumTests=$(grep '^test' test-*.sh | grep '()' | wc -l)
-tNumAsserts=$(grep assert *.sh | wc -l)
-tLinesTest=$(cat Makefile *.md *.sh *.inc | wc -l)
+tNumTests=$(grep '^test' test/test-*.sh | grep '()' | wc -l)
+tNumAsserts=$(grep assert test/*.sh | wc -l)
+tLinesTest=$(cat test/Makefile test/*.sh test/*.inc | wc -l)
 tLinesTestDoc=$(
     awk '
     	/=pod/,/=cut/ {
@@ -15,15 +17,16 @@ tLinesTestDoc=$(
     	/=internal-pod/,/=internal-cut/ {
             print $0
     	}
-    ' * | wc -l
+    ' $(find test/* -type f) | wc -l
 )
 let tOnlyTest=tLinesTest-tLinesTestDoc
 
 tLinesCode=$(
     cat \
-        ../doc/VERSION \
-        ../doc/config/* ../doc/hooks/* \
-        ../git-core/* |
+        doc/VERSION \
+        doc/config/* \
+	doc/hooks/* \
+        git-core/* |
         wc -l
 )
 tLinesCodeDoc=$(
@@ -34,19 +37,20 @@ tLinesCodeDoc=$(
     	/=internal-pod/,/=internal-cut/ {
             print $0
         }
-    ' ../git-core/* | wc -l
+    ' git-core/* | wc -l
 )
 let tOnlyCode=tLinesCode-tLinesCodeDoc
 
-tNumFun=$(grep '()' ../git-core/* | grep -Ev '#' | wc -l)
-tNumCmds=$('ls' ../git-core/git-proj-* | wc -l)
+tNumFun=$(grep '()' git-core/* | grep -Ev '#' | wc -l)
+tNumCmds=$('ls' git-core/git-proj-* | wc -l)
 
 tTotalLines=$(
     cat \
-        Makefile *.md *.sh *.inc \
-        ../doc/VERSION \
-        ../doc/config/* ../doc/hooks/* \
-        ../git-core/* |
+        Makefile *.md \
+        doc/VERSION \
+        doc/config/* \
+	doc/hooks/* \
+        git-core/* |
         wc -l
 )
 tTotalLinesDoc=$(
@@ -57,7 +61,7 @@ tTotalLinesDoc=$(
     	/=internal-pod/,/=internal-cut/ {
             print $0
         }
-    ' * ../git-core/* | wc -l
+    ' $(find git-core/* -type f) | wc -l
 )
 let tNoDoc=tTotalLines-tTotalLinesDoc
 

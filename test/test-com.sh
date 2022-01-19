@@ -508,21 +508,21 @@ testComSysLog()
 
     # Check syslog
     gpSysLog=true
-    gpVerbose=0
+    gpVerbose=1
     tMsg="Testing 123"
     #for tLevel in emerg alert crit err warning; do
     for tLevel in alert crit err warning; do
         echo -n '.' 1>&2
-        tTestArg="$tLevel.fLog"
+        tTestArg="l$tLevel"
         fTestDebug " "
         fTestDebug "Call: fLog -p $tLevel -m \"$tMsg\""
         tResult=$(fLog -p $tLevel -m "$tMsg" 2>&1)
         fTestDebug "tResult=$tResult"
-        assertContains "$LINENO tcl11-$tTestArg" "$tResult" "$tLevel:"
-        tResult=$(tail -n1 $tSysLog)
+        assertContains "$LINENO $tTestArg result=$tResult" "$tResult" "$tLevel:"
+        tResult=$(tail -n 2 $tSysLog)
         fTestDebug "syslog tResult=$tResult"
-        assertContains "$LINENO tcl12-$tTestArg" "$tResult" "$tLevel:"
-        assertContains "$LINENO tcl13-$tTestArg" "$tResult" "$tMsg"
+        assertContains "$LINENO $tTestArg result=$tResult" "$tResult" "$tLevel:"
+        assertContains "$LINENO $tTestArg result=$tResult" "$tResult" "$tMsg"
     done
     echo 1>&2
     return
@@ -550,60 +550,60 @@ testComUsage()
     #-----
     tResult=$(fComUsage -s usage -f $tUsageScript 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO tcu-short" "$tResult" "Usage"
+    assertContains "$LINENO short" "$tResult" "Usage"
 
     #-----
     tResult=$(fComUsage -s foo -f $tUsageScript 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO tcu-s-foo.1" "$tResult" "DESCRIPTION"
-    assertContains "$LINENO tcu-s-foo.2" "$tResult" "HISTORY"
+    assertContains "$LINENO desc" "$tResult" "DESCRIPTION"
+    assertContains "$LINENO hist" "$tResult" "HISTORY"
 
     #-----
     tResult=$(fComUsage -f $tUsageScript -s 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO tcu-s-null.1" "$tResult" "crit: Internal: fComUsage: Value required"
+    assertContains "$LINENO full result=$tResult" "$tResult" "test-com.sh crit: Internal: Error: fComUsage: Value required for option: -s"
 
     #-----
     tResult=$(fComUsage -s long -f $tUsageScript 2>&1)
-    assertContains "$LINENO tcu-long.1" "$tResult" "DESCRIPTION"
-    assertContains "$LINENO tcu-long.2" "$tResult" "HISTORY"
+    assertContains "$LINENO desc" "$tResult" "DESCRIPTION"
+    assertContains "$LINENO hist" "$tResult" "HISTORY"
 
     #-----
     tResult=$(fComUsage -s man -f $tUsageScript 2>&1)
-    assertContains "$LINENO tcu-man.1" "$tResult" '.IX Header "DESCRIPTION"'
-    assertContains "$LINENO tcu-man.2" "$tResult" '.IX Header "HISTORY"'
+    assertContains "$LINENO desc" "$tResult" '.IX Header "DESCRIPTION"'
+    assertContains "$LINENO hist" "$tResult" '.IX Header "HISTORY"'
 
     #-----
     tResult=$(fComUsage -s html -f $tUsageScript -t "$gpCmdName Usage" 2>&1)
-    assertContains "$LINENO tcu-html.1" "$tResult" '<li><a href="#DESCRIPTION">DESCRIPTION</a></li>'
-    assertContains "$LINENO tcu-html.2" "$tResult" '<h1 id="HISTORY">HISTORY</h1>'
-    assertContains "$LINENO tcu-html.3" "$tResult" "<title>$gpCmdName Usage</title>"
+    assertContains "$LINENO desc" "$tResult" '<li><a href="#DESCRIPTION">DESCRIPTION</a></li>'
+    assertContains "$LINENO hist" "$tResult" '<h1 id="HISTORY">HISTORY</h1>'
+    assertContains "$LINENO cmd" "$tResult" "<title>$gpCmdName Usage</title>"
     #assertContains "$LINENO $tResult" "$tResult" "Show tResult"
 
     #-----
     tResult=$(fComUsage -s md -f $tUsageScript 2>&1)
-    assertContains "$LINENO tcu-md.1" "$tResult" '# DESCRIPTION'
-    assertContains "$LINENO tcu-md.2" "$tResult" '# HISTORY'
+    assertContains "$LINENO desc" "$tResult" '# DESCRIPTION'
+    assertContains "$LINENO hist" "$tResult" '# HISTORY'
 
     #-----
     tResult=$(fComUsage -i -s long -f $tUsageScript -f $tInternalScript 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO tcu-internal.1" "$tResult" 'Template Use'
-    assertContains "$LINENO tcu-internal.2" "$tResult" 'fComSetGlobals'
+    assertContains "$LINENO Template" "$tResult" 'Template Use'
+    assertContains "$LINENO set" "$tResult" 'fComSetGlobals'
 
     #-----
     tResult=$(fComUsage -i -s html -t "Internal Doc" -f $tUsageScript -f $tInternalScript 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO tcu-int-html.1" "$tResult" '<a href="#Template-Use">Template Use</a>'
-    assertContains "$LINENO tcu-int-html.2" "$tResult" '<h3 id="fComSetGlobals">fComSetGlobals</h3>'
-    assertContains "$LINENO tcu-int-html.3" "$tResult" '<title>Internal Doc</title>'
-    assertContains "$LINENO tcu-int-html.4" "$tResult" '<h3 id="testComUsage">testComUsage</h3>'
+    assertContains "$LINENO template" "$tResult" '<a href="#Template-Use">Template Use</a>'
+    assertContains "$LINENO set" "$tResult" '<h3 id="fComSetGlobals">fComSetGlobals</h3>'
+    assertContains "$LINENO int" "$tResult" '<title>Internal Doc</title>'
+    assertContains "$LINENO com" "$tResult" '<h3 id="testComUsage">testComUsage</h3>'
 
     #-----
     tResult=$(fComUsage -i -s md -f $tUsageScript -f $tInternalScript 2>&1)
-    assertContains "$LINENO tcu-int-md.1" "$tResult" '## Template Use'
-    assertContains "$LINENO tcu-int-md.2" "$tResult" '### fComSetGlobals'
-    assertContains "$LINENO tcu-int-md.3" "$tResult" '### testComUsage'
+    assertContains "$LINENO template" "$tResult" '## Template Use'
+    assertContains "$LINENO set" "$tResult" '### fComSetGlobals'
+    assertContains "$LINENO com" "$tResult" '### testComUsage'
 
     #-----
     tResult=$(fComUsage -s long -f $tUsageScript -f $tInternalScript 2>&1)
@@ -672,7 +672,7 @@ testComSelect()
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "QUIT"
     assertContains "$LINENO $tResult" "$tResult" "Just select by number"
-    ##assertContains "$LINENO $tResult" "$tResult" "Uncoment to show tResult"
+    ##assertContains $LINENO $tResult" "$tResult" "Uncoment to show tResult"
 
     fComSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "5\n") >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
@@ -717,7 +717,6 @@ testComYesNo()
     return 0
 } # testComYesNo
 
-# ???
 # --------------------------------
 testComSetConfigGlobal()
 {
