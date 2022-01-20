@@ -138,7 +138,7 @@ enough.  BUT I<clean up your code> so that the code I<really> is
 clear.
 
 The internal documentation uses POD commands that begin with "=internal-".
-See fComInternalDoc() for how this is used.
+See fComInternalDoc for how this is used.
 
 =internal-for html <hr/>
 
@@ -146,41 +146,97 @@ See fComInternalDoc() for how this is used.
 
 =internal-head2 Common Script Functions
 
-=internal-head3 fTry/fCatch/fThrow/tThrowErrors/fIgnoreErrors
+=internal-head3 try/catch functions
 
-These functions came from:
+These functions were inspired by:
 https://gist.github.com/e7d/e43e6586c1c2ecb67ae2
 
-Notice fTry is called with a sub-shell, so any env. var. changes will
-NOT be "remembered" after when the sub-shell is done. So use
-carefully.
+Changes: The previous state of "set -e" is not saved.  Exported
+env. var. changes in the subshell are saved, so they can be restored
+when the subshell is done.
 
-Sample use:
+=internal-head4 tcTry
+
+Call this just before the required subshell section.
+
+=internal-head4 tcSaveEnv
+
+Call this when env changes must not be lost. This is called by the
+other related commands.
+
+=internal-head4 tcReturn
+
+Call this at end of the tcTry subshell.
+Calls tcSaveEnv.
+
+=internal-head4 tcThrow
+
+Call this to throw error (1..255) to tcCatch
+Calls tcSaveEnv.
+
+=internal-head4 tcCatch
+
+Save throw or cmd errors, and restore any env. var. changes in the subshell.
+If a commnd exits before a tcSaveEnv call, env. var. changes will be lost.
+Calls tcSaveEnv.
+
+=internal-head4 tcThrowErrors
+
+Now, if a cmd returns non-zero, exit the try subshell.
+Calls tcSaveEnv.
+
+=internal-head4 tcIgnoreErrors
+
+Now, if a cmd returns non-zero, execution will continue.
+Calls tcSaveEnv.
+
+=internal-head4 Sample Use
+
+    #!/bin/bash
+    . try_catch.sh
 
     export cFatal=100
     export cWarn=101
 
-    fTry (
-        # Now commands will go to fCatch if non-zero return
-        fThrowErrors
-
-        cmds-that-return-0-for-OK
-
-        # Now any non-0 return will be ignored, but throws can be done
-        fIgnoreErrors
-
-        if [ some error ]; then
-            fThrow $cFatal
+    tcTry
+    (
+        n=$((RANDOM % 3))
+        if [ $n = 1 ]; then
+            tcThrow $cFatal
         fi
+        export foo1="this will not be set if tcThrow is run"
+
+        tcThrowErrors
+        # Commands will now go to tcCatch if non-zero return
+
+        export foo2="Set, if no throw an no errors later"
+        tcSaveEnv
+
+        n=$((RANDOM % 3))
+        if [ $n = 1 ]; then
+            rm bar
+        fi
+        export foo3="this is set because 'rm' was not run", and tcSaveEnv ran
+        tcSaveEnv
+
+        # This will fail after it is created, second run, if no throws
+        mkdir foo-bar
+        export foo4="This not be set on second run"
+
+        tcReturn
     )
     fCatch || {
         case $gErr in
-            1) echo "A regular error." ;;
-            $cFatal) fError -m Exit ;;
-            $cWarn)  fLog -p warning -m warn ;;
-            *) fError -i -m Unknown;;
+            1)       echo "Caught: Expected: rm happended" ;;
+            $cFatal) echo "Caught: Throw happened" ;;
+            $cWarn)  echo "Caught: Warning" ;;
+            *)       echo "Caught: Unknown exit: $gErr" ;;
         esac
     }
+    echo foo1=$foo1
+    echo foo2=$foo2
+    echo foo3=$foo3
+    echo foo4=$foo4
 
 =internal-cut
 
@@ -191,31 +247,66 @@ EOF
 # Common Functions
 
 # --------------------
-fTry()
+tcTry()
 {
-    [[ $- = *e* ]]; gSavedOptE=$?
+    # Call this just before a subshell
     set +e
+    export gErr=0
+    export cEnvBefore=/tmp/env-before-$$.tmp
+    export cEnvAfter=/tmp/env-after-$$.tmp
+    export cEnvDiff=/tmp/env-diff-$$.sh
+    env | sort >$cEnvBefore
 }
 
-fThrow()
+tcSaveEnv()
 {
+    # Call this when env changes must not be lost
+    env | sort >$cEnvAfter
+}
+
+tcReturn()
+{
+    # Call this at end of tcTry subshell
+    tcSaveEnv
+    exit 0
+}
+
+tcThrow()
+{
+    # Call this to throw error (1..255) to catch
+    tcSaveEnv
     exit $1
 }
 
-fCatch()
+tcCatch()
 {
-    export gErr=$?
-    (( $gSavedOptE )) && set +e
+    # Save throw or cmd error, and set any env. var. changes
+    gErr=$?
+    set +e
+    if [ -f $cEnvAfter ]; then
+        diff $cEnvBefore $cEnvAfter | grep '>' | sed 's/^> //; s/=/="/; s/$/"/' >$cEnvDiff
+        chmod a+rx $cEnvDiff
+    	. $cEnvDiff
+	if [ $gErr -eq 0 ]; then
+	    cd $PWD
+	fi
+    fi
+    rm -f $cEnvBefore $cEnvAfter $cEnvDiff >/dev/null 2>&1
+    unset cEnvBefore cEnvAfter cEnvDiff
     return $gErr
 }
 
-fThrowErrors()
+tcThrowErrors()
 {
+    # Now if a cmd returns non-zero, exit try subshell
+    tcSaveEnv
     set -e
 }
 
-ignoreErrors()
+tcIgnoreErrors()
 {
+    # Now if a cmd returns non-zero, execution will continue
+    tcSaveEnv
     set +e
 }
 
@@ -368,32 +459,33 @@ fComConfigUpdateLocal()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tTopDir
-    local tExclude="local-status|local-host|proj-name|remote-status|remote-raw-dir"
+    local tExclude="local-status|local-host|remote-status|remote-raw-dir"
 
-   if ! fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
-       return 1
-   fi
+    if ! fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
+        fError -i -n -m "fComConfigUpdateLocal: Missing: $tTopDir/.gitproj" -l $tSrc:$LINENO
+        return 1
+    fi
 
-   tTopDir=$($cGetTopDir)
-   if [ -f $tTopDir/.gitproj ] && [ $tTopDir/.git/config -ot $tTopDir/.gitproj ]; then
-       return 0
-   fi
+    tTopDir=$($cGetTopDir)
+    if [ -f $tTopDir/.gitproj ] && [ $tTopDir/.git/config -ot $tTopDir/.gitproj ]; then
+        return 0
+    fi
 
-   fComConfigCopy -s $tTopDir/.git/config -d $tTopDir/.gitproj \
-       -i 'gitproj\.' -e "$tExclude"
+    fComConfigCopy -f -s $tTopDir/.git/config -d $tTopDir/.gitproj \
+        -i 'gitproj\.' -e "$tExclude"
 
-   # Force TBD values
-   fComConfigCopy -f -s $gpDoc/config/gitconfig -d -d $tTopDir/.gitproj \
-       -i $tExclude
+    # Force TBD values?
+    ## fComConfigCopy -f -s $gpDoc/config/gitconfig -d -d $tTopDir/.gitproj \
+    ##    -i $tExclude
 
-   git add $tTopDir/.gitproj
-   git commit -m Updated
-   return $?
+    git add $tTopDir/.gitproj
+    git commit -m "Updated .gitproj"
+    return 0
 
-   # or be noisy?
-   #   if ! git ls-files --error-unmatch $tTopDir/.gitproj >/dev/null 2>&1; then
-   #       fError -n -m "You must version $tTopDir/.gitproj" -l $tSrc:$LINENO
-   #   fi
+    # or just be noisy?
+    # if ! git ls-files --error-unmatch $tTopDir/.gitproj >/dev/null 2>&1; then
+    #     fError -n -m "You must version $tTopDir/.gitproj" -l $tSrc:$LINENO
+    # fi
 } # fComConfigUpdateLocal
 
 # --------------------
@@ -839,24 +931,20 @@ fComSelect()
     local tResponse
     local tStatus=1
     local tMaxLoop=30
-    local tSave=$gpVerbose
     export gResponse
-
-    # Set to 1 so warnings will be ouput
-    gpVerbose=1
 
     # Loop until a valid selection, or QUIT or OTHER
     select tResponse in QUIT HELP $pDirList; do
         let --tMaxLoop
         if [ $tMaxLoop -le 0 ]; then
-            fLog -p warning -m "Too many responses." -l $tSrc:$LINENO
+            fLog -f -p warning -m "Too many responses." -l $tSrc:$LINENO
             tResponse="QUIT"
             break
         fi
         echo
         case $tResponse in
             QUIT)
-                fLog -p warning -m "Quitting." -l $tSrc:$LINENO
+                fLog -f -p warning -m "Quitting." -l $tSrc:$LINENO
                 break
                 ;;
             HELP)
@@ -871,14 +959,13 @@ fComSelect()
             break
         fi
         if [ -z "$tResponse" ]; then
-            fLog -p warning -m "Invalid selection" -l $tSrc:$LINENO
+            fLog -f -p warning -m "Invalid selection" -l $tSrc:$LINENO
             continue
         fi
     done
 
     PS3=""
     gResponse=$tResponse
-    gpVerbose=$tSave
     return $tStatus
 } # fComSelect
 
@@ -936,6 +1023,7 @@ fComFmtLog()
     local pMsg="$2"
     local pLine=$3
     local pErr=$4
+    local pForce=$5
     local tSrc=${BASH_SOURCE##*/}
     local tDebugLevel
     local tLevel
@@ -971,19 +1059,19 @@ fComFmtLog()
     	    tLevel=$pLevel
             ;;
         warning | warn)
-	    if [ $gpVerbose -eq 0 ]; then
+	    if [ $pForce -eq 0 ] && [ $gpVerbose -eq 0 ]; then
 	        return
 	    fi
             pLevel=warning
     	    tLevel=$pLevel
             ;;
         notice)
-	    if [ $gpVerbose -lt 2 ]; then
+	    if [ $pForce -eq 0 ] && [ $gpVerbose -lt 2 ]; then
 	        return
 	    fi
 	    ;;
 	info)
-	    if [ $gpVerbose -lt 3 ]; then
+	    if [ $pForce -eq 0 ] && [ $gpVerbose -lt 3 ]; then
 	        return
 	    fi
 	    ;;
@@ -1053,18 +1141,20 @@ fLog()
     local pLine=""
     local pErr=""
     local pInt=0
+    local pForce=0
     local tSrc=${BASH_SOURCE##*/}
     local OPTARG=1
     local OPTIND
     local tArg
 
-    while getopts :m:p:l:e:i tArg; do
+    while getopts :m:p:l:e:if tArg; do
         case $tArg in
             m) pMsg="${OPTARG}" ;;
             l) pLine="${OPTARG}" ;;
             p) pLevel="${OPTARG}" ;;
             e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
+	    f) pForce=1 ;;
             :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]" ;;
             \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]" ;;
         esac
@@ -1078,7 +1168,7 @@ fLog()
         pMsg="Internal: $pMsg"
     fi
 
-    fComFmtLog $pLevel "$pMsg" $pLine $pErr
+    fComFmtLog $pLevel "$pMsg" $pLine $pErr $pForce
     return 0
 
     cat <<EOF >/dev/null
@@ -1086,7 +1176,7 @@ fLog()
 
 =internal-for html <hr/>
 
-=internal-head3 fLog -m pMsg [-p pLevel] [-l $LINENO] [-e pErr]
+=internal-head3 fLog -m pMsg [-p pLevel] [-l $LINENO] [-e pErr] [-f]
 
 pLevel - emerg alert crit err warning notice info debug debug-N
 
@@ -1108,6 +1198,7 @@ pLevel - emerg alert crit err warning notice info debug debug-N
  if gpVerbose = 1, don't output notice, info
  if gpVerbose = 2, don't output info (default verbose level)
  if gpVerbose >= 3, output all non-debug levels
+ if -f, ignore the gpVerbose setting
 
  -x - set gpDebug=1
  -xx - set gpDebug=2
@@ -1332,6 +1423,7 @@ fComSetConfig()
 		if ! fComMustBeInProjRepo $PWD; then
 		    return 1
 		fi
+		tTopDir="$($cGetTopDir 2>&1)"
 		;;
         esac
         case $tArg in
@@ -1342,11 +1434,7 @@ fComSetConfig()
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
-            L) pScope="--file $tTopDir/.gitproj"
-               if [ ! -f $tTopDir/.gitproj ]; then
-                   fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
-               fi
-               ;;
+            L) pScope="--file $tTopDir/.gitproj" ;;
             v) pValue="${OPTARG}" ;;
             :)
                 fError -n -i -m "fComSetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1456,6 +1544,7 @@ fComGetConfig()
     local pFilter=""
     local pExitOnError=0
     local tSrc=${BASH_SOURCE##*/}
+    local tTopDir
     local tValue=""
     local tExit="-n"
 
@@ -1484,6 +1573,7 @@ fComGetConfig()
 		if ! fComMustBeInProjRepo $PWD; then
                     return 1
                 fi
+		tTopDir="$($cGetTopDir 2>&1)"
 		;;
         esac
         case $tArg in
@@ -1498,11 +1588,7 @@ fComGetConfig()
             i) pType="--int" ;;
             k) pKey="${OPTARG}" ;;
             l) pScope="--local" ;;
-            L) pScope="--file $tTopDir/.gitproj"
-               if [ ! -f $tTopDir/.gitproj ]; then
-                   fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
-               fi
-               ;;
+            L) pScope="--file $tTopDir/.gitproj" ;;
             v) pFilter="${OPTARG}" ;;
             :)
                 fError $tExit -i -m "fComGetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
@@ -1675,11 +1761,12 @@ fComUnsetConfig()
     local pKey=""
     local pAll="--unset"
     local tSrc=${BASH_SOURCE##*/}
+    local tTopDir
     local OPTIND=1
     local OPTARG
     local tArg
 
-    while getopts :af:gGHk:lL tArg; do
+    while getopts :af:gk:lL tArg; do
         # shellcheck disable=SC2213,SC2220
         case $tArg in
             f)
@@ -1688,21 +1775,17 @@ fComUnsetConfig()
                     return 1
                 fi
                 ;;
-            G)
-                fError -ni -m "-G depricated" -l "$tSrc:$LINENO"
-                pScope="--global"
-                ;;
-            H)
-                fError -ni -m "-H depricated" -l "$tSrc:$LINENO"
-                pScope="--local"
-                ;;
-            l|L)
-                tTopDir="$($cGetTopDir 2>&1)"
-                if [ $? -ne 0 ]; then
-                    fError -n -m "You are not in a git dir: $PWD" -l "$tSrc:$LINENO"
+            l)
+                if ! fComMustBeInGitRepo $PWD; then
                     return 1
                 fi
                 ;;
+	    L)
+		if ! fComMustBeInProjRepo $PWD; then
+                    return 1
+                fi
+		tTopDir="$($cGetTopDir 2>&1)"
+		;;
         esac
         case $tArg in
             a) pAll="--unset-all" ;;
@@ -1710,11 +1793,7 @@ fComUnsetConfig()
             g) pScope=--global ;;
             k) pKey="${OPTARG}" ;;
             l) pScope=--local ;;
-            L) pScope="--file $tTopDir/.gitproj"
-               if [ ! -f $tTopDir/.gitproj ]; then
-                   fError -n -i -m "You are not in a gitproj dir: $PWD" -l "$tSrc:$LINENO"
-               fi
-                ;;
+            L) pScope="--file $tTopDir/.gitproj" ;;
             :)
                 fError -n -i -m "fComUnsetConfig: Value required for option: $OPTARG" -l $tSrc:$LINENO
                 return 1
@@ -1755,72 +1834,6 @@ fComSaveVar2Config()
         gErr=1
     fi
 } # fComSaveVar2Config
-
-fComConfigSetupGlobal()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tSource=$gpDoc/config/gitconfig
-    local tDest=$HOME/.gitconfig
-    local tVar
-    local tList='local-status proj-name remote-status remote-raw-dir'
-
-    if [ ! -w $HOME ]; then
-        fError -i -m "Cannot write to $HOME" -l $tSrc:$LINENO
-    fi
-    if [ ! -r $tSource ]; then
-        fError -i -m "Cannot read $tSource" -l $tSrc:$LINENO
-    fi
-
-    if [ ! -f $pDest ]; then
-        cp $tSource $pDest
-        return $?
-    fi
-
-    cp --backup=t $tDest $tDest.bak
-    fComConfigCopy -s tSource -d $tDest -i 'gitproj\.config\.'
-    for tVar in $tList; do
-        git -f $tDest gitproj.config.$tVar TBD
-    done
-
-    return 0
-} # fComConfigSetupGlobal
-
-fComConfigSetupLocal()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tSource=$HOME/.gitconfig
-    local tDest1
-    local tDest2
-    local tVar
-    local tValue
-    local tList="gitproj.config.remote-raw-dir"
-
-    fComMustBeInGitRepo $PWD
-    tDest1=$(cGetTopDir)
-    tDest2=$($tDest1)/.git/config
-    tDest1=$($tDest1)/.gitproj
-
-    if [ ! -r $tSource ]; then
-        fError -i -m "$tSource is missing or not readable" -l $tSrc:$LINENO
-    fi
-
-    if [ ! -w $tDest2 ]; then
-        fError -i -m "$tDest2 is missing or not writable" -l $tSrc:$LINENO
-    fi
-
-    if [ ! -f $tDest1 ]; then
-        # Create tDest1 from tSourcee, only copy the gitproj sections
-        fComConfigCopy -f -s $tSource -d $tDest1 -i '^gitproj\.'
-    else
-        fComConfigCopy -s $tSource -d $tDest1 -i '^gitproj\.'
-    fi
-
-    # Update tDest2 from tDest1
-    cp --backup=t $tDest2 $tDest2.bak
-    fComConfigCopy -s $tDest1 -d $tDest2
-
-    return 0
-} # fComConfigSetupLocal
 
 fComCheckPkg()
 {
