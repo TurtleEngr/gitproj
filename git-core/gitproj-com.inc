@@ -1168,7 +1168,7 @@ fLog()
         pMsg="Internal: $pMsg"
     fi
 
-    fComFmtLog $pLevel "$pMsg" $pLine $pErr $pForce
+    fComFmtLog "$pLevel" "$pMsg" "$pLine" "$pErr" "$pForce"
     return 0
 
     cat <<EOF >/dev/null
