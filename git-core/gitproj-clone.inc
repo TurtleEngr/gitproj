@@ -98,13 +98,13 @@ fCloneCheckLocalConfig()
     if [ -f .gitproj ]; then
         return 0
     fi
-    fLog -p warning -m "Missing file: .gitproj It should have been versioned. Will try to recreate it from a host config file." -l $tSrc:$LINENO
+    fLog -p warning -m "Missing file: .gitproj It should have been versioned! Will try to recreate it from ~/.gitconfig." -l $tSrc:$LINENO
 
     touch .gitproj
-    fComConfigCopy -s .git/config -d .gitproj -i 'gitproj\.'
+    fComConfigCopy -f -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
 
-    # Adjust the values
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v TBD
+    fComSetConfig -L -k gitproj.config.proj-name -v $gpProjName
+    fComSetConfig -L -k gitproj.config.ver -v "$(cat $gpDoc/VERSION)"
 
     git add .gitproj
 
@@ -112,38 +112,14 @@ fCloneCheckLocalConfig()
 } # fCloneCheckLocalConfig
 
 # --------------------
-fCloneCheckHostConfig()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tHost
-
-    tHost=$(fComGetConfig -l -k "gitproj.config.local-host")
-    if [ "$tHost" = "$HOSTNAME" ]; then
-        return 0;
-    fi
-
-    fLog -p warning -m "Missing host values. They will be created for this new host" -l $tSrc:$LINENO
-
-    fComConfigCopy -f -s .gitproj -d .git/config
-    fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
-
-    # Adjust the host var values
-    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
-
-    return 0
-} # fCloneCheckHostConfig
-
-# --------------------
 fCloneSetupGitProjConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ ! -f .gitproj ]; then
-        fLog -p warning -m "Missing .gitproj This file should have been versioned! Will try to recreate it, but the values should be checked." -l $tSrc:$LINENO
-	fComCreateGitProjFile
-    fi
+    fCloneCheckLocalConfig
 
     cp $gpVerboseFlag $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+
     if [ ! -f .gitignore ]; then
         fLog -p warning -m "Missing .gitignore file. Adding it now." -l $tSrc:$LINENO
         cp $gpVerboseFlag $gpDoc/config/gitignore .gitignore
@@ -241,18 +217,11 @@ fCloneMkRawDir()
         fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
+    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
+    fComSetConfig -l -k "gitproj.config.remote-status" -v "defined"
+
     return $tStatus
 } # fCloneMkRawDir
-
-# --------------------
-fCloneUpdateHostConfig()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    return 0
-} # fCloneUpdateHostConfig
 
 # --------------------
 fCloneSummary()
@@ -310,15 +279,17 @@ Other vars in $gpProjName/.gitproj
 $(git config -f .gitproj --list | grep -v gitproj)
 
 Modified files:
-$(git status)
+$(git status --long)
 
 EOF
     if ! fComYesNo "Continue (commit the changes)"; then
-        fLog -p warning -m "Not continuing." -l $tSrc:$LINENO
+        fLog -f -p warning -m "Not continuing." -l $tSrc:$LINENO
         return 1
     fi
+
     fLog -p notice -m "Committing changes" -l $tSrc:$LINENO
-    git commit -am "Updated .gitproj"
+    fComConfigUpdateLocal
+    git commit -am "Commit all changes"
 
     return 0
 } # fCloneSummary
@@ -337,7 +308,6 @@ fCloneFromRemoteDir()
     fCloneValidRemoteDir
     fCloneMkGitDir
     fCloneMkRawDir
-    fCloneUpdateHostConfig
     fCloneSummary
     fComIntroText
 

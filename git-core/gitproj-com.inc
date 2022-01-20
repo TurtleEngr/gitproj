@@ -479,7 +479,7 @@ fComConfigUpdateLocal()
     ##    -i $tExclude
 
     git add $tTopDir/.gitproj
-    git commit -m "Updated .gitproj"
+    git commit -m "Updated .gitproj" $tTopDir/.gitproj
     return 0
 
     # or just be noisy?

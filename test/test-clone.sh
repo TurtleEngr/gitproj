@@ -112,6 +112,7 @@ NAoneTimeTearDown()
 setUp()
 {
     local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+
     # Restore default global values, before each test
 
     unset cGetOrigin cGetTopDir cGitProjVersion cPID gErr
@@ -148,6 +149,7 @@ setUp()
     find $gpRemoteGitDir $gpRemoteRawDir -exec chmod ug+w {} \;
     find $gpRemoteGitDir $gpRemoteRawDir -type d -exec chmod a+rx {} \;
 
+    gpVerbose=3
     gpUnitDebug=0
     return 0
 
@@ -339,12 +341,11 @@ testCloneCheckLocalConfig()
     rm .gitproj
     tResult=$(fCloneCheckLocalConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Missing file: .gitproj It should have been versioned. Will try to recreate it from a host config file"
-    assertContains "$LINENO $tResult" "$tResult" "cp $c ConfigHost .gitproj"
+    assertContains "$LINENO $tResult" "$tResult" "warning: Missing file: .gitproj It should have been versioned! Will try to recreate it from ~/.gitconfig"
 
     #tResult=$(grep remote-raw-dir $c ConfigHost 2>&1)
     #assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
-
+return 0
     rm .gitproj
     #rm $c ConfigHost
     tResult=$(fCloneCheckLocalConfig 2>&1)
@@ -353,107 +354,6 @@ testCloneCheckLocalConfig()
 
     return 0
 } # testCloneCheckLocalConfig
-
-# --------------------------------
-testCloneCheckHostConfigNoHost()
-{
-    local tResult
-
-    # SetUp
-    cd $cDatHome >/dev/null 2>&1
-    HOME=$PWD
-    cd $cDatProj1 >/dev/null 2>&1
-    gpLocalTopDir=$PWD
-    gpProjName=george
-    HOSTNAME=testserver
-    #c ConfigHost=.gitproj.config.$HOSTNAME
-
-    # Start tests
-    tResult=$(fCloneCheckHostConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-
-    #rm $c ConfigHost
-    gpDebug=2
-    tResult=$(fCloneCheckHostConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Missing host file: $c ConfigHost  It will be created for this new host"
-    assertContains "$LINENO $tResult" "$tResult" "cp .gitproj $c ConfigHost"
-    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
-
-    tResult=$(grep remote-raw-dir $c ConfigHost 2>&1)
-    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
-
-    return 0
-} # testCloneCheckHostConfigNoHost
-
-# --------------------------------
-testCloneCheckHostConfigManyHosts()
-{
-    local tResult
-
-    cd $cDatHome >/dev/null 2>&1
-    HOME=$PWD
-    cd $cDatProj1 >/dev/null 2>&1
-    gpLocalTopDir=$PWD
-    gpProjName=george
-    HOSTNAME=testserver2
-    #c ConfigHost=.gitproj.config.$HOSTNAME
-
-    cp .gitproj.config.testserver .gitproj.config.testserver-1
-    echo '#gitproj.config.testserver-1' >>.gitproj.config.testserver-1
-
-    cp .gitproj.config.testserver .gitproj.config.testserver-2
-    echo '#gitproj.config.testserver-2' >>.gitproj.config.testserver-2
-
-    touch .gitproj.config.testserver-2
-    sleep 0.25
-    touch .gitproj.config.local
-
-    gpDebug=2
-    tResult=$(fCloneCheckHostConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO $tResult" "[ -f $c ConfigHost ]"
-    assertContains "$LINENO $tResult" "$tResult" "Missing host file: $c ConfigHost  It will be created for this new host"
-    assertContains "$LINENO $tResult" "$tResult" "cp .gitproj.config.testserver-2 $c ConfigHost"
-    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
-
-    tResult=$(grep remote-raw-dir $c ConfigHost 2>&1)
-    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
-
-    return 0
-} # testCloneCheckHostConfigManyHosts
-
-# --------------------------------
-testCloneCheckProjConfig()
-{
-    local tResult
-
-    # SetUp
-    cd $cDatHome >/dev/null 2>&1
-    HOME=$PWD
-    cd $cDatProj1 >/dev/null 2>&1
-    gpLocalTopDir=$PWD
-    gpProjName=george
-    HOSTNAME=testserver
-    #c ConfigHost=.gitproj.config.$HOSTNAME
-
-    # Start tests
-    tResult=$(fCloneCheckProjConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-
-    gpDebug=2
-    rm .gitproj
-    #rm $c ConfigHost
-    tResult=$(fCloneCheckProjConfig 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values"
-    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
-
-    assertTrue "$LINENO $tResult" "[ -f .gitproj ]"
-    assertTrue "$LINENO $tResult" "[ -f $c ConfigHost ]"
-
-    return 0
-} # testCloneCheckProjConfig
 
 # --------------------------------
 testCloneMkGitDirFail()
@@ -523,13 +423,12 @@ testCloneMkGitDirPass()
     assertTrue "$LINENO $HOME/project/$gpProjName" "[ -d $HOME/project/$gpProjName ]"
 
     cd $HOME/project/$gpProjName >/dev/null 2>&1
-    assertTrue $LINENO "[ -f .gitproj.config.local ]"
-    assertTrue $LINENO "[ -f .gitproj.config.$HOSTNAME ]"
+    assertTrue $LINENO "[ -f .gitproj ]"
     assertTrue $LINENO "[ -f $HOME/.gitconfig ]"
     assertTrue $LINENO "[ -d .git ]"
     assertTrue $LINENO "[ -x .git/hooks/pre-commit ]"
     assertEquals $LINENO testserver2 $HOSTNAME
-    assertTrue $LINENO "grep .gitproj.config.$HOSTNAME .git/config"
+    assertTrue $LINENO "grep local-host.=.$HOSTNAME .git/config"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     tResult=$(git branch 2>&1)
@@ -585,7 +484,7 @@ testCloneMkRawDirFail()
     gpLocalTopDir=$HOME/project/george
     cd $gpLocalTopDir >/dev/null 2>&1
 
-    export gpVerbose=2
+    gpVerbose=3
     mkdir -p raw/src/final/george.mp4
     chmod -R a-wx raw 2>/dev/null
     tResult=$(fCloneMkRawDir 2>&1)
@@ -625,7 +524,7 @@ testCloneMkRawDirPass()
     tar -xzf $tTar
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
-    gpVerbose=2
+    gpVerbose=3
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fCloneMkRawDir 2>&1)
@@ -635,58 +534,16 @@ testCloneMkRawDirPass()
     assertTrue "$LINENO" "[ -f $gpLocalRawDir/src/final/george.mp4 ]"
     ##assertContains "$LINENO tResult=$tResult" "$tResult" "Uncomment to check"
 
-    return 0
-} # testCloneMkRawDirPass
-
-# --------------------------------
-testCloneUpdateHostConfig()
-{
-    local tResult
-    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
-
-    # Assumes setUp has run
-    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
-    #                           cTestDestDir=$gpTest/../..
-    # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
-    # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
-    # HOSTNAME=testserver2
-    #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
-    # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
-    # gpProjName=george
-
-    # Setup
-    cd $cDatHome3 >/dev/null 2>&1
-    if [ ! -r $tTar ]; then
-        fail "Could not find $tTar [$LINENO]"
-        return 1
-    fi
-    tar -xzf $tTar
-    gpLocalTopDir=$HOME/project/george
-    gpLocalRawDir=$HOME/project/george/raw
-    gpVerbose=2
-
-    cd $gpLocalTopDir >/dev/null 2>&1
-    tResult=$(fCloneUpdateHostConfig 2>&1)
-    assertTrue $LINENO $?
-    assertTrue $LINENO "[ -f $c ConfigHost ]"
-
-    tResult=$(fComGetConfig -l -k "include.path" -v $c ConfigHost)
-    assertContains "$LINENO $tResult" "$tResult" "../$c ConfigHost"
-
-    tResult=$(fComGetConfig -H -k "gitproj.config.remote-raw-dir")
+    tResult=$(fComGetConfig -l -k "gitproj.config.remote-raw-dir")
+    assertTrue $LINENO "$?"
     assertContains "$LINENO $tResult" $tResult "$gpRemoteRawDir"
 
-    tResult=$(fCloneUpdateHostConfig 2>&1)
-    assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "Weird, include.path is alredy set"
-
-    tResult=$(fComGetConfig -H -k "gitproj.config.remote-status")
+    tResult=$(fComGetConfig -l -k "gitproj.config.remote-status")
     assertTrue $LINENO "$?"
-    assertNotContains "$LINENO $tResult" "$tResult" "not-defined"
+    assertContains "$LINENO $tResult" "$tResult" "defined"
 
     return 0
-} # testCloneUpdateHostConfig
+} # testCloneMkRawDirPass
 
 # --------------------------------
 testCloneSummary()
@@ -705,13 +562,11 @@ testCloneSummary()
     tar -xzf $tTar
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
-    gpVerbose=2
+    gpVerbose=3
     gpYesNo=Yes
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fCloneMkRawDir 2>&1)
-    assertTrue "$LINENO $tResult" $?
-    tResult=$(fCloneUpdateHostConfig 2>&1)
     assertTrue "$LINENO $tResult" $?
 
     # Tests
@@ -753,7 +608,7 @@ testCloneFromRemoteDir()
     gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
     gpProjName=george
     gpYesNo=Yes
-    gpVerbose=2
+    gpVerbose=3
     cd $HOME/project >/dev/null 2>&1
 
     tResult=$(fCloneFromRemoteDir 2>&1)
