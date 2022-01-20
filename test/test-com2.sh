@@ -313,119 +313,53 @@ testComConfigCopy()
 
 } # testComConfigCopy
 
-# --------------------------------
-testComConfigSetupGlobal()
+testComConfigUpdateLocal()
 {
     local tResult
-    local tSrc=$gpDoc/config/gitconfig
-    local tDst=$HOME/.gitconfig
-    local tKey
     local tValue
-    local tList
-    local tKeyList
+    local tGlobal=$gpDoc/config/gitconfig
+    local tGitProj=$HOME/$cDatProj1/.gitproj
+    local tLocal=$HOME/$cDatProj1/.git/config
 
-    startSkipping
+    cd $HOME
+    tResult=$(fComConfigUpdateLocal 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "fComConfigUpdateLocal"
 
-    #----------
-    # tDst file is missing so just cp tSrc
-    assertTrue "$LINENO $tSrc" "[ -f $tSrc ]"
-    assertTrue "$LINENO $tDst" "[ -f $tDst ]"
-    rm $tDst
-    assertTrue "$LINENO $tDst" "[ ! -f $tDst ]"
+    cd $HOME/$cDatProj1
+    mv .gitproj .gitproj.sav
+    tResult=$(fComConfigUpdateLocal 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "fComConfigUpdateLocal"
 
-    tResult=$(fComConfigSetupGlobal 2>&1)
-    assertTrue "$LINENO $tResult $?" "$?"
-    assertTrue "$LINENO $tDst" "[ -f $tDst ]"
-
-    #----------
-    # Missing values in tDst file s/b replaced from tSrc
-    assertTrue "$LINENO $tDst" "[ -f $tDst ]"
-    git config -f $tDst --unset alias.br
-    git config -f $tDst --unset alias.st
-    assertFalse "$LINENO br" "grep 'br = branch' $tDst"
-    assertFalse "$LINENO st" "grep 'st = status' $tDst"
-
-    tResult=$(fComConfigSetupGlobal $tSrc $tDst 2>&1)
+    cd $HOME/$cDatProj1
+    # Restore
+    mv .gitproj.sav .gitproj
+    # Patch (current .gitignore is missing this)
+    echo '*.bak' >>.gitignore
+    git add .gitignore
+    git ci -am Updated >/dev/null 2>&1
+    # Clean
+    rm .gitproj.bak 2>/dev/null
+    # Change
+    fComSetConfig -l -k "gitproj.config.verbose" -v 3
+    # Check
+    tValue=$(fComGetConfig -L -k "gitproj.config.verbose")
+    assertEquals "$LINENO" "2" "$tValue"
+    # Test
+    tResult=$(fComConfigUpdateLocal 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO $tDst.bak" "[ -f $tDst.bak ]"
-    assertTrue "$LINENO $tResult br" "grep 'br = branch' $tDst"
-    assertTrue "$LINENO st" "grep 'st = status' $tDst"
+    assertTrue "$LINENO $tResult" "[ -f .gitproj.bak ]"
+    assertContains "$LINENO $tResult" "$tResult" "1 file changed"
+    tValue=$(fComGetConfig -L -k "gitproj.config.verbose")
+    assertEquals "$LINENO" "3" "$tValue"
 
-    #----------
-    # Values in tList s/b TBD in tDst file
-    tList="local-status proj-name remote-status remote-raw-dir"
-    tKeyList=""
-    for tKey in $tList; do
-        git config -f $tDst gitproj.config.$tKey false
-	tKeyList="$tKeyList gitproj.config.$tKey"
-    done
-
-    tResult=$(fComConfigSetupGlobal $tSrc $tDst "$tKeyList" 2>&1)
+    tResult=$(fComConfigUpdateLocal 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO $tDst.bak" "[ -f $tDst.bak ]"
-    for tVar in $tList; do
-        tValue=$(git config -f $tDst --get gitproj.config.$tKey)
-	assertTrue "$LINENO $tVar" "$?"
-	assertEquals "$LINENO $tVar" "TBD" "$tValue"
-    done
+    assertNull "$LINENO $tResult" "$tResult"
 
     return 0
-} # testComConfigSetupGlobal
-
-testComConfigSetupLocal()
-{
-    local tResult
-    local tSrc=$gpDoc/config/gitconfig
-    local tDst1=$HOME/$cDatProj1/.gitproj
-    local tDst2=$HOME/$cDatProj1/.git/config
-
-    startSkipping
-
-    # PROJ = $HOME/$cDatProj1
-
-    # ----------
-    # No force, and create
-    rm $tDst1 >/dev/null 2>&1
-    assertTrue "$LINENO missing $tSrc" "[ -f $tSrc ]"
-    assertTrue "$LINENO missing $tDst2" "[ -f $tDst2 ]"
-
-    tResult=$(fComConfigSetupLocal no-force $tSrc $tDst1 $tDst2 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO missing $tDst1" "[ -f $tDst1 ]"
-    assertTrue "$LINENO missing $tDst2.bak" "[ -f $tDst2.bak ]"
-    assertEquals "$LINENO $tDst1 proj-name" "TBD" "$(git config -f $tDst1 --get gitproj.config.proj-name)"
-    assertEquals "$LINENO $tDst2 proj-name" "TBD" "$(git config -f $tDst2 --get gitproj.config.proj-name)"
-
-    # ----------
-    # No force, and update. Depends on previous test working
-    git config -f $tDst2 --unset gitproj.config.syslog
-    git config -f $tDst2 --unset gitproj.config.remote-raw-dir
-    git config -f $tDst2 --unset gitproj.config.proj-name
-    git config -f $tDst1 gitproj.config.proj-name TestName
-    git config -f $tDst1 gitproj.config.remote-raw-dir /mnt/test
-
-    tResult=$(fComConfigSetupLocal no-force $tSrc $tDst1 $tDst2 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO missing $tDst2.bak" "[ -f $tDst2.bak ]"
-    assertEquals "$LINENO Dst2 proj-name" "TestName" "$(git config -f $tDst2 --get gitproj.config.proj-name)"
-    assertEquals "$LINENO Dst2 syslog" "false" "$(git config -f $tDst2 --get gitproj.config.syslog)"
-    assertEquals "$LINENO Dst2 remote-raw-dir" "/mnt/test" "$(git config -f $tDst2 --get gitproj.config.remote-raw-dir)"
-
-    # ----------
-    # No force, and update. Depends on previous test working
-    git config -f $tDst1 gitproj.config.remote-raw-dir raw-dst1
-    git config -f $tDst2 gitproj.config.remote-raw-dir raw-dst2
-    git config -f $tDst1 gitproj.config.proj-name proj-dst1
-    git config -f $tDst2 gitproj.config.proj-name proj-dst2
-
-    tResult=$(fComConfigSetupLocal force $tSrc $tDst1 $tDst2 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO missing $tDst2.bak" "[ -f $tDst2.bakx ]"
-    assertEquals "$LINENO Dst2 remote-raw-dir" "raw-dst2" "$(git config -f $tDst2 --get gitproj.config.remote-raw-dir)"
-    assertEquals "$LINENO Dst2 proj-name" "proj-dst1" "$(git config -f $tDst2 --get gitproj.config.proj-name)"
-
-    return 0
-} # testComConfigSetupLocal
+} # testComConfigUpdateLocal()
 
 # --------------------------------
 testComGetConfigMore()
