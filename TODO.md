@@ -48,6 +48,24 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
+* git-proj-clone will initally copy all of PROJ/.gitproj (afer git
+  clone).  Then update local config: local-status, local-host,
+  proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig
+
+  After cloning remote, update local vars remote-status, remote-raw-dir
+
+  When in a git or git-proj dir, config vars s/b first saved to
+  .git/config
+
+  At the end of the command, update .gitprog with the gitproj values
+  from .git/config. But these vars must stay set to TBD, in .gitproj:
+  local-status, local-host, proj-name, remote-status, remote-raw-dir
+
+  Also gitproj.config.ver should be set to $gpDoc/VERSION
+
+* Cleanup the saving of git-proj vars. Save to --local, then
+  "frequently" update PROJ/.gitproj
+
 * Cleanup: remove gpMountDir. gpHookSource. Is gpGitFlowPkg used?
 
 * Cleanup: fixup log messages to follow the gpVerbose rules. (see flog
