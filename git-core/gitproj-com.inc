@@ -254,6 +254,7 @@ EOF
     return 0
 } # fComIntroText
 
+# --------------------
 fComConfigCopy()
 {
     local pForce=0
@@ -361,6 +362,39 @@ S<cp -backup=t $pDest $pDest.bak>
 =internal-cut
 EOF
 } # fComConfigCopy
+
+# --------------------
+fComConfigUpdateLocal()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tTopDir
+    local tExclude="local-status|local-host|proj-name|remote-status|remote-raw-dir"
+
+   if ! fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
+       return 1
+   fi
+
+   tTopDir=$($cGetTopDir)
+   if [ -f $tTopDir/.gitproj ] && [ $tTopDir/.git/config -ot $tTopDir/.gitproj ]; then
+       return 0
+   fi
+
+   fComConfigCopy -s $tTopDir/.git/config -d $tTopDir/.gitproj \
+       -i 'gitproj\.' -e "$tExclude"
+
+   # Force TBD values
+   fComConfigCopy -f -s $gpDoc/config/gitconfig -d -d $tTopDir/.gitproj \
+       -i $tExclude
+
+   git add $tTopDir/.gitproj
+   git commit -m Updated
+   return $?
+
+   # or be noisy?
+   #   if ! git ls-files --error-unmatch $tTopDir/.gitproj >/dev/null 2>&1; then
+   #       fError -n -m "You must version $tTopDir/.gitproj" -l $tSrc:$LINENO
+   #   fi
+} # fComConfigUpdateLocal
 
 # --------------------
 fComFirstTimeSet()
