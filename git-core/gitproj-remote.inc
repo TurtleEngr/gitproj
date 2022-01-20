@@ -14,14 +14,12 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 fRemoteSetGlobals()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tSave
 
     # Assumes we in git dir, and one that is managed by gitproj.
     if ! fComGetVer; then
         fError -m "Quitting" -l $tSrc:$LINENO
     fi
 
-    tSave=$gpVerbose
     gpAuto=${gpAuto:-0}
     gpMountDir=""
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
@@ -44,7 +42,7 @@ fRemoteSetGlobals()
 
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "TBD")
     if [ "$gpRemoteStatus" != "TBD" ]; then
-        fLog -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
+        fLog -f -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
         if [ $gpAuto -ne 0 ]; then
             fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in --local config" -l $tSrc:$LINENO
         fi
@@ -52,12 +50,11 @@ fRemoteSetGlobals()
 
     gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
     if [ "$gpRemoteRawDir" != "TBD" ]; then
-        fLog -p warning -m "Expected: TBD, but gitproj.config.remote-raw-dir=$gpRemoteRawDir" -l "$tSrc:$LINENO"
+        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-dir=$gpRemoteRawDir" -l "$tSrc:$LINENO"
     fi
 
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
 
-    gpVerbose=$tSave
     return 0
 } # fRemoteSetGlobals
 

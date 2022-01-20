@@ -3,7 +3,7 @@
 # --------------------
 export cGetOrigin cGetTopDir cTop
 
-export gpAuto gpAutoMove gpBin gpBranch gpCheckFileNames \
+export gpAuto gpAutoMove gpBin gpCheckFileNames \
     gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
     gpHookSource gpLocalRawDir gpLocalStatus gpLocalTopDir gpMaxSize \
     gpPath gpPreCommitEnabled gpProjName gpProjStatus gpRemoteGitDir \
@@ -134,95 +134,75 @@ fCloneCheckHostConfig()
 } # fCloneCheckHostConfig
 
 # --------------------
-fCloneCheckProjConfig()
+fCloneSetupGitProjConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tHost
-    local tC
 
-    tHost=$(fComGetConfig -l -k "gitproj.config.local-host")
-    if [ -f .gitproj ] && [ "$tHost" = "$HOSTNAME" ]; then
-        return 0
+    if [ ! -f .gitproj ]; then
+        fLog -p warning -m "Missing .gitproj This file should have been versioned! Will try to recreate it, but the values should be checked." -l $tSrc:$LINENO
+	fComCreateGitProjFile
     fi
 
-    fLog -p warning -m "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values." -l $tSrc:$LINENO
-
-    # Get a raw local file from ~/.gitconfig
-    if [ ! -f .gitproj ]; then
-        fComConfigCopy -f -s .gitconfig -d .gitproj -i 'gitproj\.'
+    cp $gpVerboseFlag $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+    if [ ! -f .gitignore ]; then
+        fLog -p warning -m "Missing .gitignore file. Adding it now." -l $tSrc:$LINENO
+        cp $gpVerboseFlag $gpDoc/config/gitignore .gitignore
+        git add .gitignore
     fi
 
     fComConfigCopy -s .gitproj -d .git/config
-    fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
-    # Fix up the vars, making some assumptions.
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v "TBD"
-    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
+    fComSetConfig -l -k "gitproj.config.local-host" -v $HOSTNAME
+    fComSetConfig -l -k "gitproj.config.local-status" -v "defined"
+    fComSetConfig -l -k "gitproj.config.proj-name" -v "$gpProjName"
 
-    for tC in L l; do
-        fComSetConfig -$tC -k "gitproj.config.local-status" -v "defined"
-        fComSetConfig -$tC -k "gitproj.config.remote-status" -v "defined"
-        fComSetConfig -$tC -k "gitproj.config.proj-name" -v "$gpProjName"
-    done
-
-    git add .gitproj
+    fComConfigUpdateLocal
 
     return 0
-} # fCloneCheckProjConfig
+} # fCloneSetupGitProjConfig
 
 # --------------------
 fCloneMkGitDir()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tStatus
     local tFound
+    local tSave=$gpVerbose
+    local tBranch
 
     # Assumes you are cd'd to the dir you want to clone into.
+    # And it has been verified to not be a git workspace.
 
     git clone $gpRemoteGitDir
     if [ $? -ne 0 ]; then
-        gpVerbose=2
-        fLog -p info -m "git clone $gpRemoteGitDir" -l $tSrc:$LINENO
+        fLog -f -p info -m "git clone $gpRemoteGitDir" -l $tSrc:$LINENO
         fError -i -m "The above command should have worked." -l $tSrc:$LINENO
     fi
     gpProjName=${gpRemoteGitDir##*/}
     gpProjName=${gpProjName%.git}
     gpLocalTopDir=$PWD/$gpProjName
+    cd $gpLocalTopDir >/dev/null 2>&1
 
     # Checkout some expected branches
-    cd $gpLocalTopDir >/dev/null 2>&1
-    for gpBranch in develop main master; do
-        git checkout $gpBranch >/dev/null 2>&1
+    for tBranch in develop main master; do
+        git checkout $tBranch >/dev/null 2>&1
     done
 
     # Set to the "best" default branch
     tFound=0
     git checkout develop >/dev/null 2>&1
-    for gpBranch in develop main master; do
-        if git checkout $gpBranch >/dev/null 2>&1; then
+    for tBranch in develop main master; do
+        if git checkout $tBranch >/dev/null 2>&1; then
             tFound=1
             break
         fi
     done
 
-    gpBranch=$($cGetCurBranch)
+    tBranch=$($cGetCurBranch)
     if [ $tFound -eq 0 ]; then
-        fLog -p warning -m "Unexpected default branch: $gpBranch" -l $tSrc:$LINENO
+        fLog -f -p warning -m "Unexpected default branch: $tBranch" -l $tSrc:$LINENO
     fi
 
-    if [ ! -f .gitignore ]; then
-        fLog -p warning -m "Missing .gitignore file. Adding one now." -l $tSrc:$LINENO
-        cp $gpDoc/config/gitignore.default .gitignore
-        git add .gitignore
-    fi
-
-    fCloneCheckProjConfig
-    fCloneCheckHostConfig
-    fCloneCheckLocalConfig
-
-    cp $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
-
-    git commit -am "Updating configs for this host."
+    fCloneSetupGitProjConfig
 
     return 0
 } # fCloneMkGitDir
@@ -246,7 +226,7 @@ fCloneMkRawDir()
         mkdir $gpLocalRawDir
     fi
 
-    if [ $gpVerbose -ge 1 ]; then
+    if [ $gpVerbose -eq 1 ]; then
         tVerbose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
@@ -257,8 +237,8 @@ fCloneMkRawDir()
     $tCmd
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
-        fLog -p warning -m "There may be a problem with this rsync:" -l $tSrc:$LINENO
-        fLog -p warning -m "$tCmd" -l $tSrc:$LINENO
+        fLog -f -p warning -m "There may be a problem with this rsync:" -l $tSrc:$LINENO
+        fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
     return $tStatus
@@ -279,6 +259,7 @@ fCloneSummary()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
+    local tBranch
 
     function flExists()
     {
@@ -292,7 +273,7 @@ fCloneSummary()
     } # flExists
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    gpBranch=$($cGetCurBranch)
+    tBranch=$($cGetCurBranch)
     tOrigin=$($cGetOrigin)
 
     cat <<EOF
@@ -305,7 +286,7 @@ Summary
     ($(flExists $HOME/.gitignore))  HOME/.gitignore
     ($(flExists .gitproj))  $gpProjName/.gitproj
     ($(flExists .gitignore))  $gpProjName/.gitignore
-    (branch)  $gpBranch
+    (branch)  $tBranch
     (remote-git-dir $(flExists $tOrigin))  $tOrigin
     (local-raw-dir $(flExists $gpLocalRawDir))  $gpLocalRawDir
 
@@ -345,7 +326,7 @@ EOF
 # --------------------
 fCloneFromRemoteDir()
 {
-    # Called by "git-projoclone"
+    # Called by "git-proj-clone"
     # Minimum settings:
     # All the common vars set by gitproj-com.inc fComSetGlobals()
     # Required: gpRemoteGitDir, gpRemoteRawDir, gpProjName
