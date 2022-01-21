@@ -16,7 +16,7 @@
 	co = checkout
 	df = diff
 	origin = config --get remote.origin.url
-	raw-origin = config --get remote-raw-dir
+	raw-origin = config --get remote-raw-origin
 	push-tags = push --tags origin
 	revert-all = reset --hard HEAD
 	st = status
@@ -48,7 +48,7 @@
 	local-host=TBD
 	proj-name = TBD
 	remote-status=TBD
-	remote-raw-dir=TBD
+	remote-raw-origin=TBD
 	remote-min-size = 20g
 	verbose = 2
 [gitproj "hook"]

@@ -164,7 +164,7 @@ fCheckNotRaw()
         echo
         echo "These files should not be managed in git:"
         echo "$gFileList" | fmt -w 10
-        tResult=$(git config --get gitproj.config.remote-raw-dir)
+        tResult=$(git config --get gitproj.config.remote-raw-origin)
         cat <<EOF | fmt
 
 Use "git proj push" to save binary files, in raw/, to $tResult

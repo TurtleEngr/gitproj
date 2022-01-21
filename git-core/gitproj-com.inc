@@ -441,7 +441,7 @@ names that match the pattern. For example:
 S<-i 'gitproj\.config\.|gitflow\.'>
 
 The -e pExcPat is a "grep" pattern that removes variable names that
-match the pattern. For example: S<-e 'gitproj.config.remote-raw-dir'>
+match the pattern. For example: S<-e 'gitproj.config.remote-raw-origin'>
 pExcPat is applied after pIncPat.
 
 pSource and pDest files must exist. pSource must be readable, and
@@ -459,7 +459,7 @@ fComConfigUpdateLocal()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tTopDir
-    local tExclude="local-status|local-host|remote-status|remote-raw-dir"
+    local tExclude="local-status|local-host|remote-status|remote-raw-origin"
 
     if ! fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
         fError -i -n -m "fComConfigUpdateLocal: Missing: $tTopDir/.gitproj" -l $tSrc:$LINENO
@@ -1959,9 +1959,9 @@ fComIsRemoteMounted()
 
     # Assumes we are in a gitproj managed dir
 
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "None")
+    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
     if [ "$gpRemoteRawDir" = "None" ]; then
-        fError -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+        fError -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
     if [ -d $gpRemoteRawDir ]; then
         return 0
@@ -1993,7 +1993,7 @@ fComGetProjGlobals()
     fComGetConfig -k "gitproj.config.proj-name" -d "TBD" -e >/dev/null
     gpProjName=$gGetConfigValue
 
-    fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD" -e >/dev/null
+    fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD" -e >/dev/null
     gpRemoteRawDir=$gGetConfigValue
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648" 2>&1) # 2g
 

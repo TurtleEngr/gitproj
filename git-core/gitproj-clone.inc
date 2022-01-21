@@ -217,7 +217,7 @@ fCloneMkRawDir()
         fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
-    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
+    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawDir"
     fComSetConfig -l -k "gitproj.config.remote-status" -v "defined"
 
     return $tStatus

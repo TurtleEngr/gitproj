@@ -219,7 +219,7 @@ drive.  The command will not continue if there is not enough space.
 The available space must also be twice the size of the space used by
 ProjName.raw.
 
-    remote-raw-dir
+    remote-raw-origin
 
 Default: -d pMountDir/ProjName.raw
 
@@ -293,7 +293,7 @@ file.
 		git-flow-pkg = TBD
 
 		# Local mount examples
-		remote-raw-dir = TBD
+		remote-raw-origin = TBD
 		#remote.origin.url = /MOUNT-DIR/DIR/NAME.git
 
 		# Remote examples (not implemented. TBD)

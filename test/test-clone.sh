@@ -343,7 +343,7 @@ testCloneCheckLocalConfig()
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "warning: Missing file: .gitproj It should have been versioned! Will try to recreate it from ~/.gitconfig"
 
-    #tResult=$(grep remote-raw-dir $c ConfigHost 2>&1)
+    #tResult=$(grep remote-raw-origin $c ConfigHost 2>&1)
     #assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
 return 0
     rm .gitproj
@@ -534,7 +534,7 @@ testCloneMkRawDirPass()
     assertTrue "$LINENO" "[ -f $gpLocalRawDir/src/final/george.mp4 ]"
     ##assertContains "$LINENO tResult=$tResult" "$tResult" "Uncomment to check"
 
-    tResult=$(fComGetConfig -l -k "gitproj.config.remote-raw-dir")
+    tResult=$(fComGetConfig -l -k "gitproj.config.remote-raw-origin")
     assertTrue $LINENO "$?"
     assertContains "$LINENO $tResult" $tResult "$gpRemoteRawDir"
 

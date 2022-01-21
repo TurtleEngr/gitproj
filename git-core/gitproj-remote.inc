@@ -48,9 +48,9 @@ fRemoteSetGlobals()
         fi
     fi
 
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
+    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
     if [ "$gpRemoteRawDir" != "TBD" ]; then
-        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-dir=$gpRemoteRawDir" -l "$tSrc:$LINENO"
+        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-origin=$gpRemoteRawDir" -l "$tSrc:$LINENO"
     fi
 
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
@@ -310,8 +310,8 @@ fRemoteMkRemote()
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
     fi
 
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
-    fComSetConfig -l -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
+    fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawDir"
+    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawDir"
     fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
     return 0
@@ -341,12 +341,12 @@ fRemoteReport()
         fError -i -n -m "Origin name ($tProjName) does not match project name ($gpProjName)." -l $tSrc:$LINENO
     fi
 
-    tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
+    tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
     if [ "$tRawOrigin" = "TBD" ]; then
-        fError -i -n -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+        fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
     if [ -z "$gpRemoteRawDir" ]; then
-        fError -i -n -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+        fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
     if [ ! -d $gpRemoteRawDir ]; then
         fError -i -n -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO

@@ -299,7 +299,7 @@ REMOVEDtestRemoteVerifyState()
     gpRemoteRawDir=foo
     tResult=$(fRemoteVerifyState 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Config problem remote-status=not-defined, but remote-raw-dir is set to"
+    assertContains "$LINENO $tResult" "$tResult" "Config problem remote-status=not-defined, but remote-raw-origin is set to"
 
     gpRemoteStatus=not-defined
     gpRemoteRawDir="TBD"

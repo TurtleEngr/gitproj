@@ -22,7 +22,7 @@ fUsage()
 =head1 DESCRIPTION
 
     Do a "git status"
-    Verify gitproj.config.remote-raw-dir is defined and mounted
+    Verify gitproj.config.remote-raw-origin is defined and mounted
     Verify origin is set to a path that exists (if mounted)
     Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
 
