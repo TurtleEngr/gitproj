@@ -215,7 +215,6 @@ testPushRawFiles()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-
     tResult=$(fPushRawFiles 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"

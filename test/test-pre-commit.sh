@@ -123,9 +123,8 @@ setUp()
     for tConf in \
         $cDatHome3/project/george/.gitproj.config.testserver \
         $cDatHome3/project/george/.gitproj.config.testserver2 \
-        $cDatHome3/project/george/.gitproj.config.local \
-      ; do
-	git config -f $tConf gitproj.config.ver $tVer
+        $cDatHome3/project/george/.gitproj.config.local; do
+        git config -f $tConf gitproj.config.ver $tVer
     done
 
     cd $HOME/project/george >/dev/null 2>&1

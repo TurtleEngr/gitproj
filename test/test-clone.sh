@@ -346,7 +346,7 @@ testCloneCheckLocalConfig()
 
     #tResult=$(grep remote-raw-origin $c ConfigHost 2>&1)
     #assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawOrigin"
-return 0
+    return 0
     rm .gitproj
     #rm $c ConfigHost
     tResult=$(fCloneCheckLocalConfig 2>&1)

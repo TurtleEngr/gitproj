@@ -10,14 +10,14 @@ fUsage()
     local pStyle="${1:-usage}"
 
     local tFileList="\
-	-f $gpBin/git-proj \
-	-f $gpBin/git-proj-init \
-    	-f $gpBin/git-proj-remote \
-    	-f $gpBin/git-proj-clone \
-    	-f $gpBin/git-proj-push \
-    	-f $gpBin/git-proj-pull \
-	-f $gpBin/git-proj-status \
-	"
+        -f $gpBin/git-proj \
+        -f $gpBin/git-proj-init \
+        -f $gpBin/git-proj-remote \
+        -f $gpBin/git-proj-clone \
+        -f $gpBin/git-proj-push \
+        -f $gpBin/git-proj-pull \
+        -f $gpBin/git-proj-status \
+        "
     tFileList="$(echo $tFileList)"
 
     #-f $gpBin/git-proj-config \
@@ -27,13 +27,13 @@ fUsage()
 
     local tIntFileList="\
         $tFileList \
-	-f $gpBin/gitproj-com.inc \
-	-f $gpBin/gitproj-init.inc \
-	-f $gpBin/gitproj-remote.inc \
-	-f $gpBin/gitproj-clone.inc \
-	-f $gpBin/gitproj-pull.inc \
-	-f $gpBin/gitproj-push.inc \
-	-f $gpBin/gitproj-status.inc \
+        -f $gpBin/gitproj-com.inc \
+        -f $gpBin/gitproj-init.inc \
+        -f $gpBin/gitproj-remote.inc \
+        -f $gpBin/gitproj-clone.inc \
+        -f $gpBin/gitproj-pull.inc \
+        -f $gpBin/gitproj-push.inc \
+        -f $gpBin/gitproj-status.inc \
     "
     tIntFileList="$(echo $tIntFileList)"
 
@@ -72,13 +72,13 @@ files, and repositiories on external drives.
 
 =head1 SYNOPSIS
 
- 	git proj [-v] [-V] [--version] [-h] [-H pStyle]
+        git proj [-v] [-V] [--version] [-h] [-H pStyle]
 
- 	git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
+        git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
- 	pSubCmd: init, remote, clone, push, pull, status
-	pSubCmdOpt: Just run: "git proj [pSubCmd]"
- 	[common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
+        pSubCmd: init, remote, clone, push, pull, status
+        pSubCmdOpt: Just run: "git proj [pSubCmd]"
+        [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
 
 =head1 DESCRIPTION
 
@@ -173,14 +173,14 @@ pStyle is used to select the type of help and how it is formatted.
 
 Supported styles:
 
-	short|usage - Output short usage help as text.
-	long|text   - Output long usage help as text. All subcommands.
-	man 	    - Output long usage help as a man page.
-	html 	    - Output long usage help as html. All subcommands.
-	md 	    - Output long usage help as markdown.
-	int 	    - Output internal documentation as text.
-	int-html    - Output internal documentation as html.
-	int-md 	    - Output internal documentation as markdown.
+        short|usage - Output short usage help as text.
+        long|text   - Output long usage help as text. All subcommands.
+        man         - Output long usage help as a man page.
+        html        - Output long usage help as html. All subcommands.
+        md          - Output long usage help as markdown.
+        int         - Output internal documentation as text.
+        int-html    - Output internal documentation as html.
+        int-md      - Output internal documentation as markdown.
 
 =item B<-q>
 
@@ -282,63 +282,63 @@ Uncomment the variables that should override ~/.gitconfig or
 variable should be put in the correspoinding .gitproj.config.$HOSTNAME
 file.
 
-	[gitproj "config"]
-		# Expected version, only first N must be the same.
-		# Use backward compatible code, or exit.
-		# Warn if second N is different
-		ver = 0.1.2
+        [gitproj "config"]
+                # Expected version, only first N must be the same.
+                # Use backward compatible code, or exit.
+                # Warn if second N is different
+                ver = 0.1.2
 
-		# States: not-installed, installed, config-errors
-		proj-status = not-installed
+                # States: not-installed, installed, config-errors
+                proj-status = not-installed
 
-		syslog = true
-		facility = user
+                syslog = true
+                facility = user
 
-		bin = /usr/lib/git-core
-		# bin = $(git --exec-path)
+                bin = /usr/lib/git-core
+                # bin = $(git --exec-path)
 
-		doc = /usr/share/doc/git-proj
-		test = /usr/share/doc/git-proj/test
+                doc = /usr/share/doc/git-proj
+                test = /usr/share/doc/git-proj/test
 
-	 	# See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
+                # See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
 
-		# States: not-defined, defined, config-errors
-		local-status = not-set-up
+                # States: not-defined, defined, config-errors
+                local-status = not-set-up
 
-		# States: not-defined, defined, multiple-defined
-		remote-status = not-defined
+                # States: not-defined, defined, multiple-defined
+                remote-status = not-defined
 
-		# origin-url with path and .git remote
-		proj-name = TBD
+                # origin-url with path and .git remote
+                proj-name = TBD
 
-		# This should only be changed on the matching host
-		# git rev-parse --show-toplevel
-		local-top-dir = TBD
+                # This should only be changed on the matching host
+                # git rev-parse --show-toplevel
+                local-top-dir = TBD
 
-		# Set by init. Changing these will require manual repair.
-		# If no ~ or /, this is relative to top-dir
+                # Set by init. Changing these will require manual repair.
+                # If no ~ or /, this is relative to top-dir
 
-		git-flow-pkg = TBD
+                git-flow-pkg = TBD
 
-		# Local mount examples
-		remote-raw-origin = TBD
-		#remote.origin.url = /MOUNT-DIR/DIR/NAME.git
+                # Local mount examples
+                remote-raw-origin = TBD
+                #remote.origin.url = /MOUNT-DIR/DIR/NAME.git
 
-		# Remote examples (not implemented. TBD)
-		#remote-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
-		#remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
-		#remote.origin-url=git@github.com:TurtleEngr/gitproj.git
+                # Remote examples (not implemented. TBD)
+                #remote-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
+                #remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
+                #remote.origin-url=git@github.com:TurtleEngr/gitproj.git
 
-	[gitproj "hook"]
-		# If pre-commit-enabled = true, pre-commit hook script will be
-		# installed into .git/hooks/
-		# Relative to gpDoc
-		source = hooks/pre-commit
-		pre-commit-enabled = true
-		check-file-names = true
-		check-for-big-files = true
-		# End size with b, k, m, or g
-		binary-file-size-limit = 1k
+        [gitproj "hook"]
+                # If pre-commit-enabled = true, pre-commit hook script will be
+                # installed into .git/hooks/
+                # Relative to gpDoc
+                source = hooks/pre-commit
+                pre-commit-enabled = true
+                check-file-names = true
+                check-for-big-files = true
+                # End size with b, k, m, or g
+                binary-file-size-limit = 1k
 
 =head2 Global Env. Var. Config
 

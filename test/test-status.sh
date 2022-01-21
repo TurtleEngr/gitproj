@@ -122,10 +122,9 @@ setUp()
     # Patch the version that was set in the tar file
     for tConf in \
         $HOME/project/george/.gitproj.config.local \
-	$HOME/project/george/.gitproj.config.testserver \
-	$HOME/project/george/.gitproj.config.testserver2 \
-      ; do
-	git config -f $tConf gitproj.config.ver $tVer
+        $HOME/project/george/.gitproj.config.testserver \
+        $HOME/project/george/.gitproj.config.testserver2; do
+        git config -f $tConf gitproj.config.ver $tVer
     done
 
     cd $HOME/project/george >/dev/null 2>&1

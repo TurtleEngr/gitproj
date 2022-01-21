@@ -23,7 +23,7 @@ fUsage()
 =head1 SYNOPSIS
 
     git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
-    	     	  [common-options]
+                  [common-options]
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ subcommands.
  git proj pull
  git proj set
  git proj status
- git proj add	TBD
+ git proj add   TBD
  git proj config TBD
  git flow
 

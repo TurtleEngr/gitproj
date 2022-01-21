@@ -178,8 +178,8 @@ testComSetConfigMore()
     #     1) -g ~/.gitconfig (include.path = .gitproj.config.global)
     # Relative to $HOME/$cDatProj1 ($cDatHome/$cDatProj1)
     #     2) -l .git/config
-    #	  X) -L .gitproj - with clone, updates --local
-    #	     after that it is updated from --local
+    #     X) -L .gitproj - with clone, updates --local
+    #        after that it is updated from --local
 
     # ----------
     tResult=$(fComSetConfig -g -k com.test.gvar -v "defined" 2>&1)

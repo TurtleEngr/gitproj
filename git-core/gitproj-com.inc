@@ -286,10 +286,10 @@ tcCatch()
     if [ -f $cEnvAfter ]; then
         diff $cEnvBefore $cEnvAfter | grep '>' | sed 's/^> //; s/=/="/; s/$/"/' >$cEnvDiff
         chmod a+rx $cEnvDiff
-    	. $cEnvDiff
-	if [ $gErr -eq 0 ]; then
-	    cd $PWD
-	fi
+        . $cEnvDiff
+        if [ $gErr -eq 0 ]; then
+            cd $PWD
+        fi
     fi
     rm -f $cEnvBefore $cEnvAfter $cEnvDiff >/dev/null 2>&1
     unset cEnvBefore cEnvAfter cEnvDiff
@@ -622,7 +622,7 @@ fComPreProjSetGlobals()
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
-   gpVerbose=$(fComGetConfig -k "gitproj.config.verbose" -i -d 2)
+    gpVerbose=$(fComGetConfig -k "gitproj.config.verbose" -i -d 2)
 
     gpAuto=0
     gpLocalTopDir=$PWD
@@ -824,15 +824,15 @@ fComUsage()
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | \
-            $tProg --title="$pTitle" $tHtmlOpt  | \
-            $tTidy 2>/dev/null
+            cat $pFileList |
+                $tProg --title="$pTitle" $tHtmlOpt |
+                $tTidy 2>/dev/null
         else
             if [ "$pStyle" = "short" ]; then
                 # shellcheck disable=SC2002
-                cat $pFileList | \
-                pod2text | \
-                head -n 10
+                cat $pFileList |
+                    pod2text |
+                    head -n 10
             else
                 # shellcheck disable=SC2002
                 cat $pFileList | $tProg
@@ -841,15 +841,15 @@ fComUsage()
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | \
-            fComInternalDoc | \
-            $tProg --title="$pTitle" $tHtmlOpt | \
-            $tTidy 2>/dev/null
+            cat $pFileList |
+                fComInternalDoc |
+                $tProg --title="$pTitle" $tHtmlOpt |
+                $tTidy 2>/dev/null
         else
             # shellcheck disable=SC2002
-            cat $pFileList | \
-            fComInternalDoc | \
-            $tProg
+            cat $pFileList |
+                fComInternalDoc |
+                $tProg
         fi
     fi
 
@@ -1045,52 +1045,52 @@ fComFmtLog()
     case $pLevel in
         emerg | emergency)
             pLevel=emerg
-    	    tLevel=$pLevel
+            tLevel=$pLevel
             ;;
         alert)
             :
             ;;
         crit | critical)
             pLevel=crit
-    	    tLevel=$pLevel
+            tLevel=$pLevel
             ;;
         err | error)
             pLevel=err
-    	    tLevel=$pLevel
+            tLevel=$pLevel
             ;;
         warning | warn)
-	    if [ $pForce -eq 0 ] && [ $gpVerbose -eq 0 ]; then
-	        return
-	    fi
+            if [ $pForce -eq 0 ] && [ $gpVerbose -eq 0 ]; then
+                return
+            fi
             pLevel=warning
-    	    tLevel=$pLevel
+            tLevel=$pLevel
             ;;
         notice)
-	    if [ $pForce -eq 0 ] && [ $gpVerbose -lt 2 ]; then
-	        return
-	    fi
-	    ;;
-	info)
-	    if [ $pForce -eq 0 ] && [ $gpVerbose -lt 3 ]; then
-	        return
-	    fi
-	    ;;
-	debug | debug-*)
+            if [ $pForce -eq 0 ] && [ $gpVerbose -lt 2 ]; then
+                return
+            fi
+            ;;
+        info)
+            if [ $pForce -eq 0 ] && [ $gpVerbose -lt 3 ]; then
+                return
+            fi
+            ;;
+        debug | debug-*)
             tLevel=debug
-    	    if [ $gpDebug -eq 0 ]; then
-	        return
-	    fi
-    	    if [ $gpDebug -ne 0 ] && [ "${pLevel%%-*}" != "$pLevel" ]; then
+            if [ $gpDebug -eq 0 ]; then
+                return
+            fi
+            if [ $gpDebug -ne 0 ] && [ "${pLevel%%-*}" != "$pLevel" ]; then
                 tDebugLevel=${pLevel##*-}
-            	if [ $tDebugLevel -gt $gpDebug ]; then
+                if [ $tDebugLevel -gt $gpDebug ]; then
                     return
-            	fi
-    	    fi
+                fi
+            fi
             ;;
         *)
             pMsg="Internal: (Unknown: $pLevel [$tSrc:$LINENO]) $pMsg"
             pLevel=err
-    	    tLevel=$pLevel
+            tLevel=$pLevel
             ;;
     esac
 
@@ -1154,7 +1154,7 @@ fLog()
             p) pLevel="${OPTARG}" ;;
             e) pErr="${OPTARG}" ;;
             i) pInt=1 ;;
-	    f) pForce=1 ;;
+            f) pForce=1 ;;
             :) echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]" ;;
             \?) echo "Internal: Unknown option: $OPTARG [$tSrc:$LINENO]" ;;
         esac
@@ -1297,9 +1297,10 @@ fError()
             l) pLine="${OPTARG}" ;;
             e) pErr="${OPTARG}" ;;
             i) pInt="-i" ;;
-            n) pNoExit=1
-               tLevel=err
-               ;;
+            n)
+                pNoExit=1
+                tLevel=err
+                ;;
             :)
                 echo "Internal: Value required for option: -$OPTARG [$tSrc:$LINENO]"
                 fComStackTrace
@@ -1420,11 +1421,11 @@ fComSetConfig()
                 fi
                 ;;
             L)
-		if ! fComMustBeInProjRepo $PWD; then
-		    return 1
-		fi
-		tTopDir="$($cGetTopDir 2>&1)"
-		;;
+                if ! fComMustBeInProjRepo $PWD; then
+                    return 1
+                fi
+                tTopDir="$($cGetTopDir 2>&1)"
+                ;;
         esac
         case $tArg in
             a) pAdd="--add" ;;
@@ -1569,12 +1570,12 @@ fComGetConfig()
                     return 1
                 fi
                 ;;
-	    L)
-		if ! fComMustBeInProjRepo $PWD; then
+            L)
+                if ! fComMustBeInProjRepo $PWD; then
                     return 1
                 fi
-		tTopDir="$($cGetTopDir 2>&1)"
-		;;
+                tTopDir="$($cGetTopDir 2>&1)"
+                ;;
         esac
         case $tArg in
             b) pType="--bool" ;;
@@ -1780,12 +1781,12 @@ fComUnsetConfig()
                     return 1
                 fi
                 ;;
-	    L)
-		if ! fComMustBeInProjRepo $PWD; then
+            L)
+                if ! fComMustBeInProjRepo $PWD; then
                     return 1
                 fi
-		tTopDir="$($cGetTopDir 2>&1)"
-		;;
+                tTopDir="$($cGetTopDir 2>&1)"
+                ;;
         esac
         case $tArg in
             a) pAll="--unset-all" ;;

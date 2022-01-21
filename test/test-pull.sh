@@ -134,9 +134,8 @@ setUp()
         $cDatHome/$cDatProj1/.gitproj.config.testserver \
         $cDatHome/$cDatProj1/.gitproj.config.local \
         $cDatHome2/$cDatProj1/.gitproj.config.testserver \
-        $cDatHome2/$cDatProj1/.gitproj.config.local \
-      ; do
-	git config -f $tConf gitproj.config.ver $tVer
+        $cDatHome2/$cDatProj1/.gitproj.config.local; do
+        git config -f $tConf gitproj.config.ver $tVer
     done
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     git ci -am "Updated" >/dev/null 2>&1

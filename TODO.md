@@ -234,9 +234,9 @@ Fix: look for first arg so see if it is a CMD. - done
     otherwise they can be prompted for.
     The -l option assumes you have a dir with content already in it. Is fill path needed, or can it just...
     Project Path (-l) [/home/bruce/test/seal/quit]?
-    	huh, quit? s/b
-	Project Path (-l) [/home/bruce/test/seal]
-	Project Name [seal] Continue [y/n]?
+        huh, quit? s/b
+        Project Path (-l) [/home/bruce/test/seal]
+        Project Name [seal] Continue [y/n]?
 
 * in git-proj-remote Testing Results: - done
 

@@ -85,7 +85,7 @@ fInitGetLocalPath()
         if ! fInitValidLocalPath $pLocalPath; then
             fError -m "Invalid -l pLocalPath: $pLocalPath" -l $tSrc:$LINENO
         fi
-    	fLog -p notice -m "gitproj.config.proj-name = $gpProjName" -l $tSrc:$LINENO
+        fLog -p notice -m "gitproj.config.proj-name = $gpProjName" -l $tSrc:$LINENO
         return 0
     fi
     cat <<EOF | fComFmt
@@ -235,14 +235,14 @@ EOF
         case $tResult in
             y*)
                 gpAutoMove=1
-		echo "Binary files will be moved."
-		echo
+                echo "Binary files will be moved."
+                echo
                 break
                 ;;
             n*)
                 gpAutoMove=0
-		echo "Binary files will NOT be moved."
-		echo
+                echo "Binary files will NOT be moved."
+                echo
                 break
                 ;;
         esac
@@ -275,20 +275,20 @@ fInitGetGitFlow()
 
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
-	echo
+        echo
         echo -n "Setup git-flow (-f) [y/n]? "
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
-	echo
+        echo
         if [ "$tResult" = "y" ]; then
             gpGitFlow="true"
-	    fLog -p notice -m "gitproj.config.git-flow = true" -l $tSrc:$LINENO
-	    echo
+            fLog -p notice -m "gitproj.config.git-flow = true" -l $tSrc:$LINENO
+            echo
             break
         fi
         if [ "$tResult" = "n" ]; then
             gpGitFlow="false"
-	    fLog -p notice -m "gitproj.config.git-flow = false" -l $tSrc:$LINENO
+            fLog -p notice -m "gitproj.config.git-flow = false" -l $tSrc:$LINENO
             break
         fi
     done
@@ -354,7 +354,7 @@ EOF
             let --tMaxLoop
             echo -n "Continue with creating a local git repo [y/n]? "
             read -r tResult
-	    echo
+            echo
             tResult=${tResult%${tResult#[a-z]}}
             if [ "$tResult" = "y" ]; then
                 break
@@ -468,8 +468,8 @@ fInitMkGitFlow()
     if ! fComCheckPkg git-flow; then
         echo
         fLog -p warning -m "git-flow is not installed" -l $tSrc:$LINENO
-	gpGitFlow=false
-    	fComSetConfig -g -k gitproj.config.git-flow -v false
+        gpGitFlow=false
+        fComSetConfig -g -k gitproj.config.git-flow -v false
         return 1
     fi
     echo

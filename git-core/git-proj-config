@@ -35,25 +35,25 @@ fUsage()
        Set the max size for commits of binary files.
 
 Usage:
-	proj-set-remote pPath
+        proj-set-remote pPath
 
 Description
-	Use this script if the mount path is different from the origin
-	remote. pPath is the path pointing the current repo's remote
-	repo on an external drive.
+        Use this script if the mount path is different from the origin
+        remote. pPath is the path pointing the current repo's remote
+        repo on an external drive.
 
-	Setup a different host.
+        Setup a different host.
 
-	Review and change the current settings interactively.
+        Review and change the current settings interactively.
 
 Example
-	The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git
-	But the drive is now mounted at /mnt/usb-drive, use:
+        The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git
+        But the drive is now mounted at /mnt/usb-drive, use:
 
-	    proj-set-remote /mnt/usb-drive/video-2019-04-01
+            proj-set-remote /mnt/usb-drive/video-2019-04-01
 
-	will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
-	if trip.git is found at the specified path.
+        will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
+        if trip.git is found at the specified path.
 
 =cut
 

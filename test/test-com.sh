@@ -340,10 +340,10 @@ testComLogMultiplePermutations()
         for gpVerbose in 0 1 2 3; do
             for gpDebug in 0 1 2; do
                 for tLevel in alert crit err warning notice info debug debug-1 debug-3; do
-		    let ++tCount
-		    if [ $((tCount % 50)) -eq 0 ]; then
-		        echo 1>&2
-		    fi
+                    let ++tCount
+                    if [ $((tCount % 50)) -eq 0 ]; then
+                        echo 1>&2
+                    fi
                     echo -n '.' 1>&2
                     tTestArg="l=$gpSysLog v=$gpVerbose d-$gpDebug p=$tLevel"
                     fTestDebug " "
@@ -351,47 +351,47 @@ testComLogMultiplePermutations()
                     tResult=$(fLog -p $tLevel -m "$tMsg" -l $tLine -e $tErr 2>&1)
                     fTestDebug "tResult=$tResult"
 
-		    if [ $gpVerbose -eq 0 ] && echo $tLevel | grep -Eq 'warning|notice|info'; then
+                    if [ $gpVerbose -eq 0 ] && echo $tLevel | grep -Eq 'warning|notice|info'; then
                         assertNull "$LINENO $tTestArg" "$tResult"
-			continue
+                        continue
                     fi
                     if [ $gpVerbose -eq 1 ] && echo $tLevel | grep -Eq 'notice|info'; then
                         assertNull "$LINENO $tTestArg" "$tResult"
-			continue
+                        continue
                     fi
                     if [ $gpVerbose -eq 2 ] && echo $tLevel | grep -Eq 'info'; then
                         assertNull "$LINENO $tTestArg" "$tResult"
-			continue
+                        continue
                     fi
                     if [ $gpDebug -eq 0 ] && [ "${tLevel%%-*}" = "debug" ]; then
                         assertNull "$LINENO $tTestArg" "$tResult"
-			continue
+                        continue
                     fi
                     if [ $gpDebug -eq 1 ] && [ "$tLevel" = "debug" ]; then
                         assertNotNull "$LINENO $tTestArg" "$tResult"
                     fi
                     if [ $gpDebug -eq 1 ] && [ "$tLevel" = "debug-3" ]; then
                         assertNull "$LINENO $tTestArg" "$tResult"
-			continue
+                        continue
                     fi
                     if [ $gpDebug -eq 2 ] && [ "$tLevel" = "debug" ]; then
                         assertNotNull "$LINENO $tTestArg" "$tResult"
-		    fi
+                    fi
                     if [ $gpDebug -eq 2 ] && [ "$tLevel" = "debug-1" ]; then
                         assertNotNull "$LINENO $tTestArg" "$tResult"
-		    fi
+                    fi
                     if [ $gpDebug -eq 2 ] && [ "$tLevel" = "debug-3" ]; then
                         assertNull "$LINENO $tTestArg" "$tResult"
-			continue
+                        continue
                     fi
                     assertContains "$LINENO $tTestArg name $tResult" "$tResult" "$gpCmdName"
                     assertContains "$LINENO $tTestArg" "$tResult" "$tLevel:"
                     assertContains "$LINENO $tTestArg msg" "$tResult" "$tMsg"
                     assertContains "$LINENO $tTestArg line" "$tResult" '['$tLine']'
                     assertContains "$LINENO $tTestArg err" "$tResult" '('$tErr')'
-		    if [ "$gpSyslog" = "true" ]; then
-		        assertContains "$LINENO $tTestArg date" "$tResult" "$tMonth"
-		    fi
+                    if [ "$gpSyslog" = "true" ]; then
+                        assertContains "$LINENO $tTestArg date" "$tResult" "$tMonth"
+                    fi
                 done # tLevel
             done     # gpDebug
         done         # gpVerbose
@@ -437,43 +437,43 @@ testComErrorLog()
                 if [ "$tNoExit" = "NA" ]; then
                     tNoExit=""
                 fi
-		if [ "$tInt" = "NA" ]; then
-		    tInt=""
-		fi
+                if [ "$tInt" = "NA" ]; then
+                    tInt=""
+                fi
                 echo -n '.' 1>&2
                 tTestArg="l$gpSysLog n$tNoExit i$tInt"
                 fTestDebug " "
                 fTestDebug "Call: fError $tNoExit $tInt -e $tErr -m \"$tMsg\" -l $tLine"
                 tResult=$(fError $tNoExit $tInt -m "$tMsg" -e $tErr -l $tLine 2>&1)
-		tStatus=$?
+                tStatus=$?
                 fTestDebug "tResult=$tResult"
 
-		if [ -z "$tNoExit" ]; then
+                if [ -z "$tNoExit" ]; then
                     assertContains "$LINENO $tTestArg crit" "$tResult" "crit"
-		else
+                else
                     assertContains "$LINENO $tTestArg err" "$tResult" "err"
-		fi
-		if [ -z "$tInt" ]; then
+                fi
+                if [ -z "$tInt" ]; then
                     assertNotContains "$LINENO $tTestArg !int" "$tResult" "Internal:"
-		else
+                else
                     assertContains "$LINENO $tTestArg int" "$tResult" "Internal:"
                     assertContains "$LINENO $tTestArg stack" "$tResult" "Stack trace at"
-		fi
-		if [ -z "$tNoExit" ] && [ -z "$tInt" ]; then
-		    assertContains "$LINENO $tTestArg usage" "$tResult" "Usage"
-		    assertEquals "$LINENO $tTestArg return" "1" "$tStatus"
-		fi
+                fi
+                if [ -z "$tNoExit" ] && [ -z "$tInt" ]; then
+                    assertContains "$LINENO $tTestArg usage" "$tResult" "Usage"
+                    assertEquals "$LINENO $tTestArg return" "1" "$tStatus"
+                fi
                 assertContains "$LINENO $tTestArg name" "$tResult" "$gpCmdName"
                 assertContains "$LINENO $tTestArg Error" "$tResult" "Error:"
                 assertContains "$LINENO $tTestArg msg" "$tResult" "$tMsg"
                 assertContains "$LINENO $tTestArg line" "$tResult" '['$tLine']'
                 assertContains "$LINENO $tTestArg err" "$tResult" '('$tErr')'
-		if [ "$gpSyslog" = "true" ]; then
-		    assertContains "$LINENO $tTestArg date" "$tResult" "$tMonth"
-		fi
+                if [ "$gpSyslog" = "true" ]; then
+                    assertContains "$LINENO $tTestArg date" "$tResult" "$tMonth"
+                fi
             done # gpSyslog
-	done	 # tNoExit
-    done	 # tInt
+        done     # tNoExit
+    done         # tInt
 
     echo 1>&2
     echo "$tCount" 1>&2

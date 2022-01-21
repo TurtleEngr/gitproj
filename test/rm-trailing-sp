@@ -17,10 +17,15 @@ if [ $# -eq 0 ]; then
 Usage:
     rm-trailing-sp FILE...
     
-Remove trailing whitespace. Only use this on text files.
-The script skip files when the "file" command does not show "ASCII text".
+Remove trailing whitespace. Also convert tabs to spaces with
+"expand". This helps tracking differences between file versions.
+For normalizing indents, in scripts, see: bash-fmt
 
-Backup the files if you want to be careful.
+Only use this on text files. The script skips files when the "file"
+command does not show "ASCII text". But don't depend on this check.
+It is best to only specifiy text files in the command line.  Backup
+the files, if you want to be sure non-text files are not damaged.
+
 EOF
     exit 1
 fi
@@ -48,5 +53,19 @@ for tFile in $*; do
         continue
     fi
 
-    sed -Ei 's/[[:space:]]*$//' $tFile
+    if [ ! -w $tFile ]; then
+        echo "Skipping read-only $tFile"
+        continue
+    fi
+
+    tExec=0
+    if [ -x $tFile ]; then
+        tExec=1
+    fi
+
+    expand <$tFile | sed -E 's/[[:space:]]*$//' >$tFile.tmp
+    mv $tFile.tmp $tFile
+    if [ $tExec -ne 0 ]; then
+        chmod a+rx $tFile
+    fi
 done

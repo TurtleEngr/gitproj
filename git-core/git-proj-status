@@ -77,11 +77,11 @@ while getopts :shH:qvV:xX: tArg; do
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-	q) gpVerbose=0 ;;
+        q) gpVerbose=0 ;;
         v) gpVerbose=2 ;;
-	V) gpVerbose=$OPTARG ;;
+        V) gpVerbose=$OPTARG ;;
         x) let ++gpDebug ;;
-	X) gpDebug=$OPTARG ;;
+        X) gpDebug=$OPTARG ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
