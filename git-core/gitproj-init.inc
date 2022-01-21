@@ -19,11 +19,15 @@ fInitGettingStarted()
 
     cat <<EOF
 
-Be sure you are "cd" to the "top" project directory. Or use the "-l
-pLocalPath" option. The directory name will be used for the git repo
-name. The project directory should not already be a git repo, and it
-cannot contain any git repos under it.  Also, all of the directories
-and files need to be readable by your user.
+Be sure you are "cd" to the "top" project directory,then use "-l
+$PWD".  The directory name will be used for the git repo name. The
+project directory should not already be a git repo, and it cannot
+contain any git repos under it.  Also, all of the directories and
+files need to be readable by your user (git proj init will verify
+all of the above is true.
+
+You only need to answer 5 questions to create the git part of this
+project.
 
 EOF
     if [ $gpAuto -ne 0 ]; then
@@ -66,7 +70,7 @@ fInitValidLocalPath()
 
     gpLocalTopDir=$pLocalPath
     gpProjName="${gpLocalTopDir##*/}"
-    echo "The project Name will be: $gpProjName"
+
     return 0
 } # fInitValidLocalPath
 
@@ -75,7 +79,6 @@ fInitGetLocalPath()
 {
     local pLocalPath=$1
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
@@ -84,30 +87,27 @@ fInitGetLocalPath()
         fi
         return 0
     fi
-    while [ $tMaxLoop -gt 0 ]; do
-        let --tMaxLoop
+    cat <<EOF | fComFmt
 
-        cat <<EOF | fComFmt
 Define the existing project directory. The last directory will be used
-for the name of the project. Default: current directory
+for the name of the project. If you don't want this name, type "n",
+then rename the directory you are in or move the files. You can start
+with an empty directory.
+
 EOF
-        echo "Project Path (-l) [$pLocalPath]"
-	echo -n "Project Name [${pLocalPath##*/}] Continue [y/n]? "
-        read -r tResult
-        if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
-        if [ -z "$tResult" ]; then
-            tResult=$pLocalPath
-        fi
-        if fInitValidLocalPath $tResult; then
-            break
-        fi
-    done
-    if [ $tMaxLoop -eq 0 ]; then
-        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    if ! fInitValidLocalPath $pLocalPath; then
+        exit 1
     fi
+    echo "Project Path: -l $pLocalPath"
+    echo -n "Project Name: [${pLocalPath##*/}] Continue [y/n]? "
+    read -r tResult
+    echo
+    if [ "$tResult" = "n" ]; then
+        fLog -f -p warning -m "Quitting" -l $tSrc:$LINENO
+        exit 1
+    fi
+
+    fLog -p notice -m "gitproj.config.proj-name = $gpProjName" -l $tSrc:$LINENO
 
     return 0
 } # fInitGetLocalPath
@@ -147,14 +147,14 @@ fInitGetSize()
         let --tMaxLoop
 
         cat <<EOF | fComFmt
+
 Define the size for large binary files. Format: Nb, Nk, Nm, or Ng
+Press enter to accept the value shown, or type a new value.
+(^c to quit this program.)
+
 EOF
-        echo "Size (-s) [$pMaxSize/quit]? "
+        echo "Size (-s) [$pMaxSize]? "
         read -r tResult
-        if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
         if [ -z "$tResult" ]; then
             tResult=$pMaxSize
         fi
@@ -165,6 +165,8 @@ EOF
     if [ $tMaxLoop -eq 0 ]; then
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
     fi
+
+    fLog -p notice -m "gitproj.hook.proj-binary-file-size-limit = gpMaxSize" -l $tSrc:$LINENO
 
     return 0
 } # fInitGetSize
@@ -203,10 +205,11 @@ fInitGetMoveFiles()
     local tMaxLoop=30
     declare -l tResult
 
-    fLog -p info -m "These binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "Looking for binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
 
     if ! fInitGetBinaryFiles; then
-        fLog -p warning -m 'No large binary files were found.' -l $tSrc:$LINENO
+        fLog -p notice -m 'No large binary files were found.' -l $tSrc:$LINENO
         return 0
     fi
 
@@ -219,26 +222,26 @@ fInitGetMoveFiles()
 
         cat <<EOF | fComFmt
 
-The listed files can be moved to the project's raw directory. Paths
-will be created in the raw directory that correspond to the project's
-directory. A symlink will replace the moved file. The symlink will
-point to [raw]. Quit if you want to change the MaxSize.
+The files, shown above, can be moved to the project's raw
+directory. Paths will be created in the top raw directory A symlink
+will replace the moved file. The symlink will point to
+[raw/path]. ^c if you want to change the MaxSize.
 
 EOF
         # TBD convert this logic to use fComSelect()
-        echo -n "Move the files (-m) [y/n/quit]? "
+        echo -n "Move the files (-m) [y/n]? "
         read -r tResult
         case $tResult in
-            q*)
-                fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-                exit 1
-                ;;
             y*)
                 gpAutoMove=1
+		echo "Binary files will be moved."
+		echo
                 break
                 ;;
             n*)
                 gpAutoMove=0
+		echo "Binary files will NOT be moved."
+		echo
                 break
                 ;;
         esac
@@ -259,7 +262,9 @@ fInitGetGitFlow()
 
     fComCheckPkg $gpGitFlowPkg
     if [ $? -ne 0 ]; then
-        fLog -p warning -m "git-flow is not installed." -l $tSrc:$LINENO
+        echo
+        fLog -p warning -m "git-flow is not installed. It can be added later." -l $tSrc:$LINENO
+        echo
         gpGitFlow="false"
         return 0
     fi
@@ -269,20 +274,20 @@ fInitGetGitFlow()
 
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
-
-        echo -n "Setup git-flow (-f) [y/n/quit]? "
+	echo
+        echo -n "Setup git-flow (-f) [y/n]? "
         read -r tResult
         tResult=${tResult%${tResult#[a-z]}}
-        if [ "$tResult" = "q" ]; then
-            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
-            exit 1
-        fi
+	echo
         if [ "$tResult" = "y" ]; then
             gpGitFlow="true"
+	    fLog -p notice -m "gitproj.config.git-flow = true" -l $tSrc:$LINENO
+	    echo
             break
         fi
         if [ "$tResult" = "n" ]; then
             gpGitFlow="false"
+	    fLog -p notice -m "gitproj.config.git-flow = false" -l $tSrc:$LINENO
             break
         fi
     done
@@ -319,9 +324,9 @@ Summary
     facility = $gpFacility
     bin = $gpBin
     doc = $gpDoc
-    test = $gpTest
     proj-name = $gpProjName
     git-flow-pkg = $gpGitFlowPkg
+    verbose = $gpVerbose
 
 [gitproj "hook"]
     verbose = $gpHookVerbose
@@ -332,12 +337,23 @@ Summary
     check-for-big-files = $gpCheckForBigFiles
     binary-file-size-limit = $gpMaxSize
 
+The above variables will be put in these config files: ~/.gitconfig
+(--global), PROJ/.git/config, (--local), PROJ/.gitproj. You can edit
+these files directly or use "git config" when you are in the git-proj
+directory. (PROJ/.git/config usually updated from PROJ/.git/config)
+
+You can quit now, edit the values in ~/.gitconfig, and those values
+will be used for the initial default values. For example you might
+want to set "syslog = true", so most of these messages will be sent to
+syslog.
+
 EOF
     if [ $gpAuto -eq 0 ]; then
         while [ $tMaxLoop -gt 0 ]; do
             let --tMaxLoop
             echo -n "Continue with creating a local git repo [y/n]? "
             read -r tResult
+	    echo
             tResult=${tResult%${tResult#[a-z]}}
             if [ "$tResult" = "y" ]; then
                 break
@@ -402,6 +418,7 @@ fInitMoveBinaryFiles()
         fLog -p warning -m "Binary files were found, but will not be moved." -l $tSrc:$LINENO
         return 0
     fi
+    echo
     fLog -p notice -m "Moving large binary files." -l $tSrc:$LINENO
     for tFile in $tFileList; do
         tDir=${tFile%/*}
@@ -433,6 +450,7 @@ fInitMoveBinaryFiles()
         fLog -p notice -m "Created link: $tLink" -l $tSrc:$LINENO
     done
 
+    echo
     fLog -p notice -m "Version and use the file symlinks, with no changes in your code. Or better, delete the symlinks and access the files from the project's $gpLocalRawDir." -l $tSrc:$LINENO
 
     return 0
@@ -447,10 +465,14 @@ fInitMkGitFlow()
         return 0
     fi
     if ! fComCheckPkg git-flow; then
-        fError -n -m "git-flow is not installed" -l $tSrc:$LINENO
+        echo
+        fLog -p warning -m "git-flow is not installed" -l $tSrc:$LINENO
+	gpGitFlow=false
+    	fComSetConfig -g -k gitproj.config.git-flow -v false
         return 1
     fi
-    fLog -p info -m "git flow init" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "git flow init" -l $tSrc:$LINENO
     git flow init -d
 
     # Define the default prefixes
@@ -476,33 +498,42 @@ fInitMkGitDir()
 
     cd $gpLocalTopDir >/dev/null 2>&1
 
-    fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "Create: .gitignore" -l $tSrc:$LINENO
     cp $gpDoc/config/gitignore .gitignore
 
-    fLog -p info -m "git init" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "git init" -l $tSrc:$LINENO
     git init
 
-    fLog -p info -m "git add FILES" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "git add FILES" -l $tSrc:$LINENO
     git add .gitignore *
 
-    fLog -p info -am "git commit" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "git commit" -l $tSrc:$LINENO
     git commit -am "Initial commit"
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
-        fError -i "Initial git commit failed." -l $tSrc:$LINENO
+        fError -n -i "Initial git commit failed." -l $tSrc:$LINENO
     fi
 
-    fLog -p info -m "Rename master to main" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "Rename master to main" -l $tSrc:$LINENO
     git branch --move master main
-    fLog -p info -m "Create develop branch" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "Create develop branch" -l $tSrc:$LINENO
     git branch develop
     git checkout develop
 
     fInitMkGitFlow
+    echo
     git branch
+    echo
     git status
 
-    cp $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+    echo
+    cp -v $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
 
     return 0
 } # fInitMkGitDir
@@ -516,11 +547,13 @@ fInitMkLocalConfig()
 
     touch .gitproj
 
-    fLog -p info -m "Create: .gitproj" -l $tSrc:$LINENO
-    fComConfigCopy -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
-
-    fLog -p info -m "Create: host values in --local" -l $tSrc:$LINENO
+    echo
+    fLog -p notice -m "Create: host values in --local" -l $tSrc:$LINENO
     fComConfigCopy -s .gitproj -d .git/config
+
+    echo
+    fLog -p notice -m "Create: .gitproj" -l $tSrc:$LINENO
+    fComConfigCopy -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
 
     return 0
 } # fInitMkLocalConfig
@@ -621,4 +654,5 @@ EOF
 } # fInitCreateLocalGit
 
 # ========================================
+gpVerbose=2
 fComPreProjSetGlobals
