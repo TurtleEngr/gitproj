@@ -5,7 +5,7 @@ export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
     gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
-    gpGitFlow gpHookSource gpHookVerbose gpLocalRawDir gpLocalStatus \
+    gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
@@ -91,7 +91,8 @@ fInitGetLocalPath()
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 EOF
-        echo -n "Project Path (-l) [$pLocalPath/quit]? "
+        echo "Project Path (-l) [$pLocalPath]"
+	echo -n "Project Name [${pLocalPath##*/}] Continue [y/n]? "
         read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -p warning -m "Quitting" -l $tSrc:$LINENO
@@ -330,7 +331,6 @@ Summary
     check-whitespace = $gpCheckWhitespace
     check-for-big-files = $gpCheckForBigFiles
     binary-file-size-limit = $gpMaxSize
-    source = $gpHookSource
 
 EOF
     if [ $gpAuto -eq 0 ]; then
@@ -565,7 +565,6 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.check-whitespace gpCheckWhitespace
         fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
         fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
-        fComSaveVar2Config $tFile $tS.source gpHookSource
     done
 
     if [ $gErr -eq 0 ]; then

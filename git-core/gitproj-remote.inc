@@ -124,7 +124,7 @@ fRemoteGetDirList()
     export gResponse=""
 
     if [ -n "$pMountDir" ]; then
-        tList=$(find $pMountDir $pMountDir/* $pMountDir/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
+        tList=$(find $pMountDir $pMountDir/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
         gResponse="$gResponse $tList"
     fi
 

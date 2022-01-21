@@ -384,7 +384,6 @@ testRemoteGetDirList()
     fRemoteGetDirList "$cDatMount3"
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$gResponse" "$cDatMount3"
-    assertContains "$LINENO $tResult" "$gResponse" "src"
 
     return 0
 } # testRemoteGetDirList
@@ -725,10 +724,9 @@ testGitProjRemoteCLIManual()
 
     # Works
     tMountDir=$cDatMount3
-    # video-2020-04-02 was item #9, before the two dirs were add above
-    # video-2020-04-02 is item #11
+    # video-2020-04-02 is item #6
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "11\n") 2>&1)
+    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "6\n") 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"

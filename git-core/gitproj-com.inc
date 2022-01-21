@@ -651,7 +651,6 @@ fComPreProjSetGlobals()
     gpCheckWhitespace=$(fComGetConfig -k "gitproj.hook.check-whitespace" -d true)
     gpCheckForBigFiles=$(fComGetConfig -k "gitproj.hook.check-for-big-files" -d true)
     gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
-    gpHookSource=$(fComGetConfig -k "gitproj.hook.source" -d "hooks/pre-commit")
 
     # These will be redefined later
     #    gpLocalTopDir
@@ -663,7 +662,6 @@ fComPreProjSetGlobals()
     #    gpCheckFileNames=true
     #    gpCheckForBigFiles=true
     #    gpPreCommitEnabled=true
-    #    gpHookSource=hooks/pre-commit
     #    gpMountDir=TBD
     #    gpRemoteRawDir=TBD
 

@@ -5,7 +5,7 @@ export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames \
     gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
-    gpHookSource gpLocalRawDir gpLocalStatus gpLocalTopDir gpMaxSize \
+    gpLocalRawDir gpLocalStatus gpLocalTopDir gpMaxSize \
     gpPath gpPreCommitEnabled gpProjName gpProjStatus gpRemoteGitDir \
     gpRemoteRawDir gpRemoteStatus gpSysLog gpVer gpVerbose
 

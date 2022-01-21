@@ -61,7 +61,6 @@ gpMaxSize  file:~/.gitproj.config.global      gitproj.hook.binary-file-size-limi
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-file-names=true
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-for-big-files=true
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.pre-commit-enabled=true
-TBD 	   file:~/.gitproj.config.global      gitproj.hook.source=hooks/pre-commit
 
 # ------------------
 $ git config --local --list --show-origin --includes

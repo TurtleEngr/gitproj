@@ -840,7 +840,6 @@ testInitSaveVarsToConfigs()
         fTestCheckConfig2Var $tFile $tS.check-whitespace gpCheckWhitespace true $LINENO
         fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
         fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
-        fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit $LINENO
     done
 
     return 0

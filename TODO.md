@@ -6,28 +6,6 @@ After 1.0, move these to github issues.
 
 ## bug (defect, fix, needs to be changed)
 
-* in git-proj-init Testing Results:
-
-    In help: saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME.
-    In usage: isn't -l required?
-    The -s, -m, -f options seem to only be needed if using the -a option,
-    otherwise they can be prompted for.
-    The -l option assumes you have a dir with content already in it. Is fill path needed, or can it just...
-    Project Path (-l) [/home/bruce/test/seal/quit]?
-    	huh, quit? s/b
-	Project Path (-l) [/home/bruce/test/seal]
-	Project Name [seal] Continue [y/n]?
-
-* in git-proj-remote Testing Results:
-
-    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
-    maybe limit it to only one level (DIR1)?
-
-* Remove the duplicate path, in .git/config (introduced by git-proj-clone)
-  [include]
-        path = ../.gitproj.config.testserver2
-        path = ../.gitproj.config.testserver2
-
 * git config vars and section names are case-insensitive. Fix the
   comConfig (and 'git config') functions to lowercase the var and
   section names.
@@ -251,3 +229,27 @@ Fix: look for first arg so see if it is a CMD. - done
   timestamp. Maybe don't log to syslog? Change default syslog to false. - done
 
 * Remove the need for the cCurDir variable (has it ever been used?) - done
+
+* in git-proj-init Testing Results: - Done
+
+    In help: saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME.
+    In usage: isn't -l required?
+    The -s, -m, -f options seem to only be needed if using the -a option,
+    otherwise they can be prompted for.
+    The -l option assumes you have a dir with content already in it. Is fill path needed, or can it just...
+    Project Path (-l) [/home/bruce/test/seal/quit]?
+    	huh, quit? s/b
+	Project Path (-l) [/home/bruce/test/seal]
+	Project Name [seal] Continue [y/n]?
+
+* in git-proj-remote Testing Results: - done
+
+    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
+    maybe limit it to only one level (DIR1)?
+
+* Remove the duplicate path, in .git/config (introduced by git-proj-clone)
+  [include]
+        path = ../.gitproj.config.testserver2
+        path = ../.gitproj.config.testserver2
+  NA - so done
+
