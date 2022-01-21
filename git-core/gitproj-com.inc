@@ -317,6 +317,8 @@ fComIntroText()
 
     cat <<EOF | fComFmt
 
+======================================================================
+
 You now have a local git repository project (${gpProjName}) setup at
 ${gpLocalTopDir} with support for managing large binary files (larger
 than $gpMaxSize).
@@ -333,14 +335,14 @@ Project/.gitproj.config.\$HOSTNAME file will be created, so that
 differences between systems are saved. For example, mount points and
 filesystem differences will be saved.
 
-For a more complete overview type: "git proj -h | more"
+For a more complete overview type: "git proj -h | more" or "man
+git-proj"
 
 For a quick list of the git proj subcommands just type: "git proj"
 
 All subcommands will output help text with the -h option. For example:
 "git proj SubCmd -h | more"
 
-[$tSrc:$LINENO]
 EOF
     return 0
 } # fComIntroText

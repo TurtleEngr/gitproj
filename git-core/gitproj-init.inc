@@ -369,6 +369,10 @@ EOF
             fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
         fi
     fi
+    echo
+    echo '===================================================================='
+    echo "Creating git-proj repo for $gpProjName"
+    echo
     return 0
 } # fInitSummary
 
