@@ -15,7 +15,7 @@ export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
 fInitGettingStarted()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
+    local tMaxLoop=5
 
     cat <<EOF
 
@@ -85,6 +85,7 @@ fInitGetLocalPath()
         if ! fInitValidLocalPath $pLocalPath; then
             fError -m "Invalid -l pLocalPath: $pLocalPath" -l $tSrc:$LINENO
         fi
+    	fLog -p notice -m "gitproj.config.proj-name = $gpProjName" -l $tSrc:$LINENO
         return 0
     fi
     cat <<EOF | fComFmt
@@ -133,7 +134,7 @@ fInitGetSize()
 {
     local pMaxSize=$1
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
+    local tMaxLoop=5
     declare -l tResult
 
     if [ $gpAuto -ne 0 ]; then
@@ -202,7 +203,7 @@ fInitGetBinaryFiles()
 fInitGetMoveFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
+    local tMaxLoop=5
     declare -l tResult
 
     echo
@@ -257,7 +258,7 @@ EOF
 fInitGetGitFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
+    local tMaxLoop=5
     declare -l tResult
 
     fComCheckPkg $gpGitFlowPkg
@@ -302,7 +303,7 @@ fInitGetGitFlow()
 fInitSummary()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=30
+    local tMaxLoop=5
     declare -l tResult
 
     cat <<EOF
@@ -545,15 +546,14 @@ fInitMkLocalConfig()
 
     cd $gpLocalTopDir >/dev/null 2>&1
 
-    touch .gitproj
-
-    echo
-    fLog -p notice -m "Create: host values in --local" -l $tSrc:$LINENO
-    fComConfigCopy -s .gitproj -d .git/config
-
     echo
     fLog -p notice -m "Create: .gitproj" -l $tSrc:$LINENO
+    touch .gitproj
     fComConfigCopy -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
+
+    echo
+    fLog -p notice -m "Define: host values in --local" -l $tSrc:$LINENO
+    fComConfigCopy -s .gitproj -d .git/config
 
     return 0
 } # fInitMkLocalConfig
@@ -654,5 +654,7 @@ EOF
 } # fInitCreateLocalGit
 
 # ========================================
-gpVerbose=2
+if [ ${gpAuto:-0} -eq 0 ]; then
+    gpVerbose=2
+fi
 fComPreProjSetGlobals

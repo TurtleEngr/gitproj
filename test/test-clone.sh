@@ -150,6 +150,7 @@ setUp()
     find $gpRemoteGitDir $gpRemoteRawOrigin -type d -exec chmod a+rx {} \;
 
     gpVerbose=3
+    gpMaxLoop=5
     gpUnitDebug=0
     return 0
 

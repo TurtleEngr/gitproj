@@ -123,6 +123,7 @@ setUp()
     fTestCreateEnv
     . $gpBin/gitproj-init.inc
     gpVerbose=3
+    gpMaxLoop=5
     gpUnitDebug=0
     return 0
 
@@ -316,7 +317,6 @@ testInitValidLocalPath()
     fTestDebug "Check: $HOME/$cDatProj1"
     fTestDebug "tResult: $tResult"
     assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
 
     # Called again, so that the global vars will be defined.
     fInitValidLocalPath $HOME/$cDatProj1 >/dev/null 2>&1
@@ -344,7 +344,7 @@ testInitGetLocalPath()
     tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1)
     tStatus=$?
     assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
+    assertContains "$LINENO $tResult" "$tResult" "gitproj.config.proj-name = ${cDatProj1##*/}"
 
     gpAuto=0
     # No auto, prompt/response
@@ -354,31 +354,10 @@ testInitGetLocalPath()
     tStatus=$?
     assertTrue $LINENO $tStatus
     assertContains "$LINENO $tResult" "$tResult" "Define the existing project directory"
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
-
-    # Enter "quit". Look for quit
-    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "quit"))
-    tStatus=$?
-    gpUnitDebug=0
-    fTestDebug "tResult=$tResult"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    # Enter $HOME; $HOME/$cDatProj3; quit
-    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj3\nquit\nq"))
-    tStatus=$?
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    # Enter $HOME; $HOME/$cDatProj1
-    tResult=$(fInitGetLocalPath $HOME/$cDatProj1 2>&1 < <(echo -e "$HOME\n$HOME/$cDatProj1"))
-    tStatus=$?
-    assertTrue $LINENO $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "project Name will be: ${cDatProj1##*/}"
+    assertContains "$LINENO $tResult" "$tResult" "gitproj.config.proj-name = ${cDatProj1##*/}"
 
     # Called again, so that the global vars will be defined.
-    fInitGetLocalPath $HOME/$cDatProj1 < <(echo -e "$HOME\n$HOME/$cDatProj1") >/dev/null 2>&1
+    fInitGetLocalPath $HOME/$cDatProj1 >/dev/null 2>&1 < <(echo -e "\n")
     assertTrue $LINENO $tStatus
     assertEquals $LINENO "$HOME/$cDatProj1" "$gpLocalTopDir"
     assertEquals $LINENO "${cDatProj1##*/}" "$gpProjName"
@@ -431,12 +410,6 @@ testInitGetSize()
     assertTrue $LINENO $?
     assertEquals "$LINENO" "12k" "$gpMaxSize"
 
-    tResult=$(fInitGetSize 2>&1 < <(echo -e "42\n66x\nq"))
-    tStatus=$?
-    assertFalse "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "Size must be numbers followed by"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
     return 0
 }
 
@@ -470,17 +443,26 @@ testInitGetMoveFiles()
     gpLocalTopDir=$HOME/$cDatProj1
 
     gpMaxSize="24m"
-    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "q"))
+    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "n"))
     tStatus=$?
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "No large binary files were found"
 
     gpMaxSize="18k"
-    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "x\nquit"))
+    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "n"))
     tStatus=$?
-    assertFalse "$LINENO" $tStatus
-    assertContains "$LINENO $tResult" "$tResult" "The listed files can be moved"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    assertTrue "$LINENO" "$tStatus"
+    assertContains "$LINENO $tResult" "$tResult" "The files, shown above, can be moved"
+    assertContains "$LINENO $tResult" "$tResult" "Move the files"
+    assertContains "$LINENO $tResult" "$tResult" "Binary files will NOT be moved"
+
+    gpMaxSize="18k"
+    tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "y"))
+    tStatus=$?
+    assertTrue "$LINENO" $tStatus
+    assertContains "$LINENO $tResult" "$tResult" "The files, shown above, can be moved"
+    assertContains "$LINENO $tResult" "$tResult" "Move the files"
+    assertContains "$LINENO $tResult" "$tResult" "Binary files will be moved"
 
     gpMaxSize="18k"
     fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "x\nn")
@@ -500,10 +482,6 @@ testInitGetGitFlow()
 {
     local tResult
     local tStatus
-
-    tResult=$(fInitGetGitFlow 2>&1 < <(echo -e "\nquit"))
-    assertFalse "$LINENO" $?
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     fInitGetGitFlow >/dev/null 2>&1 < <(echo -e "yes")
     assertTrue "$LINENO" $?
@@ -767,8 +745,11 @@ testInitMkLocalConfig()
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO $tResult" "[ -f .gitproj ]"
+    assertTrue $LINENO "[ -f .gitproj.bak ]"
     assertTrue $LINENO "[ -f .git/config ]"
-    assertTrue "$LINENO $tResult" "grep -q gitproj..config .git/config >/dev/null 2>&1"
+    assertTrue $LINENO "[ -f .git/config.bak ]"
+    assertTrue "$LINENO $tResult" "grep -q 'gitproj \"config' .gitproj >/dev/null 2>&1"
+    assertTrue "$LINENO $tResult" "grep -q 'gitproj \"config' .git/config >/dev/null 2>&1"
 
     return 0
 } # testInitMkLocalConfig

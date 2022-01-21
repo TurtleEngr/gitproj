@@ -130,6 +130,7 @@ setUp()
     . $gpBin/gitproj-remote.inc
     gpDebug=0
     gpVerbose=3
+    gpMaxLoop=5
     fRemoteSetGlobals
     gpUnitDebug=0
     return 0

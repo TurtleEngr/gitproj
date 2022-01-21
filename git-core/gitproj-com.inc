@@ -8,7 +8,7 @@ export PWD gErr gSavedOptE gGetConfigOrigin gGetConfigValue gResponse
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
     gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
     gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus gpLocalTopDir \
-    gpMaxSize gpMountDir gpPath gpPreCommitEnabled gpProjName \
+    gpMaxLoop gpMaxSize gpMountDir gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpVerboseFlag \
     gpYesNo
 
@@ -552,14 +552,12 @@ fComSetGlobals()
 
     cGitProjVersion=$(cat $gpDoc/VERSION)
 
-    # Included in ~/.gitproj.config (Use -G to set config vars to this)
+    # Include in ~/.gitconfig (Use -g to set config vars to this)
     # Note: ~/.gitconfig does not work all the time, so use:
     # $HOME/.gitconfig or use --global
 
-    # Depreciated
-    # cConfigGlobal -> .gitconfig
-    # cConfigLocal -> .gitproj
-    # cConfigHost -> .git/config
+    # Include in PROJ/.gitproj (Use -L to set config vars to this)
+    # Include in PROJ/.git/config (Use -l to set config vars to this)
 
     cGetOrigin='git config --get remote.origin.url'
     # Use: tOrigin=$($cGetOrigin)
@@ -570,6 +568,10 @@ fComSetGlobals()
 
     cGetCurBranch='git rev-parse --abbrev-ref HEAD'
     # Use: tBranch=$($cGetCurBranch)
+
+    gpMaxLoop=20
+    # Used internally to limit number of invalid responses to prompts.
+    # For testing this is usually reduced.
 
     # -------------------
     # Setup log variables
