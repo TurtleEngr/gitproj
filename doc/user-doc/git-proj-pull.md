@@ -10,7 +10,7 @@
 
 # DESCRIPTION
 
-rsync will be used top copy the \[remote-raw-dir\]/\[ProjName\].raw/ files
+rsync will be used top copy the \[remote-raw-origin\]/\[ProjName\].raw/ files
 to '\[ProjName\]/raw/'.
 
 If the -b option is given then run:

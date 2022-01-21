@@ -11,7 +11,7 @@
 # DESCRIPTION
 
     rsync will be used top copy the '[ProjName]/raw/' files to
-    [remote-raw-dir]/[ProjName].raw.
+    [remote-raw-origin]/[ProjName].raw.
 
 If the -b option is given then run:
 

@@ -125,20 +125,13 @@ minimum
 
 ## ~/.gitconfig
 
-Source: gpDoc/config/gitconfig.default
+Source: gpDoc/config/gitconfig
 
-If this doesn't exist, git proj init will create it from "Source":
+If this doesn't exist, git proj init will create it from "Source"
 
-This will be put in ~/.gitconfig
+Section: \[gitproj config\]
 
-    [include]
-        path = ~/.gitproj.config.global
-
-## ~/.gitproj.config.global
-
-Source: gpDoc/config/gitproj.config.global
-
-git proj init, will create the initial ~/.gitproj.config.global
+git proj init, will copy this... TBD
 
     remote-min-size = 20g
 
@@ -147,24 +140,27 @@ drive.  The command will not continue if there is not enough space.
 The available space must also be twice the size of the space used by
 ProjName.raw.
 
-    remote-raw-dir
+    remote-raw-origin
 
 Default: -d pMountDir/ProjName.raw
 
+Section: \[gitproj hook\]
+
+TBD
+
+## top-dir/.gitproj
+
+TBD
+
 ## top-dir/.git/config
 
-This will be put in the initial the local .git/config file:
-
-    [include]
-        path = ../.gitproj.config.HOSTNAME
+TBD
 
 Where HOSTNAME will be set to $HOSTNAME. This allows for different
 locations of file, based on the host. For example the remote-raw-url
 (mount point) could be very different between hosts.
 
-## top-dir/.gitproj.config.$HOSTNAME
-
-Initial Source: gpDoc/config/gitproj.config.HOSTNAME
+Initial Source: ~/.gitconfig Sections \[gitproj \*\]
 
 This will be created when git project repo is first created on a host.
 
@@ -173,10 +169,6 @@ project defaults can be defined. Then .gitproj.config.HOSTNAME can
 override variables. Any changed to the variables in
 .gitproj.config.local variables will be written to
 .gitproj.config.HOSTNAME
-
-## top-dir/.gitproj.config.local
-
-Source: gpDoc/config/gitproj.config.local
 
 Uncomment the variables that should override ~/.gitconfig or
 ~/.gitproj.config.global. If the variables are host specific, then the
@@ -187,7 +179,7 @@ file.
                 # Expected version, only first N must be the same.
                 # Use backward compatible code, or exit.
                 # Warn if second N is different
-                ver = 0.1
+                ver = 0.1.2
 
                 # States: not-installed, installed, config-errors
                 proj-status = not-installed
@@ -222,7 +214,7 @@ file.
                 git-flow-pkg = TBD
 
                 # Local mount examples
-                remote-raw-dir = TBD
+                remote-raw-origin = TBD
                 #remote.origin.url = /MOUNT-DIR/DIR/NAME.git
 
                 # Remote examples (not implemented. TBD)
@@ -241,16 +233,24 @@ file.
                 # End size with b, k, m, or g
                 binary-file-size-limit = 1k
 
-## Env. Var. Config
+## Global Env. Var. Config
 
 These are globals that may affect how the script runs. Just about all
 of these globals that begin with "gp" can be set and exported before
 the script is run. That way you can set your own defaults, by putting
 them in your ~/.bashrc or ~/.bash\_profile files.
 
-The the "common" CLI flags will override the initial variable settings.
+Global variable precedence (the last one to set the gp variable, wins):
 
-- **gpSysLog**
+    * internal hardcoded default
+    * variable in ~/.gitconfig
+    * variable in PROJ/.git/config
+    * env. var.
+    * command line option
+
+Notation below: gp\[Var\], -\[cli-opt\], \[git.config.var\], (default)
+
+- **gpSysLog, -l, gitproj.config.syslog, (false)**
 
     If set to 0, log messages will only be sent to stderr.
 
@@ -258,9 +258,9 @@ The the "common" CLI flags will override the initial variable settings.
 
     See -l, fLog and fErr for details
 
-    Default: 0
+    Default: false
 
-- **gpFacility**
+- **gpFacility, NA, gitproj.config.facility, (user)**
 
     Log messages sent to syslog will be sent to the "facility" specified
     by by gpFacility.
@@ -299,33 +299,73 @@ The the "common" CLI flags will override the initial variable settings.
         local6 - available
         local7 - available
 
-- **gpVerbose**
+- **gpVerbose, -q, -v, -V N, gitproj.config.verbose, (2)**
 
-    If set to 0, only log message at "warning" level and above will be output.
+        -q - gpVerbose=0
+        -v - gpVerbose=2
+        -v N - gpVerbose=N
 
-    If set to 1, all non-debug messages will be output.
+        gpVerbose  = 0 - output error messages (corrections must be made)
+        gpVerbose >= 1 - output warnings messages (corrections may be needed)
+        gpVerbose >= 2 - output notice messages (important information)
+        gpVerbose >= 3 - output info messages (give more information)
 
-    See -v, fLog
+    Default: 2
+
+    Normal log message:
+
+        Command [warning, notice, info]: Message [File:LineNo](ErrCode)
+
+    Error messages (crit will exit, err might continue):
+
+        Command [crit, err]: Error: Message [File:LineNo](ErrCode)
+
+    An internal error. This is probably a defect in the code (collect all
+    the output for a bug report):
+
+        Command [crit, err]: Internal: Error: Message [File:LineNo](ErrCode)
+        StackTrace:
+
+- **gpDebug, -x, -X N, NA, (0)**
 
     Default: 0
 
-- **gpDebug**
+    There is no config variable for gpDebug.
 
     If set to 0, all "debug" and "debug-N" level messages will be skipped.
 
     If not 0, all "debug" level messages will be output.
 
-    Or if "debug-N" level is used, then if gpDebug is <= N, then the
-    log message will be output, otherwise it is skipped.
+    Or if "debug-N" level is used, then if gpDebug is >= N, then the log
+    message will be output, otherwise it is skipped.
 
-    See -x
+- **gpAuto, -a, NA, (false)**
+- **gpYesNo, -y, -n, NA, (No)**
+- **gpAutoMove, NA, NA, (false)**
+- **gpBin, NA, gitproj.config.bin, (/usr/lib/git-core)**
 
-- **gpUnitDebug**
+    The location of the executing command will override this.
 
-    If set to non-zero, then the fUDebug function calls will output
-    the messages when in test functions.
+- **gpDoc, NA, gitproj.config.doc, (/usr/share/doc/git-proj)**
 
-    See gitproj-com.test
+    If not found, then set to: $gpBin/../doc
+
+- **gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)**
+- **gpCheckForBigFiles, NA, gitproj.hook.check-for-big-files, (true)**
+- **gpCheckInRaw, NA, gitproj.hook.check-in-raw, (true)**
+- **gpCheckWhitespace, NA, gitproj.hook.check-whitespace, (true)**
+
+    See rm-trailing-sp to fix.
+
+- **gpAllowTabs, NA, gitproj.hook.allow-tabs, (false)**
+
+    See rm-trailing-sp to fix (-t option)
+
+- **gpHookVerbose, NA, gitproj.hook.verbose, (true)**
+- **gpPreCommitEnabled, NA, gitproj.hook.pre-commit-enable, (true)**
+- **gpMaxSize, NA, gitproj.hook.binary-file-size-limit, (10k)**
+- **NA, NA, gitproj.config.remote-min-size, (20g)**
+- **gpGitFlow, NA, gitproj.config.flow, (true)**
 
 # ENVIRONMENT
 
@@ -380,39 +420,35 @@ TurtleEngr
 
 # SYNOPSIS
 
-    git proj init local [-a] [-l pLocalDir] [-s pMaxSize] [-m] [-f] [common-options]
-
-    Defaults: [-l $PWD] [-s 10K]
+    git proj init local -l pLocalDir [-a] [-s pMaxSize] [-m] [-f] [common-options]
 
 # DESCRIPTION
 
 This will create a local git repo with branches. If git-flow is
-installed can will optionally be setup too. After this setup the
-remote git repo with "git proj init remote"
+installed can be setup too. After "git proj init" is done, run
+"git proj remote" to setup remote for git and raw files.
 
-If there is a -a option, "git proj init local" will be run with all
-the default options, which can be overridden with the options.
+If there is a -a option, "git proj init" will be run with all the
+default options, which can be overridden with other options.
 
 If there is no -a option, you will be prompted for the settings.  See
 the OPTION section for details.
 
 When the local and remote git repos are setup, all the setings
-will be saved to ~/.gitproj.config and
-\[project\]/gitproj/config.$HOSTNAME. Includes are put in ~/.gitconfig
-and \[project\].git/config to point to the gitproj config files.
+will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
 # OPTIONS
 
 - **-a**
 
     The -a option will automattically run the whole init process with
-    default settings. The options can be defined to override the default
-    settings.
+    default settings. The other options can be defined to override the
+    default settings.
 
 - **-l pLocalDir**
 
     Define the existing project directory. The last directory will be used
-    for the name of the project. Default: current directory
+    for the name of the project. Required.
 
         Dir (-l) [$PWD]? $gpLocalTopDir
             So the project Name will be: ${gpLocalTopDir##*/}
@@ -425,7 +461,7 @@ and \[project\].git/config to point to the gitproj config files.
 
 - **-m**
 
-    These binary files greater than \[pSize\]  were found in your project dir:
+    Binary files greater than \[pSize\] were found in your project dir:
 
         [file list]
 
@@ -436,7 +472,7 @@ and \[project\].git/config to point to the gitproj config files.
 
     The symlinks are only provided for backward compatability; it would be
     best to remove those links and modifiy your code and apps to access
-    the file directly from the raw directories.
+    the files directly from the raw directories.
 
         Move the files (-m) [y/n]?
 
@@ -635,7 +671,7 @@ GPLv3 Copyright 2021 by TurtleEngr
 # DESCRIPTION
 
     rsync will be used top copy the '[ProjName]/raw/' files to
-    [remote-raw-dir]/[ProjName].raw.
+    [remote-raw-origin]/[ProjName].raw.
 
 If the -b option is given then run:
 
@@ -697,7 +733,7 @@ GPLv3 Copyright 2021 by TurtleEngr
 
 # DESCRIPTION
 
-rsync will be used top copy the \[remote-raw-dir\]/\[ProjName\].raw/ files
+rsync will be used top copy the \[remote-raw-origin\]/\[ProjName\].raw/ files
 to '\[ProjName\]/raw/'.
 
 If the -b option is given then run:
@@ -761,7 +797,7 @@ GPLv3 Copyright 2021 by TurtleEngr
 # DESCRIPTION
 
     Do a "git status"
-    Verify gitproj.config.remote-raw-dir is defined and mounted
+    Verify gitproj.config.remote-raw-origin is defined and mounted
     Verify origin is set to a path that exists (if mounted)
     Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
 
