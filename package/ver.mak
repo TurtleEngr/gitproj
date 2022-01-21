@@ -4,12 +4,12 @@
 
 ProdName=git-proj
 ProdAlias=git-proj
-ProdVer=0.2.0
+ProdVer=0.3.1
 ProdRC=
-ProdBuild=2
-ProdBuildTime=2022.01.21.1.56
+ProdBuild=1
+ProdBuildTime=2022.01.21.2.2
 ProdSvnVer=
-ProdWinVer=0.2.0
+ProdWinVer=0.3.1
 ProdDate=2022-01-21
 ProdSummary=git-proj implements a git subcommand for managing large binary files.
 ProdDesc=git-proj mostly solves the issue with large binary files causing git repo 'bloat'. Large files are not versioned, they are only copied. This is a much simpler implementation than git-lfs.
@@ -29,7 +29,7 @@ ProdRelRoot=/rel
 ProdRelCategory=software/ThirdParty/git-proj/mx
 ProdRelDir=/rel/released/software/ThirdParty/git-proj/mx
 ProdDevDir=/rel/development/software/ThirdParty/git-proj/mx
-ProdTag=tag-0-2-0-2
+ProdTag=tag-0-3-1-1
 ProdOS=mx19
 ProdOSDist=mx
 ProdOSVer=19.4
