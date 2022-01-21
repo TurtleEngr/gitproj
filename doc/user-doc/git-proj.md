@@ -11,7 +11,7 @@ files, and repositiories on external drives.
 
         pSubCmd: init, remote, clone, push, pull, status
         pSubCmdOpt: Just run: "git proj [pSubCmd]"
-        [common-options]: [-h] [-H pStyle] [-v] [-vv...] [-x] [-xx...]
+        [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
 
 # DESCRIPTION
 
@@ -94,7 +94,7 @@ minimum
 
     pStyle is used to select the type of help and how it is formatted.
 
-    Styles:
+    Supported styles:
 
             short|usage - Output short usage help as text.
             long|text   - Output long usage help as text. All subcommands.
@@ -105,23 +105,52 @@ minimum
             int-html    - Output internal documentation as html.
             int-md      - Output internal documentation as markdown.
 
+- **-q**
+
+    Set verbose to lowest level: 0
+
+    Only very important log messages will be output.
+
 - **-v**
 
-    Verbose output. Default is is only output (or log) messages with
-    level "warning" and higher.
+    This sets the verbose lovel to 2, which is the default.
 
-        -v - output "notice" and higher log messages.
-        -vv - output "info" and higher log messages.
+    At level 2, warning and notice messages will be output.
+
+- **-V N**
+
+    Set the verbose level to N.
+
+        0 - critical, errors, and important warning are output
+        1 - warnings and above are output
+        2 - notice and above are output
+        3 - info and above are output
+
+
+    The verbose level can also be set with env. var. gpVerbose. However
+    the command line option will override the variable.
 
 - **-x**
 
-    Set the gpDebug level number. Add 1 for each -x.  Or you can set
-    gpDebug before running the script.
+    Set the gpDebug level number. Add 1 for each -x argumen.  Or you can set
+    gpDebug before running the script. Or you can use the -X option.
 
         "fLog -p debug" messages will be output if gpDebug != 0.
         "fLog -p debug-N" messages will be output if gpDebug >= N.
 
     See: fLog Internal documentation for more details.
+
+- **-X N**
+
+    Set the gpDebug level to N. The command line options will override the
+    gpDebug env. var.
+
+        0 - no debug messages
+        >0 - "debug" messages
+        1 - "debug-1" messages
+        2 - "debug-2" and "debug-1" messages
+        ...
+        N - "debug-N" and messages less than N
 
 ## ~/.gitconfig
 
@@ -725,7 +754,7 @@ GPLv3 Copyright 2021 by TurtleEngr
     <hr/>
 </div>
 
-# NAME git proj push
+# NAME git proj pull
 
 # SYNOPSIS
 

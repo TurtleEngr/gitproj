@@ -2,7 +2,7 @@
     <hr/>
 </div>
 
-# NAME git proj push
+# NAME git proj pull
 
 # SYNOPSIS
 

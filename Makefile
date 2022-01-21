@@ -48,7 +48,7 @@ doc/user-doc/git-proj.md : git-core/git-proj
 
 doc/user-doc/git-proj.html : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
-	-$? -H md >$@
+	-$? -H html >$@
 
 # Remove internal doc. Any line with 'INT:' in it.
 # "uniq" is a quick way of removing any extra blank lines

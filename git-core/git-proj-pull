@@ -6,7 +6,7 @@ export gpBin gpCmdName tSrc
 fUsage()
 {
     # Quick help, run this:
-    # git-proj-push -h | less
+    # git-proj-pull -h | less
 
     local pStyle="${1:-usage}"
 
@@ -20,7 +20,7 @@ fUsage()
 
 =for html <hr/>
 
-=head1 NAME git proj push
+=head1 NAME git proj pull
 
 =head1 SYNOPSIS
 
