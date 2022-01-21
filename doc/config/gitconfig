@@ -16,7 +16,7 @@
 	co = checkout
 	df = diff
 	origin = config --get remote.origin.url
-	raw-origin = config --get remote-raw-dir
+	raw-origin = config --get remote-raw-origin
 	push-tags = push --tags origin
 	revert-all = reset --hard HEAD
 	st = status
@@ -45,15 +45,18 @@
 	git-flow-pkg = git-flow
 	git-flow = true
 	local-status=TBD
+	local-host=TBD
 	proj-name = TBD
 	remote-status=TBD
-	remote-raw-dir=TBD
+	remote-raw-origin=TBD
 	remote-min-size = 20g
+	verbose = 2
 [gitproj "hook"]
 	verbose = true
 	pre-commit-enabled = true
 	check-file-names = true
 	check-in-raw = true
 	check-whitespace = true
+	allow-tabs = false
 	check-for-big-files = true
 	binary-file-size-limit = 10k

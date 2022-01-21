@@ -80,15 +80,9 @@ NAoneTimeTearDown()
 # --------------------------------
 setUp()
 {
-    local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
-    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
-    local tVer=$(cat $gpDoc/VERSION)
-    tVer=$(echo $tVer)
-    local tConf
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpLocalRawDir \
@@ -98,6 +92,12 @@ setUp()
     HOSTNAME=testserver2
     fTestSetupEnv
     fTestCreateEnv
+
+    local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tVer=$(cat $gpDoc/VERSION)
+    tVer=$(echo $tVer)
+    local tConf
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
     cd $cTestDestDir >/dev/null 2>&1
@@ -163,17 +163,15 @@ testSetup()
 
     cd $HOME/project/george >/dev/null 2>&1
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
-    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
     assertTrue "$LINENO" "[ -f .git/config ]"
-    assertTrue "$LINENO" "[ -f .gitproj.config.local ]"
-    assertTrue "$LINENO" "[ -f .gitproj.config.$HOSTNAME ]"
+    assertTrue "$LINENO" "[ -f .gitproj ]"
     assertTrue "$LINENO" "[ -d raw ]"
     tOrigin=$($cGetOrigin)
     assertTrue "$LINENO" $?
     assertTrue "$LINENO $tOrigin" "[ -d $tOrigin ]"
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "None")
-    assertNotContains "$LINENO" "$gpRemoteRawDir" "None"
-    assertTrue "$LINENO" "[ -d $gpRemoteRawDir ]"
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
+    assertNotContains "$LINENO" "$gpRemoteRawOrigin" "None"
+    assertTrue "$LINENO" "[ -d $gpRemoteRawOrigin ]"
 
     return 0
 } # testSetup

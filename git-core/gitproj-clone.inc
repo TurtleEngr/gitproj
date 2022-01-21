@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # --------------------
-export cCurDir cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cTop
 
-export gpAuto gpAutoMove gpBin gpBranch gpCheckFileNames \
+export gpAuto gpAutoMove gpBin gpCheckFileNames \
     gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
-    gpHookSource gpLocalRawDir gpLocalStatus gpLocalTopDir gpMaxSize \
+    gpLocalRawDir gpLocalStatus gpLocalTopDir gpMaxSize \
     gpPath gpPreCommitEnabled gpProjName gpProjStatus gpRemoteGitDir \
-    gpRemoteRawDir gpRemoteStatus gpSysLog gpVer gpVerbose
+    gpRemoteRawOrigin gpRemoteStatus gpSysLog gpVer gpVerbose
 
 # ========================================
 
@@ -20,7 +20,7 @@ fCloneGettingStarted()
 
 Be sure you are "cd" to the directory that the project will be cloned to.
 Clone git from: $gpRemoteGitDir
-Clone raw from: $gpRemoteRawDir
+Clone raw from: $gpRemoteRawOrigin
 Project Name:   $gpProjName
 Project Dir:    $PWD/$gpProjName
 
@@ -54,14 +54,14 @@ fCloneValidRemoteDir()
         fError -m "$gpRemoteGitDir does not exist." -l $tSrc:$LINENO
     fi
 
-    if [ ! -d $gpRemoteRawDir ]; then
-        fError -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO
+    if [ ! -d $gpRemoteRawOrigin ]; then
+        fError -m "$gpRemoteRawOrigin does not exist." -l $tSrc:$LINENO
     fi
 
     if ! fComAllMustBeReadable $gpRemoteGitDir; then
         exit 1
     fi
-    if ! fComAllMustBeReadable $gpRemoteRawDir; then
+    if ! fComAllMustBeReadable $gpRemoteRawOrigin; then
         exit 1
     fi
 
@@ -78,7 +78,7 @@ fCloneValidRemoteDir()
     tGitSize=$(du -sm $gpRemoteGitDir | awk '{print $1}')
     let tGitSize*=2
 
-    tRawSize=$(du -sm $gpRemoteRawDir | awk '{print $1}')
+    tRawSize=$(du -sm $gpRemoteRawOrigin | awk '{print $1}')
     let tRawSize*=2
 
     let tDesiredSize=tGitSize+tRawSize
@@ -95,149 +95,90 @@ fCloneCheckLocalConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
 
-    if [ -f $cConfigLocal ]; then
+    if [ -f .gitproj ]; then
         return 0
     fi
-    fLog -p warning -m "Missing file: $cConfigLocal It should have been versioned. Will try to recreate it from a host config file." -l $tSrc:$LINENO
+    fLog -p warning -m "Missing file: .gitproj It should have been versioned! Will try to recreate it from ~/.gitconfig." -l $tSrc:$LINENO
 
-    # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
-    tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
-    if [ -z "$tHost" ]; then
-        fError -i -m "There are not host file to copy from." -l $tSrc:$LINENO
-    fi
+    touch .gitproj
+    fComConfigCopy -f -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
 
-    fLog -p debug-2 -m "cp $tHost $cConfigLocal" -l $tSrc:$LINENO
-    cp $tHost $cConfigLocal
+    fComSetConfig -L -k gitproj.config.proj-name -v $gpProjName
+    fComSetConfig -L -k gitproj.config.ver -v "$(cat $gpDoc/VERSION)"
 
-    # Adjust the host var values
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    git add $cConfigLocal
+    git add .gitproj
 
     return 0
 } # fCloneCheckLocalConfig
 
 # --------------------
-fCloneCheckHostConfig()
+fCloneSetupGitProjConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tHost
 
-    if [ -f $cConfigHost ]; then
-        return 0
-    fi
-    fLog -p warning -m "Missing host file: $cConfigHost  It will be created for this new host" -l $tSrc:$LINENO
+    fCloneCheckLocalConfig
 
-    # Look for the newest host file (by date-stamp) (but not $cConfigLocal)
-    tHost=$('ls' -1t .gitproj.config.* 2>/dev/null | grep -v local | head -n 1)
-    if [ -n "$tHost" ]; then
-        fLog -p debug-2 -m "cp $tHost $cConfigHost" -l $tSrc:$LINENO
-        cp $tHost $cConfigHost
-    else
-        fLog -p debug-2 -m "cp $cConfigLocal $cConfigHost" -l $tSrc:$LINENO
-        cp $cConfigLocal $cConfigHost
+    cp $gpVerboseFlag $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+
+    if [ ! -f .gitignore ]; then
+        fLog -p warning -m "Missing .gitignore file. Adding it now." -l $tSrc:$LINENO
+        cp $gpVerboseFlag $gpDoc/config/gitignore .gitignore
+        git add .gitignore
     fi
 
-    # Adjust the host var values
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
+    fComConfigCopy -s .gitproj -d .git/config
 
-    git add $cConfigHost
+    fComSetConfig -l -k "gitproj.config.local-host" -v $HOSTNAME
+    fComSetConfig -l -k "gitproj.config.local-status" -v "defined"
+    fComSetConfig -l -k "gitproj.config.proj-name" -v "$gpProjName"
+
+    fComConfigUpdateLocal
 
     return 0
-} # fCloneCheckHostConfig
-
-# --------------------
-fCloneCheckProjConfig()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    declare -a tHostList
-    local tC
-
-    tHostList=(.gitproj.config.*)
-    if [ "${tHostList[0]}" != ".gitproj.config.*" ]; then
-        return 0
-    fi
-
-    fLog -p warning -m "There are no host project config files for this project. They should have been versioned! Will try to create them, but they could have bad values." -l $tSrc:$LINENO
-
-    # Get a raw local file from $gpDoc
-    fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal"
-    cp $gpDoc/config/${cConfigLocal#.} $cConfigLocal
-    fLog -p debug-2 -m "cp $gpDoc/config/${cConfigLocal#.} $cConfigHost"
-    cp $gpDoc/config/${cConfigLocal#.} $cConfigHost
-
-    # Fix up the vars, making some assumptions.
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    for tC in L H; do
-        fComSetConfig -$tC -k "gitproj.config.local-status" -v "defined"
-        fComSetConfig -$tC -k "gitproj.config.remote-status" -v "defined"
-        fComSetConfig -$tC -k "gitproj.config.proj-name" -v "$gpProjName"
-        fComSetConfig -$tC -k "gitproj.config.git-flow-pkg" -v "git-flow"
-    done
-
-    git add $cConfigLocal
-    git add $cConfigHost
-
-    return 0
-} # fCloneCheckProjConfig
+} # fCloneSetupGitProjConfig
 
 # --------------------
 fCloneMkGitDir()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tStatus
     local tFound
+    local tSave=$gpVerbose
+    local tBranch
 
     # Assumes you are cd'd to the dir you want to clone into.
+    # And it has been verified to not be a git workspace.
 
     git clone $gpRemoteGitDir
     if [ $? -ne 0 ]; then
-        gpVerbose=2
-        fLog -p info -m "git clone $gpRemoteGitDir" -l $tSrc:$LINENO
+        fLog -f -p info -m "git clone $gpRemoteGitDir" -l $tSrc:$LINENO
         fError -i -m "The above command should have worked." -l $tSrc:$LINENO
     fi
     gpProjName=${gpRemoteGitDir##*/}
     gpProjName=${gpProjName%.git}
     gpLocalTopDir=$PWD/$gpProjName
+    cd $gpLocalTopDir >/dev/null 2>&1
 
     # Checkout some expected branches
-    cd $gpLocalTopDir >/dev/null 2>&1
-    for gpBranch in develop main master; do
-        git checkout $gpBranch >/dev/null 2>&1
+    for tBranch in develop main master; do
+        git checkout $tBranch >/dev/null 2>&1
     done
 
     # Set to the "best" default branch
     tFound=0
     git checkout develop >/dev/null 2>&1
-    for gpBranch in develop main master; do
-        if git checkout $gpBranch >/dev/null 2>&1; then
+    for tBranch in develop main master; do
+        if git checkout $tBranch >/dev/null 2>&1; then
             tFound=1
             break
         fi
     done
 
-    gpBranch=$($cGetCurBranch)
+    tBranch=$($cGetCurBranch)
     if [ $tFound -eq 0 ]; then
-        fLog -p warning -m "Unexpected default branch: $gpBranch" -l $tSrc:$LINENO
+        fLog -f -p warning -m "Unexpected default branch: $tBranch" -l $tSrc:$LINENO
     fi
 
-    if [ ! -f .gitignore ]; then
-        fLog -p warning -m "Missing .gitignore file. Adding one now." -l $tSrc:$LINENO
-        cp $gpDoc/config/gitignore.default .gitignore
-        git add .gitignore
-    fi
-
-    fCloneCheckProjConfig
-    fCloneCheckHostConfig
-    fCloneCheckLocalConfig
-
-    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
-    cp $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
-
-    git commit -am "Updating configs for this host."
+    fCloneSetupGitProjConfig
 
     return 0
 } # fCloneMkGitDir
@@ -261,49 +202,33 @@ fCloneMkRawDir()
         mkdir $gpLocalRawDir
     fi
 
-    if [ $gpVerbose -ge 1 ]; then
+    if [ $gpVerbose -eq 1 ]; then
         tVerbose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
         tVerbose=-viP
     fi
-    tCmd="/usr/bin/rsync $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalRawDir"
+    tCmd="/usr/bin/rsync $tOpt $tVerbose $gpRemoteRawOrigin/ $gpLocalRawDir"
     fLog -p notice -m "Run: $tCmd"
     $tCmd
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
-        fLog -p warning -m "There may be a problem with this rsync:" -l $tSrc:$LINENO
-        fLog -p warning -m "$tCmd" -l $tSrc:$LINENO
+        fLog -f -p warning -m "There may be a problem with this rsync:" -l $tSrc:$LINENO
+        fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
+
+    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
+    fComSetConfig -l -k "gitproj.config.remote-status" -v "defined"
 
     return $tStatus
 } # fCloneMkRawDir
-
-# --------------------
-fCloneUpdateHostConfig()
-{
-    local tSrc=${BASH_SOURCE##*/}
-
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v $gpRemoteRawDir
-
-    tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
-    if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, include.path is alredy set." -l $tSrc:$LINENO
-    fi
-
-    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
-
-    git add $cConfigHost
-
-    return 0
-} # fCloneUpdateHostConfig
 
 # --------------------
 fCloneSummary()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
+    local tBranch
 
     function flExists()
     {
@@ -317,7 +242,7 @@ fCloneSummary()
     } # flExists
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    gpBranch=$($cGetCurBranch)
+    tBranch=$($cGetCurBranch)
     tOrigin=$($cGetOrigin)
 
     cat <<EOF
@@ -327,16 +252,14 @@ Summary
     (verbose)  $gpVerbose
     (debug)  $gpDebug
     ($(flExists $HOME/.gitconfig))  HOME/.gitconfig
-    ($(flExists $HOME/$cConfigGlobal))  HOME/$cConfigGlobal
     ($(flExists $HOME/.gitignore))  HOME/.gitignore
-    ($(flExists $cConfigLocal))  $gpProjName/$cConfigLocal
-    ($(flExists $cConfigHost))  $gpProjName/$cConfigHost
+    ($(flExists .gitproj))  $gpProjName/.gitproj
     ($(flExists .gitignore))  $gpProjName/.gitignore
-    (branch)  $gpBranch
+    (branch)  $tBranch
     (remote-git-dir $(flExists $tOrigin))  $tOrigin
     (local-raw-dir $(flExists $gpLocalRawDir))  $gpLocalRawDir
 
-Global Config ~/$cConfigGlobal
+Global Config ~/.gitconfig
 [gitproj "config"]
     proj-status = $(fComGetConfig -k "gitproj.config.proj-status")
     syslog = $(fComGetConfig -k "gitproj.config.syslog")
@@ -345,45 +268,39 @@ Global Config ~/$cConfigGlobal
     doc = $(fComGetConfig -k "gitproj.config.doc")
     test = $(fComGetConfig -k "gitproj.config.test")
 
-Local Config $gpProjName/$cConfigHost
+Local Proj Config $gpProjName/.gitproj
 [gitproj "config"]
-    local-status = $(fComGetConfig -k "gitproj.config.local-status")
-    remote-status = $(fComGetConfig -k "gitproj.config.remote-status")
-    ver = $(fComGetConfig -k "gitproj.config.ver")
-    proj-name = $(fComGetConfig -k "gitproj.config.proj-name")
-    git-flow-pkg = $(fComGetConfig -k "gitproj.config.git-flow-pkg")
-    remote-raw-dir = $(fComGetConfig -k "gitproj.config.remote-raw-dir")
-    remote-min-size = $(fComGetConfig -k "gitproj.config.remote-min-size")
+$(git config -f .gitproj --list | grep gitproj.config | sed 's/gitproj\.config\.//')
+
 [gitproj "hook"]
-    verbose = $(fComGetConfig -k "gitproj.hook.verbose")
-    pre-commit-enabled = $(fComGetConfig -k "gitproj.hook.pre-commit-enabled")
-    check-file-names = $(fComGetConfig -k "gitproj.hook.check-file-names")
-    check-in-raw = $(fComGetConfig -k "gitproj.hook.check-in-raw")
-    check-whitespace = $(fComGetConfig -k "gitproj.hook.check-whitespace")
-    check-for-big-files = $(fComGetConfig -k "gitproj.hook.check-for-big-files")
-    binary-file-size-limit = $(fComGetConfig -k "gitproj.hook.binary-file-size-limit")
-    source = $(fComGetConfig -k "gitproj.hook.source")
+$(git config -f .gitproj --list | grep gitproj.hook | sed 's/gitproj\.hook\.//')
+
+Other vars in $gpProjName/.gitproj
+$(git config -f .gitproj --list | grep -v gitproj)
 
 Modified files:
-$(git status)
+$(git status --long)
 
 EOF
     if ! fComYesNo "Continue (commit the changes)"; then
-        fLog -p warning -m "Not continuing." -l $tSrc:$LINENO
+        fLog -f -p warning -m "Not continuing." -l $tSrc:$LINENO
         return 1
     fi
+
     fLog -p notice -m "Committing changes" -l $tSrc:$LINENO
-    git commit -am "Updated $cConfigHost"
+    fComConfigUpdateLocal
+    git commit -am "Commit all changes"
+
     return 0
 } # fCloneSummary
 
 # --------------------
 fCloneFromRemoteDir()
 {
-    # Called by "git-projoclone"
+    # Called by "git-proj-clone"
     # Minimum settings:
     # All the common vars set by gitproj-com.inc fComSetGlobals()
-    # Required: gpRemoteGitDir, gpRemoteRawDir, gpProjName
+    # Required: gpRemoteGitDir, gpRemoteRawOrigin, gpProjName
     # Optional: gpYesNo
     local tSrc=${BASH_SOURCE##*/}
 
@@ -391,7 +308,6 @@ fCloneFromRemoteDir()
     fCloneValidRemoteDir
     fCloneMkGitDir
     fCloneMkRawDir
-    fCloneUpdateHostConfig
     fCloneSummary
     fComIntroText
 

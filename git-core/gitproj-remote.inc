@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # --------------------
-export cCurDir cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
-    gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
+    gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus gpSysLog \
     gpVer gpVerbose gResponse
 
 # ========================================
@@ -16,60 +16,47 @@ fRemoteSetGlobals()
     local tSrc=${BASH_SOURCE##*/}
 
     # Assumes we in git dir, and one that is managed by gitproj.
-    if ! fComMustBeInProjRepo $PWD; then
-        fUsage usage
-        exit 1
+    if ! fComGetVer; then
+        fError -m "Quitting" -l $tSrc:$LINENO
     fi
 
     gpAuto=${gpAuto:-0}
     gpMountDir=""
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
+
     gpLocalTopDir=$($cGetTopDir 2>/dev/null)
     if [ -z "$gpLocalTopDir" ]; then
         gpLocalTopDir=$PWD
     fi
+
     gpProjName=$(fComGetConfig -k "gitproj.config.proj-name" -d "Error")
-    gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "not-defined")
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
-    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
+    if [ "$gpProjName" = "Error" ]; then
+        fError -m "It looks like 'git proj init' did not finish. Config proj-name should be 'defined' " -l $tSrc:$LINENO
+    fi
 
-    return 0
-} # fRemoteSetGlobals
-
-# --------------------
-fRemoteVerifyState()
-{
-    local tSrc=${BASH_SOURCE##*/}
-    local tTopDir
-
-    fComGetVer
-
+    gpLocalStatus=$(fComGetConfig -k "gitproj.config.local-status" -d "TBD")
     if [ "$gpLocalStatus" != "defined" ]; then
         fError -m "It looks like 'git proj init' did not finish. Config local-status should be 'defined' " -l $tSrc:$LINENO
     fi
 
-    tTopDir=$($cGetTopDir)
-    if [ "$gpLocalTopDir" != "$tTopDir" ]; then
-        fError -m "This repo appears to be configured for $gpLocalTopDir, not $tTopDir. Run 'git proj config' to reconfigure for a different host." -l $tSrc:$LINENO
-    fi
-
-    if [ "$gpRemoteStatus" = "defined" ]; then
-        fLog -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
+    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "TBD")
+    if [ "$gpRemoteStatus" != "TBD" ]; then
+        fLog -f -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawOrigin. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
         if [ $gpAuto -ne 0 ]; then
-            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in $cConfigHost" -l $tSrc:$LINENO
+            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in --local config" -l $tSrc:$LINENO
         fi
     fi
 
-    if [ "$gpRemoteStatus" = "not-defined" ] &&
-        [ "$gpRemoteRawDir" != "TBD" ] &&
-        [ -n "$gpRemoteRawDir" ]; then
-        fError -i -m "Config problem remote-status=not-defined, but remote-raw-dir is set to $gpRemoteRawDir. It should be undefined or set to TBD" -l $tSrc:$LINENO
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
+    if [ "$gpRemoteRawOrigin" != "TBD" ]; then
+        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-origin=$gpRemoteRawOrigin" -l "$tSrc:$LINENO"
     fi
 
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
+
     return 0
-} # fRemoteVerifyState
+} # fRemoteSetGlobals
 
 # --------------------
 fRemoteCheckDir()
@@ -137,7 +124,7 @@ fRemoteGetDirList()
     export gResponse=""
 
     if [ -n "$pMountDir" ]; then
-        tList=$(find $pMountDir $pMountDir/* $pMountDir/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
+        tList=$(find $pMountDir $pMountDir/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
         gResponse="$gResponse $tList"
     fi
 
@@ -310,21 +297,22 @@ fRemoteMkRemote()
     fComSetConfig -l -k "branch.develop.remote" -v "origin"
     fComSetConfig -l -k "branch.develop.merge" -v "refs/heads/develop"
 
-    mkdir -p $gpRemoteRawDir
+    mkdir -p $gpRemoteRawOrigin
     if [ $gpVerbose -ge 1 ]; then
         tVervose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-viP
     fi
-    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir"
-    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
+    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin"
+    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin
     if [ $? -ne 0 ]; then
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
     fi
 
-    fComSetConfig -L -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
-    fComSetConfig -H -k "gitproj.config.remote-raw-dir" -v "$gpRemoteRawDir"
+    fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
+    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
+    fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
     return 0
 } # fRemoteMkRemote
@@ -353,21 +341,21 @@ fRemoteReport()
         fError -i -n -m "Origin name ($tProjName) does not match project name ($gpProjName)." -l $tSrc:$LINENO
     fi
 
-    tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-dir" -d "TBD")
+    tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
     if [ "$tRawOrigin" = "TBD" ]; then
-        fError -i -n -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+        fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
-    if [ -z "$gpRemoteRawDir" ]; then
-        fError -i -n -m "gitproj.config.remote-raw-dir is not defined." -l $tSrc:$LINENO
+    if [ -z "$gpRemoteRawOrigin" ]; then
+        fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
-    if [ ! -d $gpRemoteRawDir ]; then
-        fError -i -n -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO
+    if [ ! -d $gpRemoteRawOrigin ]; then
+        fError -i -n -m "$gpRemoteRawOrigin does not exist." -l $tSrc:$LINENO
     fi
-    if [ "${gpRemoteRawDir##*/}" != "$gpProjName.raw" ]; then
-        fError -i -n -m "$gpRemoteRawDir does not match $gpProjName.raw" -l $tSrc:$LINENO
+    if [ "${gpRemoteRawOrigin##*/}" != "$gpProjName.raw" ]; then
+        fError -i -n -m "$gpRemoteRawOrigin does not match $gpProjName.raw" -l $tSrc:$LINENO
     fi
-    if [ "$tRawOrigin" != "$gpRemoteRawDir" ]; then
-        fError -i -n -m "$tRawOrigin != $gpRemoteRawDir" -l $tSrc:$LINENO
+    if [ "$tRawOrigin" != "$gpRemoteRawOrigin" ]; then
+        fError -i -n -m "$tRawOrigin != $gpRemoteRawOrigin" -l $tSrc:$LINENO
     fi
 
     if [ $gErr -ne 0 ]; then
@@ -376,14 +364,14 @@ fRemoteReport()
 
     # All looks OK, so set remote-status to "defined"
     gpRemoteStatus="defined"
-    fComSetConfig -H -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
+    fComSetConfig -l -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
     fComSetConfig -L -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
 
     echo 'Remote origin is now set to:'
     $cGetOrigin
     cat <<EOF | fComFmt
 
-Be sure the disk is mounted and that $tGitOrigin and $gpRemoteRawDir
+Be sure the disk is mounted and that $tGitOrigin and $gpRemoteRawOrigin
 exists.  Then you can use: "git push origin BRANCH" and "git pull
 origin BRANCH" If the mount path is changed or you are on a different
 system, use "git proj config" to update the git and raw origin paths.
@@ -396,7 +384,7 @@ EOF
 fRemoteCommit()
 {
     cd $gpLocalTopDir >/dev/null 2>&1
-    fComGit add $cConfigLocal $cConfigHost
+    fComGit add .gitproj
     fComGit commit -am "git proj remote has been setup"
     fComGit push origin develop
     fComGit checkout main
@@ -416,7 +404,9 @@ fRemoteCreateRemoteGit()
     # Prompt/Response or if -a, validate the options
     # fRemoteSetGlobals() has verified we are in a git proj repo
 
-    fRemoteVerifyState
+    if ! fComGetVer; then
+        fError -m "Quitting" -l $tSrc:$LINENO
+    fi
 
     # -d pMountPath (set with prompt/responnse, or required if -a)
     #  gpMountDir is required with -a, othherwise it is optional
@@ -425,7 +415,7 @@ fRemoteCreateRemoteGit()
 
     # Define the remote raw dir name (currenly hardcoded)
     fRemoteGetRemoteRawDir
-    gpRemoteRawDir=$gResponse
+    gpRemoteRawOrigin=$gResponse
 
     fRemoteMkRemote $gpMountDir
     fRemoteReport

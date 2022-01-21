@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export gpCmdName gpBin cCurDir
+export gpCmdName gpBin
 
 #--------------------
 fUsage()
@@ -29,7 +29,7 @@ fUsage()
 =head1 DESCRIPTION
 
  rsync will be used top copy the '[ProjName]/raw/' files to
- [remote-raw-dir]/[ProjName].raw.
+ [remote-raw-origin]/[ProjName].raw.
 
 If the -b option is given then run:
 
@@ -110,17 +110,16 @@ EOF
 # ========================================
 # Main
 
-export cCurDir gpBin gpCmdName tSrc
+export gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
 tSrc=${BASH_SOURCE##*/}
 
 # -------------------
-# Set current directory location in PWD and cCurDir
+# Set current directory location in PWD
 if [ -z "$PWD" ]; then
     PWD=$(pwd)
 fi
-cCurDir=$PWD
 
 # -------------------
 # Define the location of this script
@@ -142,7 +141,7 @@ fComGetProjGlobals
 tSrc=${BASH_SOURCE##*/}
 tBranchFlag=0
 gpYesNo=""
-while getopts :bnyhH:vx tArg; do
+while getopts :bnyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
         b) tBranchFlag=1 ;;
@@ -151,8 +150,11 @@ while getopts :bnyhH:vx tArg; do
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-        v) let ++gpVerbose ;;
+	q) gpVerbose=0 ;;
+        v) gpVerbose=2 ;;
+	V) gpVerbose=$OPTARG ;;
         x) let ++gpDebug ;;
+	X) gpDebug=$OPTARG ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

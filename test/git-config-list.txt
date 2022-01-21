@@ -52,7 +52,7 @@ gpLocalRawSymLink file:~/.gitproj.config.global      gitproj.config.local-raw-sy
 gpLocalTopDir	  file:~/.gitproj.config.global      gitproj.config.local-top-dir=TBD
 gpProjName	  file:~/.gitproj.config.global      gitproj.config.proj-name=TBD
 gpProjStatus   	  file:~/.gitproj.config.global      gitproj.config.proj-status=not-set-up
-gpRemoteRawDir	  file:~/.gitproj.config.global      gitproj.config.remote-raw-dir=TBD
+gpRemoteRawOrigin	  file:~/.gitproj.config.global      gitproj.config.remote-raw-dir=TBD
 gpSysLog   	  file:~/.gitproj.config.global      gitproj.config.syslog=true
 gpTest   	  file:~/.gitproj.config.global      gitproj.config.test=/usr/share/doc/git-proj/test
 cGitProjVersion   file:~/.gitproj.config.global      gitproj.config.ver=1.1
@@ -61,7 +61,6 @@ gpMaxSize  file:~/.gitproj.config.global      gitproj.hook.binary-file-size-limi
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-file-names=true
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-for-big-files=true
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.pre-commit-enabled=true
-TBD 	   file:~/.gitproj.config.global      gitproj.hook.source=hooks/pre-commit
 
 # ------------------
 $ git config --local --list --show-origin --includes

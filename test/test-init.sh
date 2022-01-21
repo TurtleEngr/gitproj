@@ -112,8 +112,7 @@ setUp()
 {
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cCurDir cGetOrigin cGetTopDir \
-        cGitProjVersion cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpLocalRawDir \
@@ -123,6 +122,7 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     . $gpBin/gitproj-init.inc
+    gpVerbose=3
     gpUnitDebug=0
     return 0
 
@@ -565,7 +565,7 @@ testInitMkRaw()
     gpMaxSize="1k"
     gpAutoMove=true
     gpAuto=0
-    gpVerbose=2
+    gpVerbose=3
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkRaw 2>&1)
@@ -600,7 +600,7 @@ testInitMoveBinaryFiles()
     gpGitFlow="true"
     gpAutoMove=true
     gpAuto=0
-    gpVerbose=2
+    gpVerbose=3
 
     cd $gpLocalTopDir >/dev/null 2>&1
     fInitMkRaw >/dev/null 2>&1
@@ -761,19 +761,16 @@ testInitMkLocalConfig()
     gpAuto=0
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    assertFalse $LINENO "[ -f $cConfigLocal ]"
-    assertFalse $LINENO "[ -f $cConfigHost ]"
-    assertFalse $LINENO "$(grep -q gitproj.config .git/config >/dev/null 2>&1); echo $?)"
+    assertFalse "$LINENO" "[ -f .gitproj ]"
+    assertFalse "$LINENO" "grep -q gitproj..config .git/config >/dev/null 2>&1"
 
     tResult=$(fInitMkLocalConfig 2>&1)
-    assertTrue $LINENO "$?"
-    assertTrue $LINENO "[ -f $cConfigLocal ]"
-    assertTrue $LINENO "[ -f $cConfigHost ]"
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO $tResult" "[ -f .gitproj ]"
+    assertTrue $LINENO "[ -f .git/config ]"
+    assertTrue "$LINENO $tResult" "grep -q gitproj..config .git/config >/dev/null 2>&1"
 
-    tResult=$(git config --local --list --show-origin --includes 2>&1)
-    assertTrue $LINENO "$?"
-    assertContains "$LINENO $tResult" "include.path=../$cConfigHost"
-
+    return 0
 } # testInitMkLocalConfig
 
 # --------------------------------
@@ -796,8 +793,8 @@ testInitSaveVarsToConfigs()
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fInitMkLocalConfig 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue $LINENO "[ -f $cConfigLocal ]"
-    assertTrue $LINENO "[ -f $cConfigHost ]"
+    assertTrue $LINENO "[ -f .gitproj ]"
+    assertTrue $LINENO "[ -f .git/config ]"
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -816,24 +813,23 @@ testInitSaveVarsToConfigs()
     # cMapFile[gitproj.config.proj-name]=local
     # if cMapFile[key] is undefined, then assume it is global and local
 
-    tFile=~/.gitproj.config.global
+    tFile=$HOME/.gitconfig
     tS=gitproj.config
     fTestCheckConfig2Var $tFile $tS.proj-status gpProjStatus ${gpProjStatus} $LINENO
     fTestCheckConfig2Var $tFile $tS.bin gpBin "${gBin#$gpLocalTopDir/}" $LINENO
     fTestCheckConfig2Var $tFile $tS.doc gpDoc "${gDoc#$gpLocalTopDir/}" $LINENO
-    fTestCheckConfig2Var $tFile $tS.test gpTest "${gTest#$gpLocalTopDir/}" $LINENO
     fTestCheckConfig2Var $tFile $tS.facility gpFacility user $LINENO
     fTestCheckConfig2Var $tFile $tS.syslog gpSysLog false $LINENO
 
-    for tFile in $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
+    for tFile in $gpLocalTopDir/.gitproj \
+        $gpLocalTopDir/.git/config; do
         tS=gitproj.config
-        fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus not-defined $LINENO
-        fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus not-defined $LINENO
+        fTestCheckConfig2Var $tFile $tS.local-status gpLocalStatus TBD $LINENO
+        fTestCheckConfig2Var $tFile $tS.remote-status gpRemoteStatus TBD $LINENO
         fTestCheckConfig2Var $tFile $tS.proj-name gpProjName $gpProjName $LINENO
     done
 
-    for tFile in ~/.gitproj.config.global $gpLocalTopDir/$cConfigLocal; do
+    for tFile in $HOME/.gitconfig $gpLocalTopDir/.gitproj; do
         tS=gitproj.config
         fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true $LINENO
         tS=gitproj.hook
@@ -844,7 +840,6 @@ testInitSaveVarsToConfigs()
         fTestCheckConfig2Var $tFile $tS.check-whitespace gpCheckWhitespace true $LINENO
         fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
         fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
-        fTestCheckConfig2Var $tFile $tS.source gpHookSource hooks/pre-commit $LINENO
     done
 
     return 0

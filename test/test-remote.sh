@@ -109,10 +109,11 @@ NAoneTimeTearDown()
 # --------------------------------
 setUp()
 {
+    local tTar=$gpTest/test-env_ProjLocalDefined.tgz
+
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
-        cGetTopDir cGitProjVersion cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -122,13 +123,14 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     cd $HOME >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
+    tar -xzf $tTar
     cd - >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     . $gpBin/gitproj-remote.inc
-    fRemoteSetGlobals
     gpDebug=0
+    gpVerbose=3
+    fRemoteSetGlobals
     gpUnitDebug=0
     return 0
 
@@ -173,47 +175,47 @@ testComGetVer()
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
 
     cGitProjVersion="0.1.0"
-    fComSetConfig -H -k "gitproj.config.ver" -v "0.1.0"
+    fComSetConfig -l -k "gitproj.config.ver" -v "0.1.0"
     fComGetVer 2>&1
     assertTrue "$LINENO" "$?"
     assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
 
     cGitProjVersion="0.1.8"
-    fComSetConfig -H -k "gitproj.config.ver" -v "0.1.0"
+    fComSetConfig -l -k "gitproj.config.ver" -v "0.1.0"
     tResult=$(fComGetVer 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO" "$cGitProjVersion" "${gpVer%.*}"
 
     cGitProjVersion="1.1.4+120"
-    fComSetConfig -H -k "gitproj.config.ver" -v "2.3.1-rc+28"
+    fComSetConfig -l -k "gitproj.config.ver" -v "2.3.1-rc+28"
     tResult=$(fComGetVer 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "crit: "
     assertContains "$LINENO" "$tResult" "The installed version $cGitProjVersion needs to be upgraded"
 
     cGitProjVersion="2.3.1-rc+28"
-    fComSetConfig -H -k "gitproj.config.ver" -v "1.1.4+120"
+    fComSetConfig -l -k "gitproj.config.ver" -v "1.1.4+120"
     tResult=$(fComGetVer 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "crit: "
     assertContains "$LINENO $tResult" "$tResult" "project needs to be upgraded"
 
     cGitProjVersion="1.2.7-rc.3+5"
-    fComSetConfig -H -k "gitproj.config.ver" -v "1.3.0"
+    fComSetConfig -l -k "gitproj.config.ver" -v "1.3.0"
     tResult=$(fComGetVer 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "warning: "
     assertContains "$LINENO $tResult" "$tResult" "Minor version difference. Expected version"
 
     cGitProjVersion="1.3.0"
-    fComSetConfig -H -k "gitproj.config.ver" -v "1.2.7-rc.3+5"
+    fComSetConfig -l -k "gitproj.config.ver" -v "1.2.7-rc.3+5"
     tResult=$(fComGetVer 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "warning: "
     assertContains "$LINENO $tResult" "$tResult" "Minor version difference. Expected version"
 
     fComUnsetConfig -L -k "gitproj.config.ver"
-    fComUnsetConfig -H -k "gitproj.config.ver"
+    fComUnsetConfig -l -k "gitproj.config.ver"
     tResult=$(fComGetVer 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "warning: "
@@ -228,10 +230,11 @@ testComGetVer()
 } # testComGetVer
 
 # --------------------------------
-testInGitProjDir()
+testRemoteSetGlobals()
 {
     local tResult
 
+    # If errors, do a stack trace
     gpDebug=2
 
     cd $HOME >/dev/null 2>&1
@@ -240,23 +243,24 @@ testInGitProjDir()
     assertContains "$LINENO $tResult" "$tResult" "You must be in a git workspace for this command"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    mv .gitproj.config.testserver .gitproj.config.testserver.sav
+    mv .gitproj .gitproj.sav
     tResult=$(fRemoteSetGlobals 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Missing .gitproj.config.$HOSTNAME, run"
+    assertContains "$LINENO $tResult" "$tResult" "Error: This git workspace is not setup for gitproj"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    mv .gitproj.config.testserver.sav .gitproj.config.testserver
-    rm .gitproj.config.local
+    mv .gitproj.sav .gitproj
     tResult=$(fRemoteSetGlobals 2>&1)
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "git workspace is not setup for gitproj"
+    assertTrue "$LINENO $tResult" "$?"
+    assertNotContains "$LINENO $tResult" "$tResult" "warning"
+
+    # TBD: add tests to force errors and warnings. See REMOVEDtestRemoteVerifyState
 
     return 0
-} # testInGitProjDir
+} # testRemoteSetGlobals
 
 # --------------------------------
-testRemoteVerifyState()
+REMOVEDtestRemoteVerifyState()
 {
     local tResult
     local tLocalTopDir
@@ -292,18 +296,18 @@ testRemoteVerifyState()
     assertContains "$LINENO $tResult" "$tResult" "You are in 'automatic' mode, so exiting"
 
     gpRemoteStatus=not-defined
-    gpRemoteRawDir=foo
+    gpRemoteRawOrigin=foo
     tResult=$(fRemoteVerifyState 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Config problem remote-status=not-defined, but remote-raw-dir is set to"
+    assertContains "$LINENO $tResult" "$tResult" "Config problem remote-status=not-defined, but remote-raw-origin is set to"
 
     gpRemoteStatus=not-defined
-    gpRemoteRawDir="TBD"
+    gpRemoteRawOrigin="TBD"
     tResult=$(fRemoteVerifyState 2>&1)
     assertTrue "$LINENO" "$?"
 
     gpRemoteStatus=not-defined
-    gpRemoteRawDir=""
+    gpRemoteRawOrigin=""
     tResult=$(fRemoteVerifyState 2>&1)
     assertTrue "$LINENO" "$?"
 
@@ -358,7 +362,7 @@ testRemoteGetMountDirAuto()
     assertContains "$LINENO $tResult" "$tResult" "Cannot continue with -a mode"
 
     gpAuto=1
-    gpRemoteRawDir=TBD
+    gpRemoteRawOrigin=TBD
     if [ -n "$gpMountDir" ]; then
         fail "$LINENO gpMountDir is not empty: ${gpMountDir}"
     fi
@@ -380,7 +384,6 @@ testRemoteGetDirList()
     fRemoteGetDirList "$cDatMount3"
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$gResponse" "$cDatMount3"
-    assertContains "$LINENO $tResult" "$gResponse" "src"
 
     return 0
 } # testRemoteGetDirList
@@ -500,6 +503,7 @@ testRemoteGetRemoteRawDir()
 testRemoteMkRemote()
 {
     local tResult
+    local tTar=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
 
     gpAuto=1
     gpVerbose=2
@@ -508,7 +512,7 @@ testRemoteMkRemote()
     cd $gpLocalTopDir >/dev/null 2>&1
     gpProjName=george
     gpMountDir=$cDatMount3/video-2020-04-02
-    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+    gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
 
     # Mount dir has already been valided
     tResult=$(fRemoteMkRemote $cDatMount3/video-2020-04-02 2>&1)
@@ -522,10 +526,10 @@ testRemoteMkRemote()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteMkRemote is run."
-        echo -e "\tRestore test-env_TestDestDirAfterMkRemote.tgz relative to env cTestDestDir"
+        echo -e "\tRestore $tTar relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz test
+        tar -cvzf $tTar test
         echo
     fi
 
@@ -537,16 +541,18 @@ testRemoteReport()
 {
     local tResult
     local tStatus
+    local tTar1=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
+    local tTar2=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
 
     cd $cTestDestDir >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_TestDestDirAfterMkRemote.tgz
+    tar -xzf $tTar1
 
     gpAuto=1
     gpVerbose=2
     gpLocalTopDir=$cDatHome/$cDatProj1
     gpProjName=george
     gpMountDir=$cDatMount3/video-2020-04-02
-    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+    gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fRemoteReport 2>&1)
@@ -558,21 +564,21 @@ testRemoteReport()
     assertTrue "$LINENO" "$?"
     assertEquals "$LINENO" "defined" "$tResult"
 
-    tResult=$(fComGetConfig -H -k "gitproj.config.remote-status" 2>&1)
-    assertTrue "$LINENO" "$?"
+    tResult=$(fComGetConfig -l -k "gitproj.config.remote-status" 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
     assertEquals "$LINENO" "defined" "$tResult"
 
-    tResult=$(fComGetConfig -L -k "gitproj.config.remote-status" 2>&1)
-    assertTrue "$LINENO" "$?"
-    assertEquals "$LINENO" "defined" "$tResult"
+    tResult=$(fComGetConfig -l -k "gitproj.config.remote-status" 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertEquals "$LINENO $tResult" "defined" "$tResult"
 
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteReport is run."
-        echo -e "\tRestore test-env_HomeAfterRemoteReport.tgz relative to env cTestDestDir"
+        echo -e "\tRestore $tTar2 relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $gpTest/test-env_TestDestDirAfterRemoteReport.tgz test
+        tar -cvzf $tTar2 test
         echo
     fi
 
@@ -585,8 +591,9 @@ testRemoteCreateRemoteGit()
     local tResult
     local tTopDir
     local tStatus
+    local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
 
-    gpVerbose=2
+    gpVerbose=3
     gpAuto=1
     gpMountDir=""
     tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
@@ -597,17 +604,14 @@ testRemoteCreateRemoteGit()
 
     cd $cTestDestDir >/dev/null 2>&1
     tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
-    assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: You must be in a git workspace for this command"
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "err: Error: You must be in a git workspace for this command"
 
     tTopDir=$cDatHome/$cDatProj1
     cd $tTopDir >/dev/null 2>&1
     fComSetGlobals
     fRemoteSetGlobals
-    ##assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
-    #/mnt/plasma.data3/home/bruce/ver/public/app/gitproj/test/root/home/john/project/george
-    #                 /home/bruce/ver/public/app/gitproj/test/root/home/john/project/george
-    assertContains "$LINENO" "$gpLocalTopDir" "$tTopDir"
+    assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
 
     gpMountDir=$cDatMount3/video-2020-04-02
     chmod a-w $gpMountDir
@@ -615,7 +619,7 @@ testRemoteCreateRemoteGit()
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "video-2020-04-02 is not writable for you"
 
-    gpVerbose=2
+    gpVerbose=3
     cd $tTopDir >/dev/null 2>&1
     chmod ug+w $gpMountDir
     tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
@@ -631,10 +635,10 @@ testRemoteCreateRemoteGit()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteReport is run."
-        echo -e "\tRestore test-env_HomeAfterRemoteReport.tgz relative to env cTestDestDir"
+        echo -e "\tRestore $tTar relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz test
+        tar -cvzf $tTar test
         echo
     fi
 
@@ -652,21 +656,21 @@ testGitProjRemoteCLIAuto()
     cd $cTestDestDir >/dev/null 2>&1
     tResult=$($gpBin/git-proj-remote -a -d $PWD 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: You must be in a git workspace for this command"
+    assertContains "$LINENO $tResult" "$tResult" "err: Error: You must be in a git workspace for this command"
     assertContains "$LINENO $tResult" "$tResult" "Usage:"
 
     # Not in a proj dir
     cd $cDatHome/$cDatProj3 >/dev/null 2>&1
     tResult=$($gpBin/git-proj-remote -a -d $PWD 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: This git workspace is not setup for gitproj"
+    assertContains "$LINENO $tResult" "$tResult" "err: Error: This git workspace is not setup for gitproj"
     assertContains "$LINENO $tResult" "$tResult" "Usage:"
 
     # -d required
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     tResult=$($gpBin/git-proj-remote -a 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "git-proj-remote: crit: The -d option is required with -a auto option"
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: The -d option is required with -a auto option"
     assertContains "$LINENO $tResult" "$tResult" "Usage:"
 
     # Works
@@ -720,10 +724,9 @@ testGitProjRemoteCLIManual()
 
     # Works
     tMountDir=$cDatMount3
-    # video-2020-04-02 was item #9, before the two dirs were add above
-    # video-2020-04-02 is item #11
+    # video-2020-04-02 is item #6
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "11\n") 2>&1)
+    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "6\n") 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"

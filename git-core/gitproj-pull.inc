@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # --------------------
-export cCurDir cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
-    gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
+    gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus gpSysLog \
     gpVer gpVerbose gResponse
 
 # ========================================
@@ -25,7 +25,7 @@ fPullRawFiles()
         tVervose=-viP
     fi
 
-    tDiff=$(diff -rq $gpRemoteRawDir $gpLocalTopDir/raw 2>&1)
+    tDiff=$(diff -rq $gpRemoteRawOrigin $gpLocalTopDir/raw 2>&1)
     if [ $? -eq 0 ]; then
         tVerbose=$gpVerbose
         fLog -p notice -m "There are no differences found with 'raw' files." -l $tSrc:$LINENO
@@ -49,10 +49,10 @@ EOF
 
 Dry Run:
 'rsync' $tOpt $tVerbose --dry-run
-        $gpRemoteRawDir/"
+        $gpRemoteRawOrigin/"
         $gpLocalTopDir/raw
 EOF
-        'rsync' $tOpt $tVerbose --dry-run -v $gpRemoteRawDir/ $gpLocalTopDir/raw
+        'rsync' $tOpt $tVerbose --dry-run -v $gpRemoteRawOrigin/ $gpLocalTopDir/raw
     fi
 
     echo
@@ -76,7 +76,7 @@ EOF
             ;;
     esac
 
-    'rsync' $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalTopDir/raw
+    'rsync' $tOpt $tVerbose $gpRemoteRawOrigin/ $gpLocalTopDir/raw
     tStatus=$?
 
     return $tStatus

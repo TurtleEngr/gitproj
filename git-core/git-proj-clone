@@ -112,17 +112,16 @@ EOF
 # ========================================
 # Main
 
-export cCurDir gpBin gpCmdName tSrc
+export gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
 tSrc=${BASH_SOURCE##*/}
 
 # -------------------
-# Set current directory location in PWD and cCurDir
+# Set current directory location in PWD
 if [ -z "$PWD" ]; then
     PWD=$(pwd)
 fi
-cCurDir=$PWD
 
 # -------------------
 # Define the location of this script
@@ -143,12 +142,12 @@ cd - >/dev/null 2>&1
 
 gpRemoteGitDir=""
 gpYesNo=""
-while getopts :d:nyhH:vx tArg; do
+while getopts :d:nyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
         d)
             gpRemoteGitDir="$OPTARG"
-            gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+            gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
             gpProjName=${gpRemoteGitDir##*/}
             gpProjName=${gpProjName%.git}
             ;;
@@ -157,8 +156,11 @@ while getopts :d:nyhH:vx tArg; do
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-        v) let ++gpVerbose ;;
+	q) gpVerbose=0 ;;
+        v) gpVerbose=2 ;;
+	V) gpVerbose=$OPTARG ;;
         x) let ++gpDebug ;;
+	X) gpDebug=$OPTARG ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

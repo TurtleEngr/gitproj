@@ -6,35 +6,9 @@ After 1.0, move these to github issues.
 
 ## bug (defect, fix, needs to be changed)
 
-* in git-proj-init Testing Results:
-
-    In help: saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME.
-    In usage: isn't -l required?
-    The -s, -m, -f options seem to only be needed if using the -a option,
-    otherwise they can be prompted for.
-    The -l option assumes you have a dir with content already in it. Is fill path needed, or can it just...
-    Project Path (-l) [/home/bruce/test/seal/quit]?
-    	huh, quit? s/b
-	Project Path (-l) [/home/bruce/test/seal]
-	Project Name [seal] Continue [y/n]?
-
-* in git-proj-remote Testing Results:
-
-    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
-    maybe limit it to only one level (DIR1)?
-
-* Remove the duplicate path, in .git/config (introduced by git-proj-clone)
-  [include]
-        path = ../.gitproj.config.testserver2
-        path = ../.gitproj.config.testserver2
-
 * git config vars and section names are case-insensitive. Fix the
   comConfig (and 'git config') functions to lowercase the var and
   section names.
-
-* Rename remote-raw-dir to remote-raw-origin
-
-* Remove "gitproj.hook.source" and "gpHookSource" from configs, code, tests
 
 --------------------
 
@@ -48,13 +22,45 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
-* Cleanup: remove gpMountDir. Is gpGitFlowPkg used?
+* git-proj-clone will initally copy all of PROJ/.gitproj (afer git
+  clone).  Then update local config: local-status, local-host,
+  proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig
 
-* Remove the need for the cCurDir variable (has it ever been used?)
+  After cloning remote, update local vars remote-status, remote-raw-dir
+
+  When in a git or git-proj dir, config vars s/b first saved to
+  .git/config
+
+  At the end of the command, update .gitprog with the gitproj values
+  from .git/config. But these vars must stay set to TBD, in .gitproj:
+  local-status, local-host, proj-name, remote-status, remote-raw-dir
+
+  Also gitproj.config.ver should be set to $gpDoc/VERSION
+
+* Cleanup the saving of git-proj vars. Save to --local, then
+  "frequently" update PROJ/.gitproj
+
+* Cleanup: break fComGetConfig in to two functions--it is doing to
+  many things that are not used.
+
+* Cleanup: remove gpMountDir. gpHookSource. Is gpGitFlowPkg used?
+
+* Cleanup: fixup log messages to follow the gpVerbose rules. (see flog
+  and git-proj)
+
+* Cleanup: fixup gpVar settings to follow the precedence rules (see
+  git-proj) Imp:
+
+  - if env. var not set, read var from ~/.gitconfig, PROJ/.git/config,
+     giving a "default" if var is not defined.
+
+  - CLI option will override env. var.
+
+  - Validate the settings, if any error, exit
 
 * Refactor the test setup so it is simpler.
 
-* Copy the test-env tar files to a "public" place. And implement the
+* Copy the test-env*.tgz files to a "public" place. And implement the
 Makefile targets for managing them.
 
 * Get travis-ci working. Run tests.
@@ -106,6 +112,10 @@ Makefile targets for managing them.
 * Version increment wizard script. Increment the
   major/minor/path/rc/build vars based on Q/A. See
   `test/dev-doc/enh-ver-wizard.md`
+
+* Implement: allow-tabs pre-commit check. Also add "expand" to
+  rm-trailing-sp script (-t option). Put rm-trailing-sp script in
+  $gpDoc/contrib dir?
 
 * Decided on which remote network service to implement. Do all, only
   do one or two? Some methods are not compatable.
@@ -213,3 +223,34 @@ Fix: look for first arg so see if it is a CMD. - done
 
 * Change the logging messages so that they don't output the
   timestamp. Maybe don't log to syslog? Change default syslog to false. - done
+
+* Remove the need for the cCurDir variable (has it ever been used?) - done
+
+* in git-proj-init Testing Results: - Done
+
+    In help: saved to ~/.gitproj.config and [project]/gitproj/config.$HOSTNAME.
+    In usage: isn't -l required?
+    The -s, -m, -f options seem to only be needed if using the -a option,
+    otherwise they can be prompted for.
+    The -l option assumes you have a dir with content already in it. Is fill path needed, or can it just...
+    Project Path (-l) [/home/bruce/test/seal/quit]?
+    	huh, quit? s/b
+	Project Path (-l) [/home/bruce/test/seal]
+	Project Name [seal] Continue [y/n]?
+
+* in git-proj-remote Testing Results: - done
+
+    "git proj remote" lists all the files in /media/$USER/DRIVE/DIR1/DIR2
+    maybe limit it to only one level (DIR1)?
+
+* Remove the duplicate path, in .git/config (introduced by git-proj-clone)
+  [include]
+        path = ../.gitproj.config.testserver2
+        path = ../.gitproj.config.testserver2
+  NA - so done
+
+* Rename remote-raw-dir to remote-raw-origin, and gpRemoteRawDir to
+  gpRemoteRawOrigin - done
+
+* Remove "gitproj.hook.source" and "gpHookSource" from configs, code,
+  tests - done

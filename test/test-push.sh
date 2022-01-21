@@ -112,8 +112,7 @@ setUp()
 {
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
-        cGetTopDir cGitProjVersion cInteractive cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cInteractive cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -129,6 +128,7 @@ setUp()
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     . $gpBin/gitproj-push.inc
 
+    gpVerbose=3
     gpDebug=0
     gpUnitDebug=0
     return 0
@@ -174,17 +174,17 @@ testComGetProjGlobals()
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     fComGetProjGlobals >/dev/null 2>&1
     assertTrue "$LINENO $tResult" "$?"
-    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.raw" "$gpRemoteRawDir"
+    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.raw" "$gpRemoteRawOrigin"
 
     tResult=$(git config --get --local remote.origin.url)
     assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.git" "$tResult"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    fComSetConfig -H -k "gitproj.config.proj-name" -v "TBD"
+    fComSetConfig -l -k "gitproj.config.proj-name" -v "TBD"
     fComSetConfig -L -k "gitproj.config.proj-name" -v "TBD"
     tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: Unexpected: gitproj.config.proj-name should not be set to: TBD"
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Unexpected: gitproj.config.proj-name should not be set to: TBD"
 
     return 0
 } # testComGetProjGlobals
@@ -199,11 +199,11 @@ testComIsRemoteMounted()
     tResult=$(fComIsRemoteMounted 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
-    mv $gpRemoteRawDir $gpRemoteRawDir.sav
+    mv $gpRemoteRawOrigin $gpRemoteRawOrigin.sav
     tResult=$(fComIsRemoteMounted 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
-    mv $gpRemoteRawDir.sav $gpRemoteRawDir
+    mv $gpRemoteRawOrigin.sav $gpRemoteRawOrigin
 
     return 0
 } # testComIsRemoteMounted
@@ -215,7 +215,6 @@ testPushRawFiles()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-    gpVerbose=2
 
     tResult=$(fPushRawFiles 2>&1)
     assertTrue "$LINENO $tResult" "$?"
@@ -246,7 +245,7 @@ testPushRawFiles()
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
-    assertTrue "$LINENO" "[ -f $gpRemoteRawDir/NewFile.txt ]"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
@@ -259,7 +258,6 @@ testPushGit()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-    gpVerbose=2
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
@@ -290,8 +288,6 @@ testPushToOrigin()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-    gpVerbose=2
-
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
@@ -300,7 +296,7 @@ testPushToOrigin()
     tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
-    assertTrue "$LINENO" "[ -f $gpRemoteRawDir/newfile.txt ]"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/newfile.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
@@ -323,7 +319,7 @@ testGitProjPushCLI()
     assertContains "$LINENO $tResult" "$tResult" "newfile.txt"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$($gpBin/git-proj-push -b -vv 2>&1 < <(echo -e "3\n3"))
+    tResult=$($gpBin/git-proj-push -b -V 3 2>&1 < <(echo -e "3\n3"))
     tStatus=$?
     assertTrue "$LINENO $tResult" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"

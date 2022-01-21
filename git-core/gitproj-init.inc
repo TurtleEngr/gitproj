@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # --------------------
-export cCurDir cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
     gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
-    gpGitFlow gpHookSource gpHookVerbose gpLocalRawDir gpLocalStatus \
+    gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
@@ -91,7 +91,8 @@ fInitGetLocalPath()
 Define the existing project directory. The last directory will be used
 for the name of the project. Default: current directory
 EOF
-        echo -n "Project Path (-l) [$pLocalPath/quit]? "
+        echo "Project Path (-l) [$pLocalPath]"
+	echo -n "Project Name [${pLocalPath##*/}] Continue [y/n]? "
         read -r tResult
         if [ "$tResult" = "quit" ] || [ "$tResult" = "q" ]; then
             fLog -p warning -m "Quitting" -l $tSrc:$LINENO
@@ -306,7 +307,7 @@ Summary
     (verbose) = $gpVerbose
     (debug) = $gpDebug
     (exits)   HOME/.gitconfig
-    (created)   HOME/$cConfigGlobal
+    (created)   HOME/.gitconfig
     (local-raw-dir) = $gpLocalRawDir
     (git-flow init) = $gpGitFlow
 
@@ -330,7 +331,6 @@ Summary
     check-whitespace = $gpCheckWhitespace
     check-for-big-files = $gpCheckForBigFiles
     binary-file-size-limit = $gpMaxSize
-    source = $gpHookSource
 
 EOF
     if [ $gpAuto -eq 0 ]; then
@@ -477,7 +477,7 @@ fInitMkGitDir()
     cd $gpLocalTopDir >/dev/null 2>&1
 
     fLog -p info -m "Create: .gitignore" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitignore.default .gitignore
+    cp $gpDoc/config/gitignore .gitignore
 
     fLog -p info -m "git init" -l $tSrc:$LINENO
     git init
@@ -485,7 +485,7 @@ fInitMkGitDir()
     fLog -p info -m "git add FILES" -l $tSrc:$LINENO
     git add .gitignore *
 
-    fLog -p info -m "git commit" -l $tSrc:$LINENO
+    fLog -p info -am "git commit" -l $tSrc:$LINENO
     git commit -am "Initial commit"
     tStatus=$?
     if [ $tStatus -ne 0 ]; then
@@ -513,19 +513,14 @@ fInitMkLocalConfig()
     local tSrc=${BASH_SOURCE##*/}
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    fLog -p info -m "Create: $cConfigLocal" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.local $cConfigLocal
-    fLog -p info -m "Create: $cConfigHost" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitproj.config.local $cConfigHost
 
-    tInclude=$(fComGetConfig -l -k "include.path" -v $cConfigHost)
-    if [ -n "$tInclude" ]; then
-        fLog -i -p warning -m "Weird, $cConfigHost is already included" -l $tSrc:$LINENO
-        return 0
-    fi
+    touch .gitproj
 
-    fLog -p info -m "Include: ../$cConfigHost in .git/config" -l $tSrc:$LINENO
-    fComSetConfig -a -l -k "include.path" -v ../$cConfigHost
+    fLog -p info -m "Create: .gitproj" -l $tSrc:$LINENO
+    fComConfigCopy -s $HOME/.gitconfig -d .gitproj -i 'gitproj\.'
+
+    fLog -p info -m "Create: host values in --local" -l $tSrc:$LINENO
+    fComConfigCopy -s .gitproj -d .git/config
 
     return 0
 } # fInitMkLocalConfig
@@ -539,18 +534,17 @@ fInitSaveVarsToConfigs()
 
     gErr=0
 
-    tFile=$HOME/$cConfigGlobal
+    tFile=$HOME/.gitconfig
     tS=gitproj.config
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
     fComSaveVar2Config $tFile $tS.bin gpBin
     fComSaveVar2Config $tFile $tS.doc gpDoc
-    fComSaveVar2Config $tFile $tS.test gpTest
     fComSaveVar2Config $tFile $tS.facility gpFacility
     fComSaveVar2Config $tFile $tS.syslog gpSysLog
 
     for tFile in \
-        $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
+        $gpLocalTopDir/.gitproj \
+        $gpLocalTopDir/.git/config; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.ver gpVer
         fComSaveVar2Config $tFile $tS.local-status gpLocalStatus
@@ -558,9 +552,9 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.proj-name gpProjName
     done
 
-    for tFile in $HOME/$cConfigGlobal \
-        $gpLocalTopDir/$cConfigLocal \
-        $gpLocalTopDir/$cConfigHost; do
+    for tFile in $HOME/.gitconfig \
+        $gpLocalTopDir/.gitproj \
+        $gpLocalTopDir/.git/config; do
         tS=gitproj.config
         fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
         tS=gitproj.hook
@@ -571,13 +565,12 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.check-whitespace gpCheckWhitespace
         fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
         fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
-        fComSaveVar2Config $tFile $tS.source gpHookSource
     done
 
     if [ $gErr -eq 0 ]; then
         fLog -p info -m "Save local configs" -l $tSrc:$LINENO
-        git add .gitproj.config.*
-        git commit -am "Save gitproj.config"
+        git add .gitproj
+        git commit -am "Save .gitproj"
     fi
 
     return $gErr

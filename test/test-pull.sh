@@ -116,8 +116,7 @@ setUp()
 
     # Restore default global values, before each test
 
-    unset cConfigGlobal cConfigLocal cConfigHost cCurDir cGetOrigin \
-        cGetTopDir cGitProjVersion cInteractive cPID gErr
+    unset cGetOrigin cGetTopDir cGitProjVersion cInteractive cPID gErr
 
     unset gpAction gpAuto gpAutoMove gpBin \
         gpDoc gpFacility gpGitFlow gpHardLink gpLocalRawDir \
@@ -162,7 +161,7 @@ setUp()
     ##git status
     git commit -am Added >/dev/null 2>&1
 
-    # Push changes to remote ($gpRemoteRawDir)
+    # Push changes to remote ($gpRemoteRawOrigin)
     $gpBin/git-proj-push -b -y >/dev/null 2>&1
 
     # --------
@@ -171,6 +170,7 @@ setUp()
     HOME=$cDatHome
     fComGetProjGlobals
 
+    gpVerbose=3
     gpDebug=0
     gpUnitDebug=0
     return 0
@@ -204,10 +204,10 @@ testSetUp()
     local tResult
 
     assertTrue "$LINENO $cDatHome2/$cDatProj1/raw/NewFile2.txt" "[ -f $cDatHome2/$cDatProj1/raw/NewFile2.txt ]"
-    assertTrue "$LINENO $gpRemoteRawDir/NewFile2.txt" "[ -f $gpRemoteRawDir/NewFile2.txt ]"
+    assertTrue "$LINENO $gpRemoteRawOrigin/NewFile2.txt" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
 
     assertTrue "$LINENO $cDatHome2/$cDatProj1/raw/src/raw/MOV001.mp4" "[ ! -f $cDatHome2/$cDatProj1/raw/src/raw/MOV001.mp4 ]"
-    assertTrue "$LINENO $gpRemoteRawDir/raw/src/raw/MOV001.mp4" "[ ! -f $gpRemoteRawDir/src/raw/MOV001.mp4 ]"
+    assertTrue "$LINENO $gpRemoteRawOrigin/raw/src/raw/MOV001.mp4" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
 
     assertTrue "$LINENO $cDatHome2/$cDatProj1/doc/NewFileFromBob.txt" "[ -f $cDatHome2/$cDatProj1/doc/NewFileFromBob.txt ]"
 
@@ -218,8 +218,6 @@ testSetUp()
 testPullRawFiles()
 {
     local tResult
-
-    gpVerbose=2
 
     # Setup a change in raw files in $cDatHome/$cDatProj1
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
@@ -270,8 +268,6 @@ testPullGit()
 {
     local tResult
 
-    gpVerbose=2
-
     # diff -rq /home/john/project/george home/bob/project/george | grep -Ev '.git|raw'
     # Only in /home/bob/project/george/doc: NewFileFromBob.txt
     # Files /home/john/project/george/README.html and /home/bob/project/george/README.html differ
@@ -305,8 +301,6 @@ testPullFromOrigin()
 {
     local tResult
 
-    gpVerbose=2
-
     tResult=$(fPullFromOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
     # raw
@@ -329,7 +323,7 @@ testGitProjPullCLI()
 {
     local tResult
 
-    tResult=$($gpBin/git-proj-pull -b -vv -y 2>&1)
+    tResult=$($gpBin/git-proj-pull -b -V 3 -y 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"

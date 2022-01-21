@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export gpCmdName gpBin cCurDir gpShort
+export gpCmdName gpBin gpShort
 
 #--------------------
 fUsage()
@@ -22,7 +22,7 @@ fUsage()
 =head1 DESCRIPTION
 
     Do a "git status"
-    Verify gitproj.config.remote-raw-dir is defined and mounted
+    Verify gitproj.config.remote-raw-origin is defined and mounted
     Verify origin is set to a path that exists (if mounted)
     Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
 
@@ -40,17 +40,16 @@ EOF
 # ========================================
 # Main
 
-export cCurDir gpBin gpCmdName tSrc
+export gpBin gpCmdName tSrc
 
 gpCmdName=${BASH_SOURCE##*/}
 tSrc=${BASH_SOURCE##*/}
 
 # -------------------
-# Set current directory location in PWD and cCurDir
+# Set current directory location in PWD
 if [ -z "$PWD" ]; then
     PWD=$(pwd)
 fi
-cCurDir=$PWD
 
 # -------------------
 # Define the location of this script
@@ -71,15 +70,18 @@ cd - >/dev/null 2>&1
 
 tSrc=${BASH_SOURCE##*/}
 gpShort=""
-while getopts :shH:vx tArg; do
+while getopts :shH:qvV:xX: tArg; do
     case $tArg in
         s) gpShort="-s" ;;
         # Script arguments
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
-        v) let ++gpVerbose ;;
+	q) gpVerbose=0 ;;
+        v) gpVerbose=2 ;;
+	V) gpVerbose=$OPTARG ;;
         x) let ++gpDebug ;;
+	X) gpDebug=$OPTARG ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
