@@ -126,7 +126,6 @@ minimum
         2 - notice and above are output
         3 - info and above are output
 
-
     The verbose level can also be set with env. var. gpVerbose. However
     the command line option will override the variable.
 
