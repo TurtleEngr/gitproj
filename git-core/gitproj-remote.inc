@@ -5,7 +5,7 @@ export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
-    gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
+    gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus gpSysLog \
     gpVer gpVerbose gResponse
 
 # ========================================
@@ -42,15 +42,15 @@ fRemoteSetGlobals()
 
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "TBD")
     if [ "$gpRemoteStatus" != "TBD" ]; then
-        fLog -f -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawDir. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
+        fLog -f -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawOrigin. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
         if [ $gpAuto -ne 0 ]; then
             fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in --local config" -l $tSrc:$LINENO
         fi
     fi
 
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
-    if [ "$gpRemoteRawDir" != "TBD" ]; then
-        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-origin=$gpRemoteRawDir" -l "$tSrc:$LINENO"
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
+    if [ "$gpRemoteRawOrigin" != "TBD" ]; then
+        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-origin=$gpRemoteRawOrigin" -l "$tSrc:$LINENO"
     fi
 
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
@@ -297,21 +297,21 @@ fRemoteMkRemote()
     fComSetConfig -l -k "branch.develop.remote" -v "origin"
     fComSetConfig -l -k "branch.develop.merge" -v "refs/heads/develop"
 
-    mkdir -p $gpRemoteRawDir
+    mkdir -p $gpRemoteRawOrigin
     if [ $gpVerbose -ge 1 ]; then
         tVervose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
         tVervose=-viP
     fi
-    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir"
-    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawDir
+    fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin"
+    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin
     if [ $? -ne 0 ]; then
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
     fi
 
-    fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawDir"
-    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawDir"
+    fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
+    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
     return 0
@@ -345,17 +345,17 @@ fRemoteReport()
     if [ "$tRawOrigin" = "TBD" ]; then
         fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
-    if [ -z "$gpRemoteRawDir" ]; then
+    if [ -z "$gpRemoteRawOrigin" ]; then
         fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
-    if [ ! -d $gpRemoteRawDir ]; then
-        fError -i -n -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO
+    if [ ! -d $gpRemoteRawOrigin ]; then
+        fError -i -n -m "$gpRemoteRawOrigin does not exist." -l $tSrc:$LINENO
     fi
-    if [ "${gpRemoteRawDir##*/}" != "$gpProjName.raw" ]; then
-        fError -i -n -m "$gpRemoteRawDir does not match $gpProjName.raw" -l $tSrc:$LINENO
+    if [ "${gpRemoteRawOrigin##*/}" != "$gpProjName.raw" ]; then
+        fError -i -n -m "$gpRemoteRawOrigin does not match $gpProjName.raw" -l $tSrc:$LINENO
     fi
-    if [ "$tRawOrigin" != "$gpRemoteRawDir" ]; then
-        fError -i -n -m "$tRawOrigin != $gpRemoteRawDir" -l $tSrc:$LINENO
+    if [ "$tRawOrigin" != "$gpRemoteRawOrigin" ]; then
+        fError -i -n -m "$tRawOrigin != $gpRemoteRawOrigin" -l $tSrc:$LINENO
     fi
 
     if [ $gErr -ne 0 ]; then
@@ -371,7 +371,7 @@ fRemoteReport()
     $cGetOrigin
     cat <<EOF | fComFmt
 
-Be sure the disk is mounted and that $tGitOrigin and $gpRemoteRawDir
+Be sure the disk is mounted and that $tGitOrigin and $gpRemoteRawOrigin
 exists.  Then you can use: "git push origin BRANCH" and "git pull
 origin BRANCH" If the mount path is changed or you are on a different
 system, use "git proj config" to update the git and raw origin paths.
@@ -415,7 +415,7 @@ fRemoteCreateRemoteGit()
 
     # Define the remote raw dir name (currenly hardcoded)
     fRemoteGetRemoteRawDir
-    gpRemoteRawDir=$gResponse
+    gpRemoteRawOrigin=$gResponse
 
     fRemoteMkRemote $gpMountDir
     fRemoteReport

@@ -5,7 +5,7 @@ export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
-    gpProjName gpProjStatus gpRemoteRawDir gpRemoteStatus gpSysLog \
+    gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus gpSysLog \
     gpVer gpVerbose gResponse
 
 # ========================================
@@ -36,14 +36,14 @@ fStatusRaw()
     local tSrc=${BASH_SOURCE##*/}
 
     if ! fComIsRemoteMounted warn; then
-        fLog -p warning -m "Remote: $gpRemoteRawDir is not mounted, so cannot give status of raw/ files." -l $tSrc:$LINENO
+        fLog -p warning -m "Remote: $gpRemoteRawOrigin is not mounted, so cannot give status of raw/ files." -l $tSrc:$LINENO
         return 0
     fi
 
     cd $gpLocalTopDir >/dev/null 2>&1
     echo
-    echo "REMOTE/ = $gpRemoteRawDir/"
-    diff -qr raw/ $gpRemoteRawDir/ | sed "s;$gpRemoteRawDir;REMOTE;"
+    echo "REMOTE/ = $gpRemoteRawOrigin/"
+    diff -qr raw/ $gpRemoteRawOrigin/ | sed "s;$gpRemoteRawOrigin;REMOTE;"
     if [ ${PIPESTATUS[0]} -eq 0 ]; then
         echo "No differences."
     fi

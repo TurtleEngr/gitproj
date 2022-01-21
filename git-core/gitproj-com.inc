@@ -641,7 +641,7 @@ fComPreProjSetGlobals()
     gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "not-defined")
 
     gpMountDir=TBD
-    gpRemoteRawDir=TBD
+    gpRemoteRawOrigin=TBD
 
     # Hook section
     gpHookVerbose=$(fComGetConfig -k "gitproj.hook.verbose" -d true)
@@ -663,7 +663,7 @@ fComPreProjSetGlobals()
     #    gpCheckForBigFiles=true
     #    gpPreCommitEnabled=true
     #    gpMountDir=TBD
-    #    gpRemoteRawDir=TBD
+    #    gpRemoteRawOrigin=TBD
 
     return 0
 } # fComPreProjSetGlobals
@@ -1959,11 +1959,11 @@ fComIsRemoteMounted()
 
     # Assumes we are in a gitproj managed dir
 
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
-    if [ "$gpRemoteRawDir" = "None" ]; then
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
+    if [ "$gpRemoteRawOrigin" = "None" ]; then
         fError -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
-    if [ -d $gpRemoteRawDir ]; then
+    if [ -d $gpRemoteRawOrigin ]; then
         return 0
     fi
 
@@ -1971,7 +1971,7 @@ fComIsRemoteMounted()
         # Just return error code if not found
         return 1
     fi
-    fError -m "$gpRemoteRawDir was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
+    fError -m "$gpRemoteRawOrigin was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
 } # fComIsRemoteMounted
 
 # --------------------
@@ -1994,7 +1994,7 @@ fComGetProjGlobals()
     gpProjName=$gGetConfigValue
 
     fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD" -e >/dev/null
-    gpRemoteRawDir=$gGetConfigValue
+    gpRemoteRawOrigin=$gGetConfigValue
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648" 2>&1) # 2g
 
     fComGetConfig -k "gitproj.config.local-status" -d "not-defined" -e >/dev/null

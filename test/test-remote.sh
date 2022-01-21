@@ -296,18 +296,18 @@ REMOVEDtestRemoteVerifyState()
     assertContains "$LINENO $tResult" "$tResult" "You are in 'automatic' mode, so exiting"
 
     gpRemoteStatus=not-defined
-    gpRemoteRawDir=foo
+    gpRemoteRawOrigin=foo
     tResult=$(fRemoteVerifyState 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Config problem remote-status=not-defined, but remote-raw-origin is set to"
 
     gpRemoteStatus=not-defined
-    gpRemoteRawDir="TBD"
+    gpRemoteRawOrigin="TBD"
     tResult=$(fRemoteVerifyState 2>&1)
     assertTrue "$LINENO" "$?"
 
     gpRemoteStatus=not-defined
-    gpRemoteRawDir=""
+    gpRemoteRawOrigin=""
     tResult=$(fRemoteVerifyState 2>&1)
     assertTrue "$LINENO" "$?"
 
@@ -362,7 +362,7 @@ testRemoteGetMountDirAuto()
     assertContains "$LINENO $tResult" "$tResult" "Cannot continue with -a mode"
 
     gpAuto=1
-    gpRemoteRawDir=TBD
+    gpRemoteRawOrigin=TBD
     if [ -n "$gpMountDir" ]; then
         fail "$LINENO gpMountDir is not empty: ${gpMountDir}"
     fi
@@ -512,7 +512,7 @@ testRemoteMkRemote()
     cd $gpLocalTopDir >/dev/null 2>&1
     gpProjName=george
     gpMountDir=$cDatMount3/video-2020-04-02
-    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+    gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
 
     # Mount dir has already been valided
     tResult=$(fRemoteMkRemote $cDatMount3/video-2020-04-02 2>&1)
@@ -552,7 +552,7 @@ testRemoteReport()
     gpLocalTopDir=$cDatHome/$cDatProj1
     gpProjName=george
     gpMountDir=$cDatMount3/video-2020-04-02
-    gpRemoteRawDir=$gpMountDir/$gpProjName.raw
+    gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fRemoteReport 2>&1)

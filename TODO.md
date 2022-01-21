@@ -10,10 +10,6 @@ After 1.0, move these to github issues.
   comConfig (and 'git config') functions to lowercase the var and
   section names.
 
-* Rename remote-raw-dir to remote-raw-origin
-
-* Remove "gitproj.hook.source" and "gpHookSource" from configs, code, tests
-
 --------------------
 
 ## documentation
@@ -253,3 +249,8 @@ Fix: look for first arg so see if it is a CMD. - done
         path = ../.gitproj.config.testserver2
   NA - so done
 
+* Rename remote-raw-dir to remote-raw-origin, and gpRemoteRawDir to
+  gpRemoteRawOrigin - done
+
+* Remove "gitproj.hook.source" and "gpHookSource" from configs, code,
+  tests - done

@@ -141,13 +141,13 @@ setUp()
 
     cd $HOME/project >/dev/null 2>&1
     . $gpBin/gitproj-clone.inc
-    gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     gpProjName=${gpRemoteGitDir##*/}
     gpProjName=${gpProjName%.git}
 
-    find $gpRemoteGitDir $gpRemoteRawDir -exec chmod a+r {} \;
-    find $gpRemoteGitDir $gpRemoteRawDir -exec chmod ug+w {} \;
-    find $gpRemoteGitDir $gpRemoteRawDir -type d -exec chmod a+rx {} \;
+    find $gpRemoteGitDir $gpRemoteRawOrigin -exec chmod a+r {} \;
+    find $gpRemoteGitDir $gpRemoteRawOrigin -exec chmod ug+w {} \;
+    find $gpRemoteGitDir $gpRemoteRawOrigin -type d -exec chmod a+rx {} \;
 
     gpVerbose=3
     gpUnitDebug=0
@@ -188,7 +188,7 @@ testGitProjCloneUsage()
     assertEquals "$LINENO" "$PWD" "$HOME"
 
     assertEquals "$LINENO gpRemoteGitDir" "$cDatMount3/video-2020-04-02/george.git" "$gpRemoteGitDir"
-    assertEquals "$LINENO gpRemoteRawDir" "${gpRemoteGitDir%.git}.raw" "$gpRemoteRawDir"
+    assertEquals "$LINENO gpRemoteRawOrigin" "${gpRemoteGitDir%.git}.raw" "$gpRemoteRawOrigin"
     assertEquals "$LINENO gpProjName" "george" "$gpProjName"
     assertEquals "$LINENO HOSTNAME" "testserver2" "$HOSTNAME"
 
@@ -215,7 +215,7 @@ testCloneValidRemoteDir()
     local tSave
 
     #gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    #gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    #gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     #gpProjName=${gpRemoteGitDir##*/}
     #gpProjName=${gpProjName%.git}
 
@@ -239,12 +239,12 @@ testCloneValidRemoteDir()
     assertContains "$LINENO $tResult" "$tResult" "$gpRemoteGitDir does not exist"
     gpRemoteGitDir=$tSave
 
-    tSave=$gpRemoteRawDir
-    gpRemoteRawDir=$cDatMount3/video-2020-04-xx/george.git
+    tSave=$gpRemoteRawOrigin
+    gpRemoteRawOrigin=$cDatMount3/video-2020-04-xx/george.git
     tResult=$(fCloneValidRemoteDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir does not exist"
-    gpRemoteRawDir=$tSave
+    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawOrigin does not exist"
+    gpRemoteRawOrigin=$tSave
 
     chmod a-r $gpRemoteGitDir/objects
     tResult=$(fCloneValidRemoteDir 2>&1)
@@ -258,17 +258,17 @@ testCloneValidRemoteDir()
     assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteGitDir"
     chmod a+x $gpRemoteGitDir/objects
 
-    chmod a-r $gpRemoteRawDir/src
+    chmod a-r $gpRemoteRawOrigin/src
     tResult=$(fCloneValidRemoteDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $gpRemoteRawDir"
-    chmod -R a+r $gpRemoteRawDir/src
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $gpRemoteRawOrigin"
+    chmod -R a+r $gpRemoteRawOrigin/src
 
-    chmod a-x $gpRemoteRawDir/src/raw
+    chmod a-x $gpRemoteRawOrigin/src/raw
     tResult=$(fCloneValidRemoteDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteRawDir"
-    chmod a+x $gpRemoteRawDir/src/raw
+    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteRawOrigin"
+    chmod a+x $gpRemoteRawOrigin/src/raw
 
     cd $HOME/project >/dev/null 2>&1
     touch $gpProjName
@@ -344,7 +344,7 @@ testCloneCheckLocalConfig()
     assertContains "$LINENO $tResult" "$tResult" "warning: Missing file: .gitproj It should have been versioned! Will try to recreate it from ~/.gitconfig"
 
     #tResult=$(grep remote-raw-origin $c ConfigHost 2>&1)
-    #assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawDir"
+    #assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawOrigin"
 return 0
     rm .gitproj
     #rm $c ConfigHost
@@ -370,12 +370,12 @@ testCloneMkGitDirFail()
     # HOSTNAME=testserver2
     #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     assertContains "$LINENO $HOME" $HOME "adric"
     assertContains "$LINENO $gpRemoteGitDir" $gpRemoteGitDir 'video-2020-04-02/george.git'
-    assertContains "$LINENO gpRemoteRawDir=$gpRemoteRawDir" $gpRemoteRawDir 'video-2020-04-02/george.raw'
+    assertContains "$LINENO gpRemoteRawOrigin=$gpRemoteRawOrigin" $gpRemoteRawOrigin 'video-2020-04-02/george.raw'
     assertTrue $LINENO "[ -r $HOME/.gitconfig ]"
 
     # Force a failure
@@ -405,12 +405,12 @@ testCloneMkGitDirPass()
     # HOSTNAME=testserver2
     #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     assertContains "$LINENO $HOME" $HOME "adric"
     assertContains "$LINENO $gpRemoteGitDir" $gpRemoteGitDir 'video-2020-04-02/george.git'
-    assertContains "$LINENO gpRemoteRawDir=$gpRemoteRawDir" $gpRemoteRawDir 'video-2020-04-02/george.raw'
+    assertContains "$LINENO gpRemoteRawOrigin=$gpRemoteRawOrigin" $gpRemoteRawOrigin 'video-2020-04-02/george.raw'
     assertEquals $LINENO george $gpProjName
     assertTrue $LINENO "[ -r $HOME/.gitconfig ]"
 
@@ -471,7 +471,7 @@ testCloneMkRawDirFail()
     # HOSTNAME=testserver2
     #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     cd $cDatHome3 >/dev/null 2>&1
@@ -512,7 +512,7 @@ testCloneMkRawDirPass()
     # HOSTNAME=testserver2
     #                 cDatMount3=$cTestDestDir/test/root/mnt/usb-video
     # gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    # gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    # gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     # gpProjName=george
 
     # Setup
@@ -536,7 +536,7 @@ testCloneMkRawDirPass()
 
     tResult=$(fComGetConfig -l -k "gitproj.config.remote-raw-origin")
     assertTrue $LINENO "$?"
-    assertContains "$LINENO $tResult" $tResult "$gpRemoteRawDir"
+    assertContains "$LINENO $tResult" $tResult "$gpRemoteRawOrigin"
 
     tResult=$(fComGetConfig -l -k "gitproj.config.remote-status")
     assertTrue $LINENO "$?"
@@ -605,7 +605,7 @@ testCloneFromRemoteDir()
     # Setup
     cd $cDatHome3 >/dev/null 2>&1
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+    gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     gpProjName=george
     gpYesNo=Yes
     gpVerbose=3

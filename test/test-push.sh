@@ -174,7 +174,7 @@ testComGetProjGlobals()
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     fComGetProjGlobals >/dev/null 2>&1
     assertTrue "$LINENO $tResult" "$?"
-    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.raw" "$gpRemoteRawDir"
+    assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.raw" "$gpRemoteRawOrigin"
 
     tResult=$(git config --get --local remote.origin.url)
     assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.git" "$tResult"
@@ -199,11 +199,11 @@ testComIsRemoteMounted()
     tResult=$(fComIsRemoteMounted 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
-    mv $gpRemoteRawDir $gpRemoteRawDir.sav
+    mv $gpRemoteRawOrigin $gpRemoteRawOrigin.sav
     tResult=$(fComIsRemoteMounted 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
-    mv $gpRemoteRawDir.sav $gpRemoteRawDir
+    mv $gpRemoteRawOrigin.sav $gpRemoteRawOrigin
 
     return 0
 } # testComIsRemoteMounted
@@ -245,7 +245,7 @@ testPushRawFiles()
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
-    assertTrue "$LINENO" "[ -f $gpRemoteRawDir/NewFile.txt ]"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0
@@ -296,7 +296,7 @@ testPushToOrigin()
     tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
-    assertTrue "$LINENO" "[ -f $gpRemoteRawDir/newfile.txt ]"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/newfile.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     return 0

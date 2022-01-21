@@ -172,9 +172,9 @@ testSetup()
     tOrigin=$($cGetOrigin)
     assertTrue "$LINENO" $?
     assertTrue "$LINENO $tOrigin" "[ -d $tOrigin ]"
-    gpRemoteRawDir=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
-    assertNotContains "$LINENO" "$gpRemoteRawDir" "None"
-    assertTrue "$LINENO" "[ -d $gpRemoteRawDir ]"
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
+    assertNotContains "$LINENO" "$gpRemoteRawOrigin" "None"
+    assertTrue "$LINENO" "[ -d $gpRemoteRawOrigin ]"
 
     return 0
 } # testSetup

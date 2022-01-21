@@ -7,7 +7,7 @@ export gpAuto gpAutoMove gpBin gpCheckFileNames \
     gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
     gpLocalRawDir gpLocalStatus gpLocalTopDir gpMaxSize \
     gpPath gpPreCommitEnabled gpProjName gpProjStatus gpRemoteGitDir \
-    gpRemoteRawDir gpRemoteStatus gpSysLog gpVer gpVerbose
+    gpRemoteRawOrigin gpRemoteStatus gpSysLog gpVer gpVerbose
 
 # ========================================
 
@@ -20,7 +20,7 @@ fCloneGettingStarted()
 
 Be sure you are "cd" to the directory that the project will be cloned to.
 Clone git from: $gpRemoteGitDir
-Clone raw from: $gpRemoteRawDir
+Clone raw from: $gpRemoteRawOrigin
 Project Name:   $gpProjName
 Project Dir:    $PWD/$gpProjName
 
@@ -54,14 +54,14 @@ fCloneValidRemoteDir()
         fError -m "$gpRemoteGitDir does not exist." -l $tSrc:$LINENO
     fi
 
-    if [ ! -d $gpRemoteRawDir ]; then
-        fError -m "$gpRemoteRawDir does not exist." -l $tSrc:$LINENO
+    if [ ! -d $gpRemoteRawOrigin ]; then
+        fError -m "$gpRemoteRawOrigin does not exist." -l $tSrc:$LINENO
     fi
 
     if ! fComAllMustBeReadable $gpRemoteGitDir; then
         exit 1
     fi
-    if ! fComAllMustBeReadable $gpRemoteRawDir; then
+    if ! fComAllMustBeReadable $gpRemoteRawOrigin; then
         exit 1
     fi
 
@@ -78,7 +78,7 @@ fCloneValidRemoteDir()
     tGitSize=$(du -sm $gpRemoteGitDir | awk '{print $1}')
     let tGitSize*=2
 
-    tRawSize=$(du -sm $gpRemoteRawDir | awk '{print $1}')
+    tRawSize=$(du -sm $gpRemoteRawOrigin | awk '{print $1}')
     let tRawSize*=2
 
     let tDesiredSize=tGitSize+tRawSize
@@ -208,7 +208,7 @@ fCloneMkRawDir()
     if [ $gpVerbose -ge 2 ]; then
         tVerbose=-viP
     fi
-    tCmd="/usr/bin/rsync $tOpt $tVerbose $gpRemoteRawDir/ $gpLocalRawDir"
+    tCmd="/usr/bin/rsync $tOpt $tVerbose $gpRemoteRawOrigin/ $gpLocalRawDir"
     fLog -p notice -m "Run: $tCmd"
     $tCmd
     tStatus=$?
@@ -217,7 +217,7 @@ fCloneMkRawDir()
         fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
-    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawDir"
+    fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.remote-status" -v "defined"
 
     return $tStatus
@@ -300,7 +300,7 @@ fCloneFromRemoteDir()
     # Called by "git-proj-clone"
     # Minimum settings:
     # All the common vars set by gitproj-com.inc fComSetGlobals()
-    # Required: gpRemoteGitDir, gpRemoteRawDir, gpProjName
+    # Required: gpRemoteGitDir, gpRemoteRawOrigin, gpProjName
     # Optional: gpYesNo
     local tSrc=${BASH_SOURCE##*/}
 

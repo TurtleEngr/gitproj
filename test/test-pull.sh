@@ -161,7 +161,7 @@ setUp()
     ##git status
     git commit -am Added >/dev/null 2>&1
 
-    # Push changes to remote ($gpRemoteRawDir)
+    # Push changes to remote ($gpRemoteRawOrigin)
     $gpBin/git-proj-push -b -y >/dev/null 2>&1
 
     # --------
@@ -204,10 +204,10 @@ testSetUp()
     local tResult
 
     assertTrue "$LINENO $cDatHome2/$cDatProj1/raw/NewFile2.txt" "[ -f $cDatHome2/$cDatProj1/raw/NewFile2.txt ]"
-    assertTrue "$LINENO $gpRemoteRawDir/NewFile2.txt" "[ -f $gpRemoteRawDir/NewFile2.txt ]"
+    assertTrue "$LINENO $gpRemoteRawOrigin/NewFile2.txt" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
 
     assertTrue "$LINENO $cDatHome2/$cDatProj1/raw/src/raw/MOV001.mp4" "[ ! -f $cDatHome2/$cDatProj1/raw/src/raw/MOV001.mp4 ]"
-    assertTrue "$LINENO $gpRemoteRawDir/raw/src/raw/MOV001.mp4" "[ ! -f $gpRemoteRawDir/src/raw/MOV001.mp4 ]"
+    assertTrue "$LINENO $gpRemoteRawOrigin/raw/src/raw/MOV001.mp4" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
 
     assertTrue "$LINENO $cDatHome2/$cDatProj1/doc/NewFileFromBob.txt" "[ -f $cDatHome2/$cDatProj1/doc/NewFileFromBob.txt ]"
 

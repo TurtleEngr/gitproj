@@ -147,7 +147,7 @@ while getopts :d:nyhH:qvV:xX: tArg; do
         # Script arguments
         d)
             gpRemoteGitDir="$OPTARG"
-            gpRemoteRawDir=${gpRemoteGitDir%.git}.raw
+            gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
             gpProjName=${gpRemoteGitDir##*/}
             gpProjName=${gpProjName%.git}
             ;;

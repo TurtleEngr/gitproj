@@ -52,7 +52,7 @@ gpLocalRawSymLink file:~/.gitproj.config.global      gitproj.config.local-raw-sy
 gpLocalTopDir	  file:~/.gitproj.config.global      gitproj.config.local-top-dir=TBD
 gpProjName	  file:~/.gitproj.config.global      gitproj.config.proj-name=TBD
 gpProjStatus   	  file:~/.gitproj.config.global      gitproj.config.proj-status=not-set-up
-gpRemoteRawDir	  file:~/.gitproj.config.global      gitproj.config.remote-raw-dir=TBD
+gpRemoteRawOrigin	  file:~/.gitproj.config.global      gitproj.config.remote-raw-dir=TBD
 gpSysLog   	  file:~/.gitproj.config.global      gitproj.config.syslog=true
 gpTest   	  file:~/.gitproj.config.global      gitproj.config.test=/usr/share/doc/git-proj/test
 cGitProjVersion   file:~/.gitproj.config.global      gitproj.config.ver=1.1
