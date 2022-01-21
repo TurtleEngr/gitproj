@@ -128,6 +128,7 @@ setUp()
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     . $gpBin/gitproj-push.inc
 
+    gpVerbose=3
     gpDebug=0
     gpUnitDebug=0
     return 0
@@ -179,11 +180,11 @@ testComGetProjGlobals()
     assertEquals "$LINENO" "$cDatMount3/video-2020-04-02/$gpProjName.git" "$tResult"
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    fComSetConfig -H -k "gitproj.config.proj-name" -v "TBD"
+    fComSetConfig -l -k "gitproj.config.proj-name" -v "TBD"
     fComSetConfig -L -k "gitproj.config.proj-name" -v "TBD"
     tResult=$(fComGetProjGlobals 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: Unexpected: gitproj.config.proj-name should not be set to: TBD"
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Unexpected: gitproj.config.proj-name should not be set to: TBD"
 
     return 0
 } # testComGetProjGlobals
@@ -214,7 +215,6 @@ testPushRawFiles()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-    gpVerbose=2
 
     tResult=$(fPushRawFiles 2>&1)
     assertTrue "$LINENO $tResult" "$?"
@@ -258,7 +258,6 @@ testPushGit()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-    gpVerbose=2
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
     assertTrue "$LINENO" "$?"
@@ -288,8 +287,6 @@ testPushToOrigin()
     local tResult
 
     fComGetProjGlobals >/dev/null 2>&1
-
-    gpVerbose=2
 
     echo "Make a change." >>README.html
     git commit -am "Updated README.html" >/dev/null 2>&1
@@ -322,7 +319,7 @@ testGitProjPushCLI()
     assertContains "$LINENO $tResult" "$tResult" "newfile.txt"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$($gpBin/git-proj-push -b -vv 2>&1 < <(echo -e "3\n3"))
+    tResult=$($gpBin/git-proj-push -b -V 3 2>&1 < <(echo -e "3\n3"))
     tStatus=$?
     assertTrue "$LINENO $tResult" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"

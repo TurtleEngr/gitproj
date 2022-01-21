@@ -133,6 +133,7 @@ setUp()
 
     cp $gpDoc/hooks/pre-commit .git/hooks
 
+    gpVerbose=3
     gpUnitDebug=0
     return 0
 
@@ -165,10 +166,8 @@ testSetup()
 
     cd $HOME/project/george >/dev/null 2>&1
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
-    assertTrue "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
     assertTrue "$LINENO" "[ -f .git/config ]"
-    assertTrue "$LINENO" "[ -f .gitproj.config.local ]"
-    assertTrue "$LINENO" "[ -f .gitproj.config.$HOSTNAME ]"
+    assertTrue "$LINENO" "[ -f .gitproj ]"
     assertTrue "$LINENO" "[ -d raw ]"
     tOrigin=$($cGetOrigin)
     assertTrue "$LINENO" $?

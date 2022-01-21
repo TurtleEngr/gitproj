@@ -126,6 +126,7 @@ setUp()
 
     cp $gpDoc/config/gitconfig $gpDoc/config/gitconfig.sav
 
+    gpVerbose=3
     gpUnitDebug=0
     return 0
 
@@ -175,14 +176,10 @@ testComSetConfigMore()
     # Files:
     # Relative to $HOME ($cDatHome)
     #     1) -g ~/.gitconfig (include.path = .gitproj.config.global)
-    #TBD	  2) -G $HOME/$c ConfigGlobal ($HOME/.gitproj.config.global)
     # Relative to $HOME/$cDatProj1 ($cDatHome/$cDatProj1)
-    #     3) -l .git/config (include.path = ../.gitproj.config.HOSTNAME)
-    #	  4) -L .gitproj.config.local (.gitproj)
-    #TBD	  5) -H .gitproj ($c ConfigHost,
-    #	  	 	    include-path=.gitproj)
-
-    gpVerbose=2
+    #     2) -l .git/config
+    #	  X) -L .gitproj - with clone, updates --local
+    #	     after that it is updated from --local
 
     # ----------
     tResult=$(fComSetConfig -g -k com.test.gvar -v "defined" 2>&1)
@@ -199,7 +196,7 @@ testComSetConfigMore()
     cd $HOME
     tResult=$(fComSetConfig -l -k com.test.lvar -v "defined" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "You are not in a git dir"
+    assertContains "$LINENO $tResult" "$tResult" "err: Error: You must be in a git workspace for this command"
 
     # ----------
     cd $HOME/$cDatProj1
@@ -211,19 +208,19 @@ testComSetConfigMore()
     cd $HOME
     tResult=$(fComSetConfig -L -k com.test.Lvar -v "defined" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "You are not in a git dir"
+    assertContains "$LINENO $tResult" "$tResult" "err: Error: You must be in a git workspace for this command"
 
     # ----------
     cd $HOME/$cDatProj1
-    tResult=$(fComSetConfig -H -k com.test.Hvar -v "defined" 2>&1)
+    tResult=$(fComSetConfig -l -k com.test.lvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Hvar $c ConfigHost"
+    assertTrue "$LINENO" "fLookFor lvar $c .git/config"
 
     # ----------
     cd $HOME
-    tResult=$(fComSetConfig -H -k com.test.Hvar -v "defined" 2>&1)
+    tResult=$(fComSetConfig -l -k com.test.Hvar -v "defined" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "You are not in a git dir"
+    assertContains "$LINENO $tResult" "$tResult" "err: Error: You must be in a git workspace for this command"
 
     # ----------
     cd $HOME/$cDatProj1
@@ -248,7 +245,7 @@ testComSetConfigMore()
     tResult=$(fComSetConfig -g -v "defined" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "fComSetConfig: missing key"
-    assertContains "$LINENO $tResult" "$tResult" "crit: Internal:"
+    assertContains "$LINENO $tResult" "$tResult" "err: Internal: Error: fComSetConfig: missing key"
     assertContains "$LINENO $tResult" "$tResult" "Stack trace"
 
     # ----------
@@ -268,9 +265,9 @@ testComSetConfigMore()
 
     # ----------
     #rm $HOME/$c ConfigGlobal
-    tResult=$(fComSetConfig -G -k com.test.Gvar -v "defined" 2>&1)
+    tResult=$(fComGetConfig -e -g -k com.test.Xvar 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Could not find"
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Unexpected: com.test.Xvar is not defined!"
 
     return 0
 } # testComSetConfigMore
@@ -284,8 +281,6 @@ testComConfigCopy()
     local tDst=$HOME/project/test/config.test
 
     # fComConfigCopy [-f] [-s pSrc] [-d pDst] [-i pInclPat] [-e pExclPat]
-
-    gpVerbose=1
 
     tResult=$(fComConfigCopy 2>&1)
     assertFalse "$LINENO" "$?"
@@ -335,10 +330,6 @@ testComConfigUpdateLocal()
     cd $HOME/$cDatProj1
     # Restore
     mv .gitproj.sav .gitproj
-    # Patch (current .gitignore is missing this)
-    echo '*.bak' >>.gitignore
-    git add .gitignore
-    git ci -am Updated >/dev/null 2>&1
     # Clean
     rm .gitproj.bak 2>/dev/null
     # Change

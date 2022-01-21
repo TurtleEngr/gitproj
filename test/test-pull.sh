@@ -170,6 +170,7 @@ setUp()
     HOME=$cDatHome
     fComGetProjGlobals
 
+    gpVerbose=3
     gpDebug=0
     gpUnitDebug=0
     return 0
@@ -217,8 +218,6 @@ testSetUp()
 testPullRawFiles()
 {
     local tResult
-
-    gpVerbose=2
 
     # Setup a change in raw files in $cDatHome/$cDatProj1
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
@@ -269,8 +268,6 @@ testPullGit()
 {
     local tResult
 
-    gpVerbose=2
-
     # diff -rq /home/john/project/george home/bob/project/george | grep -Ev '.git|raw'
     # Only in /home/bob/project/george/doc: NewFileFromBob.txt
     # Files /home/john/project/george/README.html and /home/bob/project/george/README.html differ
@@ -304,8 +301,6 @@ testPullFromOrigin()
 {
     local tResult
 
-    gpVerbose=2
-
     tResult=$(fPullFromOrigin 1 2>&1 < <(echo -e 3))
     assertTrue "$LINENO $tResult" "$?"
     # raw
@@ -328,7 +323,7 @@ testGitProjPullCLI()
 {
     local tResult
 
-    tResult=$($gpBin/git-proj-pull -b -vv -y 2>&1)
+    tResult=$($gpBin/git-proj-pull -b -V 3 -y 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"

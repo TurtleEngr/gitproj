@@ -66,6 +66,9 @@ After 1.0, move these to github issues.
 * Cleanup the saving of git-proj vars. Save to --local, then
   "frequently" update PROJ/.gitproj
 
+* Cleanup: break fComGetConfig in to two functions--it is doing to
+  many things that are not used.
+
 * Cleanup: remove gpMountDir. gpHookSource. Is gpGitFlowPkg used?
 
 * Cleanup: fixup log messages to follow the gpVerbose rules. (see flog
