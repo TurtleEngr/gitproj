@@ -81,6 +81,8 @@ fRemoteCheckDir()
         return 1
     fi
 
+#TBD, verify the dir is not in a git workspace!
+
     return 0
 } # fRemoteCheckDir
 
@@ -217,9 +219,12 @@ fRemoteGetMountDir()
     tPrompt="Select by number, the location for the remote git and raw files? "
     tHelp=$(
         cat <<EOF
-This is a list of dirs under the -d pMountDir, if you gave that option.
-Other mounted directories might be listed too.
-Select OTHER, to define another MountDir.
+
+This is a list of dirs under the -d pMountDir, if you gave that
+option.  Other mounted directories might be listed too. If you don't
+see any directories listed, or one want, select OTHER, to type in the
+name of top MountDir.
+
 EOF
     )
     # Loop until the selection is OK, or Quit
@@ -245,6 +250,10 @@ EOF
             continue
         fi
         if ! fRemoteCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
+            continue
+        fi
+        fComYesNo "Use: $tMountDir"
+        if [ $? -ne 0 ] then
             continue
         fi
         break
@@ -407,6 +416,9 @@ fRemoteCreateRemoteGit()
     if ! fComGetVer; then
         fError -m "Quitting" -l $tSrc:$LINENO
     fi
+
+#TBD - check to see if a remove-raw-origin or git origin have already
+# been setup. If no, continue. If yes, ask for override.
 
     # -d pMountPath (set with prompt/responnse, or required if -a)
     #  gpMountDir is required with -a, othherwise it is optional

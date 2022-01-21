@@ -22,6 +22,10 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
+* in git-proj-remote: check to see if a remove-raw-origin or git
+  origin have already been setup. If no, continue. If yes, ask for
+  override.
+
 * git-proj-clone will initally copy all of PROJ/.gitproj (afer git
   clone).  Then update local config: local-status, local-host,
   proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig
