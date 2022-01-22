@@ -22,7 +22,7 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj clone -d pRemoteDir [-y|-n] [common-options]
+    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]
 
 =head1 DESCRIPTION
 
@@ -39,11 +39,16 @@ mounted drive.
 
 TBD
 
+=item B<-a>
+
+Automated mode. Use this in batch (non-interactve) scripts. See the
+-y|-n options.
+
 =item B<-y|-n>
 
-If -y, then default to "yes" to all prompts to continue.
-
-If -n, then default to "no" to all prompts to continue.
+These are only used if -a option is defined. Where there are
+"exceptions" these will be used for the default answer: -y continue,
+-n quit.
 
 =item B<[common-options]>
 
@@ -141,18 +146,21 @@ cd - >/dev/null 2>&1
 # Calls: fCloneSetGlobals
 
 gpRemoteGitDir=""
-gpYesNo=""
-while getopts :d:nyhH:qvV:xX: tArg; do
+gpAuto=0
+gpYesNo="No"
+while getopts :ad:nyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
+	a)
+	    gpAuto=1
+	    fError -m "-a is not implemented yet." -l $tSrc:$LINENO
+	    ;;
         d)
             gpRemoteGitDir="$OPTARG"
             gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
             gpProjName=${gpRemoteGitDir##*/}
             gpProjName=${gpProjName%.git}
             ;;
-        n) gpYesNo=No ;;
-        y) gpYesNo=Yes ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -161,6 +169,8 @@ while getopts :d:nyhH:qvV:xX: tArg; do
         V) gpVerbose=$OPTARG ;;
         x) let ++gpDebug ;;
         X) gpDebug=$OPTARG ;;
+        n) gpYesNo=No ;;
+        y) gpYesNo=Yes ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

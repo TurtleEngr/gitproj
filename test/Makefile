@@ -53,10 +53,10 @@ mCmdToDo = \
 # Test
 
 # Only run tests where the dependencies have changed
-test : $(mDepList) $(mBaseList) $(mCmdList)
+test : rm-trailing-sp bash-fmt $(mDepList) $(mBaseList) $(mCmdList)
 
 # Use this for *force* all tests to be run
-test-all : clear-logs test
+test-all : rm-trailing-sp bash-fmt clear-logs test
 
 clear-logs :
 	rm test-*.log
@@ -68,6 +68,14 @@ stats :
 gen-dev-doc :
 	-$(mCore)/git-proj -H int-md >dev-doc/git-proj.md
 	-$(mCore)/git-proj -H int-html >dev-doc/git-proj.html
+
+# rm-trailing-sp :
+rm-trailing-sp : ~/bin/rm-trailing-sp
+	diff $@ $?
+
+# bash-fmt :
+bash-fmt : ~/bin/bash-fmt
+	diff $@ $?
 
 # ========================================
 # Tests for each of the commands

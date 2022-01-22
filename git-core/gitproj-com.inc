@@ -32,10 +32,11 @@ fComGitProjInternalDoc()
 
 =internal-over 4
 
-=internal-item * Copy template.sh to your script file.
-
-=internal-item * Your script, gitproj-com.inc, and gitproj-com.test
-need to be in the same directory.
+=internal-item * Your script, git-proj-CMD and gitproj-CMD.inc need to
+be in the same directory. git-proj-CND should only: collect options,
+make a call to the variable setup function, and call the "main"
+function for the script. The main function will call functions to
+validate the options and implement the main process.
 
 =internal-item * Globally replace SCRIPTNAME with the name of your
 script file.
@@ -571,7 +572,7 @@ fComSetGlobals()
     cGetCurBranch='git rev-parse --abbrev-ref HEAD'
     # Use: tBranch=$($cGetCurBranch)
 
-    gpMaxLoop=20
+    gpMaxLoop=${gpMaxLoop:-20}
     # Used internally to limit number of invalid responses to prompts.
     # For testing this is usually reduced.
 
@@ -978,13 +979,15 @@ fComYesNo()
     local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
 
-    if [ "$gpYesNo" = "Yes" ]; then
-        gResponse="Yes"
-        return 0
-    fi
-    if [ "$gpYesNo" = "No" ]; then
-        gResponse="No"
-        return 1
+    if [ $gpAuto -ne 0 ]; then
+        if [ "$gpYesNo" = "Yes" ]; then
+            gResponse="Yes"
+            return 0
+        fi
+        if [ "$gpYesNo" = "No" ]; then
+            gResponse="No"
+            return 1
+        fi
     fi
 
     echo -n "$pPrompt [y/n]? "
@@ -1892,15 +1895,15 @@ fComMustNotBeInGit()
         git branch
         tFound=1
     fi
-    if [ $tFound -eq 0 ]; then
-        tGitDir=$(find . -type d -name .git)
-        if [ -n "$tGitDir" ]; then
-            tFound=2
-        fi
-    fi
+#    if [ $tFound -eq 0 ]; then
+#        tGitDir=$(find . -type d -name .git)
+#        if [ -n "$tGitDir" ]; then
+#            tFound=2
+#        fi
+#    fi
     cd - >/dev/null 2>&1
     if [ $tFound -ne 0 ]; then
-        fError -n -m "$pDir must NOT be in a git repo, or a directory above a git repo" -l $tSrc:$LINENO
+        fError -n -m "$pDir must NOT be in a git repo" -l $tSrc:$LINENO
         return 1
     fi
     return 0

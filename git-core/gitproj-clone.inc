@@ -301,7 +301,7 @@ fCloneFromRemoteDir()
     # Minimum settings:
     # All the common vars set by gitproj-com.inc fComSetGlobals()
     # Required: gpRemoteGitDir, gpRemoteRawOrigin, gpProjName
-    # Optional: gpYesNo
+    # gpYesNo, if gpAuto=1
     local tSrc=${BASH_SOURCE##*/}
 
     fCloneGettingStarted

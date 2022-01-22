@@ -261,7 +261,7 @@ TBD
 
 =head2 top-dir/.git/config
 
-TBD
+TBD - this needs to be rewritten.
 
 Where HOSTNAME will be set to $HOSTNAME. This allows for different
 locations of file, based on the host. For example the remote-raw-url

@@ -4,9 +4,9 @@
 export cGetOrigin cGetTopDir cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
-    gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMountDir gpPath \
-    gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus gpSysLog \
-    gpVer gpVerbose gResponse
+    gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMaxLoop gpMountDir \
+    gpPath gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus \
+    gpSysLog gpVer gpVerbose gpYesNo gResponse
 
 # ========================================
 
@@ -40,19 +40,6 @@ fRemoteSetGlobals()
         fError -m "It looks like 'git proj init' did not finish. Config local-status should be 'defined' " -l $tSrc:$LINENO
     fi
 
-    gpRemoteStatus=$(fComGetConfig -k "gitproj.config.remote-status" -d "TBD")
-    if [ "$gpRemoteStatus" != "TBD" ]; then
-        fLog -f -p warning -m "It looks like a remote has already been setup with: $gpRemoteRawOrigin. Currently gitproj can handle only one remote." -l $tSrc:$LINENO
-        if [ $gpAuto -ne 0 ]; then
-            fError -m "You are in 'automatic' mode, so exiting. To force an 'override' set 'remote-status = not-defined' in --local config" -l $tSrc:$LINENO
-        fi
-    fi
-
-    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
-    if [ "$gpRemoteRawOrigin" != "TBD" ]; then
-        fLog -f -p warning -m "Expected: TBD, but gitproj.config.remote-raw-origin=$gpRemoteRawOrigin" -l "$tSrc:$LINENO"
-    fi
-
     gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
 
     return 0
@@ -68,20 +55,36 @@ fRemoteCheckDir()
         fError -n -m "Could not find: $pDir" -l $tSrc:$LINENO
         return 1
     fi
+
     if [ ! -w $pDir ]; then
         fError -n -m "$pDir is not writable for you." -l $tSrc:$LINENO
         return 1
     fi
+
+    if ! fComMustNotBeInGit $pDir >/dev/null 2>&1; then
+        fError -n -m "$pDir cannot be in another git dir." -l $tSrc:$LINENO
+        return 1
+    fi
+
     if [ -e $pDir/$gpProjName.git ]; then
         fError -n -m "$pDir/$gpProjName.git already exists." -l $tSrc:$LINENO
         return 1
     fi
+
     if [ -e $pDir/$gpProjName.raw ]; then
         fError -n -m "$pDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
         return 1
     fi
 
-#TBD, verify the dir is not in a git workspace!
+    if [[  "$pDir" =~ (.*\.git$|.*\.git/) ]]; then
+        fError -n -m "$pDir is in another remote git dir." -l $tSrc:$LINENO
+        return 1
+    fi
+
+    if [[ "$pDir" =~ (.*\.raw$|.*\.raw/) ]]; then
+        fError -n -m "$pDir is in another remote raw dir." -l $tSrc:$LINENO
+        return 1
+    fi
 
     return 0
 } # fRemoteCheckDir
@@ -155,6 +158,7 @@ fRemoteGetAnotherMountDir()
     gResponse=""
 
     # Loop until the selection is OK, or quit
+    tMaxLoop=$gpMaxLoop
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
         echo -ne "\nMount Dir [$pMountDir | q]? "
@@ -228,6 +232,7 @@ name of top MountDir.
 EOF
     )
     # Loop until the selection is OK, or Quit
+    tMaxLoop=$gpMaxLoop
     while [ $tMaxLoop -gt 0 ]; do
         let --tMaxLoop
         fComSelect "$tPrompt" "OTHER $tDirList" "$tHelp"
@@ -376,16 +381,6 @@ fRemoteReport()
     fComSetConfig -l -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
     fComSetConfig -L -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
 
-    echo 'Remote origin is now set to:'
-    $cGetOrigin
-    cat <<EOF | fComFmt
-
-Be sure the disk is mounted and that $tGitOrigin and $gpRemoteRawOrigin
-exists.  Then you can use: "git push origin BRANCH" and "git pull
-origin BRANCH" If the mount path is changed or you are on a different
-system, use "git proj config" to update the git and raw origin paths.
-
-EOF
     return 0
 } # fRemoteReport
 
@@ -404,6 +399,45 @@ fRemoteCommit()
 } # fRemoteCommit
 
 # --------------------
+fRemoteStatus()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tRemoteStatus
+    local tRawOrigin
+    local tGitOrigin
+
+    tRemoteStatus=$(fComGetConfig -k gitproj.config.remote-status -d TBD)
+    tRawOrigin=$(fComGetConfig -k gitproj.config.remote-raw-origin -d TBD)
+    tGitOrigin=$(fComGetConfig -k remote.origin.url -d TBD)
+
+    if [[ "$tRemoteStatus" != TBD || "$tRawOrigin" != TBD || "$tGitOrigin" != TBD ]]; then
+        cat <<EOF
+
+It looks like a remote origin already esists:
+    gitprog.config.remote-status = $tRemoteStatus
+    gitproj.config.remote-raw-origin = $tRawOrigin
+    remote.origin.url = $tGitOrigin
+
+EOF
+        if [ $gpAuto -ne 0 ]; then
+            if [ $gpYesNo = "Yes" ]; then
+                return 0
+            fi
+            return 1
+        fi
+
+        # Prompt
+        fComYesNo "Replace this with another remote origin"
+        if [ $? -ne 0 ]; then
+            fLog -p warning -m "Quitting" -l $tSrc:$LINENO
+            exit 1
+        fi
+    fi
+
+    return 0
+} # fRemoteStatus
+
+# --------------------
 fRemoteCreateRemoteGit()
 {
     local pMountDir="$1"
@@ -417,8 +451,7 @@ fRemoteCreateRemoteGit()
         fError -m "Quitting" -l $tSrc:$LINENO
     fi
 
-#TBD - check to see if a remove-raw-origin or git origin have already
-# been setup. If no, continue. If yes, ask for override.
+    fRemoteStatus
 
     # -d pMountPath (set with prompt/responnse, or required if -a)
     #  gpMountDir is required with -a, othherwise it is optional
@@ -429,10 +462,32 @@ fRemoteCreateRemoteGit()
     fRemoteGetRemoteRawDir
     gpRemoteRawOrigin=$gResponse
 
+    echo
+    echo "================================================================="
+    echo
     fRemoteMkRemote $gpMountDir
+    echo
     fRemoteReport
+    echo
     fRemoteCommit
 
+    echo
+    echo "================================================================="
+    echo
+    echo -n 'git remote origin is now: '
+    $cGetOrigin
+    echo "raw remote origin is now: $gpRemoteRawOrigin"
+
+    cat <<EOF | fComFmt
+
+Be sure the disk is mounted and that $tGitOrigin and
+$gpRemoteRawOrigin exists.  Then you can use: "git push origin BRANCH"
+and "git pull origin BRANCH"
+
+If the mount path has changed, or you are on a different system, you
+can re-run "git proj remote".
+
+EOF
     return 0
 } # fRemoteCreateRemoteGit
 

@@ -134,7 +134,7 @@ setUp()
     . $gpBin/gitproj-remote.inc
     gpDebug=0
     gpVerbose=3
-    gpMaxLoop=5
+    gpMaxLoop=3
     fRemoteSetGlobals
     gpUnitDebug=0
     return 0
@@ -344,6 +344,33 @@ testRemoteCheckDir()
     tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" ".raw already exists"
+
+    tResult=$(fRemoteCheckDir $cDatHome/$cDatProj1 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "cannot be in another git dir"
+
+    mkdir -p /tmp/foo/src
+    mkdir -p /tmp/foo/bar.raw/src
+    mkdir -p /tmp/foo/bar.git/src
+    mkdir -p /tmp/foo/bar/foo.raw.xy/src
+
+    tResult=$(fRemoteCheckDir /tmp/foo/src 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    tResult=$(fRemoteCheckDir /tmp/foo/bar.raw 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    tResult=$(fRemoteCheckDir /tmp/foo/bar.raw/src 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+
+    tResult=$(fRemoteCheckDir /tmp/foo/bar.git 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    tResult=$(fRemoteCheckDir /tmp/foo/bar.git/src 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+
+    tResult=$(fRemoteCheckDir /tmp/foo/bar/foo.raw.xy 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    tResult=$(fRemoteCheckDir /tmp/foo/bar/foo.raw.xy/src 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
 
     rm -rf /tmp/foo
     return 0
@@ -563,7 +590,6 @@ testRemoteReport()
     tResult=$(fRemoteReport 2>&1)
     tStatus=$?
     assertTrue "$LINENO" "$tStatus"
-    assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and"
 
     tResult=$(fComGetConfig -k "gitproj.config.remote-status" 2>&1)
     assertTrue "$LINENO" "$?"
@@ -631,11 +657,13 @@ testRemoteCreateRemoteGit()
     tStatus=$?
     assertTrue "$LINENO $tResult" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
-    assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
-    assertContains "$LINENO $tResult" "$tResult" "$gpMountDir/$gpProjName.git"
-    assertContains "$LINENO $tResult" "$tResult" "Be sure the disk is mounted and that"
+    assertContains "$LINENO" "$tResult" "git remote origin is now"
+    assertContains "$LINENO" "$tResult" "raw remote origin is now"
+    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.git"
+    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.raw"
+
     #assertNotContains "$LINENO UPSTREAM $tResult" "$tResult" "but the upstream is gone"
-    #assertContains "$LINENO $tResult" "$tResult" "xxx"
+    #assertContains "$LINENO $tResult" "$tResult" "uncoment-to-show"
 
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
@@ -684,9 +712,10 @@ testGitProjRemoteCLIAuto()
     tResult=$($gpBin/git-proj-remote -a -d $tMountDir 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
-    assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
+    assertContains "$LINENO" "$tResult" "git remote origin is now"
+    assertContains "$LINENO" "$tResult" "raw remote origin is now"
     assertContains "$LINENO $tResult" "$tResult" "$tMountDir/george.git"
-    assertContains "$LINENO $tResult" "$tResult" "If the mount path is changed or you are on a different system"
+    assertContains "$LINENO" "$tResult" "If the mount path has changed"
 
     return 0
 } # testGitProjRemoteCLIAuto
@@ -697,6 +726,8 @@ testGitProjRemoteCLIManual()
     local tResult
     local tTopDir
     local tMountDir=""
+
+    gpMaxLoop=3
 
     # Usage
     tResult=$($gpBin/git-proj-remote -h 2>&1)
@@ -731,12 +762,16 @@ testGitProjRemoteCLIManual()
     tMountDir=$cDatMount3
     # video-2020-04-02 is item #6
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "6\ny\n") 2>&1)
+    tResult=$($gpBin/git-proj-remote -d $tMountDir 2>&1 < <(echo -e "6\ny\ny\n"))
     assertTrue "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
-    assertContains "$LINENO $tResult" "$tResult" "Remote origin is now set to:"
-    assertContains "$LINENO $tResult" "$tResult" "$tMountDir/video-2020-04-02/george.git"
-    assertContains "$LINENO $tResult" "$tResult" "If the mount path is changed or you are on a different system"
+    assertContains "$LINENO" "$tResult" "Cloning into bare repository 'george.git'"
+    assertContains "$LINENO" "$tResult" "git remote origin is now"
+    assertContains "$LINENO" "$tResult" "raw remote origin is now"
+    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.git"
+    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.raw"
+    assertContains "$LINENO" "$tResult" "$tMountDir/video-2020-04-02/george.git"
+    assertContains "$LINENO" "$tResult" "If the mount path has changed"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment-To-Show"
 
     return 0
 } # testGitProjRemoteCLIManual

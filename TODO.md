@@ -7,8 +7,7 @@ After 1.0, move these to github issues.
 ## bug (defect, fix, needs to be changed)
 
 * git config vars and section names are case-insensitive. Fix the
-  comConfig (and 'git config') functions to lowercase the var and
-  section names.
+  comConfig (and 'git config') functions to lowercase the key names.
 
 --------------------
 
@@ -16,15 +15,13 @@ After 1.0, move these to github issues.
 
 * Cleanup the user docs. (bump the "patch" number for doc-only changes)
 
-* Make and cleanup the internal docs.
+* Make and cleanup the internal docs. Describe more of the block-file
+structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
+[ $x -eq 1 ]
 
 --------------------
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
-
-* in git-proj-remote: check to see if a remove-raw-origin or git
-  origin have already been setup. If no, continue. If yes, ask for
-  override.
 
 * git-proj-clone will initally copy all of PROJ/.gitproj (afer git
   clone).  Then update local config: local-status, local-host,
@@ -44,10 +41,10 @@ After 1.0, move these to github issues.
 * Cleanup the saving of git-proj vars. Save to --local, then
   "frequently" update PROJ/.gitproj
 
-* Cleanup: break fComGetConfig in to two functions--it is doing to
-  many things that are not used.
+* Cleanup: break fComGetConfig in to two functions--it is doing too
+  many things that are not used. (e.g. listing source)
 
-* Cleanup: remove gpMountDir. gpHookSource. Is gpGitFlowPkg used?
+* Cleanup: Is gpGitFlowPkg used?
 
 * Cleanup: fixup log messages to follow the gpVerbose rules. (see flog
   and git-proj)
@@ -79,35 +76,19 @@ Makefile targets for managing them.
 
 ## enhancement
 
-* Refactor: Move the [gitproj] sections in in .gitproj.config.global to
-  .gitconfig so the include.path does not need to be maintained? Also
-  removing the include path from PROJ/.git/config will make is easer
-  to not forget to include the --include option to "git config". Also
-  there will be fewer files for the user to manage.
-  Only $gpDoc/gitconfig is needed.
-
-* Refactor: Maybe copy [gitproj] sections from
-  PROJ/.gitproj.config.local to PROJ/.git/config and update the values
-  needed for the host? That way the include path can be removed. The
-  file is usually only changed when it is crated by init or clone. The
-  HOST option can be removed from the fComConfigGet/Set
-  functions. .gitproj.config.local should remain as a template for new
-  hosts.  Only PROJ/.gitproj is needed (i.e. .gitproj.config.local and
-  .gitproj.config.HOST files are not needed. .gitproj.config.HOST vars
-  are put in PROJ/.git/config. This works because git-proj-init or
-  git-proj-clone will set the HOST relevant values.
-
 * Code git-proj-config.
 
 * In the git-proj-config command implement processes for a user to
   copy git-proj vars between PROJ/.gitproj, PROJ/.git/config, and
   ~/.gitconfig, using update or force.
 
-* Imp a command that with show the files in REMOTE-PATH/PROJ.raw
+* Implement a command that with show the files in REMOTE-PATH/PROJ.raw
   git proj status does a diff, which is good, maybe just add the
   option to have th diff show the files that are the same.
 
-* Code git-proj-add (support adding whole directory trees of raw files)
+* Code git-proj-add (support adding whole directory trees looking for
+  binary files to be moved to "raw" files). See function in pre-commit
+  hook script, for identifying those files.
 
 ----
 
@@ -117,9 +98,12 @@ Makefile targets for managing them.
   major/minor/path/rc/build vars based on Q/A. See
   `test/dev-doc/enh-ver-wizard.md`
 
-* Implement: allow-tabs pre-commit check. Also add "expand" to
-  rm-trailing-sp script (-t option). Put rm-trailing-sp script in
-  $gpDoc/contrib dir?
+* Implement: allow-tabs pre-commit check.
+
+* Add "expand" to
+  rm-trailing-sp script.
+
+* Put rm-trailing-sp script in $gpDoc/contrib dir?
 
 * Decided on which remote network service to implement. Do all, only
   do one or two? Some methods are not compatable.
@@ -258,3 +242,28 @@ Fix: look for first arg so see if it is a CMD. - done
 
 * Remove "gitproj.hook.source" and "gpHookSource" from configs, code,
   tests - done
+
+* in git-proj-remote: check to see if a remove-raw-origin or git
+  origin have already been setup. If no, continue. If yes, ask for
+  override. - done
+
+* Cleanup: remove gpMountDir. gpHookSource. - done
+
+* Refactor: Move the [gitproj] sections in in .gitproj.config.global to
+  .gitconfig so the include.path does not need to be maintained? Also
+  removing the include path from PROJ/.git/config will make is easer
+  to not forget to include the --include option to "git config". Also
+  there will be fewer files for the user to manage.
+  Only $gpDoc/gitconfig is needed. - done
+
+* Refactor: Maybe copy [gitproj] sections from
+  PROJ/.gitproj.config.local to PROJ/.git/config and update the values
+  needed for the host? That way the include path can be removed. The
+  file is usually only changed when it is crated by init or clone. The
+  HOST option can be removed from the fComConfigGet/Set
+  functions. .gitproj.config.local should remain as a template for new
+  hosts.  Only PROJ/.gitproj is needed (i.e. .gitproj.config.local and
+  .gitproj.config.HOST files are not needed. .gitproj.config.HOST vars
+  are put in PROJ/.git/config. This works because git-proj-init or
+  git-proj-clone will set the HOST relevant values. - done
+
