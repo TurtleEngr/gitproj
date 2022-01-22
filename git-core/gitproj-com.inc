@@ -2033,9 +2033,8 @@ fComGetVer()
     if [ -z "$tLocVer" ]; then
         gpVer=$cGitProjVersion
         fLog -i -p warning -m "gitproj.config.ver was not found. Setting it to: $gpVer" -l "$tSrc:$LINENO"
-        return 1
         fComSetConfig -L -k "gitproj.config.ver" -v "$gpVer"
-        fComSetConfig -H -k "gitproj.config.ver" -v "$gpVer"
+        fComSetConfig -l -k "gitproj.config.ver" -v "$gpVer"
     fi
     gpVer=$tLocVer
 

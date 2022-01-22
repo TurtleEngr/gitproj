@@ -151,7 +151,7 @@ fRemoteGetAnotherMountDir()
     local pMountDir=$1
     local tSrc=${BASH_SOURCE##*/}
     local tReply
-    local tMaxLoop=30
+    local tMaxLoop=$gpMaxLoop
     gResponse=""
 
     # Loop until the selection is OK, or quit
@@ -190,7 +190,7 @@ fRemoteGetMountDir()
     local tSrc=${BASH_SOURCE##*/}
     export gResponse=""
     local tDirList
-    local tMaxLoop=20
+    local tMaxLoop=$gpMaxLoop
     local tMountDir
     local tResponse
     local tStatus
@@ -253,7 +253,7 @@ EOF
             continue
         fi
         fComYesNo "Use: $tMountDir"
-        if [ $? -ne 0 ] then
+        if [ $? -ne 0 ]; then
             continue
         fi
         break
