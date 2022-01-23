@@ -59,7 +59,7 @@ test : rm-trailing-sp bash-fmt $(mDepList) $(mBaseList) $(mCmdList)
 test-all : rm-trailing-sp bash-fmt clear-logs test
 
 clear-logs :
-	rm test-*.log
+	-rm test-*.log
 
 # Get project statistics
 stats :

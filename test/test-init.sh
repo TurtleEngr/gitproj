@@ -190,14 +190,6 @@ checkComMustNotBeInGit()
     assertFalse $LINENO $tStatus
     assertContains "$LINENO $pFun $tResult" "$tResult" "does not exist"
 
-    # Git is below this dir
-    tResult=$($pFun $HOME 2>&1)
-    tStatus=$?
-    fTestDebug "$LINENO Check: $HOME"
-    fTestDebug "$LINENO Check: $tResult"
-    assertFalse $LINENO $tStatus
-    assertContains "$LINENO $pFun x${HOME}x $tResult" "$tResult" "must NOT be in a git repo"
-
     # This is in a git dir
     tResult=$($pFun $HOME/$cDatProj3 2>&1)
     tStatus=$?

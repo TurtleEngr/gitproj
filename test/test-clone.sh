@@ -636,7 +636,7 @@ testGetProjCloneCLI()
     tResult=$($gpBin/git-proj-clone -a -V 1 -d $cDatMount3/video-2020-04-02/george.git -y 2>&1)
     assertTrue $LINENO $?
     assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
-    assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0
 } # testGetProjCloneCLI

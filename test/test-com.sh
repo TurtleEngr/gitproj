@@ -686,11 +686,13 @@ testComYesNo()
 {
     local tResult
 
+    gpAuto=1
     gpYesNo="Yes"
     fComYesNo "Continue" 2>&1
     assertTrue $LINENO $?
     assertEquals $LINENO "Yes" "$gResponse"
 
+    gpAuto=1
     gpYesNo="No"
     fComYesNo "Continue" 2>&1
     assertFalse $LINENO $?
