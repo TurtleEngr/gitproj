@@ -151,6 +151,8 @@ setUp()
 
     gpVerbose=3
     gpMaxLoop=5
+    gpAuto=0
+    gpYesNo=""
     gpUnitDebug=0
     return 0
 
@@ -299,18 +301,21 @@ testCloneGettingStarted()
 
     gpDebug=2
     cd $HOME/project >/dev/null 2>&1
+    gpAuto=1
     gpYesNo=No
     tResult=$(fCloneGettingStarted 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
     assertContains "$LINENO $tResult" "$tResult" "Not continuing"
 
+    gpAuto=1
     gpYesNo=Yes
     tResult=$(fCloneGettingStarted 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
     assertContains "$LINENO $tResult" "$tResult" "Cloning: $gpProjName"
 
+    gpAuto=0
     gpYesNo=""
     tResult=$(fCloneGettingStarted 2>&1 < <(echo y))
     assertTrue "$LINENO" "$?"
@@ -564,6 +569,7 @@ testCloneSummary()
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=3
+    gpAuto=1
     gpYesNo=Yes
 
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -608,6 +614,7 @@ testCloneFromRemoteDir()
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
     gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     gpProjName=george
+    gpAuto=1
     gpYesNo=Yes
     gpVerbose=3
     cd $HOME/project >/dev/null 2>&1
@@ -626,10 +633,10 @@ testGetProjCloneCLI()
     local tResult
 
     cd $cDatHome3/project >/dev/null 2>&1
-    tResult=$($gpBin/git-proj-clone -y -vv -d $cDatMount3/video-2020-04-02/george.git -y 2>&1)
+    tResult=$($gpBin/git-proj-clone -a -V 1 -d $cDatMount3/video-2020-04-02/george.git -y 2>&1)
     assertTrue $LINENO $?
     assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
-    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+    assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0
 } # testGetProjCloneCLI

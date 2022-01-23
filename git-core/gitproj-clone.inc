@@ -208,6 +208,7 @@ fCloneMkRawDir()
     if [ $gpVerbose -ge 2 ]; then
         tVerbose=-viP
     fi
+    cd $gpLocalTopDir/.. >/dev/null 2>&1
     tCmd="/usr/bin/rsync $tOpt $tVerbose $gpRemoteRawOrigin/ $gpLocalRawDir"
     fLog -p notice -m "Run: $tCmd"
     $tCmd
@@ -217,6 +218,7 @@ fCloneMkRawDir()
         fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
+    cd $gpLocalTopDir/.. >/dev/null 2>&1
     fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.remote-status" -v "defined"
 
@@ -304,10 +306,17 @@ fCloneFromRemoteDir()
     # gpYesNo, if gpAuto=1
     local tSrc=${BASH_SOURCE##*/}
 
-    fCloneGettingStarted
     fCloneValidRemoteDir
+    fCloneGettingStarted
+
+    echo
+    echo '================================================================='
+    exho
     fCloneMkGitDir
     fCloneMkRawDir
+
+    echo
+    echo '================================================================='
     fCloneSummary
     fComIntroText
 
