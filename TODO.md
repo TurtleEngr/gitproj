@@ -44,6 +44,26 @@ structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
 * Cleanup: break fComGetConfig in to two functions--it is doing too
   many things that are not used. (e.g. listing source)
 
+* Cleanup: change true/false integer tests to be internally "safer". Use "0" and
+"1", for input values, and do string tests:
+
+    if [ "${flag:-0}" = "0" ]
+    if [ "${flag:-0}" != "0" ]
+    if [ "$?" != "0" ]  # this is optional, since $? will always be an int
+
+* Cleanup: Tests for yes/no etc. can be cleaned up with this parameter
+syntax. Make first letter lower: ${ans,}. Return first char: ${ans::1}
+
+    Input: ans="Yes" or ans="NO"
+
+    declare -l ans
+    ans=${ans:-n}
+    if [ "${ans::1}" = "y" ]
+
+    ans=${ans:-n}
+    ans=${ans,}
+    if [ "${ans::1}" = "y" ]
+
 * Cleanup: Is gpGitFlowPkg used?
 
 * Cleanup: fixup log messages to follow the gpVerbose rules. (see flog

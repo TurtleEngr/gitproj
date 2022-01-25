@@ -1,0 +1,62 @@
+[core]
+        filemode = true
+        autocrlf = false
+        ignorecase = true
+        excludesFile = ~/.gitignore
+        logAllRefUpdates = true
+        quotePath = false
+        trustctime = false
+[user]
+        name = YourName
+        email = YourEmail@example.com
+[alias]
+        br = branch
+        br-all = branch -r
+        ci = commit
+        co = checkout
+        df = diff
+        origin = config --get remote.origin.url
+        raw-origin = config --get remote-raw-origin
+        push-tags = push --tags origin
+        revert-all = reset --hard HEAD
+        st = status
+        top = rev-parse --show-toplevel
+        tracked = remote show origin
+[color]
+        ui = never
+[branch "develop"]
+        mergeoptions = --log
+[gitflow "branch"]
+        master = main
+        main = main
+        develop = develop
+[gitflow "prefix"]
+        feature = feature/
+        release = release/
+        hotfix = hotfix/
+        bugfix = bugfix/
+        support = support/
+[gitproj "config"]
+        proj-status = installed
+        syslog = false
+        facility = user
+        bin = /usr/lib/git-core
+        doc = /usr/share/doc/git-proj
+        git-flow-pkg = git-flow
+        git-flow = true
+        local-status=TBD
+        local-host=TBD
+        proj-name = TBD
+        remote-status=TBD
+        remote-raw-origin=TBD
+        remote-min-size = 20g
+        verbose = 2
+[gitproj "hook"]
+        verbose = true
+        pre-commit-enabled = true
+        check-file-names = true
+        check-in-raw = true
+        check-whitespace = true
+        allow-tabs = false
+        check-for-big-files = true
+        binary-file-size-limit = 10k

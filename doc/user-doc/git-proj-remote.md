@@ -19,31 +19,27 @@ rsync access.)
 
 - **-d pMountDir**
 
+    This command is run after "git proj init" to setup a remote location.
+    After this is setup, "git proj push" and "git proj pull" can be used
+    to push/pull git and raw file changes.
+
     Export the git repo to an external drive (or another local dir) This
     is usually the removable drive's "top" directory.  Ideally the top
-    directory should be different across a set of external drives, so that the
-    local "origin" can be used to make sure the proper git repo is found
-    on the drive. "origin" will be set to $pMountDir/ProjName.git
-
-    After adding and committing files, run this script to copy this git
-    repo to a mounted drive (or to another local directory).
-
-    A mounted drive should have top directory that is different from other
-    drives so that the repo can be found with it's "origin" name.
-
-    For example, with a mount point: /mnt/usb-video create the remote git
-    at the top directory video-2019-04-01, with:
-
-        git proj init -e /mnt/usb-video/video-2019-04-01
+    directory should be different across a set of external drives, so that
+    the local "origin" can be used to make sure the proper git repo is
+    found on the drive. The git "origin" will be set to
+    pMountDir/ProjName.git And "remote-raw-origin" will be set to
+    pMountDir/ProjName.raw
 
 - **\[common-options\]**
 
-        -h
+        -h                     (-H text)
         -H pStyle
-        -v, -vv
-        -x, -xx
+        -q | -v | -V N         (gpVerbose level)
+        -x | -xx... | -X N     (gpDebug level)
+        -y | -n                (only used with -a option)
 
-    Run "git proj -h"  for details.
+    Run "git proj -h" for details.
 
 # RETURN VALUE
 

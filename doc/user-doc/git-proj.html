@@ -77,6 +77,11 @@
     <li><a href="#NAME-git-proj-status">NAME git proj status</a></li>
     <li><a href="#SYNOPSIS6">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION6">DESCRIPTION</a></li>
+    <li><a href="#OPTIONS6">OPTIONS</a></li>
+    <li><a href="#RETURN-VALUE5">RETURN VALUE</a></li>
+    <li><a href="#SEE-ALSO6">SEE ALSO</a></li>
+    <li><a href="#AUTHOR6">AUTHOR</a></li>
+    <li><a href="#HISTORY6">HISTORY</a></li>
   </ul>
   <h1 id="NAME-git-proj">NAME git proj</h1>
   <p>This implements the "git proj" subcommand, for managing large binary
@@ -240,7 +245,7 @@
   <h2 id="top-dir-.gitproj">top-dir/.gitproj</h2>
   <p>TBD</p>
   <h2 id="top-dir-.git-config">top-dir/.git/config</h2>
-  <p>TBD</p>
+  <p>TBD - this needs to be rewritten.</p>
   <p>Where HOSTNAME will be set to $HOSTNAME. This allows for different
   locations of file, based on the host. For example the remote-raw-url (mount
   point) could be very different between hosts.</p>
@@ -326,12 +331,11 @@
  * command line option</code></pre>
   <p>Notation below: gp[Var], -[cli-opt], [git.config.var], (default)</p>
   <dl>
-    <dt id="gpSysLog--l-gitproj.config.syslog-false"><b>gpSysLog, -l,
+    <dt id="gpSysLog-NA-gitproj.config.syslog-false"><b>gpSysLog, NA,
     gitproj.config.syslog, (false)</b></dt>
     <dd>
       <p>If set to 0, log messages will only be sent to stderr.</p>
       <p>If set to 1, log messages will be sent to stderr and syslog.</p>
-      <p>See -l, fLog and fErr for details</p>
       <p>Default: false</p>
     </dd>
     <dt id="gpFacility-NA-gitproj.config.facility-user"><b>gpFacility, NA,
@@ -395,13 +399,16 @@
       <p>If set to 0, all "debug" and "debug-N" level messages will be
       skipped.</p>
       <p>If not 0, all "debug" level messages will be output.</p>
-      <p>Or if "debug-N" level is used, then if gpDebug is &gt;= N, then the
-      log message will be output, otherwise it is skipped.</p>
+      <p>If "debug-N" level is used, then if gpDebug is &gt;= N, then the log
+      message will be output, otherwise it is skipped.</p>
     </dd>
     <dt id="gpAuto--a-NA-false"><b>gpAuto, -a, NA, (false)</b></dt>
     <dd></dd>
     <dt id="gpYesNo--y--n-NA-No"><b>gpYesNo, -y, -n, NA, (No)</b></dt>
-    <dd></dd>
+    <dd>
+      <p>If gpAuto is true, then gpYesNo can be used to define default
+      answers.</p>
+    </dd>
     <dt id="gpAutoMove-NA-NA-false"><b>gpAutoMove, NA, NA, (false)</b></dt>
     <dd></dd>
     <dt id="gpBin-NA-gitproj.config.bin-usr-lib-git-core"><b>gpBin, NA,
@@ -412,7 +419,8 @@
     <dt id="gpDoc-NA-gitproj.config.doc-usr-share-doc-git-proj"><b>gpDoc, NA,
     gitproj.config.doc, (/usr/share/doc/git-proj)</b></dt>
     <dd>
-      <p>If not found, then set to: $gpBin/../doc</p>
+      <p>If not found, then set to: $gpBin/../doc If still not found:
+      error.</p>
     </dd>
     <dt id="gpCheckFileNames-NA-gitproj.hook.check-file-names-true">
     <b>gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)</b></dt>
@@ -485,7 +493,8 @@
   <hr />
   <h1 id="NAME-git-proj-init">NAME git proj init</h1>
   <h1 id="SYNOPSIS1">SYNOPSIS</h1>
-  <pre><code>    git proj init local -l pLocalDir [-a] [-s pMaxSize] [-m] [-f] [common-options]</code></pre>
+  <pre><code>    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
+                  [common-options]</code></pre>
   <h1 id="DESCRIPTION1">DESCRIPTION</h1>
   <p>This will create a local git repo with branches. If git-flow is
   installed can be setup too. After "git proj init" is done, run "git proj
@@ -508,19 +517,21 @@
     <dd>
       <p>Define the existing project directory. The last directory will be
       used for the name of the project. Required.</p>
+      <p>Prompt:</p>
       <pre><code>    Dir (-l) [$PWD]? $gpLocalTopDir
         So the project Name will be: ${gpLocalTopDir##*/}</code></pre>
     </dd>
     <dt id="s-pMaxSize"><b>-s pMaxSize</b></dt>
     <dd>
       <p>Define the "size" for large binary files. Default 10K</p>
+      <p>Prompt:</p>
       <pre><code>    Size (-s) [10K]?</code></pre>
     </dd>
     <dt id="m"><b>-m</b></dt>
     <dd>
-      <p>Binary files greater than [pSize] were found in your project
-      dir:</p>
-      <pre><code>    [file list]</code></pre>
+      <p>Prompt:</p>
+      <pre><code>    Binary files greater than [pSize] were found in your project dir:
+        [file list]</code></pre>
       <p>The listed files can be moved to the project's "raw" directory. Dirs
       will be created in the raw directory that correspond to the project's
       directory. A symlink will replace the moved file. The symlink will
@@ -528,20 +539,23 @@
       <p>The symlinks are only provided for backward compatability; it would
       be best to remove those links and modifiy your code and apps to access
       the files directly from the raw directories.</p>
+      <p>Prompt:</p>
       <pre><code>    Move the files (-m) [y/n]?</code></pre>
     </dd>
     <dt id="f"><b>-f</b></dt>
     <dd>
-      <p>[If git-flow is installed]</p>
+      <p>If git-flow is installed.</p>
+      <p>Prompt:</p>
       <pre><code>    Setup git-flow (-f) [y/n]?</code></pre>
     </dd>
     <dt id="common-options1"><b>[common-options]</b></dt>
     <dd>
       <pre><code> -h
  -H pStyle
- -v, -vv
- -x, -xx</code></pre>
-      <p>Run "git proj -h" for details.</p>
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
+      <p>Run "git proj -h" for details. Or "man git-proj" for help with all
+      the subcommands.</p>
     </dd>
   </dl>
   <h1 id="RETURN-VALUE">RETURN VALUE</h1>
@@ -551,11 +565,12 @@
   <pre><code> git proj
  git proj remote
  git proj clone
- git proj add
  git proj push
  git proj pull
  git proj set
  git proj status
+ git proj add   TBD
+ git proj config TBD
  git flow</code></pre>
   <h1 id="AUTHOR1">AUTHOR</h1>
   <p>TurtleEngr</p>
@@ -573,25 +588,24 @@
   <dl>
     <dt id="d-pMountDir"><b>-d pMountDir</b></dt>
     <dd>
+      <p>This command is run after "git proj init" to setup a remote
+      location. After this is setup, "git proj push" and "git proj pull" can
+      be used to push/pull git and raw file changes.</p>
       <p>Export the git repo to an external drive (or another local dir) This
       is usually the removable drive's "top" directory. Ideally the top
       directory should be different across a set of external drives, so that
       the local "origin" can be used to make sure the proper git repo is
-      found on the drive. "origin" will be set to $pMountDir/ProjName.git</p>
-      <p>After adding and committing files, run this script to copy this git
-      repo to a mounted drive (or to another local directory).</p>
-      <p>A mounted drive should have top directory that is different from
-      other drives so that the repo can be found with it's "origin" name.</p>
-      <p>For example, with a mount point: /mnt/usb-video create the remote
-      git at the top directory video-2019-04-01, with:</p>
-      <pre><code> git proj init -e /mnt/usb-video/video-2019-04-01</code></pre>
+      found on the drive. The git "origin" will be set to
+      pMountDir/ProjName.git And "remote-raw-origin" will be set to
+      pMountDir/ProjName.raw</p>
     </dd>
     <dt id="common-options2"><b>[common-options]</b></dt>
     <dd>
-      <pre><code> -h
+      <pre><code> -h                     (-H text)
  -H pStyle
- -v, -vv
- -x, -xx</code></pre>
+ -q | -v | -V N         (gpVerbose level)
+ -x | -xx... | -X N     (gpDebug level)
+ -y | -n                (only used with -a option)</code></pre>
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
@@ -615,7 +629,7 @@
   <hr />
   <h1 id="NAME-git-proj-clone">NAME git proj clone</h1>
   <h1 id="SYNOPSIS3">SYNOPSIS</h1>
-  <pre><code>    git proj clone -d pRemoteDir [-y|-n] [common-options]</code></pre>
+  <pre><code>    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION3">DESCRIPTION</h1>
   <p>Clone a local git repo from the external pRemoteDir.</p>
   <p>Use this script get a local copy of the remote git repo frome a mounted
@@ -626,10 +640,16 @@
     <dd>
       <p>TBD</p>
     </dd>
+    <dt id="a1"><b>-a</b></dt>
+    <dd>
+      <p>Automated mode. Use this in batch (non-interactve) scripts. See the
+      -y|-n options.</p>
+    </dd>
     <dt id="y--n"><b>-y|-n</b></dt>
     <dd>
-      <p>If -y, then default to "yes" to all prompts to continue.</p>
-      <p>If -n, then default to "no" to all prompts to continue.</p>
+      <p>These are only used if -a option is defined. Where there are
+      "exceptions" these will be used for the default answer: -y continue, -n
+      quit.</p>
     </dd>
     <dt id="common-options3"><b>[common-options]</b></dt>
     <dd>
@@ -754,15 +774,54 @@
   <hr />
   <h1 id="NAME-git-proj-status">NAME git proj status</h1>
   <h1 id="SYNOPSIS6">SYNOPSIS</h1>
-  <pre><code> git proj status [-s] [common-options]</code></pre>
+  <pre><code> git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]</code></pre>
   <h1 id="DESCRIPTION6">DESCRIPTION</h1>
   <pre><code>    Do a "git status"
-    Verify gitproj.config.remote-raw-origin is defined and mounted
-    Verify origin is set to a path that exists (if mounted)
+    Verify gitproj.config.remote-raw-origin is defined and mounted.
+
+    Verify origin is set to a path that exists (if mounted).
+
     Give a "diff" (-qr) of the raw files, local vs remote (if mounted)</code></pre>
-  <p>Check install related health</p>
-  <pre><code>    fComGetVer
-    Compare .git/hooks/pre-commit to $gpDoc/hooks/pre-commit
-    if -v, show all the proj related config settings.</code></pre>
+  <h1 id="OPTIONS6">OPTIONS</h1>
+  <dl>
+    <dt id="g-pGitOpt"><b>-g "pGitOpt"</b></dt>
+    <dd>
+      <p>Git status options. For example:</p>
+      <p>git proj status -g "--short --ignored"</p>
+    </dd>
+    <dt id="r-pRawOpt"><b>-r "pRawOpt"</b></dt>
+    <dd>
+      <p>Raw options. Currently these will be options passed to the diff
+      command. (This will be added after the default options: -qr) For
+      example:</p>
+      <p>git proj status -r "-s"</p>
+    </dd>
+    <dt id="common-options6"><b>[common-options]</b></dt>
+    <dd>
+      <pre><code> -h
+ -H pStyle
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
+      <p>Run "git proj -h" for details. Or "man git-proj" for help with all
+      the subcommands.</p>
+    </dd>
+  </dl>
+  <h1 id="RETURN-VALUE5">RETURN VALUE</h1>
+  <pre><code> 0 - if OK
+ !0 - if errors</code></pre>
+  <h1 id="SEE-ALSO6">SEE ALSO</h1>
+  <pre><code> git proj
+ git proj init
+ git proj remote
+ git proj clone
+ git proj push
+ git proj pull
+ git proj add   TBD
+ git proj config TBD
+ git flow</code></pre>
+  <h1 id="AUTHOR6">AUTHOR</h1>
+  <p>TurtleEngr</p>
+  <h1 id="HISTORY6">HISTORY</h1>
+  <p>GPLv3 Copyright 2021 by TurtleEngr</p>
 </body>
 </html>

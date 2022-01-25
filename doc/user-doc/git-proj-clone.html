@@ -25,7 +25,7 @@
   <h1 id="NAME-git-proj-clone"><a href="#_podtop_">NAME git proj
   clone</a></h1>
   <h1 id="SYNOPSIS"><a href="#_podtop_">SYNOPSIS</a></h1>
-  <pre><code>    git proj clone -d pRemoteDir [-y|-n] [common-options]</code></pre>
+  <pre><code>    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION"><a href="#_podtop_">DESCRIPTION</a></h1>
   <p>Clone a local git repo from the external pRemoteDir.</p>
   <p>Use this script get a local copy of the remote git repo frome a mounted
@@ -36,10 +36,16 @@
     <dd>
       <p>TBD</p>
     </dd>
+    <dt id="a"><b>-a</b></dt>
+    <dd>
+      <p>Automated mode. Use this in batch (non-interactve) scripts. See the
+      -y|-n options.</p>
+    </dd>
     <dt id="y--n"><b>-y|-n</b></dt>
     <dd>
-      <p>If -y, then default to "yes" to all prompts to continue.</p>
-      <p>If -n, then default to "no" to all prompts to continue.</p>
+      <p>These are only used if -a option is defined. Where there are
+      "exceptions" these will be used for the default answer: -y continue, -n
+      quit.</p>
     </dd>
     <dt id="common-options"><b>[common-options]</b></dt>
     <dd>

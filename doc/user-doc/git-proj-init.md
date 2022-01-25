@@ -6,7 +6,8 @@
 
 # SYNOPSIS
 
-    git proj init local -l pLocalDir [-a] [-s pMaxSize] [-m] [-f] [common-options]
+    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
+                  [common-options]
 
 # DESCRIPTION
 
@@ -36,6 +37,8 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     Define the existing project directory. The last directory will be used
     for the name of the project. Required.
 
+    Prompt:
+
         Dir (-l) [$PWD]? $gpLocalTopDir
             So the project Name will be: ${gpLocalTopDir##*/}
 
@@ -43,13 +46,16 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
     Define the "size" for large binary files. Default 10K
 
+    Prompt:
+
         Size (-s) [10K]?
 
 - **-m**
 
-    Binary files greater than \[pSize\] were found in your project dir:
+    Prompt:
 
-        [file list]
+        Binary files greater than [pSize] were found in your project dir:
+            [file list]
 
     The listed files can be moved to the project's "raw" directory. Dirs
     will be created in the raw directory that correspond to the project's
@@ -60,11 +66,15 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     best to remove those links and modifiy your code and apps to access
     the files directly from the raw directories.
 
+    Prompt:
+
         Move the files (-m) [y/n]?
 
 - **-f**
 
-    \[If git-flow is installed\]
+    If git-flow is installed.
+
+    Prompt:
 
         Setup git-flow (-f) [y/n]?
 
@@ -72,10 +82,11 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
         -h
         -H pStyle
-        -v, -vv
-        -x, -xx
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
 
-    Run "git proj -h"  for details.
+    Run "git proj -h" for details. Or "man git-proj" for help with all the
+    subcommands.
 
 # RETURN VALUE
 
@@ -87,11 +98,12 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     git proj
     git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
     git proj set
     git proj status
+    git proj add   TBD
+    git proj config TBD
     git flow
 
 # AUTHOR

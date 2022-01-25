@@ -14,20 +14,64 @@
     <li><a href="#NAME-git-proj-status">NAME git proj status</a></li>
     <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+    <li><a href="#OPTIONS">OPTIONS</a></li>
+    <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
+    <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+    <li><a href="#AUTHOR">AUTHOR</a></li>
+    <li><a href="#HISTORY">HISTORY</a></li>
   </ul>
   <hr />
   <h1 id="NAME-git-proj-status"><a href="#_podtop_">NAME git proj
   status</a></h1>
   <h1 id="SYNOPSIS"><a href="#_podtop_">SYNOPSIS</a></h1>
-  <pre><code> git proj status [-s] [common-options]</code></pre>
+  <pre><code> git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]</code></pre>
   <h1 id="DESCRIPTION"><a href="#_podtop_">DESCRIPTION</a></h1>
   <pre><code>    Do a "git status"
-    Verify gitproj.config.remote-raw-origin is defined and mounted
-    Verify origin is set to a path that exists (if mounted)
+    Verify gitproj.config.remote-raw-origin is defined and mounted.
+
+    Verify origin is set to a path that exists (if mounted).
+
     Give a "diff" (-qr) of the raw files, local vs remote (if mounted)</code></pre>
-  <p>Check install related health</p>
-  <pre><code>    fComGetVer
-    Compare .git/hooks/pre-commit to $gpDoc/hooks/pre-commit
-    if -v, show all the proj related config settings.</code></pre>
+  <h1 id="OPTIONS"><a href="#_podtop_">OPTIONS</a></h1>
+  <dl>
+    <dt id="g-pGitOpt"><b>-g "pGitOpt"</b></dt>
+    <dd>
+      <p>Git status options. For example:</p>
+      <p>git proj status -g "--short --ignored"</p>
+    </dd>
+    <dt id="r-pRawOpt"><b>-r "pRawOpt"</b></dt>
+    <dd>
+      <p>Raw options. Currently these will be options passed to the diff
+      command. (This will be added after the default options: -qr) For
+      example:</p>
+      <p>git proj status -r "-s"</p>
+    </dd>
+    <dt id="common-options"><b>[common-options]</b></dt>
+    <dd>
+      <pre><code> -h
+ -H pStyle
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
+      <p>Run "git proj -h" for details. Or "man git-proj" for help with all
+      the subcommands.</p>
+    </dd>
+  </dl>
+  <h1 id="RETURN-VALUE"><a href="#_podtop_">RETURN VALUE</a></h1>
+  <pre><code> 0 - if OK
+ !0 - if errors</code></pre>
+  <h1 id="SEE-ALSO"><a href="#_podtop_">SEE ALSO</a></h1>
+  <pre><code> git proj
+ git proj init
+ git proj remote
+ git proj clone
+ git proj push
+ git proj pull
+ git proj add   TBD
+ git proj config TBD
+ git flow</code></pre>
+  <h1 id="AUTHOR"><a href="#_podtop_">AUTHOR</a></h1>
+  <p>TurtleEngr</p>
+  <h1 id="HISTORY"><a href="#_podtop_">HISTORY</a></h1>
+  <p>GPLv3 Copyright 2021 by TurtleEngr</p>
 </body>
 </html>

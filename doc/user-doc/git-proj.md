@@ -182,7 +182,7 @@ TBD
 
 ## top-dir/.git/config
 
-TBD
+TBD - this needs to be rewritten.
 
 Where HOSTNAME will be set to $HOSTNAME. This allows for different
 locations of file, based on the host. For example the remote-raw-url
@@ -278,13 +278,11 @@ Global variable precedence (the last one to set the gp variable, wins):
 
 Notation below: gp\[Var\], -\[cli-opt\], \[git.config.var\], (default)
 
-- **gpSysLog, -l, gitproj.config.syslog, (false)**
+- **gpSysLog, NA, gitproj.config.syslog, (false)**
 
     If set to 0, log messages will only be sent to stderr.
 
     If set to 1, log messages will be sent to stderr and syslog.
-
-    See -l, fLog and fErr for details
 
     Default: false
 
@@ -364,11 +362,14 @@ Notation below: gp\[Var\], -\[cli-opt\], \[git.config.var\], (default)
 
     If not 0, all "debug" level messages will be output.
 
-    Or if "debug-N" level is used, then if gpDebug is >= N, then the log
+    If "debug-N" level is used, then if gpDebug is >= N, then the log
     message will be output, otherwise it is skipped.
 
 - **gpAuto, -a, NA, (false)**
 - **gpYesNo, -y, -n, NA, (No)**
+
+    If gpAuto is true, then gpYesNo can be used to define default answers.
+
 - **gpAutoMove, NA, NA, (false)**
 - **gpBin, NA, gitproj.config.bin, (/usr/lib/git-core)**
 
@@ -376,7 +377,7 @@ Notation below: gp\[Var\], -\[cli-opt\], \[git.config.var\], (default)
 
 - **gpDoc, NA, gitproj.config.doc, (/usr/share/doc/git-proj)**
 
-    If not found, then set to: $gpBin/../doc
+    If not found, then set to: $gpBin/../doc  If still not found: error.
 
 - **gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)**
 - **gpCheckForBigFiles, NA, gitproj.hook.check-for-big-files, (true)**
@@ -448,7 +449,8 @@ TurtleEngr
 
 # SYNOPSIS
 
-    git proj init local -l pLocalDir [-a] [-s pMaxSize] [-m] [-f] [common-options]
+    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
+                  [common-options]
 
 # DESCRIPTION
 
@@ -478,6 +480,8 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     Define the existing project directory. The last directory will be used
     for the name of the project. Required.
 
+    Prompt:
+
         Dir (-l) [$PWD]? $gpLocalTopDir
             So the project Name will be: ${gpLocalTopDir##*/}
 
@@ -485,13 +489,16 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
     Define the "size" for large binary files. Default 10K
 
+    Prompt:
+
         Size (-s) [10K]?
 
 - **-m**
 
-    Binary files greater than \[pSize\] were found in your project dir:
+    Prompt:
 
-        [file list]
+        Binary files greater than [pSize] were found in your project dir:
+            [file list]
 
     The listed files can be moved to the project's "raw" directory. Dirs
     will be created in the raw directory that correspond to the project's
@@ -502,11 +509,15 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     best to remove those links and modifiy your code and apps to access
     the files directly from the raw directories.
 
+    Prompt:
+
         Move the files (-m) [y/n]?
 
 - **-f**
 
-    \[If git-flow is installed\]
+    If git-flow is installed.
+
+    Prompt:
 
         Setup git-flow (-f) [y/n]?
 
@@ -514,10 +525,11 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
         -h
         -H pStyle
-        -v, -vv
-        -x, -xx
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
 
-    Run "git proj -h"  for details.
+    Run "git proj -h" for details. Or "man git-proj" for help with all the
+    subcommands.
 
 # RETURN VALUE
 
@@ -529,11 +541,12 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     git proj
     git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
     git proj set
     git proj status
+    git proj add   TBD
+    git proj config TBD
     git flow
 
 # AUTHOR
@@ -565,31 +578,27 @@ rsync access.)
 
 - **-d pMountDir**
 
+    This command is run after "git proj init" to setup a remote location.
+    After this is setup, "git proj push" and "git proj pull" can be used
+    to push/pull git and raw file changes.
+
     Export the git repo to an external drive (or another local dir) This
     is usually the removable drive's "top" directory.  Ideally the top
-    directory should be different across a set of external drives, so that the
-    local "origin" can be used to make sure the proper git repo is found
-    on the drive. "origin" will be set to $pMountDir/ProjName.git
-
-    After adding and committing files, run this script to copy this git
-    repo to a mounted drive (or to another local directory).
-
-    A mounted drive should have top directory that is different from other
-    drives so that the repo can be found with it's "origin" name.
-
-    For example, with a mount point: /mnt/usb-video create the remote git
-    at the top directory video-2019-04-01, with:
-
-        git proj init -e /mnt/usb-video/video-2019-04-01
+    directory should be different across a set of external drives, so that
+    the local "origin" can be used to make sure the proper git repo is
+    found on the drive. The git "origin" will be set to
+    pMountDir/ProjName.git And "remote-raw-origin" will be set to
+    pMountDir/ProjName.raw
 
 - **\[common-options\]**
 
-        -h
+        -h                     (-H text)
         -H pStyle
-        -v, -vv
-        -x, -xx
+        -q | -v | -V N         (gpVerbose level)
+        -x | -xx... | -X N     (gpDebug level)
+        -y | -n                (only used with -a option)
 
-    Run "git proj -h"  for details.
+    Run "git proj -h" for details.
 
 # RETURN VALUE
 
@@ -624,7 +633,7 @@ GPLv3 Copyright 2021 by TurtleEngr
 
 # SYNOPSIS
 
-    git proj clone -d pRemoteDir [-y|-n] [common-options]
+    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]
 
 # DESCRIPTION
 
@@ -639,11 +648,16 @@ mounted drive.
 
     TBD
 
+- **-a**
+
+    Automated mode. Use this in batch (non-interactve) scripts. See the
+    \-y|-n options.
+
 - **-y|-n**
 
-    If -y, then default to "yes" to all prompts to continue.
-
-    If -n, then default to "no" to all prompts to continue.
+    These are only used if -a option is defined. Where there are
+    "exceptions" these will be used for the default answer: -y continue,
+    \-n quit.
 
 - **\[common-options\]**
 
@@ -820,17 +834,64 @@ GPLv3 Copyright 2021 by TurtleEngr
 
 # SYNOPSIS
 
-    git proj status [-s] [common-options]
+    git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]
 
 # DESCRIPTION
 
     Do a "git status"
-    Verify gitproj.config.remote-raw-origin is defined and mounted
-    Verify origin is set to a path that exists (if mounted)
+    Verify gitproj.config.remote-raw-origin is defined and mounted.
+
+    Verify origin is set to a path that exists (if mounted).
+
     Give a "diff" (-qr) of the raw files, local vs remote (if mounted)
 
-Check install related health
+# OPTIONS
 
-    fComGetVer
-    Compare .git/hooks/pre-commit to $gpDoc/hooks/pre-commit
-    if -v, show all the proj related config settings.
+- **-g "pGitOpt"**
+
+    Git status options. For example:
+
+    git proj status -g "--short --ignored"
+
+- **-r "pRawOpt"**
+
+    Raw options. Currently these will be options passed to the diff
+    command. (This will be added after the default options: -qr) For
+    example:
+
+    git proj status -r "-s"
+
+- **\[common-options\]**
+
+        -h
+        -H pStyle
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
+
+    Run "git proj -h" for details. Or "man git-proj" for help with all the
+    subcommands.
+
+# RETURN VALUE
+
+    0 - if OK
+    !0 - if errors
+
+# SEE ALSO
+
+    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj add   TBD
+    git proj config TBD
+    git flow
+
+# AUTHOR
+
+TurtleEngr
+
+# HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr

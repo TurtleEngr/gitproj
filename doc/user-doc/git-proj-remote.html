@@ -33,25 +33,24 @@
   <dl>
     <dt id="d-pMountDir"><b>-d pMountDir</b></dt>
     <dd>
+      <p>This command is run after "git proj init" to setup a remote
+      location. After this is setup, "git proj push" and "git proj pull" can
+      be used to push/pull git and raw file changes.</p>
       <p>Export the git repo to an external drive (or another local dir) This
       is usually the removable drive's "top" directory. Ideally the top
       directory should be different across a set of external drives, so that
       the local "origin" can be used to make sure the proper git repo is
-      found on the drive. "origin" will be set to $pMountDir/ProjName.git</p>
-      <p>After adding and committing files, run this script to copy this git
-      repo to a mounted drive (or to another local directory).</p>
-      <p>A mounted drive should have top directory that is different from
-      other drives so that the repo can be found with it's "origin" name.</p>
-      <p>For example, with a mount point: /mnt/usb-video create the remote
-      git at the top directory video-2019-04-01, with:</p>
-      <pre><code> git proj init -e /mnt/usb-video/video-2019-04-01</code></pre>
+      found on the drive. The git "origin" will be set to
+      pMountDir/ProjName.git And "remote-raw-origin" will be set to
+      pMountDir/ProjName.raw</p>
     </dd>
     <dt id="common-options"><b>[common-options]</b></dt>
     <dd>
-      <pre><code> -h
+      <pre><code> -h                     (-H text)
  -H pStyle
- -v, -vv
- -x, -xx</code></pre>
+ -q | -v | -V N         (gpVerbose level)
+ -x | -xx... | -X N     (gpDebug level)
+ -y | -n                (only used with -a option)</code></pre>
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>

@@ -6,7 +6,7 @@
 
 # SYNOPSIS
 
-    git proj clone -d pRemoteDir [-y|-n] [common-options]
+    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]
 
 # DESCRIPTION
 
@@ -21,11 +21,16 @@ mounted drive.
 
     TBD
 
+- **-a**
+
+    Automated mode. Use this in batch (non-interactve) scripts. See the
+    \-y|-n options.
+
 - **-y|-n**
 
-    If -y, then default to "yes" to all prompts to continue.
-
-    If -n, then default to "no" to all prompts to continue.
+    These are only used if -a option is defined. Where there are
+    "exceptions" these will be used for the default answer: -y continue,
+    \-n quit.
 
 - **\[common-options\]**
 
