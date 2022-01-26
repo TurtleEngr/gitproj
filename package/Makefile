@@ -153,6 +153,12 @@ tag : ver.env ver.mak
 # --------------------
 # Work Targets
 
-ver.mak ver.epm ver.env : ver.sh
+ver.epm ver.env : ver.sh
 	if [ "$(USER)" = "root" ]; then exit 1; fi
-	mkver.pl -e 'mak env epm'
+	mkver.pl -e 'env epm'
+
+ver.mak : ver.sh
+	if [ "$(USER)" = "root" ]; then exit 1; fi
+	mkver.pl -e 'mak'
+	cat $@ | grep -E 'ProdName=|ProdAlias=|ProdVer=|ProdRC=|ProdBuild=|ProdSupport=|ProdVendor=|ProdPackager=|ProdCopyright=|MkVer=|ProdOS=|ProdOSDist=|ProdOSVer=|ProdArch=|CurLogName' >ver.tmp
+	cp ver.tmp $@
