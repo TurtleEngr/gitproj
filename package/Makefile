@@ -131,8 +131,8 @@ package : epm.list $(ProdOSDist).require
 release : ver.mak
 	+echo ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
 	-ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
-	.ssh $(ProdRelServer) test -d $(ProdRelDir)
-	.rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
+	ssh $(ProdRelServer) test -d $(ProdRelDir)
+	rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
 
 clean-rc-release : TBD
 	# Remove all $(ProdName) Release Candidates from repo
