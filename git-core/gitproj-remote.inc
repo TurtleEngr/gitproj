@@ -76,7 +76,7 @@ fRemoteCheckDir()
         return 1
     fi
 
-    if [[  "$pDir" =~ (.*\.git$|.*\.git/) ]]; then
+    if [[ "$pDir" =~ (.*\.git$|.*\.git/) ]]; then
         fError -n -m "$pDir is in another remote git dir." -l $tSrc:$LINENO
         return 1
     fi

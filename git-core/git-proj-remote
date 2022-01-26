@@ -53,11 +53,11 @@ pMountDir/ProjName.raw
 
 =item B<[common-options]>
 
- -h			(-H text)
+ -h                     (-H text)
  -H pStyle
- -q | -v | -V N		(gpVerbose level)
- -x | -xx... | -X N	(gpDebug level)
- -y | -n       	  	(only used with -a option)
+ -q | -v | -V N         (gpVerbose level)
+ -x | -xx... | -X N     (gpDebug level)
+ -y | -n                (only used with -a option)
 
 Run "git proj -h" for details.
 
@@ -160,8 +160,8 @@ while getopts :ad:hH:vxyn tArg; do
         H) fUsage "$OPTARG" ;;
         v) let ++gpVerbose ;;
         x) let ++gpDebug ;;
-	y) gpYesNo=Yes ;;
-	n) gpYesNo=No ;;
+        y) gpYesNo=Yes ;;
+        n) gpYesNo=No ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

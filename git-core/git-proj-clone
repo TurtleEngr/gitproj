@@ -151,7 +151,7 @@ gpYesNo="No"
 while getopts :ad:nyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
-	a) gpAuto=1 ;;
+        a) gpAuto=1 ;;
         d)
             gpRemoteGitDir="$OPTARG"
             gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw

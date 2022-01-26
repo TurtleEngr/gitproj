@@ -217,7 +217,7 @@ testRemoteSetGlobals()
     mv -f .gitproj.sav .gitproj
     tResult=$(fRemoteSetGlobals 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-#    assertNotContains "$LINENO $tResult" "$tResult" "warning"
+    #    assertNotContains "$LINENO $tResult" "$tResult" "warning"
 
     # TBD: add tests to force errors and warnings. See REMOVEDtestRemoteVerifyState
     return 0
@@ -330,7 +330,6 @@ testRemoteCheckDir()
     assertTrue "$LINENO $tResult" "$?"
     tResult=$(fRemoteCheckDir /tmp/foo/bar/foo.raw.xy/src 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-
 
     rm -rf /tmp/foo
     return 0

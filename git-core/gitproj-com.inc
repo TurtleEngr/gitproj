@@ -204,28 +204,28 @@ Calls tcSaveEnv.
 
     fCmd1()
     {
-	tcMsg="fCmd1 error"
+        tcMsg="fCmd1 error"
         if [ $((RANDOM % 3)) = 1 ]; then
-	    rm /x/y/zz/y
-	fi
-	echo cmd1="fCmd1 ran OK"
+            rm /x/y/zz/y
+        fi
+        echo cmd1="fCmd1 ran OK"
     }
 
     fCmd2()
     {
-	tcMsg="fCmd2 error"
+        tcMsg="fCmd2 error"
         if [ $((RANDOM % 4)) = 1 ]; then
-	    rm /x/y/zz/y
-	fi
-	if [ $((RANDOM % 4)) = 1 ]; then
-	  tcThrow 42 "fCmd2 threw this"
-	fi
-	echo cmd2="fCmd2 ran OK"
+            rm /x/y/zz/y
+        fi
+        if [ $((RANDOM % 4)) = 1 ]; then
+          tcThrow 42 "fCmd2 threw this"
+        fi
+        echo cmd2="fCmd2 ran OK"
     }
 
     fTestIt()
     {
-	tcMessage="Default message for exits"
+        tcMessage="Default message for exits"
         tcTry
         (
             # This is an error, but execution will continue
@@ -266,7 +266,7 @@ Calls tcSaveEnv.
                 *)  echo "Caught: Unknown exit: $tcErr. $tcMsg" ;;
             esac
         }
-	echo
+        echo
         echo foo1=$foo1
         echo foo2=$foo2
         echo foo3=$foo3
@@ -1031,7 +1031,7 @@ fComYesNo()
             gResponse="No"
             return 1
         fi
-	return 1
+        return 1
     fi
 
     echo -n "$pPrompt [y/n]? "
@@ -1938,12 +1938,12 @@ fComMustNotBeInGit()
         git branch
         tFound=1
     fi
-#    if [ $tFound -eq 0 ]; then
-#        tGitDir=$(find . -type d -name .git)
-#        if [ -n "$tGitDir" ]; then
-#            tFound=2
-#        fi
-#    fi
+    #    if [ $tFound -eq 0 ]; then
+    #        tGitDir=$(find . -type d -name .git)
+    #        if [ -n "$tGitDir" ]; then
+    #            tFound=2
+    #        fi
+    #    fi
     cd - >/dev/null 2>&1
     if [ $tFound -ne 0 ]; then
         fError -n -m "$pDir must NOT be in a git repo" -l $tSrc:$LINENO
@@ -2005,7 +2005,7 @@ fComAllMustBeReadable()
 # --------------------
 fComIsGitRemoteAvailable()
 {
-# TBD not used yet
+    # TBD not used yet
     local pLevel="${1:-debug}"
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
@@ -2013,7 +2013,7 @@ fComIsGitRemoteAvailable()
     tOrigin=$(fComGetConfig -k "remote.origin.url" -d "TBD")
     if [ "$tOrigin" = "TBD" ]; then
         fLog -p $pLevel -m "remote.origin.url is not defined." -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     if git ls-remote $tOrigin >/dev/null 2>&1; then
         return 0
@@ -2025,14 +2025,14 @@ fComIsGitRemoteAvailable()
 # --------------------
 fComIsRawRemoteAvailable()
 {
-# TBD not used yet
+    # TBD not used yet
     local pLevel="${1:-debug}"
     local tSrc=${BASH_SOURCE##*/}
 
     gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
     if [ "$gpRemoteRawOrigin" = "TBD" ]; then
         fLog -p $pLevel -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
-	return 1
+        return 1
     fi
     # TBD: change this to use rclone
     if [ -d $gpRemoteRawOrigin ]; then

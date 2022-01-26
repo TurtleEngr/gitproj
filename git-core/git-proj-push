@@ -171,8 +171,8 @@ gpAuto=0
 while getopts :adgnyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
-	a) gpAuto=1 ;;
-	d) pDeleteRaw=1;;
+        a) gpAuto=1 ;;
+        d) pDeleteRaw=1 ;;
         g) pBranchFlag=1 ;;
         n) gpYesNo=No ;;
         y) gpYesNo=Yes ;;

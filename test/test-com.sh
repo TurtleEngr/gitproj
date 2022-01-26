@@ -227,7 +227,7 @@ testComFirstTimeSet()
     tResult=$(fComFirstTimeSet 2>&1)
     tResult=$(fComFirstTimeSet 2>&1)
     tResult=$(fComFirstTimeSet 2>&1)
-    assertTrue "$LINENO"  "[ -f $HOME/.gitconfig.bak.~1~ ]"
+    assertTrue "$LINENO" "[ -f $HOME/.gitconfig.bak.~1~ ]"
     assertFalse "$LINENO" "[ -f $HOME/.gitconfig.bak.~2~ ]"
     ##assertContains "$LINENO $(ls -a $HOME)" "$tResult" "xxx-comment-out-if-OK"
 

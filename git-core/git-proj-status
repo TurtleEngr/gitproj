@@ -149,8 +149,8 @@ pGitOpt=""
 pRawOpt=""
 while getopts :g:r:hH:qvV:xX: tArg; do
     case $tArg in
-	g) pGitOpt="$pGitOpt $OPTARG" ;;
-	r) pRawOpt="$pRawOpt $OPTARG" ;;
+        g) pGitOpt="$pGitOpt $OPTARG" ;;
+        r) pRawOpt="$pRawOpt $OPTARG" ;;
         # Script arguments
         # Common arguments
         h) fUsage long ;;

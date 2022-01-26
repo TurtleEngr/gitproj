@@ -171,8 +171,8 @@ testSetUp()
     assertFalse "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
     assertFalse "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
 
-    assertTrue "$LINENO"  "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
-    assertTrue "$LINENO"  "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
+    assertTrue "$LINENO" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
 
     cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
     HOME=$cDatHome2

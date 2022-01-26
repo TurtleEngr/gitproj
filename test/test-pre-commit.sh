@@ -110,12 +110,11 @@ setUp()
 
     # Patch things that may have been in the tar file
     for tConf in \
-            $cDatHome3/project/george/.gitproj.config.testserver \
-            $cDatHome3/project/george/.gitproj.config.testserver2 \
-            $cDatHome3/project/george/.gitproj.config.local \
-            $cDatHome3/project/george/.*.bak \
-            $cDatHome3/project/george/.*.bak.*~ \
-	; do
+        $cDatHome3/project/george/.gitproj.config.testserver \
+        $cDatHome3/project/george/.gitproj.config.testserver2 \
+        $cDatHome3/project/george/.gitproj.config.local \
+        $cDatHome3/project/george/.*.bak \
+        $cDatHome3/project/george/.*.bak.*~; do
         rm -f $fConfig >/dev/null 2>&1
     done
     git config -f $cDatHome3/project/george/.gitproj gitproj.config.ver $tVer
