@@ -4,13 +4,13 @@
 
 ProdName=git-proj
 ProdAlias=git-proj
-ProdVer=0.3.2
+ProdVer=0.4.1
 ProdRC=
 ProdBuild=1
-ProdBuildTime=2022.01.24.23.29
+ProdBuildTime=2022.01.26.5.14
 ProdSvnVer=
-ProdWinVer=0.3.2
-ProdDate=2022-01-24
+ProdWinVer=0.4.1
+ProdDate=2022-01-26
 ProdSummary=git-proj implements a git subcommand for managing large binary files.
 ProdDesc=git-proj mostly solves the issue with large binary files causing git repo 'bloat'. Large files are not versioned, they are only copied. This is a much simpler implementation than git-lfs.
 ProdSupport=turtle.engr@gmail.com
@@ -29,7 +29,7 @@ ProdRelRoot=/rel
 ProdRelCategory=software/ThirdParty/git-proj/mx
 ProdRelDir=/rel/released/software/ThirdParty/git-proj/mx
 ProdDevDir=/rel/development/software/ThirdParty/git-proj/mx
-ProdTag=tag-0-3-2-1
+ProdTag=tag-0-4-1-1
 ProdOS=mx19
 ProdOSDist=mx
 ProdOSVer=19.4

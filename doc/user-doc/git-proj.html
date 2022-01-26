@@ -63,6 +63,7 @@
     <li><a href="#DESCRIPTION4">DESCRIPTION</a></li>
     <li><a href="#OPTIONS4">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE3">RETURN VALUE</a></li>
+    <li><a href="#EXAMPLES1">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO4">SEE ALSO</a></li>
     <li><a href="#AUTHOR4">AUTHOR</a></li>
     <li><a href="#HISTORY4">HISTORY</a></li>
@@ -684,20 +685,37 @@
   <hr />
   <h1 id="NAME-git-proj-push">NAME git proj push</h1>
   <h1 id="SYNOPSIS4">SYNOPSIS</h1>
-  <pre><code>    git proj push [-b] [-y|-n] [common-options]</code></pre>
+  <pre><code>    git proj push [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION4">DESCRIPTION</h1>
   <pre><code> rsync will be used top copy the '[ProjName]/raw/' files to
  [remote-raw-origin]/[ProjName].raw.</code></pre>
-  <p>If the -b option is given then run:</p>
-  <pre><code> "git push origin [current-branch]"</code></pre>
   <h1 id="OPTIONS4">OPTIONS</h1>
   <dl>
-    <dt id="b"><b>-b</b></dt>
-    <dd></dd>
+    <dt id="g"><b>-g</b></dt>
+    <dd>
+      <p>If the -g option is given then run:</p>
+      <pre><code> "git push origin [current-branch]"</code></pre>
+    </dd>
+    <dt id="d"><b>-d</b></dt>
+    <dd>
+      <p>If the -d option is used, then the remote raw/ will be made
+      identical to the local raw/. I.e. files might be deleated from the
+      remote raw/.</p>
+      <p>See the EXAMPLES section for a "save" way to use this option.</p>
+    </dd>
+    <dt id="a2"><b>-a</b></dt>
+    <dd>
+      <p>This turns on automated push for raw/ files. Use the -y or -n to
+      select the action. -n will just display what would be done.</p>
+      <p>If there is a -d option, that will be removed and the -n option will
+      be added. -d could be very distructive, so it needs to be run
+      interactively.</p>
+    </dd>
     <dt id="y--n1"><b>-y|-n</b></dt>
     <dd>
-      <p>If -y, then default to "yes" to all prompts to continue.</p>
-      <p>If -n, then default to "no" to all prompts to continue.</p>
+      <p>If -y, then push files to the remote raw/</p>
+      <p>If -n, then just show what would be pushed to the remote raw/</p>
+      <p>Default: -n</p>
     </dd>
     <dt id="common-options4"><b>[common-options]</b></dt>
     <dd>
@@ -711,6 +729,13 @@
   <h1 id="RETURN-VALUE3">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
+  <h1 id="EXAMPLES1">EXAMPLES</h1>
+  <p>The rsync (and rclone) updates of the files in raw/ are not versioned,
+  so be very careful with the -d option; files will be permanently
+  deleted.</p>
+  <p>For a "safe" way, of updating the files in raw/, is to do a "push", then
+  "pull" with no -d. Then manually remove files you don't want in the local
+  raw/. Now run "push" with -d, to update the remote raw/</p>
   <h1 id="SEE-ALSO4">SEE ALSO</h1>
   <pre><code> git proj
  git proj init
@@ -729,20 +754,39 @@
   <hr />
   <h1 id="NAME-git-proj-pull">NAME git proj pull</h1>
   <h1 id="SYNOPSIS5">SYNOPSIS</h1>
-  <pre><code>    git proj pull [-b] [-y|-n] [common-options]</code></pre>
+  <pre><code>    git proj pull [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION5">DESCRIPTION</h1>
   <p>rsync will be used top copy the [remote-raw-origin]/[ProjName].raw/
   files to '[ProjName]/raw/'.</p>
-  <p>If the -b option is given then run:</p>
+  <p>If the -g option is given then run:</p>
   <pre><code> "git pull origin [current-branch]"</code></pre>
   <h1 id="OPTIONS5">OPTIONS</h1>
   <dl>
-    <dt id="b1"><b>-b</b></dt>
-    <dd></dd>
+    <dt id="g1"><b>-g</b></dt>
+    <dd>
+      <p>If the -g option is given then run:</p>
+      <pre><code> "git push origin [current-branch]"</code></pre>
+    </dd>
+    <dt id="d1"><b>-d</b></dt>
+    <dd>
+      <p>If the -d option is used, then the local raw/ will be made identical
+      to the remote raw/. I.e. files might be deleated from the local
+      raw/.</p>
+      <p>See the help EXAMPLES section, in "git proj push", for a "save" way
+      to use this option.</p>
+    </dd>
+    <dt id="a3"><b>-a</b></dt>
+    <dd>
+      <p>This turns on automated push for raw/ files. Use the -y or -n to
+      select the action. -n will just display what would be done.</p>
+      <p>If there is a -d option, that will be removed and the -n option will
+      be added. -d could be very distructive, so it needs to be run
+      interactively.</p>
+    </dd>
     <dt id="y--n2"><b>-y|-n</b></dt>
     <dd>
-      <p>If -y, then default to "yes" to all prompts to continue.</p>
-      <p>If -n, then default to "no" to all prompts to continue.</p>
+      <p>If -y, then pull files from the remote raw/</p>
+      <p>If -n, then just show what would be pulled from the remote raw/</p>
     </dd>
     <dt id="common-options5"><b>[common-options]</b></dt>
     <dd>
@@ -787,21 +831,21 @@
     <dt id="g-pGitOpt"><b>-g "pGitOpt"</b></dt>
     <dd>
       <p>Git status options. For example:</p>
-      <p>git proj status -g "--short --ignored"</p>
+      <pre><code>    git proj status -g "-s --ignored"</code></pre>
     </dd>
     <dt id="r-pRawOpt"><b>-r "pRawOpt"</b></dt>
     <dd>
       <p>Raw options. Currently these will be options passed to the diff
       command. (This will be added after the default options: -qr) For
       example:</p>
-      <p>git proj status -r "-s"</p>
+      <pre><code>    git proj status -r "-s"</code></pre>
     </dd>
     <dt id="common-options6"><b>[common-options]</b></dt>
     <dd>
-      <pre><code> -h
- -H pStyle
- -q, -v, -V N     (gpVerbose)
- -x, -xx..., -X N (gpDebug)</code></pre>
+      <pre><code>    -h
+    -H pStyle
+    -q, -v, -V N     (gpVerbose)
+    -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details. Or "man git-proj" for help with all
       the subcommands.</p>
     </dd>
