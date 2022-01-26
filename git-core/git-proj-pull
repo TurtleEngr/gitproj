@@ -24,14 +24,14 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj pull [-b] [-y|-n] [common-options]
+    git proj pull [-g] [-d] [-a] [-y|-n] [common-options]
 
 =head1 DESCRIPTION
 
 rsync will be used top copy the [remote-raw-origin]/[ProjName].raw/ files
 to '[ProjName]/raw/'.
 
-If the -b option is given then run:
+If the -g option is given then run:
 
  "git pull origin [current-branch]"
 
@@ -39,13 +39,34 @@ If the -b option is given then run:
 
 =over 4
 
-=item B<-b>
+=item B<-g>
+
+If the -g option is given then run:
+
+ "git push origin [current-branch]"
+
+=item B<-d>
+
+If the -d option is used, then the local raw/ will be made identical
+to the remote raw/. I.e. files might be deleated from the local raw/.
+
+See the help EXAMPLES section, in "git proj push", for a "save" way to
+use this option.
+
+=item B<-a>
+
+This turns on automated push for raw/ files. Use the -y or -n to
+select the action. -n will just display what would be done.
+
+If there is a -d option, that will be removed and the -n option
+will be added. -d could be very distructive, so it needs to be
+run interactively.
 
 =item B<-y|-n>
 
-If -y, then default to "yes" to all prompts to continue.
+If -y, then pull files from the remote raw/
 
-If -n, then default to "no" to all prompts to continue.
+If -n, then just show what would be pulled from the remote raw/
 
 =item B<[common-options]>
 
@@ -137,12 +158,16 @@ cd - >/dev/null 2>&1
 fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
-tBranchFlag=0
+pBranchFlag=0
+pDeleteRaw=0
 gpYesNo=""
-while getopts :bnyhH:qvV:xX: tArg; do
+gpAuto=0
+while getopts :adgbnyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
-        b) tBranchFlag=1 ;;
+	a) gpAuto=1 ;;
+	d) pDeleteRaw=1;;
+        g) pBranchFlag=1 ;;
         n) gpYesNo=No ;;
         y) gpYesNo=Yes ;;
         # Common arguments
@@ -162,7 +187,12 @@ shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
 fi
+if [[ ${gpAuto:-0} -ne 0 && $pDeleteRaw -ne 0 ]]; then
+    pDeleteRaw=0
+    gpYesNo=No
+    fLog -f -p warning -m "-d cannot be used with -a. Removing -d option and adding -n option." -l $tSrc:$LINENO
+fi
 
 # ----------
-fPullFromOrigin $tBranchFlag
+fPullFromOrigin $pBranchFlag $pDeleteRaw
 exit 0

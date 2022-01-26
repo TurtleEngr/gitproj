@@ -9,8 +9,7 @@ export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
     gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
     gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus gpLocalTopDir \
     gpMaxLoop gpMaxSize gpMountDir gpPath gpPreCommitEnabled gpProjName \
-    gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpVerboseFlag \
-    gpYesNo
+    gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose gpYesNo
 
 # --------------------------------
 fComGitProjInternalDoc()
@@ -112,16 +111,16 @@ where the variables are set.
 
 =internal-head3 Global Variables
 
- gpSysLog - -l
- gpVerbose - -q, -v, -vv, -V N (default: 2)
- gpDebug - -x, -xx..., -X N (default: 0)
- gErr - error code (0 = no error)
+ gpSysLog - true/false
+ gpVerbose - -q (-V0), -v (-V2), -V N (default: 2)
+ gpDebug - -x (-X1), -xx..., -X N (default: 0)
  gpCmdName - script's name taken from $0
  gpBin - directory where the script is executing from
  gpDoc - directory for config/, hooks/
  gpTest - $gBin/../test (only set if in dev dir)
 
-For more help, see the Globals section in git-proj fUsage.
+For more variables and help, see the "Global Env. Var. Config" section
+in git-proj fUsage.
 
 =internal-head3 Documentation Format
 
@@ -149,10 +148,13 @@ See fComInternalDoc for how this is used.
 
 =internal-head3 try/catch functions
 
+B<NOTE the env. var. part does not reliably work. So don't use the
+"tc" functions until they are fixed.>
+
 These functions were inspired by:
 https://gist.github.com/e7d/e43e6586c1c2ecb67ae2
 
-Changes: The previous state of "set -e" is not saved.  Exported
+Changes: This version doesn't save the previous state of "set -e".  Exported
 env. var. changes in the subshell are saved, so they can be restored
 when the subshell is done.
 
@@ -198,46 +200,81 @@ Calls tcSaveEnv.
 
     export cFatal=100
     export cWarn=101
+    export cmd1 cmd2 foo1 foo2 foo3
 
-    tcTry
-    (
-        n=$((RANDOM % 3))
-        if [ $n = 1 ]; then
-            tcThrow $cFatal
-        fi
-        export foo1="this will not be set if tcThrow is run"
-
-        tcThrowErrors
-        # Commands will now go to tcCatch if non-zero return
-
-        export foo2="Set, if no throw an no errors later"
-        tcSaveEnv
-
-        n=$((RANDOM % 3))
-        if [ $n = 1 ]; then
-            rm bar
-        fi
-        export foo3="this is set because 'rm' was not run", and tcSaveEnv ran
-        tcSaveEnv
-
-        # This will fail after it is created, second run, if no throws
-        mkdir foo-bar
-        export foo4="This not be set on second run"
-
-        tcReturn
-    )
-    fCatch || {
-        case $gErr in
-            1)       echo "Caught: Expected: rm happended" ;;
-            $cFatal) echo "Caught: Throw happened" ;;
-            $cWarn)  echo "Caught: Warning" ;;
-            *)       echo "Caught: Unknown exit: $gErr" ;;
-        esac
+    fCmd1()
+    {
+	tcMsg="fCmd1 error"
+        if [ $((RANDOM % 3)) = 1 ]; then
+	    rm /x/y/zz/y
+	fi
+	echo cmd1="fCmd1 ran OK"
     }
-    echo foo1=$foo1
-    echo foo2=$foo2
-    echo foo3=$foo3
-    echo foo4=$foo4
+
+    fCmd2()
+    {
+	tcMsg="fCmd2 error"
+        if [ $((RANDOM % 4)) = 1 ]; then
+	    rm /x/y/zz/y
+	fi
+	if [ $((RANDOM % 4)) = 1 ]; then
+	  tcThrow 42 "fCmd2 threw this"
+	fi
+	echo cmd2="fCmd2 ran OK"
+    }
+
+    fTestIt()
+    {
+	tcMessage="Default message for exits"
+        tcTry
+        (
+            # This is an error, but execution will continue
+            rm /x/y/zz/y
+
+            tcThrowErrors
+            # Commands will now go to tcCatch if non-zero return
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                tcThrow $cFatal "Throw message. Line=$LINENO"
+            fi
+            export foo1="this will not be set if tcThrow is run"
+            tcSaveEnv
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                rm /x/y/zz/y
+            fi
+            export foo2="this is set because 'rm' was not run", and tcSaveEnv ran
+            tcSaveEnv
+
+            fCmd1
+            fCmd2
+
+            # This will fail after it is created, second run, if no throws
+            mkdir foo-bar
+            export foo3="This not be set on second run"
+
+            tcReturn
+        )
+        tcCatch || {
+            case $tcErr in
+                $cFatal)
+                    echo "Caught: Throw happened. $tcMsg"
+                    ;;
+                $cWarn)
+                    echo "Caught: Warning. $tcMsg"
+                    ;;
+                *)  echo "Caught: Unknown exit: $tcErr. $tcMsg" ;;
+            esac
+        }
+	echo
+        echo foo1=$foo1
+        echo foo2=$foo2
+        echo foo3=$foo3
+        echo cmd1=$cmd1
+        echo cmd2=$cmd1
+    } # fTestIt
+
+    fTestIt
 
 =internal-cut
 
@@ -252,17 +289,18 @@ tcTry()
 {
     # Call this just before a subshell
     set +e
-    export gErr=0
-    export cEnvBefore=/tmp/env-before-$$.tmp
-    export cEnvAfter=/tmp/env-after-$$.tmp
-    export cEnvDiff=/tmp/env-diff-$$.sh
-    env | sort >$cEnvBefore
+    export tcErr=0
+    export tcMsg=""
+    export tcEnvBefore=/tmp/env-before-$$.tmp
+    export tcEnvAfter=/tmp/env-after-$$.tmp
+    export tcEnvDiff=/tmp/env-diff-$$.sh
+    env | sort >$tcEnvBefore
 }
 
 tcSaveEnv()
 {
     # Call this when env changes must not be lost
-    env | sort >$cEnvAfter
+    env | sort >$tcEnvAfter
 }
 
 tcReturn()
@@ -274,39 +312,40 @@ tcReturn()
 
 tcThrow()
 {
-    # Call this to throw error (1..255) to catch
+    tcErr=${1:-0}
+    tcMsg=${2:-$tcMsg}
     tcSaveEnv
-    exit $1
+    exit $tcErr
 }
 
 tcCatch()
 {
-    # Save throw or cmd error, and set any env. var. changes
-    gErr=$?
+    # Save error code, and set any env. var. changes, including tcMsg
+    tcErr=$?
     set +e
-    if [ -f $cEnvAfter ]; then
-        diff $cEnvBefore $cEnvAfter | grep '>' | sed 's/^> //; s/=/="/; s/$/"/' >$cEnvDiff
-        chmod a+rx $cEnvDiff
-        . $cEnvDiff
-        if [ $gErr -eq 0 ]; then
+    if [ -f $tcEnvAfter ]; then
+        diff $tcEnvBefore $tcEnvAfter | grep '>' | sed 's/^> //; s/=/="/; s/$/"/' >$tcEnvDiff
+        chmod a+rx $tcEnvDiff
+        . $tcEnvDiff
+        if [ $tcErr -eq 0 ]; then
             cd $PWD
         fi
     fi
-    rm -f $cEnvBefore $cEnvAfter $cEnvDiff >/dev/null 2>&1
-    unset cEnvBefore cEnvAfter cEnvDiff
-    return $gErr
+    rm -f $tcEnvBefore $tcEnvAfter $tcEnvDiff >/dev/null 2>&1
+    unset tcEnvBefore tcEnvAfter tcEnvDiff
+    return $tcErr
 }
 
 tcThrowErrors()
 {
-    # Now if a cmd returns non-zero, exit try subshell
+    # Now if any cmd returns non-zero, exit the "try" subshell
     tcSaveEnv
     set -e
 }
 
 tcIgnoreErrors()
 {
-    # Now if a cmd returns non-zero, execution will continue
+    # Now if any cmd returns non-zero, execution will continue
     tcSaveEnv
     set +e
 }
@@ -357,7 +396,7 @@ fComConfigCopy()
     local pIncPat=""
     local pExcPat="@@"
     local tSrc=${BASH_SOURCE##*/}
-    local tVerbose
+    local tVerbose=""
     declare -l tVar
     local tValue
     local tFound
@@ -365,7 +404,7 @@ fComConfigCopy()
     local OPTARG
     local tArg
 
-    if [ $gpVerbose -gt 0 ]; then
+    if [ $gpVerbose -ge 2 ]; then
         tVerbose='-v'
     fi
 
@@ -419,6 +458,9 @@ fComConfigCopy()
         fi
         git config -f $pDest $tVar "$tValue"
     done
+    if diff -q $pDest $pDest.bak; then
+        rm -f $pDest.bak
+    fi
 
     return 0
     # ----------------------
@@ -498,10 +540,15 @@ fComFirstTimeSet()
     local tInclude
     local tUserName
     local tUserEmail
+    local tVerbose
+
+    if [ $gpVerbose -ge 2 ]; then
+        tVerbose='-v'
+    fi
 
     if [ ! -f $HOME/.gitconfig ]; then
-        fLog -p info -m "Create: $HOME/.gitconig" -l $tSrc:$LINENO
-        cp $gpDoc/config/gitconfig $HOME/.gitconfig
+        fLog -p info -m "Create: $HOME/.gitconfig" -l $tSrc:$LINENO
+        cp $tVerbose --backup=t $gpDoc/config/gitconfig $HOME/.gitconfig
         return 0
     fi
 
@@ -582,11 +629,7 @@ fComSetGlobals()
     gpDebug=${gpDebug:-0}
 
     # -v
-    gpVerbose=${gpVerbose:-0}
-    gpVerboseFlag=''
-    if [ $gpVerbose -gt 0 ]; then
-        gpVerboseFlag='-v'
-    fi
+    gpVerbose=${gpVerbose:-2}
 
     # -l
     gpSysLog=${gpSysLog:-false}
@@ -803,7 +846,7 @@ fComUsage()
             ;;
         *)
             tProg=pod2text
-            fLog -p warning -m "Unknown style: $pStyle so usiing text" -l $tSrc:$LINENO
+            fLog -p warning -m "Unknown style: '$pStyle' so usiing text" -l $tSrc:$LINENO
             ;;
     esac
 
@@ -979,7 +1022,7 @@ fComYesNo()
     local tSrc=${BASH_SOURCE##*/}
     declare -l tResult
 
-    if [ $gpAuto -ne 0 ]; then
+    if [ ${gpAuto:-0} -ne 0 ]; then
         if [ "$gpYesNo" = "Yes" ]; then
             gResponse="Yes"
             return 0
@@ -988,12 +1031,12 @@ fComYesNo()
             gResponse="No"
             return 1
         fi
+	return 1
     fi
 
     echo -n "$pPrompt [y/n]? "
     read -r tResult
-    tResult=${tResult%${tResult#[a-z]}}
-    if [ "$tResult" = "y" ]; then
+    if [ "${tResult::1}" = "y" ]; then
         gResponse="Yes"
         return 0
     fi
@@ -1960,26 +2003,63 @@ fComAllMustBeReadable()
 } # fComAllMustBeReadable
 
 # --------------------
+fComIsGitRemoteAvailable()
+{
+# TBD not used yet
+    local pLevel="${1:-debug}"
+    local tSrc=${BASH_SOURCE##*/}
+    local tOrigin
+
+    tOrigin=$(fComGetConfig -k "remote.origin.url" -d "TBD")
+    if [ "$tOrigin" = "TBD" ]; then
+        fLog -p $pLevel -m "remote.origin.url is not defined." -l $tSrc:$LINENO
+	return 1
+    fi
+    if git ls-remote $tOrigin >/dev/null 2>&1; then
+        return 0
+    fi
+    fLog -p $pLevel -m "$tOrigin was not found. Try again after mounting it or run 'git proj remote' to change the remote.raw.dir location." -l $tSrc:$LINENO
+    return 1
+} # fComIsGitRemoteAvailable
+
+# --------------------
+fComIsRawRemoteAvailable()
+{
+# TBD not used yet
+    local pLevel="${1:-debug}"
+    local tSrc=${BASH_SOURCE##*/}
+
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
+    if [ "$gpRemoteRawOrigin" = "TBD" ]; then
+        fLog -p $pLevel -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
+	return 1
+    fi
+    # TBD: change this to use rclone
+    if [ -d $gpRemoteRawOrigin ]; then
+        return 0
+    fi
+    fLog -p $pLevel -m "$gpRemoteRawOrigin was not found. Try again after mounting it or run 'git proj remote' to change the remote.raw.dir location." -l $tSrc:$LINENO
+    return 1
+} # fComIsRawRemoteAvailable
+
+# --------------------
 fComIsRemoteMounted()
 {
-    local pWarn="$1"
+    local pLevel="${1:-debug}"
     local tSrc=${BASH_SOURCE##*/}
 
     # Assumes we are in a gitproj managed dir
+    # And this assumes remotes are local disks
 
-    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
-    if [ "$gpRemoteRawOrigin" = "None" ]; then
-        fError -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
+    gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
+    if [ "$gpRemoteRawOrigin" = "TBD" ]; then
+        fLog -p $pLevel -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
     if [ -d $gpRemoteRawOrigin ]; then
         return 0
     fi
-
-    if [ -n "$pWarn" ]; then
-        # Just return error code if not found
-        return 1
-    fi
-    fError -m "$gpRemoteRawOrigin was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location." -l $tSrc:$LINENO
+    fLog -p $pLevel -m "$gpRemoteRawOrigin was not found. Try again after mounting it or run 'git proj remote' to change the remote.raw.dir location." -l $tSrc:$LINENO
+    return 1
 } # fComIsRemoteMounted
 
 # --------------------

@@ -67,17 +67,6 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 1
-} # oneTimeSetUp
-
-NAoneTimeTearDown()
-{
-    return 1
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     # Restore default global values, before each test
@@ -89,15 +78,14 @@ setUp()
         gpLocalTopDir gpMaxSize \
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
+    local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tVer
+    local tConf
+
     HOSTNAME=testserver2
     fTestSetupEnv
     fTestCreateEnv
-
-    local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
-    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
-    local tVer=$(cat $gpDoc/VERSION)
-    tVer=$(echo $tVer)
-    local tConf
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
     cd $cTestDestDir >/dev/null 2>&1
@@ -119,13 +107,21 @@ setUp()
     HOME=$cDatHome3
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
 
-    # Patch the version that was set in the tar file
+    tVer=$(cat $gpDoc/VERSION)
+    tVer=$(echo $tVer)
+
+    # Patch things that may have been in the tar file
     for tConf in \
-        $HOME/project/george/.gitproj.config.local \
-        $HOME/project/george/.gitproj.config.testserver \
-        $HOME/project/george/.gitproj.config.testserver2; do
-        git config -f $tConf gitproj.config.ver $tVer
+            $cDatHome3/project/george/.gitproj.config.testserver \
+            $cDatHome3/project/george/.gitproj.config.testserver2 \
+            $cDatHome3/project/george/.gitproj.config.local \
+            $cDatHome3/project/george/.*.bak \
+            $cDatHome3/project/george/.*.bak.*~ \
+	; do
+        rm -f $fConfig >/dev/null 2>&1
     done
+    git config -f $cDatHome3/project/george/.gitproj gitproj.config.ver $tVer
+    git config -f $cDatHome3/project/george/.git/config gitproj.config.ver $tVer
 
     cd $HOME/project/george >/dev/null 2>&1
     . $gpBin/gitproj-status.inc

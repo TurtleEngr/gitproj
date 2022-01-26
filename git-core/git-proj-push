@@ -24,28 +24,46 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj push [-b] [-y|-n] [common-options]
+    git proj push [-g] [-d] [-a] [-y|-n] [common-options]
 
 =head1 DESCRIPTION
 
  rsync will be used top copy the '[ProjName]/raw/' files to
  [remote-raw-origin]/[ProjName].raw.
 
-If the -b option is given then run:
-
- "git push origin [current-branch]"
-
 =head1 OPTIONS
 
 =over 4
 
-=item B<-b>
+=item B<-g>
+
+If the -g option is given then run:
+
+ "git push origin [current-branch]"
+
+=item B<-d>
+
+If the -d option is used, then the remote raw/ will be made identical
+to the local raw/. I.e. files might be deleated from the remote raw/.
+
+See the EXAMPLES section for a "save" way to use this option.
+
+=item B<-a>
+
+This turns on automated push for raw/ files. Use the -y or -n to
+select the action. -n will just display what would be done.
+
+If there is a -d option, that will be removed and the -n option
+will be added. -d could be very distructive, so it needs to be
+run interactively.
 
 =item B<-y|-n>
 
-If -y, then default to "yes" to all prompts to continue.
+If -y, then push files to the remote raw/
 
-If -n, then default to "no" to all prompts to continue.
+If -n, then just show what would be pushed to the remote raw/
+
+Default: -n
 
 =item B<[common-options]>
 
@@ -65,7 +83,14 @@ Run "git proj -h" for details.
 
 =for comment =head1 ERRORS
 
-=for comment =head1 EXAMPLES
+=head1 EXAMPLES
+
+The rsync (and rclone) updates of the files in raw/ are not versioned, so
+be very careful with the -d option; files will be permanently deleted.
+
+For a "safe" way, of updating the files in raw/, is to do a "push",
+then "pull" with no -d. Then manually remove files you don't want in
+the local raw/. Now run "push" with -d, to update the remote raw/
 
 =for comment=head1 ENVIRONMENT
 
@@ -139,12 +164,16 @@ cd - >/dev/null 2>&1
 fComGetProjGlobals
 
 tSrc=${BASH_SOURCE##*/}
-tBranchFlag=0
-gpYesNo=""
-while getopts :bnyhH:qvV:xX: tArg; do
+pBranchFlag=0
+pDeleteRaw=0
+gpYesNo="No"
+gpAuto=0
+while getopts :adgnyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
-        b) tBranchFlag=1 ;;
+	a) gpAuto=1 ;;
+	d) pDeleteRaw=1;;
+        g) pBranchFlag=1 ;;
         n) gpYesNo=No ;;
         y) gpYesNo=Yes ;;
         # Common arguments
@@ -164,7 +193,12 @@ shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
 fi
+if [[ ${gpAuto:-0} -ne 0 && $pDeleteRaw -ne 0 ]]; then
+    pDeleteRaw=0
+    gpYesNo=No
+    fLog -f -p warning -m "-d cannot be used with -a. Removing -d option and adding -n option." -l $tSrc:$LINENO
+fi
 
 # ----------
-fPushToOrigin $tBranchFlag
+fPushToOrigin $pBranchFlag $pDeleteRaw
 exit 0

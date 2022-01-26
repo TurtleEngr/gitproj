@@ -67,47 +67,6 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 0
-
-    cat <<EOF >/dev/null
-=internal-pod
-
-=internal-head2 Test gitproj-pull.inc
-
-=internal-head3 oneTimeSetuUp
-
-Currently this records all of the script's expected initial global
-variable settings, defined in fComSetGlobals. If different, adjust the
-tests as needed.
-
-Env Var
-
- HOME - this is set to the test user's home dir
- gpUnitDebug - this can be manually set to 1 in unit test functions.
-
-Calls:
-
- $gpBin/gitproj-com.inc
- fComSetGlobals
-
-=internal-cut
-EOF
-} # oneTimeSetUp
-
-# --------------------------------
-NAoneTimeTearDown()
-{
-    if [ $gpDebug -ne 0 ]; then
-        fTestRmEnv
-    fi
-    if [ -n "$cHome" ]; then
-        HOME=$cHome
-    fi
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     local tVer=$(cat $gpDoc/VERSION)
@@ -130,16 +89,15 @@ setUp()
     cd - >/dev/null 2>&1
 
     # Patch the version that was set in the tar file
-    for tConf in \
-        $cDatHome/$cDatProj1/.gitproj.config.testserver \
-        $cDatHome/$cDatProj1/.gitproj.config.local \
-        $cDatHome2/$cDatProj1/.gitproj.config.testserver \
-        $cDatHome2/$cDatProj1/.gitproj.config.local; do
-        git config -f $tConf gitproj.config.ver $tVer
-    done
+
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
+    fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     git ci -am "Updated" >/dev/null 2>&1
+
     cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
+    fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
+    fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     git ci -am "Updated" >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
@@ -147,21 +105,24 @@ setUp()
 
     # --------
     # Make changes to $cDatHome2 area
+
     cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
     HOME=$cDatHome2
     fComGetProjGlobals
+
     # Add a file to local raw/ and remove a file from local raw/
-    echo "Make a new file in bob dir" >raw/NewFile2.txt
+    echo "Make a new file" >raw/NewFile2.txt
     rm raw/src/raw/MOV001.mp4
 
     # Add a file to local git, and change a file in local git
-    echo "Add a file to git area, in bob dir" >doc/NewFileFromBob.txt
-    git add doc/NewFileFromBob.txt >/dev/null 2>&1
-    ##git status
-    git commit -am Added >/dev/null 2>&1
+    echo "Add a file to git area" >doc/NewFileFromBob.txt
+    echo 'Make a change' >>README.html
+    git add doc/NewFileFromBob.txt README.html >/dev/null 2>&1
+    git commit -am Updated >/dev/null 2>&1
+    git push origin develop >/dev/null 2>&1
 
     # Push changes to remote ($gpRemoteRawOrigin)
-    $gpBin/git-proj-push -b -y >/dev/null 2>&1
+    $gpBin/git-proj-push -d >/dev/null 2>&1 < <(echo -e "y")
 
     # --------
     # Now test "git proj pull" command and functions, from this user
@@ -202,65 +163,93 @@ testSetUp()
 {
     local tResult
 
-    assertTrue "$LINENO $cDatHome2/$cDatProj1/raw/NewFile2.txt" "[ -f $cDatHome2/$cDatProj1/raw/NewFile2.txt ]"
-    assertTrue "$LINENO $gpRemoteRawOrigin/NewFile2.txt" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    HOME=$cDatHome
+    fComGetProjGlobals
 
-    assertTrue "$LINENO $cDatHome2/$cDatProj1/raw/src/raw/MOV001.mp4" "[ ! -f $cDatHome2/$cDatProj1/raw/src/raw/MOV001.mp4 ]"
-    assertTrue "$LINENO $gpRemoteRawOrigin/raw/src/raw/MOV001.mp4" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
+    assertFalse "$LINENO" "[ -f raw/NewFile2.txt ]"
+    assertFalse "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertFalse "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
 
-    assertTrue "$LINENO $cDatHome2/$cDatProj1/doc/NewFileFromBob.txt" "[ -f $cDatHome2/$cDatProj1/doc/NewFileFromBob.txt ]"
+    assertTrue "$LINENO"  "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
+    assertTrue "$LINENO"  "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
+
+    cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
+    HOME=$cDatHome2
+    fComGetProjGlobals
+
+    assertTrue "$LINENO" "[ -f raw/NewFile2.txt ]"
+    assertTrue "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
+
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
+    assertTrue "$LINENO" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
 
     return 0
 } # testSetUp
 
 # --------------------------------
-testPullRawFiles()
+testPullRawFilesNoDelete()
 {
     local tResult
 
     # Setup a change in raw files in $cDatHome/$cDatProj1
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    fComGetProjGlobals
 
-    # Pull the changes from remote
-
-    # 1) QUIT
-    tResult=$(fPullRawFiles 2>&1 < <(echo -e "1\n"))
+    # No Pull
+    tResult=$(fPullRawFiles 1 2>&1 < <(echo -e "n"))
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
-    assertContains "$LINENO $tResult" "$tResult" "src/raw: MOV001.mp4"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    # 2) HELP
-    tResult=$(fPullRawFiles 2>&1 < <(echo -e "2\n1\n"))
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "if the above differences look OK"
-    assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
-    assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
-
-    # 4) No-skip-pulling
-    tResult=$(fPullRawFiles 2>&1 < <(echo -e "4\n"))
-    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "raw: NewFile2.txt"
+    assertContains "$LINENO $tResult" "$tResult" "raw/src/raw: MOV001.mp4"
+    assertContains "$LINENO $tResult" "$tResult" "Dry Run"
     assertContains "$LINENO $tResult" "$tResult" "Nothing was pulled"
-    assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
+    assertFalse "$LINENO" "[ -f raw/NewFile2.txt ]"
+    assertFalse "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertFalse "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    # 3) Yes-pull-these-files
-    tResult=$(fPullRawFiles 2>&1 < <(echo -e "3\n"))
+    # Yes Pull, no delete
+    tResult=$(fPullRawFiles 0 2>&1 < <(echo -e "y"))
     assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
-    assertTrue "$LINENO" "[ -f raw/NewFile2.txt ]"
-    assertTrue "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertContains "$LINENO $tResult" "$tResult" "raw: NewFile2.txt"
+    assertContains "$LINENO $tResult" "$tResult" "raw/src/raw: MOV001.mp4"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
+    assertTrue "$LINENO" "[ -f raw/NewFile2.txt ]"
+    assertFalse "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertFalse "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
-
-    tResult=$(fPullRawFiles 2>&1)
-    assertTrue "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
 
     return 0
-} # testPullRawFiles
+} # testPullRawFilesNoDelete
+
+# --------------------------------
+testPullRawFilesDelete()
+{
+    local tResult
+
+    # Setup a change in raw files in $cDatHome/$cDatProj1
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    fComGetProjGlobals
+
+    # Yes Pull, delete
+    tResult=$(fPullRawFiles 1 2>&1 < <(echo -e "y"))
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "raw: NewFile2.txt"
+    assertContains "$LINENO $tResult" "$tResult" "raw/src/raw: MOV001.mp4"
+    assertContains "$LINENO $tResult" "$tResult" "total size is"
+    assertTrue "$LINENO" "[ -f raw/NewFile2.txt ]"
+    assertTrue "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
+    assertFalse "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
+
+    tResult=$(fPullRawFiles 0 2>&1 < <(echo -e "n"))
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
+
+    return 0
+} # testPullRawFilesDelete
 
 # --------------------------------
 testPullGit()
@@ -286,10 +275,11 @@ testPullGit()
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
+    assertContains "$LINENO $tResult" "$tResult" "2 files changed"
     assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
+    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     # TBD: what if a current local branch has no remote branch?
-    # TBD: what if the current branch has files that have not been committed?
     # TBD: merge conflicts with changed local files?
 
     return 0
@@ -300,7 +290,7 @@ testPullFromOrigin()
 {
     local tResult
 
-    tResult=$(fPullFromOrigin 1 2>&1 < <(echo -e 3))
+    tResult=$(fPullFromOrigin 1 1 2>&1 < <(echo -e y))
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
@@ -322,11 +312,11 @@ testGitProjPullCLI()
 {
     local tResult
 
-    tResult=$($gpBin/git-proj-pull -b -V 3 -y 2>&1)
+    tResult=$($gpBin/git-proj-pull -g -d -V 3 2>&1 < <(echo -e y))
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
-    assertTrue "$LINENO" "[ -f raw/NewFile2.txt ]"
+    assertTrue "$LINENO $tResult" "[ -f raw/NewFile2.txt ]"
     assertTrue "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
     # git

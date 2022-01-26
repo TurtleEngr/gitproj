@@ -23,7 +23,7 @@
 
     Git status options. For example:
 
-    git proj status -g "--short --ignored"
+        git proj status -g "-s --ignored"
 
 - **-r "pRawOpt"**
 
@@ -31,7 +31,7 @@
     command. (This will be added after the default options: -qr) For
     example:
 
-    git proj status -r "-s"
+        git proj status -r "-s"
 
 - **\[common-options\]**
 

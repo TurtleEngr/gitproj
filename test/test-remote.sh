@@ -66,47 +66,6 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 0
-
-    cat <<EOF >/dev/null
-=internal-pod
-
-=internal-head2 Test gitproj-com.inc
-
-=internal-head3 oneTimeSetuUp
-
-Currently this records all of the script's expected initial global
-variable settings, defined in fComSetGlobals. If different, adjust the
-tests as needed.
-
-Env Var
-
- HOME - this is set to the test user's home dir
- gpUnitDebug - this can be manually set to 1 in unit test functions.
-
-Calls:
-
- $gpBin/gitproj-com.inc
- fComSetGlobals
-
-=internal-cut
-EOF
-} # oneTimeSetUp
-
-# --------------------------------
-NAoneTimeTearDown()
-{
-    if [ $gpDebug -ne 0 ]; then
-        fTestRmEnv
-    fi
-    if [ -n "$cHome" ]; then
-        HOME=$cHome
-    fi
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     local tTar=$gpTest/test-env_ProjLocalDefined.tgz
@@ -132,6 +91,7 @@ setUp()
     fComSetConfig -l -k "gitproj.config.ver" -v "$gpVer"
 
     . $gpBin/gitproj-remote.inc
+
     gpDebug=0
     gpVerbose=3
     gpMaxLoop=3

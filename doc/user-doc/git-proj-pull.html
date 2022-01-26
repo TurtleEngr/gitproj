@@ -23,20 +23,39 @@
   <hr />
   <h1 id="NAME-git-proj-pull"><a href="#_podtop_">NAME git proj pull</a></h1>
   <h1 id="SYNOPSIS"><a href="#_podtop_">SYNOPSIS</a></h1>
-  <pre><code>    git proj pull [-b] [-y|-n] [common-options]</code></pre>
+  <pre><code>    git proj pull [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION"><a href="#_podtop_">DESCRIPTION</a></h1>
   <p>rsync will be used top copy the [remote-raw-origin]/[ProjName].raw/
   files to '[ProjName]/raw/'.</p>
-  <p>If the -b option is given then run:</p>
+  <p>If the -g option is given then run:</p>
   <pre><code> "git pull origin [current-branch]"</code></pre>
   <h1 id="OPTIONS"><a href="#_podtop_">OPTIONS</a></h1>
   <dl>
-    <dt id="b"><b>-b</b></dt>
-    <dd></dd>
+    <dt id="g"><b>-g</b></dt>
+    <dd>
+      <p>If the -g option is given then run:</p>
+      <pre><code> "git push origin [current-branch]"</code></pre>
+    </dd>
+    <dt id="d"><b>-d</b></dt>
+    <dd>
+      <p>If the -d option is used, then the local raw/ will be made identical
+      to the remote raw/. I.e. files might be deleated from the local
+      raw/.</p>
+      <p>See the help EXAMPLES section, in "git proj push", for a "save" way
+      to use this option.</p>
+    </dd>
+    <dt id="a"><b>-a</b></dt>
+    <dd>
+      <p>This turns on automated push for raw/ files. Use the -y or -n to
+      select the action. -n will just display what would be done.</p>
+      <p>If there is a -d option, that will be removed and the -n option will
+      be added. -d could be very distructive, so it needs to be run
+      interactively.</p>
+    </dd>
     <dt id="y--n"><b>-y|-n</b></dt>
     <dd>
-      <p>If -y, then default to "yes" to all prompts to continue.</p>
-      <p>If -n, then default to "no" to all prompts to continue.</p>
+      <p>If -y, then pull files from the remote raw/</p>
+      <p>If -n, then just show what would be pulled from the remote raw/</p>
     </dd>
     <dt id="common-options"><b>[common-options]</b></dt>
     <dd>

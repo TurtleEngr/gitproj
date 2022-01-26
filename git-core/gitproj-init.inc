@@ -481,7 +481,6 @@ fInitMkGitFlow()
     git flow init -d
 
     # Define the default prefixes
-
     fComSetConfig -g -k gitflow.branch.main -v main
     fComSetConfig -g -k gitflow.branch.master -v main
     fComSetConfig -g -k gitflow.branch.develop -v develop
@@ -500,12 +499,17 @@ fInitMkGitDir()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tStatus
+    local tVerbose=""
 
     cd $gpLocalTopDir >/dev/null 2>&1
 
+    if [ $gpVerbose -ge 2 ]; then
+        tVerbose='-v'
+    fi
+
     echo
     fLog -p notice -m "Create: .gitignore" -l $tSrc:$LINENO
-    cp $gpDoc/config/gitignore .gitignore
+    cp $tVerbose --backup=t $gpDoc/config/gitignore .gitignore
 
     echo
     fLog -p notice -m "git init" -l $tSrc:$LINENO
@@ -538,7 +542,7 @@ fInitMkGitDir()
     git status
 
     echo
-    cp -v $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+    cp $tVerbose --backup=t $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
 
     return 0
 } # fInitMkGitDir

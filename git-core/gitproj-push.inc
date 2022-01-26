@@ -13,73 +13,52 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 # --------------------
 fPushRawFiles()
 {
+    local pDeleteRaw=${1:-0}
     local tSrc=${BASH_SOURCE##*/}
     local tDiff
-    local tHelp
-    local tOpt="-azC --delete-after"
-    local tStatus
+    local tOpt="-azC"
+    local tDel=""
     local tVerbose
-    declare -l tReply
 
-    if [ $gpVerbose -ge 2 ]; then
-        tVervose=-viP
+    if [ $gpVerbose -ge 3 ]; then
+        tVerbose=-iP
+    fi
+    if [ ${pDeleteRaw:-0} -ne 0 ]; then
+        tDel="--delete --delete-after"
     fi
 
+    echo
+    echo '----------------------------------------'
+    echo 'raw/ push'
     tDiff=$(diff -rq $gpLocalTopDir/raw $gpRemoteRawOrigin 2>&1)
     if [ $? -eq 0 ]; then
-        tVerbose=$gpVerbose
-        fLog -p notice -m "There are no differences found with 'raw' files." -l $tSrc:$LINENO
-        gpVerbose=$tVerbose
+        fLog -f -p notice -m "There are no differences found with 'raw' files." -l $tSrc:$LINENO
         return 0
     fi
-
-    tHelp=$(
-        cat <<EOF
-
-diff summary:
-$tDiff
-
-Select 'Yes' if the above differences look OK."
-EOF
-    )
-    echo "$tHelp"
+    echo "diff summary:"
+    echo -E "$tDiff"
 
     if [ $gpVerbose -ne 0 ]; then
         cat <<EOF
 
 Dry Run:
-'rsync' $tOpt $tVerbose --dry-run
+'rsync' --dry-run $tOpt $tDel -v $tVerbose
         $gpLocalTopDir/raw/
-        $gpRemoteRawOrigin"
+        $gpRemoteRawOrigin
 EOF
-        'rsync' $tOpt $tVerbose --dry-run -v $gpLocalTopDir/raw/ $gpRemoteRawOrigin
+        'rsync' --dry-run $tOpt $tDel -v $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin
     fi
 
     echo
-    gResponse=$gpYesNo
-    if [ -z "$gpYesNo" ]; then
-        fComSelect "Continue? " "Yes-push-these-files No-skip-pushing" "$tHelp"
+    if ! fComYesNo "Are the above differences OK"; then
+        echo
+        fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
+        return 1
     fi
-    case $gResponse in
-        QUIT)
-            exit 1
-            ;;
-        No*)
-            fLog -p warning -m "Nothing was pushed." -l $tSrc:$LINENO
-            return 1
-            ;;
-        Yes*)
-            :
-            ;;
-        *)
-            fError -i -m "Expected: Yes or No" -l $tSrc:$LINENO
-            ;;
-    esac
+    echo
 
-    'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin
-    tStatus=$?
-
-    return $tStatus
+    'rsync' $tOpt $tDel -v $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin
+    return $?
 } # fPushRawFiles
 
 # --------------------
@@ -93,28 +72,33 @@ fPushGit()
         return 0
     fi
 
+    echo
+    echo '----------------------------------------'
+    echo 'git push'
     tBranch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
     if [ $? -ne 0 ]; then
         fError -i -m "Problem getting current branch name." -l $tSrc:$LINENO
     fi
 
     fComGit push origin $tBranch
-    tStatus=$?
-
-    return 0
+    return $?
 } # fPushGit
 
 # --------------------
 fPushToOrigin()
 {
-    local pBranchFlag="${1:-0}"
+    local pBranchFlag="$1"
+    local pDeleteRaw="$2"
     local tSrc=${BASH_SOURCE##*/}
 
-    # Called by: "git-proj-push [-b]
+    # Called by: "git-proj-push
 
     fComGetProjGlobals
-    fComIsRemoteMounted
-    fPushRawFiles
+    if ! fComIsRemoteMounted warning; then
+        return 1
+    fi
+
+    fPushRawFiles $pDeleteRaw
     fPushGit $pBranchFlag
 
     return 0

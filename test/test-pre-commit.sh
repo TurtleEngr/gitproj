@@ -67,17 +67,6 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 1
-} # oneTimeSetUp
-
-NAoneTimeTearDown()
-{
-    return 1
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
@@ -119,19 +108,22 @@ setUp()
     HOME=$cDatHome3
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
 
-    # Patch the version that was set in the tar file
+    # Patch things that may have been in the tar file
     for tConf in \
-        $cDatHome3/project/george/.gitproj.config.testserver \
-        $cDatHome3/project/george/.gitproj.config.testserver2 \
-        $cDatHome3/project/george/.gitproj.config.local; do
-        git config -f $tConf gitproj.config.ver $tVer
+            $cDatHome3/project/george/.gitproj.config.testserver \
+            $cDatHome3/project/george/.gitproj.config.testserver2 \
+            $cDatHome3/project/george/.gitproj.config.local \
+            $cDatHome3/project/george/.*.bak \
+            $cDatHome3/project/george/.*.bak.*~ \
+	; do
+        rm -f $fConfig >/dev/null 2>&1
     done
+    git config -f $cDatHome3/project/george/.gitproj gitproj.config.ver $tVer
 
     cd $HOME/project/george >/dev/null 2>&1
-    fComGetProjGlobals
+    fComGetProjGlobals >/dev/null 2>&1
 
     cp $gpDoc/hooks/pre-commit .git/hooks
-
     gpVerbose=3
     gpUnitDebug=0
     return 0

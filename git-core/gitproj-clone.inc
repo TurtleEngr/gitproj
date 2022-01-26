@@ -115,14 +115,19 @@ fCloneCheckLocalConfig()
 fCloneSetupGitProjConfig()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tVerbose=""
 
     fCloneCheckLocalConfig
 
-    cp $gpVerboseFlag $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+    if [ $gpVerbose -ge 2 ]; then
+        tVerbose='-v'
+    fi
+
+    cp $tVerbose --backup=t $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
 
     if [ ! -f .gitignore ]; then
-        fLog -p warning -m "Missing .gitignore file. Adding it now." -l $tSrc:$LINENO
-        cp $gpVerboseFlag $gpDoc/config/gitignore .gitignore
+        fLog -f -p warning -m "Missing .gitignore file. Adding it now." -l $tSrc:$LINENO
+        cp $tVerbose --backup=t $gpDoc/config/gitignore .gitignore
         git add .gitignore
     fi
 
@@ -202,10 +207,10 @@ fCloneMkRawDir()
         mkdir $gpLocalRawDir
     fi
 
-    if [ $gpVerbose -eq 1 ]; then
+    if [ $gpVerbose -ge 2 ]; then
         tVerbose=-v
     fi
-    if [ $gpVerbose -ge 2 ]; then
+    if [ $gpVerbose -ge 3 ]; then
         tVerbose=-viP
     fi
     cd $gpLocalTopDir/.. >/dev/null 2>&1

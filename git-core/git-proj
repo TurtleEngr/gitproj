@@ -359,13 +359,11 @@ Notation below: gp[Var], -[cli-opt], [git.config.var], (default)
 
 =over 4
 
-=item B<gpSysLog, -l, gitproj.config.syslog, (false)>
+=item B<gpSysLog, NA, gitproj.config.syslog, (false)>
 
 If set to 0, log messages will only be sent to stderr.
 
 If set to 1, log messages will be sent to stderr and syslog.
-
-See -l, fLog and fErr for details
 
 Default: false
 
@@ -445,12 +443,14 @@ If set to 0, all "debug" and "debug-N" level messages will be skipped.
 
 If not 0, all "debug" level messages will be output.
 
-Or if "debug-N" level is used, then if gpDebug is >= N, then the log
+If "debug-N" level is used, then if gpDebug is >= N, then the log
 message will be output, otherwise it is skipped.
 
 =item B<gpAuto, -a, NA, (false)>
 
 =item B<gpYesNo, -y, -n, NA, (No)>
+
+If gpAuto is true, then gpYesNo can be used to define default answers.
 
 =item B<gpAutoMove, NA, NA, (false)>
 
@@ -460,7 +460,7 @@ The location of the executing command will override this.
 
 =item B<gpDoc, NA, gitproj.config.doc, (/usr/share/doc/git-proj)>
 
-If not found, then set to: $gpBin/../doc
+If not found, then set to: $gpBin/../doc  If still not found: error.
 
 =item B<gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)>
 

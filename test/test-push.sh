@@ -67,47 +67,6 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 0
-
-    cat <<EOF >/dev/null
-=internal-pod
-
-=internal-head2 Test gitproj-push.inc
-
-=internal-head3 oneTimeSetuUp
-
-Currently this records all of the script's expected initial global
-variable settings, defined in fComSetGlobals. If different, adjust the
-tests as needed.
-
-Env Var
-
- HOME - this is set to the test user's home dir
- gpUnitDebug - this can be manually set to 1 in unit test functions.
-
-Calls:
-
- $gpBin/gitproj-com.inc
- fComSetGlobals
-
-=internal-cut
-EOF
-} # oneTimeSetUp
-
-# --------------------------------
-NAoneTimeTearDown()
-{
-    if [ $gpDebug -ne 0 ]; then
-        fTestRmEnv
-    fi
-    if [ -n "$cHome" ]; then
-        HOME=$cHome
-    fi
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     # Restore default global values, before each test
@@ -126,6 +85,9 @@ setUp()
     cd - >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
+    fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
+
     . $gpBin/gitproj-push.inc
 
     gpVerbose=3
@@ -196,13 +158,27 @@ testComIsRemoteMounted()
 
     fComGetProjGlobals >/dev/null 2>&1
 
-    tResult=$(fComIsRemoteMounted 2>&1)
+    tResult=$(fComIsRemoteMounted notice 2>&1)
     assertTrue "$LINENO $tResult" "$?"
+    assertNull "$LINENO" "$tResult"
 
     mv $gpRemoteRawOrigin $gpRemoteRawOrigin.sav
+    tResult=$(fComIsRemoteMounted warning 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "warning"
+    assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run"
+
     tResult=$(fComIsRemoteMounted 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "was not found. Try again after mounting it or run 'git proj config' to change the remote.raw.dir location"
+    assertNull "$LINENO" "$tResult"
+    assertNotContains "$LINENO $tResult" "$tResult" "warning"
+
+    gpDebug=1
+    tResult=$(fComIsRemoteMounted 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "debug:"
+    gpDebug=0
+
     mv $gpRemoteRawOrigin.sav $gpRemoteRawOrigin
 
     return 0
@@ -215,32 +191,22 @@ testPushRawFiles()
 
     fComGetProjGlobals >/dev/null 2>&1
 
+    gpAuto=0
     tResult=$(fPushRawFiles 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
 
     echo "Make a new file" >$gpLocalTopDir/raw/NewFile.txt
 
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "1\n"))
+    tResult=$(fPushRawFiles 2>&1 < <(echo -e "n"))
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
-
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "2\n1\n"))
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "if the above differences look OK"
-    assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
-    assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
-    assertContains "$LINENO $tResult" "$tResult" "Quitting"
+    assertContains "$LINENO $tResult" "$tResult" "diff summary"
+    assertContains "$LINENO $tResult" "$tResult" "Dry Run"
+    assertContains "$LINENO $tResult" "$tResult" "warning: Nothing was pushed"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "4\n"))
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Nothing was pushed"
-    assertContains "$LINENO $tResult" "$tResult" "DRY RUN"
-    ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
-
-    tResult=$(fPushRawFiles 2>&1 < <(echo -e "3\n"))
+    tResult=$(fPushRawFiles 2>&1 < <(echo -e "y"))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "NewFile.txt"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
@@ -292,7 +258,8 @@ testPushToOrigin()
     assertTrue "$LINENO" "$?"
     echo "New file in raw/" >raw/newfile.txt
 
-    tResult=$(fPushToOrigin 1 2>&1 < <(echo -e 3))
+    gpAuto=0
+    tResult=$(fPushToOrigin 1 0 2>&1 < <(echo -e y))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "git push origin develop"
     assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/newfile.txt ]"
@@ -313,12 +280,12 @@ testGitProjPushCLI()
     assertTrue "$LINENO $tResult" "$?"
     echo "New file in raw/" >raw/newfile.txt
 
-    tResult=$($gpBin/git-proj-push -vv 2>&1 < <(echo -e "3\n"))
+    tResult=$($gpBin/git-proj-push -V 3 2>&1 < <(echo -e "y"))
     assertTrue "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "newfile.txt"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    tResult=$($gpBin/git-proj-push -b -V 3 2>&1 < <(echo -e "3\n3"))
+    tResult=$($gpBin/git-proj-push -g -V 3 2>&1)
     tStatus=$?
     assertTrue "$LINENO $tResult" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "There are no differences found with 'raw' files"
@@ -338,6 +305,7 @@ testGitProjPushCLI()
         tar -cvzf $gpTest/test-env_Home2AfterPush.tgz test
         echo
     fi
+
     return 0
 } # testGitProjPushCLI
 

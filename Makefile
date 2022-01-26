@@ -58,9 +58,10 @@ fmt : clean
 	which shfmt
 	which $(mTestDir)/rm-trailing-sp
 	-rm fmt-err.tmp
-	rm-trailing-sp doc/config/* doc/hooks/* git-core/* test/*.sh
-	rm-trailing-sp doc/LICENSE doc/VERSION
-	rm-trailing-sp Makefile README.md TODO.md CHANGES.md
+	rm-trailing-sp -t doc/config/* doc/hooks/* git-core/* test/*.sh
+	rm-trailing-sp -t doc/LICENSE doc/VERSION
+	rm-trailing-sp -t README.md TODO.md CHANGES.md
+	rm-trailing-sp Makefile
 	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
 		if ! bash -n $$i; then \

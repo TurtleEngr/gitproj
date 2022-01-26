@@ -67,48 +67,6 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 1
-
-    cat <<EOF >/dev/null
-=internal-pod
-
-=internal-head2 Test gitproj-com.inc
-
-=internal-head3 oneTimeSetuUp
-
-Currently this records all of the script's expected initial global
-variable settings, defined in fComSetGlobals. If different, adjust the
-tests as needed.
-
-Env Var
-
- HOME - this is set to the test user's home dir
- gpUnitDebug - this can be manually set to 1 in unit test functions.
-
-Calls:
-
- $gpBin/gitproj-com.inc
- fComSetGlobals
-
-=internal-cut
-EOF
-} # oneTimeSetUp
-
-# --------------------------------
-NAoneTimeTearDown()
-{
-    return 1
-    if [ $gpDebug -ne 0 ]; then
-        fTestRmEnv
-    fi
-    if [ -n "$cHome" ]; then
-        HOME=$cHome
-    fi
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
@@ -140,7 +98,7 @@ setUp()
     gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
 
     cd $HOME/project >/dev/null 2>&1
-    . $gpBin/gitproj-clone.inc
+    . $gpBin/gitproj-clone.inc >/dev/null 2>&1
     gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
     gpProjName=${gpRemoteGitDir##*/}
     gpProjName=${gpProjName%.git}
@@ -705,7 +663,7 @@ gpTestList="$*"
 # -----
 . $gpTest/test.inc
 fTestCreateEnv
-. $gpBin/gitproj-clone.inc
+. $gpBin/gitproj-clone.inc >/dev/null 2>&1
 
 # Look for serious setup errors
 fTestConfigSetup

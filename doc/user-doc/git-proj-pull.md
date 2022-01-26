@@ -6,25 +6,47 @@
 
 # SYNOPSIS
 
-    git proj pull [-b] [-y|-n] [common-options]
+    git proj pull [-g] [-d] [-a] [-y|-n] [common-options]
 
 # DESCRIPTION
 
 rsync will be used top copy the \[remote-raw-origin\]/\[ProjName\].raw/ files
 to '\[ProjName\]/raw/'.
 
-If the -b option is given then run:
+If the -g option is given then run:
 
     "git pull origin [current-branch]"
 
 # OPTIONS
 
-- **-b**
+- **-g**
+
+    If the -g option is given then run:
+
+        "git push origin [current-branch]"
+
+- **-d**
+
+    If the -d option is used, then the local raw/ will be made identical
+    to the remote raw/. I.e. files might be deleated from the local raw/.
+
+    See the help EXAMPLES section, in "git proj push", for a "save" way to
+    use this option.
+
+- **-a**
+
+    This turns on automated push for raw/ files. Use the -y or -n to
+    select the action. -n will just display what would be done.
+
+    If there is a -d option, that will be removed and the -n option
+    will be added. -d could be very distructive, so it needs to be
+    run interactively.
+
 - **-y|-n**
 
-    If -y, then default to "yes" to all prompts to continue.
+    If -y, then pull files from the remote raw/
 
-    If -n, then default to "no" to all prompts to continue.
+    If -n, then just show what would be pulled from the remote raw/
 
 - **\[common-options\]**
 

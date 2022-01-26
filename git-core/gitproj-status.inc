@@ -13,17 +13,17 @@ export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
 # --------------------
 fStatusGit()
 {
-    local pShort="$1"
+    local pOpt="${@}"
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
 
     echo
-    git status $pShort --ignored
+    git status $pOpt
 
-    if fComIsRemoteMounted warn; then
+    if fComIsRemoteMounted debug; then
         tOrigin=$($cGetOrigin)
         if [ ! -d $tOrigin ]; then
-            fLog -p warning -m "Could not find: $tOrigin" -l $tSrc:$LINENO
+            fLog -f -p notice -m "Could not find: $tOrigin" -l $tSrc:$LINENO
         fi
     fi
 
@@ -33,17 +33,18 @@ fStatusGit()
 # --------------------
 fStatusRaw()
 {
+    local pOpt="$*"
     local tSrc=${BASH_SOURCE##*/}
 
-    if ! fComIsRemoteMounted warn; then
-        fLog -p warning -m "Remote: $gpRemoteRawOrigin is not mounted, so cannot give status of raw/ files." -l $tSrc:$LINENO
+    if ! fComIsRemoteMounted warning; then
+        fLog -p notice -m "Remote is not mounted, so cannot give status of raw/ files." -l $tSrc:$LINENO
         return 0
     fi
 
     cd $gpLocalTopDir >/dev/null 2>&1
     echo
     echo "REMOTE/ = $gpRemoteRawOrigin/"
-    diff -qr raw/ $gpRemoteRawOrigin/ | sed "s;$gpRemoteRawOrigin;REMOTE;"
+    diff -qr $pOpt raw/ $gpRemoteRawOrigin/ | sed "s;$gpRemoteRawOrigin;REMOTE;"
     if [ ${PIPESTATUS[0]} -eq 0 ]; then
         echo "No differences."
     fi
@@ -55,12 +56,13 @@ fStatusRaw()
 # --------------------
 fStatusOutput()
 {
-    local pShort=$1
+    local pGitOpt="$1"
+    local pRawOpt="$2"
     local tSrc=${BASH_SOURCE##*/}
 
     # Called by: "git-proj-status
-    fStatusGit $pShort
-    fStatusRaw
+    fStatusGit $pGitOpt
+    fStatusRaw $pRawOpt
 
     return 0
 } # fStatusOutput

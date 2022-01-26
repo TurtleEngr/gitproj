@@ -9,6 +9,8 @@ export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
 
+export TMOUT=10
+
 # Relative to $HOME, cDatHome, george
 export cDatProj1 cDatProj2 cDatProj3
 # Relative to $HOME, cDatHome2, bob
@@ -113,7 +115,7 @@ fTestSetupEnv()
     # video-2019-11-26/src/
     # video-2020-04-02 - a remote git proj will be put here
 
-    return
+    return 0
 } # fTestSetupEnv
 
 # --------------------------------

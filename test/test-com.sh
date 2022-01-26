@@ -67,49 +67,13 @@ EOF
 # ========================================
 
 # --------------------------------
-NAoneTimeSetUp()
-{
-    return 0
-
-    cat <<EOF >/dev/null
-=internal-pod
-
-=internal-head2 Test gitproj-com.inc
-
-=internal-head3 oneTimeSetuUp
-
-Currently this records all of the script's expected initial global
-variable settings, defined in fComSetGlobals. If different, adjust the
-tests as needed.
-
-Env Var
-
- HOME - this is set to the test user's home dir
- gpUnitDebug - this can be manually set to 1 in unit test functions.
-
-Calls:
-
- $gpBin/gitproj-com.inc
- fComSetGlobals
-
-=internal-cut
-EOF
-} # oneTimeSetUp
-
-NAoneTimeTearDown()
-{
-    if [ -n "$cHome" ]; then
-        HOME=$cHome
-    fi
-} # oneTimeTearDown
-
-# --------------------------------
 setUp()
 {
     # Restore default global values, before each test
     unset gpBin cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
     fTestSetupEnv
     fTestCreateEnv
+
     gpUnitDebug=0
     return 0
 
@@ -201,7 +165,7 @@ testComSetGlobals()
     assertTrue "$LINENO -d $gpDoc" "[ -d $gpDoc ]"
 
     assertEquals "$LINENO" "0" "$gpDebug"
-    assertEquals "$LINENO" "0" "$gpVerbose"
+    assertEquals "$LINENO" "2" "$gpVerbose"
     assertEquals "$LINENO" "false" "$gpSysLog"
     assertEquals "$LINENO" "user" "$gpFacility"
     assertEquals "$LINENO" "0" "$gErr"
@@ -233,29 +197,39 @@ testComFirstTimeSet()
     # source gitproj-init.inc calls fInitSetGlobals, which calls
     # fComFirstTimeSet, which creates these files.
     # Intially not defined:
-    assertFalse "$LINENO" "[ -f $HOME/.gitconfig ]"
+    assertTrue "$LINENO" "[ ! -f $HOME/.gitconfig ]"
     # Old
-    assertFalse "$LINENO" "[ -f $HOME/.gitproj.config.global ]"
+    assertTrue "$LINENO" "[ ! -f $HOME/.gitconfig.global ]"
 
-    fComFirstTimeSet
+    gpVerbose=3
+    tResult=$(fComFirstTimeSet 2>&1)
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
+    assertFalse "$LINENO" "[ -f $HOME/.gitconfig.bak ]"
+
     tResult=$(git config --global --list)
     assertContains "$LINENO tResult" "$tResult" "gitproj.config.proj-status=installed"
 
-    fComFirstTimeSet
-    assertTrue "$LINENO" "[ -f $HOME/.gitconfig.bak ]"
-    assertTrue "$LINENO" "diff $HOME/.gitconfig $HOME/.gitconfig.bak"
+    tResult=$(fComFirstTimeSet 2>&1)
+    assertTrue "$LINENO" "[ ! -f $HOME/.gitconfig.bak ]"
+
     tResult=$(git config --global --list)
     assertContains "$LINENO tResult" "$tResult" "gitproj.config.proj-status=installed"
 
     git config --global --unset gitproj.config.proj-status
     git config --global user.name foobar
-    fComFirstTimeSet
+    tResult=$(fComFirstTimeSet 2>&1)
     assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
     assertFalse "$LINENO" "diff $HOME/.gitconfig $HOME/.gitconfig.bak"
     tResult=$(git config --global --list)
     assertContains "$LINENO tResult" "$tResult" "gitproj.config.proj-status=installed"
     assertContains "$LINENO tResult" "$tResult" "user.name=foobar"
+
+    tResult=$(fComFirstTimeSet 2>&1)
+    tResult=$(fComFirstTimeSet 2>&1)
+    tResult=$(fComFirstTimeSet 2>&1)
+    assertTrue "$LINENO"  "[ -f $HOME/.gitconfig.bak.~1~ ]"
+    assertFalse "$LINENO" "[ -f $HOME/.gitconfig.bak.~2~ ]"
+    ##assertContains "$LINENO $(ls -a $HOME)" "$tResult" "xxx-comment-out-if-OK"
 
     return 0
 } # testComFirstTimeSet
@@ -265,7 +239,7 @@ testComPreProjSetGlobals()
 {
     assertTrue "$LINENO" "[ -d $HOME/$cDatProj1 ]"
     cd $HOME/$cDatProj1
-    fComPreProjSetGlobals
+    fComPreProjSetGlobals >/dev/null 2>&1
 
     assertEquals "$LINENO" "$cGitProjVersion" "$gpVer"
 
@@ -698,8 +672,8 @@ testComYesNo()
     assertFalse $LINENO $?
     assertEquals $LINENO "No" "$gResponse"
 
+    gpAuto=0
     gpYesNo=""
-
     fComYesNo "Continue" >/dev/null 2>&1 < <(echo yes)
     assertTrue $LINENO $?
     assertEquals $LINENO "Yes" $gResponse
