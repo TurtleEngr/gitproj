@@ -10,6 +10,7 @@ ProdCopyright=Copyright 2022. All rights reserved.
 MkVer=2.2
 ProdRelServer=moria.whyayh.com
 ProdRelDir=/rel/released/software/ThirdParty/git-proj/mx
+ProdTag=tag-0-4-1-1
 ProdOS=mx19
 ProdOSDist=mx
 ProdOSVer=19.4

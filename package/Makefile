@@ -160,7 +160,7 @@ ver.epm ver.env : ver.sh
 ver.mak : ver.sh
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	mkver.pl -e 'mak'
-	cat $@ | grep -E 'ProdName=|ProdAlias=|ProdVer=|ProdRC=|ProdBuild=|ProdSupport=|ProdVendor=|ProdPackager=|ProdCopyright=|MkVer=|ProdOS=|ProdOSDist=|ProdOSVer=|ProdArch=|ProdRelServer=|ProdRelDir=|CurLogName' >ver.tmp
+	cat $@ | grep -E 'ProdName=|ProdAlias=|ProdVer=|ProdRC=|ProdBuild=|ProdSupport=|ProdVendor=|ProdPackager=|ProdCopyright=|MkVer=|ProdOS=|ProdOSDist=|ProdOSVer=|ProdArch=|ProdRelServer=|ProdRelDir=|ProdTag=|CurLogName' >ver.tmp
 	cp ver.tmp $@
 
 
