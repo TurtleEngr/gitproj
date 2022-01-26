@@ -128,23 +128,23 @@ package : epm.list $(ProdOSDist).require
 	#epm -v -f portable -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
 	# Set ProdRC for Release Candidate packages
 
-release : ver.env ver.mak
-	+. ./ver.env; echo ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
-	-. ./ver.env; ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
-	. ./ver.env; ssh $(ProdRelServer) test -d $(ProdRelDir)
-	. ./ver.env; rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
+release : ver.mak
+	+echo ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
+	-ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
+	.ssh $(ProdRelServer) test -d $(ProdRelDir)
+	.rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
 
 clean-rc-release : TBD
 	# Remove all $(ProdName) Release Candidates from repo
 
-tag : ver.env ver.mak
+tag : ver.mak
 	-git commit -am Updated
-	. ./ver.env; git tag -f -a -m "Released to: $(ProdRelServer):$(ProdRelDir)" $(ProdTag)
+	git tag -f -a -m "Released to: $(ProdRelServer):$(ProdRelDir)" $(ProdTag)
 	echo "# --------------------" >>VERSION
 	date -u +'%F %R UTC' >>VERSION
-	. ./ver.env; echo "$(ProdTag)" >>VERSION
-	. ./ver.env; echo "Released: $$(ls pkg)" >>VERSION
-	. ./ver.env; echo "to: $(ProdRelServer):$(ProdRelDir)" >>VERSION
+	echo "$(ProdTag)" >>VERSION
+	echo "Released: $$(ls pkg)" >>VERSION
+	echo "to: $(ProdRelServer):$(ProdRelDir)" >>VERSION
 	#git commit -am Updated
 	#git push origin develop
 	#git push --tags -f
@@ -160,5 +160,7 @@ ver.epm ver.env : ver.sh
 ver.mak : ver.sh
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	mkver.pl -e 'mak'
-	cat $@ | grep -E 'ProdName=|ProdAlias=|ProdVer=|ProdRC=|ProdBuild=|ProdSupport=|ProdVendor=|ProdPackager=|ProdCopyright=|MkVer=|ProdOS=|ProdOSDist=|ProdOSVer=|ProdArch=|CurLogName' >ver.tmp
+	cat $@ | grep -E 'ProdName=|ProdAlias=|ProdVer=|ProdRC=|ProdBuild=|ProdSupport=|ProdVendor=|ProdPackager=|ProdCopyright=|MkVer=|ProdOS=|ProdOSDist=|ProdOSVer=|ProdArch=|ProdRelServer=|ProdRelDir=|CurLogName' >ver.tmp
 	cp ver.tmp $@
+
+
