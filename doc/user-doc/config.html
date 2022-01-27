@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Configuration Documentation</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body id="_podtop_">
+  <ul id="index">
+    <li><a href="#Configuration-Documentation">Configuration
+    Documentation</a></li>
+    <li>
+      <a href="#gitproj">gitproj</a>
+      <ul>
+        <li><a href="#Config-Variables">Config Variables</a></li>
+        <li><a href="#Precedence">Precedence</a></li>
+      </ul>
+    </li>
+    <li><a href="#System">System</a></li>
+    <li><a href="#User---global">User (--global)</a></li>
+    <li><a href="#Project---local">Project (--local)</a></li>
+    <li><a href="#pre-commit">pre-commit</a></li>
+  </ul>
+  <h1 id="Configuration-Documentation"><a href="#_podtop_">Configuration
+  Documentation</a></h1>
+  <h1 id="gitproj"><a href="#_podtop_">gitproj</a></h1>
+  <h2 id="Config-Variables">Config Variables</h2>
+  <pre><code>        env.var, default, config.vars, options</code></pre>
+  <h2 id="Precedence">Precedence</h2>
+  <h1 id="System"><a href="#_podtop_">System</a></h1>
+  <pre><code>        /usr/share/doc/git-proj/config/gitconfig
+        /usr/share/doc/git-proj/config/gitignore</code></pre>
+  <h1 id="User---global"><a href="#_podtop_">User (--global)</a></h1>
+  <pre><code>        ~/.gitconfig
+        ~/.gitignore</code></pre>
+  <h1 id="Project---local"><a href="#_podtop_">Project (--local)</a></h1>
+  <pre><code>        PROJ/.gitproj
+        PROJ/.gitignore
+        PROJ/.git/config</code></pre>
+  <h1 id="pre-commit"><a href="#_podtop_">pre-commit</a></h1>
+  <pre><code>        /usr/share/doc/git-proj/hooks/pre-commit
+        PROJ/.git/hooks/pre-commit</code></pre>
+</body>
+</html>

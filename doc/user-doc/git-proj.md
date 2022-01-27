@@ -441,7 +441,6 @@ Subcommand files:
         git-proj-CMD - called with "git proj CMD"
         gitproj-CMD.inc - all the code for CMD
 
-
 # SEE ALSO
 
     git proj init
