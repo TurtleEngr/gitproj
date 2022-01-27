@@ -5,8 +5,8 @@
 # pre-commit-enabled = if true, this script is enabled
 # check-file-names = if true, "abnormal" file names will not be allowed
 # check-for-big-files = if true, files bigger than
-#     binary-file-size-limit cannot be committed.
-# binary-file-size-limit = defines the max size. # of bytes if no suffix.
+#     binary-file-size cannot be committed.
+# binary-file-size = defines the max size. # of bytes if no suffix.
 #     Suffixes: k,m,g
 
 # --------------------
@@ -190,7 +190,7 @@ fCheckBigFiles()
         return 0
     fi
 
-    tMaxSize=$(git config --get --int --default=0 gitproj.hook.binary-file-size-limit)
+    tMaxSize=$(git config --get --int --default=0 gitproj.hook.binary-file-size)
     if [ $tMaxSize -le 1000 ]; then
         return 0
     fi
@@ -218,7 +218,7 @@ fCheckBigFiles()
 Large binary files should NOT be committed to git.  Move the files to
 the top raw/ dir, or use "git proj move FILE" to move the file to the
 raw/ dir and it will make a symlink to the files old location. Or
-change config gitproj.hook.binary-file-size-limit to be larger. Or
+change config gitproj.hook.binary-file-size to be larger. Or
 disable this check, and live with a massive git repo.
 
 EOF

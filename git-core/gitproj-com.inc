@@ -581,7 +581,7 @@ fComPreProjSetGlobals()
     gpCheckInRaw=$(fComGetConfig -k "gitproj.hook.check-in-raw" -d true)
     gpCheckWhitespace=$(fComGetConfig -k "gitproj.hook.check-whitespace" -d true)
     gpCheckForBigFiles=$(fComGetConfig -k "gitproj.hook.check-for-big-files" -d true)
-    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size-limit" -d "10k")
+    gpMaxSize=$(fComGetConfig -k "gitproj.hook.binary-file-size" -d "10k")
 
     # These will be redefined later
     #    gpLocalTopDir

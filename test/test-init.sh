@@ -772,7 +772,7 @@ testInitSaveVarsToConfigs()
         fTestCheckConfig2Var $tFile $tS.check-in-raw gpCheckInRaw true $LINENO
         fTestCheckConfig2Var $tFile $tS.check-whitespace gpCheckWhitespace true $LINENO
         fTestCheckConfig2Var $tFile $tS.check-for-big-files gpCheckForBigFiles true $LINENO
-        fTestCheckConfig2Var $tFile $tS.binary-file-size-limit gpMaxSize 10k $LINENO
+        fTestCheckConfig2Var $tFile $tS.binary-file-size gpMaxSize 10k $LINENO
     done
 
     return 0

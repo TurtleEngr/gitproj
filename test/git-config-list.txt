@@ -57,7 +57,7 @@ gpSysLog   	  file:~/.gitproj.config.global      gitproj.config.syslog=true
 gpTest   	  file:~/.gitproj.config.global      gitproj.config.test=/usr/share/doc/git-proj/test
 cGitProjVersion   file:~/.gitproj.config.global      gitproj.config.ver=1.1
 
-gpMaxSize  file:~/.gitproj.config.global      gitproj.hook.binary-file-size-limit=10k
+gpMaxSize  file:~/.gitproj.config.global      gitproj.hook.binary-file-size=10k
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-file-names=true
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.check-for-big-files=true
 TBD 	   file:~/.gitproj.config.global      gitproj.hook.pre-commit-enabled=true
@@ -94,7 +94,7 @@ gpProjName	   file:.gitproj.config.local      gitproj.config.proj-name=TBD
 gpProjStatus   	   file:.gitproj.config.local      gitproj.config.proj-status=not-set-up
 TBD 		   file:.gitproj.config.local      gitproj.config.remote-raw-dir=TBD
 
-gpMaxSize  file:.gitproj.config.local      gitproj.hook.binary-file-size-limit=1k
+gpMaxSize  file:.gitproj.config.local      gitproj.hook.binary-file-size=1k
 TBD 	   file:.gitproj.config.local      gitproj.hook.check-file-names=true
 TBD	   file:.gitproj.config.local      gitproj.hook.check-for-big-files=true
 TBD	   file:.gitproj.config.local      gitproj.hook.pre-commit-enabled=true

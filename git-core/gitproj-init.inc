@@ -167,7 +167,7 @@ EOF
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
     fi
 
-    fLog -p notice -m "gitproj.hook.proj-binary-file-size-limit = gpMaxSize" -l $tSrc:$LINENO
+    fLog -p notice -m "gitproj.hook.proj-binary-file-size = gpMaxSize" -l $tSrc:$LINENO
 
     return 0
 } # fInitGetSize
@@ -336,7 +336,7 @@ Summary
     check-in-raw = $gpCheckInRaw
     check-whitespace = $gpCheckWhitespace
     check-for-big-files = $gpCheckForBigFiles
-    binary-file-size-limit = $gpMaxSize
+    binary-file-size = $gpMaxSize
 
 The above variables will be put in these config files: ~/.gitconfig
 (--global), PROJ/.git/config, (--local), PROJ/.gitproj. You can edit
@@ -605,7 +605,7 @@ fInitSaveVarsToConfigs()
         fComSaveVar2Config $tFile $tS.check-in-raw gpCheckInRaw
         fComSaveVar2Config $tFile $tS.check-whitespace gpCheckWhitespace
         fComSaveVar2Config $tFile $tS.check-for-big-files gpCheckForBigFiles
-        fComSaveVar2Config $tFile $tS.binary-file-size-limit gpMaxSize
+        fComSaveVar2Config $tFile $tS.binary-file-size gpMaxSize
     done
 
     if [ $gErr -eq 0 ]; then

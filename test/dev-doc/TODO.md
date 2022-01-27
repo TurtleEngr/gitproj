@@ -210,7 +210,7 @@ Makefile targets for managing them.
 * Code and test pre-commit checks. - done
 
 * Move "auto-move" out of hooks config.  Use this in git-proj-add (or move)
-  add: find binary files that are greater than binary-file-size-limit
+  add: find binary files that are greater than binary-file-size
   add: move and create symlink, or just move to raw/ - done
 
 * Create install.sh to install directly from development git

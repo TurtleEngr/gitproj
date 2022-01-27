@@ -259,7 +259,7 @@ file.
                 check-file-names = true
                 check-for-big-files = true
                 # End size with b, k, m, or g
-                binary-file-size-limit = 1k
+                binary-file-size = 1k
 
 ## Global Env. Var. Config
 
