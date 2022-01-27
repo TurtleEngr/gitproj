@@ -59,10 +59,10 @@ dist-clean : clear-logs
 # Test
 
 # Only run tests where the dependencies have changed
-test : rm-trailing-sp bash-fmt $(mDepList) $(mBaseList) $(mCmdList)
+test : rm-trailing-sp bash-fmt bash-lint $(mDepList) $(mBaseList) $(mCmdList)
 
 # Use this for *force* all tests to be run
-test-all : rm-trailing-sp bash-fmt clear-logs test
+test-all : rm-trailing-sp bash-fmt bash-lint clear-logs test
 
 clear-logs :
 	-rm test-*.log
@@ -81,6 +81,10 @@ rm-trailing-sp : ~/bin/rm-trailing-sp
 
 # bash-fmt :
 bash-fmt : ~/bin/bash-fmt
+	diff $@ $?
+
+# bash-lint :
+bash-lint : ~/bin/bash-lint
 	diff $@ $?
 
 # ========================================
