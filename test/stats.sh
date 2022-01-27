@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "For accurate counts 'make dist-clean' should be run before this."
+
 cd ..
 
 tProjStart=2021-10-23
@@ -8,28 +10,17 @@ tProjDuration=$(dateutils.ddiff $tProjStart $tProjEnd)
 
 tNumTests=$(grep '^test' test/test-*.sh | grep '()' | wc -l)
 tNumAsserts=$(grep assert test/*.sh | wc -l)
-tLinesTest=$(cat test/Makefile test/*.sh test/*.inc | wc -l)
-tLinesTestDoc=$(
-    awk '
-        /=pod/,/=cut/ {
-            print $0
-        }
-        /=internal-pod/,/=internal-cut/ {
-            print $0
-        }
-    ' $(find test/* -type f) | wc -l
-)
-let tOnlyTest=tLinesTest-tLinesTestDoc
 
-tLinesCode=$(
-    cat \
-        doc/VERSION \
-        doc/config/* \
-        doc/hooks/* \
-        git-core/* |
-        wc -l
-)
-tLinesCodeDoc=$(
+tTotalLines=$(cat $(find * -type f | grep -Ev 'dist|subcommands') | wc -l)
+
+tLinesInTest=$(cat $(find test -type f) | wc -l)
+
+tLinesInDoc=$(cat $(find doc -type f) | wc -l)
+tDoc=$(cat $(find * -prune -type f) | wc -l)
+let tLinesInDoc+=tDoc
+
+tLinesInCode=$(cat $(find git-core -type f) | wc -l)
+tDoc=$(
     awk '
         /=pod/,/=cut/ {
             print $0
@@ -37,33 +28,13 @@ tLinesCodeDoc=$(
         /=internal-pod/,/=internal-cut/ {
             print $0
         }
-    ' git-core/* | wc -l
+    ' $(find test/* git-core/* -type f) | wc -l
 )
-let tOnlyCode=tLinesCode-tLinesCodeDoc
+let tLinesInDoc+=tDoc
+let tLinesInCode-=tDoc
 
 tNumFun=$(grep '()' git-core/* | grep -Ev '#' | wc -l)
 tNumCmds=$('ls' git-core/git-proj-* | wc -l)
-
-tTotalLines=$(
-    cat \
-        Makefile *.md \
-        doc/VERSION \
-        doc/config/* \
-        doc/hooks/* \
-        git-core/* |
-        wc -l
-)
-tTotalLinesDoc=$(
-    awk '
-        /=pod/,/=cut/ {
-            print $0
-        }
-        /=internal-pod/,/=internal-cut/ {
-            print $0
-        }
-    ' $(find git-core/* -type f) | wc -l
-)
-let tNoDoc=tTotalLines-tTotalLinesDoc
 
 let tLinesPerWeek=tTotalLines*7/tProjDuration
 
@@ -72,19 +43,15 @@ cat <<EOF
 Tests
         Number of tests:    $tNumTests
         Number of asserts:  $tNumAsserts
-        Lines of test code: $tOnlyTest
-        Lines of doc. in test code: $tLinesTestDoc
-        Total lines of test code:   $tLinesTest
+        Lines in test/:     $tLinesInTest
+Doc
+        Lines of doc:       $tLinesInDoc
 Code
         Number of git SubCmds: $tNumCmds
         Number of Functions:   $tNumFun
-        Lines of code:         $tOnlyCode
-        Lines of doc. in code: $tLinesCodeDoc
-        Total lines of code:   $tLinesCode
+        Lines of code:         $tLinesInCode
 
-Total non-doc code: $tNoDoc
-Total lines of doc: $tTotalLinesDoc
-Total for all:      $tTotalLines
+Total for all:   $tTotalLines
 
 Time: $tProjDuration days
 Lines/Week: $tLinesPerWeek

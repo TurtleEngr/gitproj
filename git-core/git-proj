@@ -516,26 +516,26 @@ Subcommand files:
 
     /usr/share/doc/git-proj/
         VERSION - current installed version (git proj --version)
-	CHANGES.md - changes for each version
-	README.md - getting started
-	LICENSE - GNU GPL V3
+        CHANGES.md - changes for each version
+        README.md - getting started
+        LICENSE - GNU GPL V3
     /usr/share/doc/git-proj/config/
         gitconfig - global config template
-	gitignore - default ignore file
+        gitignore - default ignore file
     /usr/share/doc/git-proj/hooks/
         pre-commit - see gitproj.hooks section for configuring this
     /usr/share/doc/git-proj/contrib/
         bash-fmt - format bash scripts
-	rm-trailing-sp - fix pre-commit whitespace issues
+        rm-trailing-sp - fix pre-commit whitespace issues
     /usr/share/doc/git-proj/user-doc/
-	git-proj.html - all documentation in one file (git proj -h)
-	git-proj.md - all documentation in one file (git proj -h)
+        git-proj.html - all documentation in one file (git proj -h)
+        git-proj.md - all documentation in one file (git proj -h)
         git-proj-CMD*.html (git proj CMD -h)
         git-proj-CMD*.md (git proj CMD -h)
     /usr/lib/git-core/git-proj/
         git-proj - get overall help "git proj -h"
-	git-proj-CMD - called with "git proj CMD"
-	gitproj-CMD.inc - all the code for CMD
+        git-proj-CMD - called with "git proj CMD"
+        gitproj-CMD.inc - all the code for CMD
 
 =head1 SEE ALSO
 

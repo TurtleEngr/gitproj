@@ -872,8 +872,8 @@ fComUsage()
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | \
-                $tProg --title="$pTitle" $tHtmlOpt | \
+            cat $pFileList |
+                $tProg --title="$pTitle" $tHtmlOpt |
                 $tTidy 2>/dev/null | more
         else
             if [ "$pStyle" = "short" ]; then
@@ -887,12 +887,12 @@ fComUsage()
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList | fComInternalDoc | \
-                $tProg --title="$pTitle" $tHtmlOpt | \
+            cat $pFileList | fComInternalDoc |
+                $tProg --title="$pTitle" $tHtmlOpt |
                 $tTidy 2>/dev/null | more
         else
             # shellcheck disable=SC2002
-            cat $pFileList |fComInternalDoc | $tProg | more
+            cat $pFileList | fComInternalDoc | $tProg | more
         fi
     fi
 
