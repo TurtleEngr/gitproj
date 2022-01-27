@@ -375,13 +375,13 @@ Project/.gitproj.config.\$HOSTNAME file will be created, so that
 differences between systems are saved. For example, mount points and
 filesystem differences will be saved.
 
-For a more complete overview type: "git proj -h | more" or "man
+For a more complete overview type: "git proj -h" or "man
 git-proj"
 
 For a quick list of the git proj subcommands just type: "git proj"
 
 All subcommands will output help text with the -h option. For example:
-"git proj SubCmd -h | more"
+"git proj SubCmd -h
 
 EOF
     return 0
@@ -752,6 +752,8 @@ fComCheckDeps()
     cat <<EOF >/dev/null
 =internal-pod
 
+=internal-for text ========================================
+
 =internal-for html <hr/>
 
 =internal-head3 fComCheckDeps "pRequired List" "pOptional List"
@@ -870,32 +872,27 @@ fComUsage()
     if [ $pInt -eq 0 ]; then
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList |
-                $tProg --title="$pTitle" $tHtmlOpt |
-                $tTidy 2>/dev/null
+            cat $pFileList | \
+                $tProg --title="$pTitle" $tHtmlOpt | \
+                $tTidy 2>/dev/null | more
         else
             if [ "$pStyle" = "short" ]; then
                 # shellcheck disable=SC2002
-                cat $pFileList |
-                    pod2text |
-                    head -n 10
+                cat $pFileList | pod2text | head -n 10
             else
                 # shellcheck disable=SC2002
-                cat $pFileList | $tProg
+                cat $pFileList | $tProg | more
             fi
         fi
     else
         if [ "$pStyle" = "html" ]; then
             # shellcheck disable=SC2002
-            cat $pFileList |
-                fComInternalDoc |
-                $tProg --title="$pTitle" $tHtmlOpt |
-                $tTidy 2>/dev/null
+            cat $pFileList | fComInternalDoc | \
+                $tProg --title="$pTitle" $tHtmlOpt | \
+                $tTidy 2>/dev/null | more
         else
             # shellcheck disable=SC2002
-            cat $pFileList |
-                fComInternalDoc |
-                $tProg
+            cat $pFileList |fComInternalDoc | $tProg | more
         fi
     fi
 

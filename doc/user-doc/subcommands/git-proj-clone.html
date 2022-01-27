@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body id="_podtop_">
+
+
+
+<ul id="index">
+  <li><a href="#NAME-git-proj-clone">NAME git proj clone</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+</ul>
+
+<hr/>
+
+<a href="#_podtop_"><h1 id="NAME-git-proj-clone">NAME git proj clone</h1></a>
+
+<a href="#_podtop_"><h1 id="SYNOPSIS">SYNOPSIS</h1></a>
+
+<pre><code>    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]</code></pre>
+
+<a href="#_podtop_"><h1 id="DESCRIPTION">DESCRIPTION</h1></a>
+
+<p>Clone a local git repo from the external pRemoteDir.</p>
+
+<p>Use this script get a local copy of the remote git repo frome a mounted drive.</p>
+
+<a href="#_podtop_"><h1 id="OPTIONS">OPTIONS</h1></a>
+
+<dl>
+
+<dt id="d-pRemoteDir"><b>-d pRemoteDir</b></dt>
+<dd>
+
+<p>TBD</p>
+
+</dd>
+<dt id="a"><b>-a</b></dt>
+<dd>
+
+<p>Automated mode. Use this in batch (non-interactve) scripts. See the -y|-n options.</p>
+
+</dd>
+<dt id="y--n"><b>-y|-n</b></dt>
+<dd>
+
+<p>These are only used if -a option is defined. Where there are &quot;exceptions&quot; these will be used for the default answer: -y continue, -n quit.</p>
+
+</dd>
+<dt id="common-options"><b>[common-options]</b></dt>
+<dd>
+
+<pre><code> -h
+ -H pStyle
+ -v, -vv
+ -x, -xx</code></pre>
+
+<p>Run &quot;git proj -h&quot; for details.</p>
+
+</dd>
+</dl>
+
+<a href="#_podtop_"><h1 id="RETURN-VALUE">RETURN VALUE</h1></a>
+
+<pre><code> 0 - if OK
+ !0 - if errors</code></pre>
+
+<a href="#_podtop_"><h1 id="EXAMPLES">EXAMPLES</h1></a>
+
+<p>The drive is mounted at: /mnt/usb-video and the the repo is at: video-2019-04-01/trip.git So use this to get a local copy.</p>
+
+<p>proj-get-local -d /mnt/usb-video/video-2019-04-01/trip.git</p>
+
+<a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
+
+<pre><code> git proj
+ git proj remote
+ git proj clone
+ git proj add
+ git proj push
+ git proj pull
+ git proj set
+ git proj status
+ git flow</code></pre>
+
+<a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
+
+<p>TurtleEngr</p>
+
+<a href="#_podtop_"><h1 id="HISTORY">HISTORY</h1></a>
+
+<p>GPLv3 Copyright 2021 by TurtleEngr</p>
+
+
+</body>
+
+</html>
+
+

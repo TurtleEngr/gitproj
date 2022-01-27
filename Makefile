@@ -28,9 +28,10 @@ clean :
 	-find . -name '*.tmp' -exec rm {} \;
 
 gen-doc : doc/CHANGES.md doc/README.md doc/user-doc/git-proj.md doc/user-doc/git-proj.html
+	-mkdir -p doc/user-doc/subcommands
 	-for tCmd in git-core/git-proj-*; do \
-		pod2markdown $$tCmd >doc/user-doc/$${tCmd##*/}.md; \
-		pod2html $(mHtmlOpt) $$tCmd >doc/user-doc/$${tCmd##*/}.html; \
+		pod2markdown $$tCmd >doc/user-doc/subcommands/$${tCmd##*/}.md; \
+		pod2html $(mHtmlOpt) $$tCmd >doc/user-doc/subcommands/$${tCmd##*/}.html; \
 		$(mTidy) doc/user-doc/$${tCmd##*/}.html 2>/dev/null; \
 	done
 

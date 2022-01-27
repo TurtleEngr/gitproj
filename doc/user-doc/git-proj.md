@@ -72,7 +72,7 @@ no need to save every rendered version.
 
 - **git proj \[pSubCmd\]**
 
-    This outputs short usage help for pSubCmd.
+    For most pSubCmds this outputs short usage help.
 
 - **git proj \[pSubCmd -h\]**
 
@@ -396,6 +396,12 @@ Notation below: gp\[Var\], -\[cli-opt\], \[git.config.var\], (default)
 - **NA, NA, gitproj.config.remote-min-size, (20g)**
 - **gpGitFlow, NA, gitproj.config.flow, (true)**
 
+# EXAMPLES
+
+\[create a blank git-proj\]
+
+\[create a git-proj from existing files\]
+
 # ENVIRONMENT
 
 See Globals section for details.
@@ -404,11 +410,37 @@ HOME, USER, HOSTNAME, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
 
 # FILES
 
-    ~/.gitconfig
-    ~/.gitproj.config.global
-    PROJ/.gitproj.config.local
-    PROJ/.gitproj.config.$HOSTNAME
-    PROJ/.git/config
+Config files:
+
+    ~/.gitconfig - --global (gitproj sections setup with 'init' or 'clone')
+    PROJ/.gitproj - set up with 'init' and used by 'clone'
+    PROJ/.git/config --local (setup with 'init' or 'clone')
+
+Subcommand files:
+
+    /usr/share/doc/git-proj/
+        VERSION - current installed version (git proj --version)
+        CHANGES.md - changes for each version
+        README.md - getting started
+        LICENSE - GNU GPL V3
+    /usr/share/doc/git-proj/config/
+        gitconfig - global config template
+        gitignore - default ignore file
+    /usr/share/doc/git-proj/hooks/
+        pre-commit - see gitproj.hooks section for configuring this
+    /usr/share/doc/git-proj/contrib/
+        bash-fmt - format bash scripts
+        rm-trailing-sp - fix pre-commit whitespace issues
+    /usr/share/doc/git-proj/user-doc/
+        git-proj.html - all documentation in one file (git proj -h)
+        git-proj.md - all documentation in one file (git proj -h)
+        git-proj-CMD*.html (git proj CMD -h)
+        git-proj-CMD*.md (git proj CMD -h)
+    /usr/lib/git-core/git-proj/
+        git-proj - get overall help "git proj -h"
+        git-proj-CMD - called with "git proj CMD"
+        gitproj-CMD.inc - all the code for CMD
+
 
 # SEE ALSO
 
@@ -423,15 +455,27 @@ HOME, USER, HOSTNAME, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
 
 Currently gitproj only supports **local** git repos. The repos are
 called "remote" but that is only because the repo could be put on a
-"mounted" disk.
+"mounted" disk. Only the "origin" remote is supported. However each
+workspace can have its own "origin" definition, because the mount
+points could be different between systems.
+
+An existing remote git repo can be used, BUT manual work will be
+needed to set it up. TBD
 
 A future implementation could support git repos that are truly remote,
 on other systems. When that is implemented, an existing repo could be
-"upgraded" to a gitproj repo.
+"upgraded" to be a gitproj repo. The "raw" file remote could also be
+saved on other systems (via rsync, rclone, or even cvs).
 
-A remote repo implies the "raw" files will also be managed on a remote
-or local system. I.e. the raw files could be on most any servers that
-is supported by rsync or rclone.
+Use use the -x or -X options, or gpDebug env. var.  to turn on debug
+levels. Larger numbers, more debug. There is only a little bit of
+debug output, because the code uses "test code" to identify problems,
+before the code is released. See the github repo for the development
+process.
+
+# BUGS
+
+Please report bugs at: [issues](https://github.com/TurtleEngr/gitproj/issues)
 
 # AUTHOR
 
@@ -439,7 +483,7 @@ TurtleEngr
 
 # HISTORY
 
-(c) Copyright 2021 by TurtleEngr
+(c) Copyright 2022 by TurtleEngr
 
 <div>
     <hr/>

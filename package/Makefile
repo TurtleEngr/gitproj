@@ -68,6 +68,8 @@ build epm.list : clean ver.mak ver.epm ver.env
 	echo $(ProdVer) >../doc/VERSION
 	cp ../git-core/* dist/usr/lib/git-core
 	rsync -a ../doc/* dist/usr/share/doc/git-proj
+	-rm dist/usr/share/doc/git-proj/config/*.sav
+	-rm dist/usr/share/doc/git-proj/config/*.bak
 	cp ../LICENSE dist/usr/share/doc/git-proj
 	mkdir -p dist/usr/share/doc/git-proj/contrib
 	cp -p ../test/rm-trailing-sp ../test/bash-fmt \
@@ -100,7 +102,7 @@ uninstall :
 clean :
 	-rm epm.list ver.cs ver.env ver.epm ver.h ver.java ver.pl ver.xml >/dev/null 2>&1
 	-rm -rf dist tmp >/dev/null 2>&1
-	-find * -name '*~' -exec rm {} \; >/dev/null 2>&1
+	-find .. -name '*~' -exec rm {} \; >/dev/null 2>&1
 
 dist-clean : clean
 	-cd ../test; make clean

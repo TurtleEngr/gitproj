@@ -1,0 +1,34 @@
+=pod
+
+=head1 Configuration Documentation
+
+=head1 gitproj
+
+=head2 Config Variables
+
+	env.var, default, config.vars, options
+
+=head2 Precedence
+
+=head1 System
+
+	/usr/share/doc/git-proj/config/gitconfig
+	/usr/share/doc/git-proj/config/gitignore
+
+=head1 User (--global)
+
+	~/.gitconfig
+	~/.gitignore
+
+=head1 Project (--local)
+
+	PROJ/.gitproj
+	PROJ/.gitignore
+	PROJ/.git/config
+
+=head1 pre-commit
+
+	/usr/share/doc/git-proj/hooks/pre-commit
+	PROJ/.git/hooks/pre-commit
+
+=cut

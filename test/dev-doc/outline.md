@@ -18,12 +18,38 @@
     |   |   |   |getproj.config.local
     |   |   |hooks/
     |   |   |   |pre-commit*
+    |   |   |user-doc/
+    |   |   |   |README.md - generated from ../../README.md
+    |   |   |   |git-proj.html - generated
+    |   |   |   |git-proj.md - generated
+    |   |   |   |config.html - generated
+    |   |   |   |config.md - generated
+    |   |   |   |subcommands/
+    |   |   |   |   |git-proj-CMD.html - gen from git-proj-CMD
+    |   |   |   |   |git-proj-CMD.md - gen from git-proj-CMD
+    |   |   |   |tutorials/
+    |   |   |   |   |create_a_git-proj_repo.html - gen from src-doc/create_a_git-proj_repo.pod
+    |   |src-doc/ - src for generated docs
+    |   |   |doc-org.md
+    |   |   |config.pod
+    |   |   |create_a_git-proj_repo.pod
     |   |git-core/
     |   |   |git-proj*
     |   |   |gitproj-com.inc*
     |   |   |gitproj-[SUBCMD].inc*
     |   |   |git-proj-[SUBCMD]*
     |   |test/
+    |   |   |dev-doc/
+    |   |   |   |enhancements/
+    |   |   |   |   |raw-cvs.md
+    |   |   |   |   |raw-pros-cons.md
+    |   |   |   |   |raw-rclone.md
+    |   |   |   |   |raw-rsnapshot.md
+    |   |   |   |   |raw-ssh.md
+    |   |   |   |   |version-wizard.md
+    |   |   |   |git-proj.html - gen: 'git-proj -H int-html'
+    |   |   |   |git-proj.md - gen: 'git-proj -H int-md'
+    |   |   |   |outline.md - this document
     |   |   |Makefile
     |   |   |outline.md
     |   |   |shunit2 -> shunit2.1*
@@ -35,20 +61,32 @@
     |   |   |test-[SUBCMD].sh*
     |   |package/
     |   |   |Makefile
-    |   |generated/
-    |   |   |pkg/
-    |   |   |html/ - not versioned
-    |   |   |   |index.html
-    |   |   |   |*.html
-    |   |   |markdown/ - maybe versioned
-    |   |   |   |*.md
-    |   |   |development/ - not versioned
-    |   |   |   |index.html
-    |   |   |   |*.html
-    |   |   |   |*.md
-    |   |   |man/ - not versioned
-    |   |   |   |man1/
-    |   |   |   |   |gitproj.1.gz - user docs
+    |   |   |dist/ - all in dist is generated or copied
+    |   |   |   |usr/
+    |   |   |   |   |lib/
+    |   |   |   |   |   |git-core/
+    |   |   |   |share/
+    |   |   |   |doc/
+    |   |   |   |   |   |git-proj/
+    |   |   |   |   |   |   |config/
+    |   |   |   |   |   |   |contrib/
+    |   |   |   |   |   |   |hooks/
+    |   |   |   |   |   |   |user-doc
+    |   |   |   |   |   |   |   |subcommands/
+    |   |   |   |   |   |   |   |   |tutorials/
+    |   |   |   |   |   |man
+    |   |   |   |   |   |   |man1
+    |   |   |   |   |   |   |    |gitproj.1.gz
+    |   |   |pkg/ - generated
+    |   |   |Makefile
+    |   |   |ver.sh*
+    |   |   |mx.require
+    |   |   |epm.patch*
+    |   |   |epm.list - generated not versioned
+    |   |   |ver.env* - generated not versioned
+    |   |   |ver.epm - generated not versioned
+    |   |   |ver.mak - generated not versioned
+    |   |   |    |   |   |VERSION - versioned generated release info
 
 ## gitproj Installed Files - prod
 
@@ -56,28 +94,7 @@ Note: The tests will only check for a valid installation. Unit test
 will only be supported in a dev env. Running unit test on the
 installed files would be tricky, and of low value.
 
-    /usr/
-    |   |lib/
-    |   |   |git-core/  (gitproj/git-core/)
-    |   |   |   |git-proj
-    |   |   |   |gitproj-com.inc*
-    |   |   |   |git-proj-[SUBCMD].inc*
-    |   |share/
-    |   |   |doc/ (gitproj/doc/)
-    |   |   |   |git-proj/
-    |   |   |   |   |LICENSE
-    |   |   |   |   |README
-    |   |   |   |   |VERSION
-    |   |   |   |   |config/
-    |   |   |   |   |   |gitconfig.default
-    |   |   |   |   |   |gitignore.default
-    |   |   |   |   |   |gitproj.config.global
-    |   |   |   |   |   |getproj.config.local
-    |   |   |   |   |hooks/
-    |   |   |   |   |   |pre-commit*
-    |   |   |man/ (gitproj/generated/man/)
-    |   |   |   |man1/
-    |   |   |   |   |gitproj.1.gz
+See gitproj/package/dist/
 
 ## After running git-proj-init local, or git-proj-clone
 
@@ -89,7 +106,7 @@ installed files would be tricky, and of low value.
     cd ~/ANY-DIR
     git proj clone -d /MOUNT-DIR/ANY-DIR/PROJ.git
 
-    /home/
+    home/
     |   |USER/
     |   |   |.git.config - see "include.path" .gitproj.config.global
     |   |   |.gitproj.config.global
@@ -178,9 +195,9 @@ user.
 
     * Ifs
 
-        * Avoid if/then/else.
+        * Avoid if/then/else. Replace with: if problem, then exit
 
-        * Avoid long contents in ifs
+        * Avoid long contents in ifs. Make functions.
 
         * Don't nest ifs more than 2 levels. One level is preferred.
 

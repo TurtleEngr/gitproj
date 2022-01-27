@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body id="_podtop_">
+
+
+
+<ul id="index">
+  <li><a href="#NAME-git-proj-remote">NAME git proj remote</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+</ul>
+
+<hr/>
+
+<a href="#_podtop_"><h1 id="NAME-git-proj-remote">NAME git proj remote</h1></a>
+
+<a href="#_podtop_"><h1 id="SYNOPSIS">SYNOPSIS</h1></a>
+
+<pre><code>    git proj remote [-a] [-d pMountDir] [common-options]</code></pre>
+
+<a href="#_podtop_"><h1 id="DESCRIPTION">DESCRIPTION</h1></a>
+
+<p>This will create a remote git repo on an external drive.</p>
+
+<p>(Future versions may support repos on remote computers, where you have rsync access.)</p>
+
+<a href="#_podtop_"><h1 id="OPTIONS">OPTIONS</h1></a>
+
+<dl>
+
+<dt id="d-pMountDir"><b>-d pMountDir</b></dt>
+<dd>
+
+<p>This command is run after &quot;git proj init&quot; to setup a remote location. After this is setup, &quot;git proj push&quot; and &quot;git proj pull&quot; can be used to push/pull git and raw file changes.</p>
+
+<p>Export the git repo to an external drive (or another local dir) This is usually the removable drive&#39;s &quot;top&quot; directory. Ideally the top directory should be different across a set of external drives, so that the local &quot;origin&quot; can be used to make sure the proper git repo is found on the drive. The git &quot;origin&quot; will be set to pMountDir/ProjName.git And &quot;remote-raw-origin&quot; will be set to pMountDir/ProjName.raw</p>
+
+</dd>
+<dt id="common-options"><b>[common-options]</b></dt>
+<dd>
+
+<pre><code> -h                     (-H text)
+ -H pStyle
+ -q | -v | -V N         (gpVerbose level)
+ -x | -xx... | -X N     (gpDebug level)
+ -y | -n                (only used with -a option)</code></pre>
+
+<p>Run &quot;git proj -h&quot; for details.</p>
+
+</dd>
+</dl>
+
+<a href="#_podtop_"><h1 id="RETURN-VALUE">RETURN VALUE</h1></a>
+
+<pre><code> 0 - if OK
+ !0 - if errors</code></pre>
+
+<a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
+
+<pre><code> git proj
+ git proj init
+ git proj clone
+ git proj add
+ git proj push
+ git proj pull
+ git proj config
+ git proj status
+ git flow</code></pre>
+
+<a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
+
+<p>TurtleEngr</p>
+
+<a href="#_podtop_"><h1 id="HISTORY">HISTORY</h1></a>
+
+<p>GPLv3 Copyright 2021 by TurtleEngr</p>
+
+
+</body>
+
+</html>
+
+

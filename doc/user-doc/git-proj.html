@@ -27,10 +27,12 @@
         Config</a></li>
       </ul>
     </li>
+    <li><a href="#EXAMPLES">EXAMPLES</a></li>
     <li><a href="#ENVIRONMENT">ENVIRONMENT</a></li>
     <li><a href="#FILES">FILES</a></li>
     <li><a href="#SEE-ALSO">SEE ALSO</a></li>
     <li><a href="#CAVEATS">CAVEATS</a></li>
+    <li><a href="#BUGS">BUGS</a></li>
     <li><a href="#AUTHOR">AUTHOR</a></li>
     <li><a href="#HISTORY">HISTORY</a></li>
     <li><a href="#NAME-git-proj-init">NAME git proj init</a></li>
@@ -54,7 +56,7 @@
     <li><a href="#DESCRIPTION3">DESCRIPTION</a></li>
     <li><a href="#OPTIONS3">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE2">RETURN VALUE</a></li>
-    <li><a href="#EXAMPLES">EXAMPLES</a></li>
+    <li><a href="#EXAMPLES1">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO3">SEE ALSO</a></li>
     <li><a href="#AUTHOR3">AUTHOR</a></li>
     <li><a href="#HISTORY3">HISTORY</a></li>
@@ -63,7 +65,7 @@
     <li><a href="#DESCRIPTION4">DESCRIPTION</a></li>
     <li><a href="#OPTIONS4">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE3">RETURN VALUE</a></li>
-    <li><a href="#EXAMPLES1">EXAMPLES</a></li>
+    <li><a href="#EXAMPLES2">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO4">SEE ALSO</a></li>
     <li><a href="#AUTHOR4">AUTHOR</a></li>
     <li><a href="#HISTORY4">HISTORY</a></li>
@@ -156,7 +158,7 @@
   <dl>
     <dt id="git-proj-pSubCmd"><b>git proj [pSubCmd]</b></dt>
     <dd>
-      <p>This outputs short usage help for pSubCmd.</p>
+      <p>For most pSubCmds this outputs short usage help.</p>
     </dd>
     <dt id="git-proj-pSubCmd--h"><b>git proj [pSubCmd -h]</b></dt>
     <dd>
@@ -460,16 +462,42 @@
     gitproj.config.flow, (true)</b></dt>
     <dd></dd>
   </dl>
+  <h1 id="EXAMPLES">EXAMPLES</h1>
+  <p>[create a blank git-proj]</p>
+  <p>[create a git-proj from existing files]</p>
   <h1 id="ENVIRONMENT">ENVIRONMENT</h1>
   <p>See Globals section for details.</p>
   <p>HOME, USER, HOSTNAME, gpSysLog, gpFacility, gpVerbose, gpDebug,
   gpAuto</p>
   <h1 id="FILES">FILES</h1>
-  <pre><code>    ~/.gitconfig
-    ~/.gitproj.config.global
-    PROJ/.gitproj.config.local
-    PROJ/.gitproj.config.$HOSTNAME
-    PROJ/.git/config</code></pre>
+  <p>Config files:</p>
+  <pre><code>    ~/.gitconfig - --global (gitproj sections setup with 'init' or 'clone')
+    PROJ/.gitproj - set up with 'init' and used by 'clone'
+    PROJ/.git/config --local (setup with 'init' or 'clone')</code></pre>
+  <p>Subcommand files:</p>
+  <pre><code>    /usr/share/doc/git-proj/
+        VERSION - current installed version (git proj --version)
+        CHANGES.md - changes for each version
+        README.md - getting started
+        LICENSE - GNU GPL V3
+    /usr/share/doc/git-proj/config/
+        gitconfig - global config template
+        gitignore - default ignore file
+    /usr/share/doc/git-proj/hooks/
+        pre-commit - see gitproj.hooks section for configuring this
+    /usr/share/doc/git-proj/contrib/
+        bash-fmt - format bash scripts
+        rm-trailing-sp - fix pre-commit whitespace issues
+    /usr/share/doc/git-proj/user-doc/
+        git-proj.html - all documentation in one file (git proj -h)
+        git-proj.md - all documentation in one file (git proj -h)
+        git-proj-CMD*.html (git proj CMD -h)
+        git-proj-CMD*.md (git proj CMD -h)
+    /usr/lib/git-core/git-proj/
+        git-proj - get overall help "git proj -h"
+        git-proj-CMD - called with "git proj CMD"
+        gitproj-CMD.inc - all the code for CMD
+        </code></pre>
   <h1 id="SEE-ALSO">SEE ALSO</h1>
   <pre><code>    git proj init
     git proj remote
@@ -480,17 +508,26 @@
   <h1 id="CAVEATS">CAVEATS</h1>
   <p>Currently gitproj only supports <b>local</b> git repos. The repos are
   called "remote" but that is only because the repo could be put on a
-  "mounted" disk.</p>
+  "mounted" disk. Only the "origin" remote is supported. However each
+  workspace can have its own "origin" definition, because the mount points
+  could be different between systems.</p>
+  <p>An existing remote git repo can be used, BUT manual work will be needed
+  to set it up. TBD</p>
   <p>A future implementation could support git repos that are truly remote,
   on other systems. When that is implemented, an existing repo could be
-  "upgraded" to a gitproj repo.</p>
-  <p>A remote repo implies the "raw" files will also be managed on a remote
-  or local system. I.e. the raw files could be on most any servers that is
-  supported by rsync or rclone.</p>
+  "upgraded" to be a gitproj repo. The "raw" file remote could also be saved
+  on other systems (via rsync, rclone, or even cvs).</p>
+  <p>Use use the -x or -X options, or gpDebug env. var. to turn on debug
+  levels. Larger numbers, more debug. There is only a little bit of debug
+  output, because the code uses "test code" to identify problems, before the
+  code is released. See the github repo for the development process.</p>
+  <h1 id="BUGS">BUGS</h1>
+  <p>Please report bugs at: <a href=
+  "https://github.com/TurtleEngr/gitproj/issues">issues</a></p>
   <h1 id="AUTHOR">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY">HISTORY</h1>
-  <p>(c) Copyright 2021 by TurtleEngr</p>
+  <p>(c) Copyright 2022 by TurtleEngr</p>
   <hr />
   <h1 id="NAME-git-proj-init">NAME git proj init</h1>
   <h1 id="SYNOPSIS1">SYNOPSIS</h1>
@@ -664,7 +701,7 @@
   <h1 id="RETURN-VALUE2">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-  <h1 id="EXAMPLES">EXAMPLES</h1>
+  <h1 id="EXAMPLES1">EXAMPLES</h1>
   <p>The drive is mounted at: /mnt/usb-video and the the repo is at:
   video-2019-04-01/trip.git So use this to get a local copy.</p>
   <p>proj-get-local -d /mnt/usb-video/video-2019-04-01/trip.git</p>
@@ -729,7 +766,7 @@
   <h1 id="RETURN-VALUE3">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-  <h1 id="EXAMPLES1">EXAMPLES</h1>
+  <h1 id="EXAMPLES2">EXAMPLES</h1>
   <p>The rsync (and rclone) updates of the files in raw/ are not versioned,
   so be very careful with the -d option; files will be permanently
   deleted.</p>

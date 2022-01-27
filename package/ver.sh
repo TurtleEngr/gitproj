@@ -15,7 +15,7 @@ export ProdName="git-proj"
 export ProdAlias="git-proj"
 # One word [-a-z0-9]
 
-export ProdVer="0.4.1"
+export ProdVer="0.4.2"
 # [0-9]*.[0-9]*{.[0-9]*}
 # Requires 2 numbers, 3'rd number is optional
 # %version ProdVer
@@ -81,7 +81,7 @@ export ProdTPCopyright=""
 
 export ProdRelServer="moria.whyayh.com"
 export ProdRelRoot="/rel"
-export ProdRelCategory="software/ThirdParty/$ProdName/$ProdOSDist"
+export ProdRelCategory="software/own/$ProdName/deb"
 # Generated: ProdRelDir=$ProdRelRoot/released/$ProdRelCategory
 # Generated: ProdDevDir=$ProdRelRoot/development/$ProdRelCategory
 
