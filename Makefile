@@ -39,9 +39,9 @@ gen-doc : doc/CHANGES.md doc/README.md user-doc cmd-doc tutorial-doc
 user-doc : doc/user-doc/git-proj.md doc/user-doc/git-proj.html doc/user-doc/config.html
 
 doc/user-doc/config.html : src-doc/config.pod
-	pod2html --title='Configuration Documentation' $(mHtmlOpt) <$? >$@
-	$(mTidy) doc/user-doc/config.html
-	pod2markdown <$? >doc/user-doc/config.md
+	-pod2html --title='Configuration Documentation' $(mHtmlOpt) <$? >$@
+	-$(mTidy) doc/user-doc/config.html
+	-pod2markdown <src-doc/config.pod >doc/user-doc/config.md
 
 cmd-doc :
 	-mkdir -p doc/user-doc/subcommands
@@ -55,15 +55,15 @@ tutorial-doc : doc/user-doc/tutoral/create_a_git-proj_repo.html
 
 doc/user-doc/tutoral/create_a_git-proj_repo.html : src-doc/create_a_git-proj_repo.pod
 	-mkdir -p doc/user-doc/tutoral
-	pod2html --title='Create a git-proj Repo' $(mHtmlOpt) <$? >$@
-	$(mTidy) doc/user-doc/config.html
-	pod2markdown <$? >doc/user-doc/tutoral/config.podcreate_a_git-proj_repo.md
+	-pod2html --title='Create a git-proj Repo' $(mHtmlOpt) <$? >$@
+	-$(mTidy) doc/user-doc/config.html
+	-pod2markdown <$? >doc/user-doc/tutoral/config.podcreate_a_git-proj_repo.md
 
 doc/CHANGES.md : CHANGES.md
-	grep -Ev 'INT:' <$? | uniq >$@
+	-grep -Ev 'INT:' <$? | uniq >$@
 
 doc/README.md : README.md
-	grep -Ev 'INT:' <$? | uniq | awk ' \
+	-grep -Ev 'INT:' <$? | uniq | awk ' \
 	    /^## For Developers/ { exit 0 } \
 	    { print $$0 } \
 	' >$@
