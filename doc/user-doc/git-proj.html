@@ -237,7 +237,7 @@
   <p>If this doesn't exist, git proj init will create it from "Source"</p>
   <p>Section: [gitproj config]</p>
   <p>git proj init, will copy this... TBD</p>
-  <pre><code>    remote-min-size = 20g</code></pre>
+  <pre><code>    remote-min-space = 20g</code></pre>
   <p>This is the minium space that should be available on the external drive.
   The command will not continue if there is not enough space. The available
   space must also be twice the size of the space used by ProjName.raw.</p>
@@ -321,147 +321,7 @@
                 # End size with b, k, m, or g
                 binary-file-size-limit = 1k</code></pre>
   <h2 id="Global-Env.-Var.-Config">Global Env. Var. Config</h2>
-  <p>These are globals that may affect how the script runs. Just about all of
-  these globals that begin with "gp" can be set and exported before the
-  script is run. That way you can set your own defaults, by putting them in
-  your ~/.bashrc or ~/.bash_profile files.</p>
-  <p>Global variable precedence (the last one to set the gp variable,
-  wins):</p>
-  <pre><code> * internal hardcoded default
- * variable in ~/.gitconfig
- * variable in PROJ/.git/config
- * env. var.
- * command line option</code></pre>
-  <p>Notation below: gp[Var], -[cli-opt], [git.config.var], (default)</p>
-  <dl>
-    <dt id="gpSysLog-NA-gitproj.config.syslog-false"><b>gpSysLog, NA,
-    gitproj.config.syslog, (false)</b></dt>
-    <dd>
-      <p>If set to 0, log messages will only be sent to stderr.</p>
-      <p>If set to 1, log messages will be sent to stderr and syslog.</p>
-      <p>Default: false</p>
-    </dd>
-    <dt id="gpFacility-NA-gitproj.config.facility-user"><b>gpFacility, NA,
-    gitproj.config.facility, (user)</b></dt>
-    <dd>
-      <p>Log messages sent to syslog will be sent to the "facility" specified
-      by by gpFacility.</p>
-      <p>"user" log messages will be sent to /var/log/user.log, or
-      /var/log/syslog, or /var/log/messages.log</p>
-      <p>See: fLog</p>
-      <p>Default: user</p>
-      <p>Allowed facility names:</p>
-      <pre><code> local0 through local7 - local system facilities
- user - misc scripts, generic user-level messages
- auth - security/authorization messages
- authpriv - security/authorization messages (private)
- cron - clock daemon (cron and at)
- daemon - system daemons without separate facility value
- ftp - ftp daemon
- kern - kernel  messages  (these  can't be generated from user processes)
- lpr - line printer subsystem
- mail - mail subsystem
- news - USENET news subsystem
- syslog - messages generated internally by syslogd(8)
- uucp - UUCP subsystem</code></pre>
-      <p>These are some suggested uses for the localN facilities:</p>
-      <pre><code> local0 - system or application configuration
- local1 - application processes
- local2 - web site errors
- local3 - web site access
- local4 - backend processes
- local5 - publishing
- local6 - available
- local7 - available</code></pre>
-    </dd>
-    <dt id="gpVerbose--q--v--V-N-gitproj.config.verbose-2"><b>gpVerbose, -q,
-    -v, -V N, gitproj.config.verbose, (2)</b></dt>
-    <dd>
-      <pre><code> -q - gpVerbose=0
- -v - gpVerbose=2
- -v N - gpVerbose=N
-
- gpVerbose  = 0 - output error messages (corrections must be made)
- gpVerbose &gt;= 1 - output warnings messages (corrections may be needed)
- gpVerbose &gt;= 2 - output notice messages (important information)
- gpVerbose &gt;= 3 - output info messages (give more information)</code></pre>
-      <p>Default: 2</p>
-      <p>Normal log message:</p>
-      <pre><code> Command [warning, notice, info]: Message [File:LineNo](ErrCode)</code></pre>
-      <p>Error messages (crit will exit, err might continue):</p>
-      <pre><code> Command [crit, err]: Error: Message [File:LineNo](ErrCode)</code></pre>
-      <p>An internal error. This is probably a defect in the code (collect
-      all the output for a bug report):</p>
-      <pre><code> Command [crit, err]: Internal: Error: Message [File:LineNo](ErrCode)
- StackTrace:</code></pre>
-    </dd>
-    <dt id="gpDebug--x--X-N-NA-0"><b>gpDebug, -x, -X N, NA, (0)</b></dt>
-    <dd>
-      <p>Default: 0</p>
-      <p>There is no config variable for gpDebug.</p>
-      <p>If set to 0, all "debug" and "debug-N" level messages will be
-      skipped.</p>
-      <p>If not 0, all "debug" level messages will be output.</p>
-      <p>If "debug-N" level is used, then if gpDebug is &gt;= N, then the log
-      message will be output, otherwise it is skipped.</p>
-    </dd>
-    <dt id="gpAuto--a-NA-false"><b>gpAuto, -a, NA, (false)</b></dt>
-    <dd></dd>
-    <dt id="gpYesNo--y--n-NA-No"><b>gpYesNo, -y, -n, NA, (No)</b></dt>
-    <dd>
-      <p>If gpAuto is true, then gpYesNo can be used to define default
-      answers.</p>
-    </dd>
-    <dt id="gpAutoMove-NA-NA-false"><b>gpAutoMove, NA, NA, (false)</b></dt>
-    <dd></dd>
-    <dt id="gpBin-NA-gitproj.config.bin-usr-lib-git-core"><b>gpBin, NA,
-    gitproj.config.bin, (/usr/lib/git-core)</b></dt>
-    <dd>
-      <p>The location of the executing command will override this.</p>
-    </dd>
-    <dt id="gpDoc-NA-gitproj.config.doc-usr-share-doc-git-proj"><b>gpDoc, NA,
-    gitproj.config.doc, (/usr/share/doc/git-proj)</b></dt>
-    <dd>
-      <p>If not found, then set to: $gpBin/../doc If still not found:
-      error.</p>
-    </dd>
-    <dt id="gpCheckFileNames-NA-gitproj.hook.check-file-names-true">
-    <b>gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)</b></dt>
-    <dd></dd>
-    <dt id="gpCheckForBigFiles-NA-gitproj.hook.check-for-big-files-true">
-    <b>gpCheckForBigFiles, NA, gitproj.hook.check-for-big-files,
-    (true)</b></dt>
-    <dd></dd>
-    <dt id="gpCheckInRaw-NA-gitproj.hook.check-in-raw-true"><b>gpCheckInRaw,
-    NA, gitproj.hook.check-in-raw, (true)</b></dt>
-    <dd></dd>
-    <dt id="gpCheckWhitespace-NA-gitproj.hook.check-whitespace-true">
-    <b>gpCheckWhitespace, NA, gitproj.hook.check-whitespace, (true)</b></dt>
-    <dd>
-      <p>See rm-trailing-sp to fix.</p>
-    </dd>
-    <dt id="gpAllowTabs-NA-gitproj.hook.allow-tabs-false"><b>gpAllowTabs, NA,
-    gitproj.hook.allow-tabs, (false)</b></dt>
-    <dd>
-      <p>See rm-trailing-sp to fix (-t option)</p>
-    </dd>
-    <dt id="gpHookVerbose-NA-gitproj.hook.verbose-true"><b>gpHookVerbose, NA,
-    gitproj.hook.verbose, (true)</b></dt>
-    <dd></dd>
-    <dt id="gpPreCommitEnabled-NA-gitproj.hook.pre-commit-enable-true">
-    <b>gpPreCommitEnabled, NA, gitproj.hook.pre-commit-enable,
-    (true)</b></dt>
-    <dd></dd>
-    <dt id="gpMaxSize-NA-gitproj.hook.binary-file-size-limit-10k">
-    <b>gpMaxSize, NA, gitproj.hook.binary-file-size-limit, (10k)</b></dt>
-    <dd></dd>
-    <dt id="NA-NA-gitproj.config.remote-min-size-20g"><b>NA, NA,
-    gitproj.config.remote-min-size, (20g)</b></dt>
-    <dd></dd>
-    <dt id="gpGitFlow-NA-gitproj.config.flow-true"><b>gpGitFlow, NA,
-    gitproj.config.flow, (true)</b></dt>
-    <dd></dd>
-  </dl>
+  <p>See... TBD</p>
   <h1 id="EXAMPLES">EXAMPLES</h1>
   <p>[create a blank git-proj]</p>
   <p>[create a git-proj from existing files]</p>

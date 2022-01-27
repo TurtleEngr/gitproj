@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Configuration Documentation</title>
@@ -11,38 +11,288 @@
 </head>
 <body id="_podtop_">
   <ul id="index">
-    <li><a href="#Configuration-Documentation">Configuration
+    <li><a href="#gitproj-Configuration-Documentation">gitproj Configuration
     Documentation</a></li>
     <li>
-      <a href="#gitproj">gitproj</a>
+      <a href="#Precedence">Precedence</a>
       <ul>
-        <li><a href="#Config-Variables">Config Variables</a></li>
-        <li><a href="#Precedence">Precedence</a></li>
+        <li><a href="#System-etc-gitconfg">System, /etc/gitconfg</a></li>
+        <li><a href=
+        "#gitproj-global-usr-share-doc-git-proj-config-gitconfig">gitproj,
+        global, /usr/share/doc/git-proj/config/gitconfig</a></li>
+        <li><a href="#Global-user---global-.gitconfig">Global, user,
+        --global, ~/.gitconfig</a></li>
+        <li><a href="#gitproj-local-PROJ-.gitproj">gitproj, local,
+        PROJ/.gitproj</a></li>
+        <li><a href="#Local-proj---local-PROJ-.git-config">Local, proj,
+        --local, PROJ/.git/config</a></li>
+        <li><a href=
+        "#usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit">
+        /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit,
+        PROJ/.pre-commit</a></li>
       </ul>
     </li>
-    <li><a href="#System">System</a></li>
-    <li><a href="#User---global">User (--global)</a></li>
-    <li><a href="#Project---local">Project (--local)</a></li>
-    <li><a href="#pre-commit">pre-commit</a></li>
+    <li>
+      <a href="#Config-Variables-and-Environment-Variables">Config Variables
+      and Environment Variables</a>
+      <ul>
+        <li><a href="#Notation:-gp-Var---A-git.config.-var-default">Notation:
+        gp[Var]; -[A]; git.config.[var]; (default)</a></li>
+        <li><a href="#gpSysLog--NA-gitproj.config.syslog-false">gpSysLog;
+        -NA; gitproj.config.syslog; (false)</a></li>
+        <li><a href=
+        "#gpFacility--NA-gitproj.config.facility-user">gpFacility; -NA;
+        gitproj.config.facility; (user)</a></li>
+        <li><a href=
+        "#gpVerbose--q--v--V-N-gitproj.config.verbose-2">gpVerbose; -q, -v,
+        -V N; gitproj.config.verbose; (2)</a></li>
+        <li><a href="#gpDebug--x--X-N-NA-0">gpDebug; -x, -X N; NA;
+        (0)</a></li>
+        <li><a href="#gpAuto--a-NA-false">gpAuto; -a; NA; (false)</a></li>
+        <li><a href="#gpYesNo--y--n-NA-No">gpYesNo; -y; -n; NA; (No)</a></li>
+        <li><a href="#gpAutoMove--NA-NA-false">gpAutoMove; -NA; NA;
+        (false)</a></li>
+        <li><a href="#gpBin--NA-gitproj.config.bin-usr-lib-git-core">gpBin;
+        -NA; gitproj.config.bin; (/usr/lib/git-core)</a></li>
+        <li><a href=
+        "#gpDoc--NA-gitproj.config.doc-usr-share-doc-git-proj">gpDoc; -NA;
+        gitproj.config.doc; (/usr/share/doc/git-proj)</a></li>
+        <li><a href=
+        "#gpCheckFileNames--NA-gitproj.hook.check-file-names-true">gpCheckFileNames;
+        -NA; gitproj.hook.check-file-names; (true)</a></li>
+        <li><a href=
+        "#gpCheckForBigFiles--NA-gitproj.hook.check-for-big-files-true">gpCheckForBigFiles;
+        -NA; gitproj.hook.check-for-big-files; (true)</a></li>
+        <li><a href=
+        "#gpCheckInRaw--NA-gitproj.hook.check-in-raw-true">gpCheckInRaw; -NA;
+        gitproj.hook.check-in-raw; (true)</a></li>
+        <li><a href=
+        "#gpCheckWhitespace--NA-gitproj.hook.check-whitespace-true">gpCheckWhitespace;
+        -NA; gitproj.hook.check-whitespace; (true)</a></li>
+        <li><a href=
+        "#gpAllowTabs--NA-gitproj.hook.allow-tabs-false">gpAllowTabs; -NA;
+        gitproj.hook.allow-tabs; (false)</a></li>
+        <li><a href=
+        "#gpHookVerbose--NA-gitproj.hook.verbose-true">gpHookVerbose; -NA;
+        gitproj.hook.verbose; (true)</a></li>
+        <li><a href=
+        "#gpPreCommitEnabled--NA-gitproj.hook.pre-commit-enable-true">gpPreCommitEnabled;
+        -NA; gitproj.hook.pre-commit-enable; (true)</a></li>
+        <li><a href=
+        "#gpMaxSize--NA-gitproj.hook.binary-file-size-limit-10k">gpMaxSize;
+        -NA; gitproj.hook.binary-file-size-limit; (10k)</a></li>
+        <li><a href=
+        "#gpRemoteMinSpace--NA-gitproj.config.remote-min-space-20g">gpRemoteMinSpace;
+        -NA; gitproj.config.remote-min-space; (20g)</a></li>
+        <li><a href="#gpGitFlow--NA-gitproj.config.flow-true">gpGitFlow; -NA;
+        gitproj.config.flow; (true)</a></li>
+      </ul>
+    </li>
   </ul>
-  <h1 id="Configuration-Documentation"><a href="#_podtop_">Configuration
-  Documentation</a></h1>
-  <h1 id="gitproj"><a href="#_podtop_">gitproj</a></h1>
-  <h2 id="Config-Variables">Config Variables</h2>
-  <pre><code>        env.var, default, config.vars, options</code></pre>
-  <h2 id="Precedence">Precedence</h2>
-  <h1 id="System"><a href="#_podtop_">System</a></h1>
-  <pre><code>        /usr/share/doc/git-proj/config/gitconfig
-        /usr/share/doc/git-proj/config/gitignore</code></pre>
-  <h1 id="User---global"><a href="#_podtop_">User (--global)</a></h1>
-  <pre><code>        ~/.gitconfig
-        ~/.gitignore</code></pre>
-  <h1 id="Project---local"><a href="#_podtop_">Project (--local)</a></h1>
-  <pre><code>        PROJ/.gitproj
-        PROJ/.gitignore
-        PROJ/.git/config</code></pre>
-  <h1 id="pre-commit"><a href="#_podtop_">pre-commit</a></h1>
-  <pre><code>        /usr/share/doc/git-proj/hooks/pre-commit
-        PROJ/.git/hooks/pre-commit</code></pre>
+  <h1 id="gitproj-Configuration-Documentation"><a href="#_podtop_">gitproj
+  Configuration Documentation</a></h1>
+  <h1 id="Precedence"><a href="#_podtop_">Precedence</a></h1>
+  <p>There are over 20 config variables for managing the git-proj
+  subcommands. Their "scope" is defined by the file they are in. Definitions
+  "closer" to the project directory have higher precedence. Think of this as
+  a sieve, with variables looked for in the following order, where the last
+  definition wins.</p>
+  <pre><code>       Scope           Access    Locaton
+    1. System          --file    /etc/gitconfig
+       gitproj, global --file    /usr/share/doc/config/gitconfig
+    2. Global, user    --global  ~/.gitconfig
+       gitproj, local  --file    PROJ/.gitproj
+    3. Local, proj     --local   PROJ/.git/config
+    4. Worktree        --file    PROJ/.git/config.worktree
+       </code></pre>
+  <p>If the "Access" is defined for "set" or "get", then that is the only
+  location "git config" will use.</p>
+  <p>git-proj doesn't do anything with ".git/config.worktree".</p>
+  <h2 id="System-etc-gitconfg">System, /etc/gitconfg</h2>
+  <pre><code>    /etc/gitconfg</code></pre>
+  <p>Currently gitproj does not do anything with this file. Variables that
+  should be set for all users on a system can be put in this file. Since
+  gitproj defines all of the gitproj variables in a user's ~/.gitconfig, the
+  /etc/gitconfig changes will not have any impact on the gitproj
+  variables.</p>
+  <h2 id="gitproj-global-usr-share-doc-git-proj-config-gitconfig">gitproj,
+  global, /usr/share/doc/git-proj/config/gitconfig</h2>
+  <pre><code>    L&lt;/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig&gt;</code></pre>
+  <p>gitproj default variable values for all users and projects are defined
+  in this file. The values are only copied at selected times and unless
+  specified, they will only add missing vars, not changing user or project
+  vars.</p>
+  <p>This file is mainly used when creating an initial project with
+  <span style="white-space: nowrap;">"git proj init"</span> or <span style=
+  "white-space: nowrap;">"git proj clone"</span>. It is also used by
+  <span style="white-space: nowrap;">"git proj config"</span>.</p>
+  <p>The /usr/share/doc/git-proj/config/gitconfig file is not used directly
+  by "git config". It is only used to setup the ~/.gitconfig file.</p>
+  <p>When a new version of gitproj is installed, new vars and new default
+  values may be added. Package manager options can be used to replace or keep
+  the existing config file (see man dpkg --force-confdef, --force-confnew, or
+  --force-confold).</p>
+  <h2 id="Global-user---global-.gitconfig">Global, user, --global,
+  ~/.gitconfig</h2>
+  <pre><code>    ~/.gitconfig
+    ~/.gitignore</code></pre>
+  <p>If the ~/.gitconfig is not defined, it will be copied from
+  /usr/share/doc/config/gitconfig. Also if ~/.gitignore is not defined, it
+  will be copyied from /usr/share/doc/config/gitignore.</p>
+  <p><span style="white-space: nowrap;">"git proj init"</span> and
+  <span style="white-space: nowrap;">"git proj clone"</span> will update
+  ~/.gitconfig from /usr/share/doc/config/gitconfig, for any vars that are
+  not defined in ~/.gitconfig. Existing variables will not be chnaged.</p>
+  <h2 id="gitproj-local-PROJ-.gitproj">gitproj, local, PROJ/.gitproj</h2>
+  <pre><code>    PROJ/.gitproj
+    PROJ/.gitignore</code></pre>
+  <p>The PROJ/.gitproj file is not used directly by "git config". It is only
+  used to setup the initial PROJ/.git/config file.</p>
+  <p><span style="white-space: nowrap;">"git proj init"</span> will create
+  PROJ/.gitproj from the gitproj sections in ~/.gitconfig (also filling in
+  "missing" vars from /usr/share/doc/config/gitconfig). PROJ/.gitproj should
+  be versioned, for use by <span style="white-space: nowrap;">git proj
+  clone</span></p>
+  <p><span style="white-space: nowrap;">"git proj clone"</span> will add vars
+  from PROJ/.gitproj to PROJ/.git/config afer the files are created. If
+  PROJ/.gitproj is missing, it will create it with the "init" process.</p>
+  <p>git-proj commands that change gitproj section vars in PROJ/.git/config
+  will also change the vars in PROD/.gitproj, so that later clones can update
+  PROJ/.git/config.</p>
+  <h2 id="Local-proj---local-PROJ-.git-config">Local, proj, --local,
+  PROJ/.git/config</h2>
+  <pre><code>    PROJ/.git/config</code></pre>
+  <p><span style="white-space: nowrap;">"git proj init"</span> and
+  <span style="white-space: nowrap;">"git proj clone"</span> will copy all of
+  the vars in PROJ/.gitproj to PROJ/.git/config.</p>
+  <h2 id=
+  "usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit">
+  /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit,
+  PROJ/.pre-commit</h2>
+  <pre><code>    L&lt;/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit&gt;
+    ~/.pre-commit (optinal)
+    PROJ/.pre-commit (optinal)
+    PROJ/.git/hooks/pre-commit</code></pre>
+  <p>The pre-commit hook file is created with a precidence similar to the
+  config vars.</p>
+  <p><span style="white-space: nowrap;">"git proj init"</span> and
+  <span style="white-space: nowrap;">"git proj clone"</span> will create the
+  PROJ/.git/hooks/pre-commit file. If PROJ/.pre-commit exists, that file will
+  be used. If ~/.pre-commit exits, that file will be used. And finally the
+  /usr/share/doc/git-proj/hooks/pre-commit file will be used.</p>
+  <h1 id="Config-Variables-and-Environment-Variables"><a href=
+  "#_podtop_">Config Variables and Environment Variables</a></h1>
+  <p>These are globals and vars that effect how the script runs. Just about
+  all of the env. vars. that begin with "gp" can be set and exported before
+  the script is run. That way you can set your own defaults, by putting them
+  in your ~/.bashrc or ~/.bash_profile files.</p>
+  <p>Global variable precedence (the last one to set the gp variable, wins).
+  (Internally, this is not implemented in this order, but this is the logical
+  result.)</p>
+  <pre><code> * internal hardcoded default
+ * variable in ~/.gitconfig
+ * variable in PROJ/.git/config
+ * env. var.
+ * command line option
+
+        </code></pre>
+  <h2 id="Notation:-gp-Var---A-git.config.-var-default">Notation: gp[Var];
+  -[A]; git.config.[var]; (default)</h2>
+  <h2 id="gpSysLog--NA-gitproj.config.syslog-false">gpSysLog; -NA;
+  gitproj.config.syslog; (false)</h2>
+  <p>If set to 0, log messages will only be sent to stderr.</p>
+  <p>If set to 1, log messages will be sent to stderr and syslog.</p>
+  <p>Default: false</p>
+  <h2 id="gpFacility--NA-gitproj.config.facility-user">gpFacility; -NA;
+  gitproj.config.facility; (user)</h2>
+  <p>Log messages sent to syslog will be sent to the "facility" specified by
+  by gpFacility.</p>
+  <p>"user" log messages will be sent to /var/log/user.log, or
+  /var/log/syslog, or /var/log/messages.log</p>
+  <p>See: fLog</p>
+  <p>Default: user</p>
+  <p>Allowed facility names:</p>
+  <pre><code> local0 through local7 - local system facilities
+ user - misc scripts, generic user-level messages
+ auth - security/authorization messages
+ authpriv - security/authorization messages (private)
+ cron - clock daemon (cron and at)
+ daemon - system daemons without separate facility value
+ ftp - ftp daemon
+ kern - kernel  messages  (these  can't be generated from user processes)
+ lpr - line printer subsystem
+ mail - mail subsystem
+ news - USENET news subsystem
+ syslog - messages generated internally by syslogd(8)
+ uucp - UUCP subsystem</code></pre>
+  <p>These are some suggested uses for the localN facilities:</p>
+  <pre><code> local0 - system or application configuration
+ local1 - application processes
+ local2 - web site errors
+ local3 - web site access
+ local4 - backend processes
+ local5 - publishing
+ local6 - available
+ local7 - available</code></pre>
+  <h2 id="gpVerbose--q--v--V-N-gitproj.config.verbose-2">gpVerbose; -q, -v,
+  -V N; gitproj.config.verbose; (2)</h2>
+  <pre><code> -q - gpVerbose=0
+ -v - gpVerbose=2
+ -v N - gpVerbose=N
+
+ gpVerbose  = 0 - output error messages (corrections must be made)
+ gpVerbose &gt;= 1 - output warnings messages (corrections may be needed)
+ gpVerbose &gt;= 2 - output notice messages (important information)
+ gpVerbose &gt;= 3 - output info messages (give more information)</code></pre>
+  <p>Default: 2</p>
+  <p>Normal log message:</p>
+  <pre><code> Command [warning, notice, info]: Message [File:LineNo](ErrCode)</code></pre>
+  <p>Error messages (crit will exit, err might continue):</p>
+  <pre><code> Command [crit, err]: Error: Message [File:LineNo](ErrCode)</code></pre>
+  <p>An internal error. This is probably a defect in the code (collect all
+  the output for a bug report):</p>
+  <pre><code> Command [crit, err]: Internal: Error: Message [File:LineNo](ErrCode)
+ StackTrace:</code></pre>
+  <h2 id="gpDebug--x--X-N-NA-0">gpDebug; -x, -X N; NA; (0)</h2>
+  <p>Default: 0</p>
+  <p>There is no config variable for gpDebug.</p>
+  <p>If set to 0, all "debug" and "debug-N" level messages will be
+  skipped.</p>
+  <p>If not 0, all "debug" level messages will be output.</p>
+  <p>If "debug-N" level is used, then if gpDebug is &gt;= N, then the log
+  message will be output, otherwise it is skipped.</p>
+  <h2 id="gpAuto--a-NA-false">gpAuto; -a; NA; (false)</h2>
+  <h2 id="gpYesNo--y--n-NA-No">gpYesNo; -y; -n; NA; (No)</h2>
+  <p>If gpAuto is true, then gpYesNo can be used to define default
+  answers.</p>
+  <h2 id="gpAutoMove--NA-NA-false">gpAutoMove; -NA; NA; (false)</h2>
+  <h2 id="gpBin--NA-gitproj.config.bin-usr-lib-git-core">gpBin; -NA;
+  gitproj.config.bin; (/usr/lib/git-core)</h2>
+  <p>The location of the executing command will override this.</p>
+  <h2 id="gpDoc--NA-gitproj.config.doc-usr-share-doc-git-proj">gpDoc; -NA;
+  gitproj.config.doc; (/usr/share/doc/git-proj)</h2>
+  <p>If not found, then set to: $gpBin/../doc If still not found: error.</p>
+  <h2 id="gpCheckFileNames--NA-gitproj.hook.check-file-names-true">
+  gpCheckFileNames; -NA; gitproj.hook.check-file-names; (true)</h2>
+  <h2 id="gpCheckForBigFiles--NA-gitproj.hook.check-for-big-files-true">
+  gpCheckForBigFiles; -NA; gitproj.hook.check-for-big-files; (true)</h2>
+  <h2 id="gpCheckInRaw--NA-gitproj.hook.check-in-raw-true">gpCheckInRaw; -NA;
+  gitproj.hook.check-in-raw; (true)</h2>
+  <h2 id="gpCheckWhitespace--NA-gitproj.hook.check-whitespace-true">
+  gpCheckWhitespace; -NA; gitproj.hook.check-whitespace; (true)</h2>
+  <p>See rm-trailing-sp to fix.</p>
+  <h2 id="gpAllowTabs--NA-gitproj.hook.allow-tabs-false">gpAllowTabs; -NA;
+  gitproj.hook.allow-tabs; (false)</h2>
+  <p>See rm-trailing-sp to fix (-t option)</p>
+  <h2 id="gpHookVerbose--NA-gitproj.hook.verbose-true">gpHookVerbose; -NA;
+  gitproj.hook.verbose; (true)</h2>
+  <h2 id="gpPreCommitEnabled--NA-gitproj.hook.pre-commit-enable-true">
+  gpPreCommitEnabled; -NA; gitproj.hook.pre-commit-enable; (true)</h2>
+  <h2 id="gpMaxSize--NA-gitproj.hook.binary-file-size-limit-10k">gpMaxSize;
+  -NA; gitproj.hook.binary-file-size-limit; (10k)</h2>
+  <h2 id="gpRemoteMinSpace--NA-gitproj.config.remote-min-space-20g">
+  gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (20g)</h2>
+  <h2 id="gpGitFlow--NA-gitproj.config.flow-true">gpGitFlow; -NA;
+  gitproj.config.flow; (true)</h2>
 </body>
 </html>

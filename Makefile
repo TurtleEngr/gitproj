@@ -80,8 +80,8 @@ doc/user-doc/git-proj.html : git-core/git-proj
 # "uniq" is a quick way of removing any extra blank lines
 
 fmt : clean
-	which shfmt
-	which $(mTestDir)/rm-trailing-sp
+	command -v shfmt
+	command -v $(mTestDir)/rm-trailing-sp
 	-rm fmt-err.tmp
 	rm-trailing-sp -t doc/config/* doc/hooks/* git-core/* test/*.sh
 	rm-trailing-sp -t doc/LICENSE doc/VERSION

@@ -46,17 +46,17 @@ include ver.mak
 first : ver.mak ver.epm /usr/lib/git-core
 	touch ver.sh
 	make ver.mak
-	@which git
-	@which epm
-	@which mkver.pl
-	@which mkepmlist
-	@which patch-epm-list
-	@which perl
-	@which gawk
-	@which fmt
-	@which sed
-	@which tr
-	@which pod2markdown
+	@command -v git
+	@command -v epm
+	@command -v mkver.pl
+	@command -v mkepmlist
+	@command -v patch-epm-list
+	@command -v perl
+	@command -v gawk
+	@command -v fmt
+	@command -v sed
+	@command -v tr
+	@command -v pod2markdown
 
 build epm.list : clean ver.mak ver.epm ver.env
 	if [ "$(USER)" = "root" ]; then exit 1; fi
@@ -72,7 +72,7 @@ build epm.list : clean ver.mak ver.epm ver.env
 	-rm dist/usr/share/doc/git-proj/config/*.bak
 	cp ../LICENSE dist/usr/share/doc/git-proj
 	mkdir -p dist/usr/share/doc/git-proj/contrib
-	cp -p ../test/rm-trailing-sp ../test/bash-fmt \
+	cp -p ../test/rm-trailing-sp ../test/bash-fmt ../test/bash-lint \
 		dist/usr/share/doc/git-proj/contrib
 	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
 	gzip dist/usr/share/man/man1/git-proj.1

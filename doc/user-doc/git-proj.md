@@ -161,7 +161,7 @@ Section: \[gitproj config\]
 
 git proj init, will copy this... TBD
 
-    remote-min-size = 20g
+    remote-min-space = 20g
 
 This is the minium space that should be available on the external
 drive.  The command will not continue if there is not enough space.
@@ -263,138 +263,7 @@ file.
 
 ## Global Env. Var. Config
 
-These are globals that may affect how the script runs. Just about all
-of these globals that begin with "gp" can be set and exported before
-the script is run. That way you can set your own defaults, by putting
-them in your ~/.bashrc or ~/.bash\_profile files.
-
-Global variable precedence (the last one to set the gp variable, wins):
-
-    * internal hardcoded default
-    * variable in ~/.gitconfig
-    * variable in PROJ/.git/config
-    * env. var.
-    * command line option
-
-Notation below: gp\[Var\], -\[cli-opt\], \[git.config.var\], (default)
-
-- **gpSysLog, NA, gitproj.config.syslog, (false)**
-
-    If set to 0, log messages will only be sent to stderr.
-
-    If set to 1, log messages will be sent to stderr and syslog.
-
-    Default: false
-
-- **gpFacility, NA, gitproj.config.facility, (user)**
-
-    Log messages sent to syslog will be sent to the "facility" specified
-    by by gpFacility.
-
-    "user" log messages will be sent to /var/log/user.log, or
-    /var/log/syslog, or /var/log/messages.log
-
-    See: fLog
-
-    Default: user
-
-    Allowed facility names:
-
-        local0 through local7 - local system facilities
-        user - misc scripts, generic user-level messages
-        auth - security/authorization messages
-        authpriv - security/authorization messages (private)
-        cron - clock daemon (cron and at)
-        daemon - system daemons without separate facility value
-        ftp - ftp daemon
-        kern - kernel  messages  (these  can't be generated from user processes)
-        lpr - line printer subsystem
-        mail - mail subsystem
-        news - USENET news subsystem
-        syslog - messages generated internally by syslogd(8)
-        uucp - UUCP subsystem
-
-    These are some suggested uses for the localN facilities:
-
-        local0 - system or application configuration
-        local1 - application processes
-        local2 - web site errors
-        local3 - web site access
-        local4 - backend processes
-        local5 - publishing
-        local6 - available
-        local7 - available
-
-- **gpVerbose, -q, -v, -V N, gitproj.config.verbose, (2)**
-
-        -q - gpVerbose=0
-        -v - gpVerbose=2
-        -v N - gpVerbose=N
-
-        gpVerbose  = 0 - output error messages (corrections must be made)
-        gpVerbose >= 1 - output warnings messages (corrections may be needed)
-        gpVerbose >= 2 - output notice messages (important information)
-        gpVerbose >= 3 - output info messages (give more information)
-
-    Default: 2
-
-    Normal log message:
-
-        Command [warning, notice, info]: Message [File:LineNo](ErrCode)
-
-    Error messages (crit will exit, err might continue):
-
-        Command [crit, err]: Error: Message [File:LineNo](ErrCode)
-
-    An internal error. This is probably a defect in the code (collect all
-    the output for a bug report):
-
-        Command [crit, err]: Internal: Error: Message [File:LineNo](ErrCode)
-        StackTrace:
-
-- **gpDebug, -x, -X N, NA, (0)**
-
-    Default: 0
-
-    There is no config variable for gpDebug.
-
-    If set to 0, all "debug" and "debug-N" level messages will be skipped.
-
-    If not 0, all "debug" level messages will be output.
-
-    If "debug-N" level is used, then if gpDebug is >= N, then the log
-    message will be output, otherwise it is skipped.
-
-- **gpAuto, -a, NA, (false)**
-- **gpYesNo, -y, -n, NA, (No)**
-
-    If gpAuto is true, then gpYesNo can be used to define default answers.
-
-- **gpAutoMove, NA, NA, (false)**
-- **gpBin, NA, gitproj.config.bin, (/usr/lib/git-core)**
-
-    The location of the executing command will override this.
-
-- **gpDoc, NA, gitproj.config.doc, (/usr/share/doc/git-proj)**
-
-    If not found, then set to: $gpBin/../doc  If still not found: error.
-
-- **gpCheckFileNames, NA, gitproj.hook.check-file-names, (true)**
-- **gpCheckForBigFiles, NA, gitproj.hook.check-for-big-files, (true)**
-- **gpCheckInRaw, NA, gitproj.hook.check-in-raw, (true)**
-- **gpCheckWhitespace, NA, gitproj.hook.check-whitespace, (true)**
-
-    See rm-trailing-sp to fix.
-
-- **gpAllowTabs, NA, gitproj.hook.allow-tabs, (false)**
-
-    See rm-trailing-sp to fix (-t option)
-
-- **gpHookVerbose, NA, gitproj.hook.verbose, (true)**
-- **gpPreCommitEnabled, NA, gitproj.hook.pre-commit-enable, (true)**
-- **gpMaxSize, NA, gitproj.hook.binary-file-size-limit, (10k)**
-- **NA, NA, gitproj.config.remote-min-size, (20g)**
-- **gpGitFlow, NA, gitproj.config.flow, (true)**
+See... TBD
 
 # EXAMPLES
 

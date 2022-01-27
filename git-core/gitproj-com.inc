@@ -611,14 +611,14 @@ fComCheckDeps()
     local tComOpt='pod2html pod2man pod2markdown tidy shunit2.1 gawk sed tr fmt'
 
     for tProg in $pOptional $tComOpt; do
-        if ! which $tProg >/dev/null 2>&1; then
+        if ! command -v $tProg >/dev/null 2>&1; then
             echo "Optional: Missing $tProg"
             tErr=1
         fi
     done
 
     for tProg in $pRequired $tComReq; do
-        if ! which $tProg >/dev/null 2>&1; then
+        if ! command -v $tProg >/dev/null 2>&1; then
             echo "Required: Missing $tProg"
             tErr=2
         fi
@@ -736,7 +736,7 @@ fComUsage()
     esac
 
     # Validate
-    if ! which $tProg >/dev/null 2>&1; then
+    if ! command -v $tProg >/dev/null 2>&1; then
         fLog -p warning -m "Could not find $tProg so using text" -l $tSrc:$LINENO
         tProg=pod2text
     fi
