@@ -79,8 +79,8 @@
         "#gpPreCommitEnabled--NA-gitproj.hook.pre-commit-enable-true">gpPreCommitEnabled;
         -NA; gitproj.hook.pre-commit-enable; (true)</a></li>
         <li><a href=
-        "#gpMaxSize--NA-gitproj.hook.binary-file-size-10k">gpMaxSize;
-        -NA; gitproj.hook.binary-file-size; (10k)</a></li>
+        "#gpMaxSize--NA-gitproj.hook.binary-file-size-10k">gpMaxSize; -NA;
+        gitproj.hook.binary-file-size; (10k)</a></li>
         <li><a href=
         "#gpRemoteMinSpace--NA-gitproj.config.remote-min-space-20g">gpRemoteMinSpace;
         -NA; gitproj.config.remote-min-space; (20g)</a></li>
@@ -103,8 +103,7 @@
     2. Global, user    --global  ~/.gitconfig
        gitproj, local  --file    PROJ/.gitproj
     3. Local, proj     --local   PROJ/.git/config
-    4. Worktree        --file    PROJ/.git/config.worktree
-       </code></pre>
+    4. Worktree        --file    PROJ/.git/config.worktree</code></pre>
   <p>If the "Access" is defined for "set" or "get", then that is the only
   location "git config" will use.</p>
   <p>git-proj doesn't do anything with ".git/config.worktree".</p>
@@ -132,6 +131,75 @@
   values may be added. Package manager options can be used to replace or keep
   the existing config file (see man dpkg --force-confdef, --force-confnew, or
   --force-confold).</p>
+  <pre><code>    [core]
+        # These options work will between Linux and Windows
+        filemode = true
+        autocrlf = false
+        ignorecase = true
+        excludesFile = ~/.gitignore
+        logAllRefUpdates = true
+        quotePath = false
+        trustctime = false
+    [user]
+        # This is required!
+        name = YourName
+        email = YourEmail@example.com
+    [alias]
+        # Add, remove, or change these
+        br = branch
+        br-all = branch -r
+        ci = commit
+        co = checkout
+        df = diff
+        origin = config --get remote.origin.url
+        raw-origin = config --get remote-raw-origin
+        push-tags = push --tags origin
+        revert-all = reset --hard HEAD
+        st = status
+        top = rev-parse --show-toplevel
+        tracked = remote show origin
+    [color]
+        # Change if desired
+        ui = never
+    [branch "develop"]
+        # Change if desired
+        mergeoptions = --log
+    [gitflow "branch"]
+        master = main
+        main = main
+        develop = develop
+    [gitflow "prefix"]
+        feature = feature/
+        release = release/
+        hotfix = hotfix/
+        bugfix = bugfix/
+        support = support/
+    [gitproj "config"]
+        proj-status = installed
+        syslog = false
+        facility = user
+        bin = /usr/lib/git-core
+        doc = /usr/share/doc/git-proj
+        git-flow-pkg = git-flow
+        git-flow = true         # set by init in PROJ/.gitroj
+        # The TBDs are changed when in PROJ/.gitroj and PROJ/.git/config
+        local-status=TBD        # set by init and clone
+        local-host=TBD          # set by init and clone
+        proj-name = TBD         # set by init and clone
+        remote-status=TBD       # set by remote and clone
+        remote-raw-origin=TBD   # set by remote and clone
+        remote-min-space = 20g  # set by remote and clone
+        verbose = 2
+    [gitproj "hook"]
+        verbose = true
+        pre-commit-enabled = true
+        check-file-names = true         # only these ch in names: [-_.a-zA-z0-9]
+        check-in-raw = true             # don't allow ci to PROJ/raw/?
+        check-whitespace = true         # don't allow trailing spaces
+        check-for-tabs = false          # don't allow tabs for tab-ext-list
+        tab-ext-list = c sh md html pod
+        check-for-big-files = true      # don't allow files &gt; binary-file-size
+        binary-file-size = 10k</code></pre>
   <h2 id="Global-user---global-.gitconfig">Global, user, --global,
   ~/.gitconfig</h2>
   <pre><code>    ~/.gitconfig
@@ -193,9 +261,7 @@
  * variable in ~/.gitconfig
  * variable in PROJ/.git/config
  * env. var.
- * command line option
-
-        </code></pre>
+ * command line option</code></pre>
   <h2 id="Notation:-gp-Var---A-git.config.-var-default">Notation: gp[Var];
   -[A]; git.config.[var]; (default)</h2>
   <h2 id="gpSysLog--NA-gitproj.config.syslog-false">gpSysLog; -NA;
@@ -288,8 +354,8 @@
   gitproj.hook.verbose; (true)</h2>
   <h2 id="gpPreCommitEnabled--NA-gitproj.hook.pre-commit-enable-true">
   gpPreCommitEnabled; -NA; gitproj.hook.pre-commit-enable; (true)</h2>
-  <h2 id="gpMaxSize--NA-gitproj.hook.binary-file-size-10k">gpMaxSize;
-  -NA; gitproj.hook.binary-file-size; (10k)</h2>
+  <h2 id="gpMaxSize--NA-gitproj.hook.binary-file-size-10k">gpMaxSize; -NA;
+  gitproj.hook.binary-file-size; (10k)</h2>
   <h2 id="gpRemoteMinSpace--NA-gitproj.config.remote-min-space-20g">
   gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (20g)</h2>
   <h2 id="gpGitFlow--NA-gitproj.config.flow-true">gpGitFlow; -NA;
