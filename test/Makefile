@@ -50,6 +50,12 @@ mCmdToDo = \
 	check
 
 # --------------------
+clean :
+	-find * -name '*~' -exec rm -f {} \;
+
+dist-clean : clear-logs
+
+# --------------------
 # Test
 
 # Only run tests where the dependencies have changed

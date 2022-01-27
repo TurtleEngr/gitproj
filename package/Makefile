@@ -105,9 +105,11 @@ clean :
 	-find .. -name '*~' -exec rm {} \; >/dev/null 2>&1
 
 dist-clean : clean
-	-cd ../test; make clean
-	-rm ver.mak
+	-cd ../test; make dist-clean
 	-rm -rf pkg >/dev/null 2>&1
+
+archive :
+	cd ../..; tar -czf gitproj-$$(cat gitproj/doc/VERSION).tgz --exclude=.git --exclude-vcs gitproj test-env*.tgz
 
 test-package : epm.list $(ProdOSDist).require
 	if [ "$(USER)" = "root" ]; then exit 1; fi
