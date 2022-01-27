@@ -1,0 +1,556 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Outline of Files</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body id="_podtop_">
+  <h1>Outline of Files</h1>
+  <h2>TOC</h2>
+  <ul id="index">
+    <li><a href="#gitproj-Source-Repo---dev">gitproj Source Repo -
+    dev</a></li>
+    <li><a href="#gitproj-Installed-Files---prod">gitproj Installed Files -
+    prod</a></li>
+    <li><a href="#After-running-git-proj-init-local-or-git-proj-clone">After
+    running git-proj-init local, or git-proj-clone</a></li>
+    <li><a href="#After-running-git-proj-remote">After running
+    git-proj-remote</a></li>
+    <li><a href="#dev-test-Environment">dev-test Environment</a></li>
+    <li>
+      <a href="#Function-Call-Map">Function Call Map</a>
+      <ul>
+        <li><a href="#git-proj">git-proj</a></li>
+        <li><a href="#git-proj-add">git-proj-add</a></li>
+        <li><a href="#git-proj-check">git-proj-check</a></li>
+        <li><a href="#git-proj-clone">git-proj-clone</a></li>
+        <li><a href="#git-proj-config">git-proj-config</a></li>
+        <li><a href="#git-proj-init">git-proj-init</a></li>
+        <li><a href="#git-proj-pull">git-proj-pull</a></li>
+        <li><a href="#git-proj-push">git-proj-push</a></li>
+        <li><a href="#git-proj-remote">git-proj-remote</a></li>
+        <li><a href="#git-proj-status">git-proj-status</a></li>
+        <li><a href="#gitproj-clone.inc">gitproj-clone.inc</a></li>
+        <li><a href="#gitproj-com.inc">gitproj-com.inc</a></li>
+        <li><a href="#gitproj-init.inc">gitproj-init.inc</a></li>
+        <li><a href="#gitproj-pull.inc">gitproj-pull.inc</a></li>
+        <li><a href="#gitproj-push.inc">gitproj-push.inc</a></li>
+        <li><a href="#gitproj-remote.inc">gitproj-remote.inc</a></li>
+        <li><a href="#gitproj-status.inc">gitproj-status.inc</a></li>
+        <li><a href="#Get-List">Get List</a></li>
+      </ul>
+    </li>
+  </ul>
+  <h2 id="gitproj-Source-Repo---dev"><a href="#_podtop_">gitproj Source Repo
+  - dev</a></h2>
+  <pre><code>    gitproj/
+    |   |Makefile
+    |   |README.md
+    |   |TODO.md
+    |   |.gitignore
+    |   |doc/
+    |   |   |LICENSE
+    |   |   |README.md - generated from ../../README.md, versioned
+    |   |   |VERSION
+    |   |   |config/
+    |   |   |   |gitconfig.default
+    |   |   |   |gitignore.default
+    |   |   |   |gitproj.config.global
+    |   |   |   |getproj.config.local
+    |   |   |hooks/
+    |   |   |   |pre-commit*
+    |   |   |user-doc/
+    |   |   |   |git-proj.html - generated, versioned
+    |   |   |   |git-proj.md - generated, versioned
+    |   |   |   |config.html - generated, versioned
+    |   |   |   |config.md - generated, versioned
+    |   |   |   |subcommands/
+    |   |   |   |   |git-proj-CMD.html - gen from git-proj-CMD
+    |   |   |   |   |git-proj-CMD.md - gen from git-proj-CM, versionedD
+    |   |   |   |tutorials/
+    |   |   |   |   |create_a_git-proj_repo.html - generated, not versioned
+    |   |   |   |   |create_a_git-proj_repo.md -  generated, versioned
+    |   |src-doc/ - src for generated docs
+    |   |   |doc-org.md
+    |   |   |config.pod
+    |   |   |create_a_git-proj_repo.pod
+    |   |git-core/
+    |   |   |git-proj*
+    |   |   |gitproj-com.inc*
+    |   |   |gitproj-[SUBCMD].inc*
+    |   |   |git-proj-[SUBCMD]*
+    |   |test/
+    |   |   |dev-doc/
+    |   |   |   |enhancements/
+    |   |   |   |   |raw-cvs.md
+    |   |   |   |   |raw-pros-cons.md
+    |   |   |   |   |raw-rclone.md
+    |   |   |   |   |raw-rsnapshot.md
+    |   |   |   |   |raw-ssh.md
+    |   |   |   |   |version-wizard.md
+    |   |   |   |git-proj.html - gen: 'git-proj -H int-html', versioned
+    |   |   |   |git-proj.md - gen: 'git-proj -H int-md', versioned
+    |   |   |   |outline.md - this document
+    |   |   |Makefile
+    |   |   |shunit2 -&gt; shunit2.1*
+    |   |   |shunit2.1*
+    |   |   |test.inc
+    |   |   |test-com.sh*
+    |   |   |test-[SUBCMD].sh*
+    |   |   |test-env.tgz -&gt; ../../test-env.tgz
+    |   |   |test-env_FILE.tgz -&gt; ../../test-env_FILE.tgz
+    |   |   |test-com.log - generated
+    |   |   |test-[SUBCMD].log - generated
+    |   |package/
+    |   |   |Makefile
+    |   |   |dist/ - all in dist is generated or copied
+    |   |   |   |usr/
+    |   |   |   |   |lib/
+    |   |   |   |   |   |git-core/ - copy
+    |   |   |   |   |   |   |git-proj
+    |   |   |   |   |   |   |git-proj-CMD
+    |   |   |   |   |   |   |gitproj-CMD.inc
+    |   |   |   |   |share/
+    |   |   |   |   |   |doc/
+    |   |   |   |   |   |   |git-proj/ - copy doc/
+    |   |   |   |   |   |   |   |config/ - system configs
+    |   |   |   |   |   |   |   |contrib/
+    |   |   |   |   |   |   |   |hooks/
+    |   |   |   |   |   |   |   |user-doc/
+    |   |   |   |   |   |   |   |   |index.html
+    |   |   |   |   |   |   |   |   |README.html
+    |   |   |   |   |   |   |   |   |subcommands/
+    |   |   |   |   |   |   |   |   |tutorials/
+    |   |   |   |   |   |man
+    |   |   |   |   |   |   |man1
+    |   |   |   |   |   |   |    |git-proj.1.gz - generated
+    |   |   |   |   |   |   |    |gitproj.1.gz - generated
+    |   |   |pkg/ - generated
+    |   |   |Makefile
+    |   |   |ver.sh*
+    |   |   |mx.require
+    |   |   |epm.patch*
+    |   |   |epm.list - generated not versioned
+    |   |   |ver.env* - generated not versioned
+    |   |   |ver.epm - generated not versioned
+    |   |   |ver.mak - generated not versioned
+    |   |   |    |   |   |VERSION - versioned generated release info</code></pre>
+  <h2 id="gitproj-Installed-Files---prod"><a href="#_podtop_">gitproj
+  Installed Files - prod</a></h2>
+  <p>Note: The tests will only check for a valid installation. Unit test will
+  only be supported in a dev env. Running unit test on the installed files
+  would be tricky, and of low value.&lt;/p&gt;</p>
+  <p>See gitproj/package/dist/</p>
+  <h2 id="After-running-git-proj-init-local-or-git-proj-clone"><a href=
+  "#_podtop_">After running git-proj-init local, or git-proj-clone</a></h2>
+  <pre><code>    cd ~/ANY-DIR/PROJECT
+    git proj init
+
+    or
+
+    cd ~/ANY-DIR
+    git proj clone -d /MOUNT-DIR/ANY-DIR/PROJ.git
+
+    home/
+    |   |USER/
+    |   |   |.gitconfig - see gitproj sections
+    |   |   |.gitignore
+    |   |   |ANY-DIR/
+    |   |   |   |PROJECT/
+    |   |   |   |   |.git/
+    |   |   |   |   |   |config/ - see gitproj sections
+    |   |   |   |   |   |hooks/
+    |   |   |   |   |   |   |pre-commmit
+    |   |   |   |   |.gitproj - version
+    |   |   |   |   |.gitignore - version
+    |   |   |   |   |.pre-commit - version
+    |   |   |   |   |raw/ - never versioned in git
+    |   |   |   |   |   |ANY-DIR/
+    |   |   |   |   |   |  |LARGE-FILE.MP4
+    |   |   |   |   |ANY-DIR/ - version
+    |   |   |   |   |   |ANY-FILE - version
+    |   |   |   |   |   |LARGE-FILE.MP4 -&gt; ../raw/ANY-DIR/LARGE-FILE.MP4
+                         - version the symlink</code></pre>
+  <h2 id="After-running-git-proj-remote"><a href="#_podtop_">After running
+  git-proj-remote</a></h2>
+  <pre><code>    cd ~/ANY-DIR/PROJECT
+    git proj remote -a -d /MOUNT-DIR/ANY-DIR
+
+    /MOUNT-DIR/
+    |   |   |ANY-DIR/
+    |   |   |   |PROJECT.raw/ - remote-raw-origin
+    |   |   |   |PROJECT.git/ - remote-origin</code></pre>
+  <h2 id="dev-test-Environment"><a href="#_podtop_">dev-test
+  Environment</a></h2>
+  <pre><code>    gpTest=DIR/gitproj/test
+    cTestEnv=$gpTest/../..
+    HOME=$cTestEnv/root/home/john</code></pre>
+  <p>Create with:</p>
+  <pre><code>    cd $cTestEnv
+    tar -xzf $gpTest/test-env.tgz</code></pre>
+  <p>Creates:</p>
+  <pre><code>    $cTestEnv/
+    |   |test/
+    |   |   |test-files.txt - this outline
+    |   |   |root/
+            |   |mnt/
+            |   |   |disk-2/            - $cDatMount1
+            |   |   |usb-misc/          - $cDatMount2
+            |   |   |   |files-2021-08-12/
+            |   |   |usb-video/         - $cDatMount3
+            |   |   |   |video-2020-04-02/
+            |   |home/
+            |   |   |john/              - $HOME
+            |   |   |   |project/
+            |   |   |   |   |beach/     - $cDatProj3
+            |   |   |   |   |   |doc/
+            |   |   |   |   |   |   |file1.txt
+            |   |   |   |   |   |   |file2.txt
+            |   |   |   |   |   |edit/
+            |   |   |   |   |   |   |file.txt
+            |   |   |   |   |   |.git/
+            |   |   |   |   |george/    - $cDatProj1
+            |   |   |   |   |   |doc/
+            |   |   |   |   |   |   |notes.html
+            |   |   |   |   |   |edit/
+            |   |   |   |   |   |   |george.kdenlive
+            |   |   |   |   |   |src/
+            |   |   |   |   |   |   |final/
+            |   |   |   |   |   |   |   |george.mp4 - $cDatProj1Big
+            |   |   |   |   |   |   |raw/
+            |   |   |   |   |   |   |   |MOV001.MP3 - $cDatProj1Big
+            |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj1Big
+            |   |   |   |   |   |.gitignore
+            |   |   |   |   |   |README.html
+            |   |   |   |   |paulb/             - $cDatProj2
+            |   |   |   |   |   |doc/
+            |   |   |   |   |   |   |notes.html
+            |   |   |   |   |   |edit/
+            |   |   |   |   |   |   |paulb.kdenlive
+            |   |   |   |   |   |src/
+            |   |   |   |   |   |   |final/
+            |   |   |   |   |   |   |   |paulb.mp4  - $cDatProj2Big
+            |   |   |   |   |   |   |raw/
+            |   |   |   |   |   |   |   |MOV001.MP3 - $cDatProj2Big
+            |   |   |   |   |   |   |   |MOV001.mp4 - $cDatProj2Big
+            |   |   |   |   |   |README.html</code></pre>
+  <h2 id="Function-Call-Map"><a href="#_podtop_">Function Call Map</a></h2>
+  <h3 id="git-proj">git-proj</h3>
+  <pre><code>    fUsage()
+        fComUsage
+        fComSetGlobals</code></pre>
+  <h3 id="git-proj-add">git-proj-add</h3>
+  <pre><code>    fUsage()</code></pre>
+  <h3 id="git-proj-check">git-proj-check</h3>
+  <h3 id="git-proj-clone">git-proj-clone</h3>
+  <pre><code>    fUsage()
+            fComUsage
+            fCloneFromRemoteDir</code></pre>
+  <h3 id="git-proj-config">git-proj-config</h3>
+  <pre><code>    fUsage()
+
+    fCheckForGit()
+
+    fFindRemote()</code></pre>
+  <h3 id="git-proj-init">git-proj-init</h3>
+  <pre><code>    fUsage()
+            fComUsage
+            fInitCreateLocalGit</code></pre>
+  <h3 id="git-proj-pull">git-proj-pull</h3>
+  <pre><code>    fUsage()
+        fComUsage
+        fComGetProjGlobals
+        fPullFromOrigin</code></pre>
+  <h3 id="git-proj-push">git-proj-push</h3>
+  <pre><code>    fUsage()
+        fComUsage
+        rsync
+        fComGetProjGlobals
+        fPushToOrigin</code></pre>
+  <h3 id="git-proj-remote">git-proj-remote</h3>
+  <pre><code>    fUsage()
+        fComUsage
+        fRemoteSetGlobals
+        fRemoteCreateRemoteGit</code></pre>
+  <h3 id="git-proj-status">git-proj-status</h3>
+  <pre><code>    fUsage()
+        fComGetVer
+        fStatusOutput</code></pre>
+  <h3 id="gitproj-clone.inc">gitproj-clone.inc</h3>
+  <pre><code>    fCloneGettingStarted()
+
+    fCloneValidRemoteDir()
+
+    fCloneCheckLocalConfig()
+        fComConfigCopy
+        fComSetConfig
+
+    fCloneCheckHostConfig()
+        tHost=$(fComGetConfig
+        fComConfigCopy
+        fComSetConfig
+        fComSetConfig
+
+    fCloneCheckProjConfig()
+        tHost=$(fComGetConfig
+        fComConfigCopy
+        fComSetConfig
+
+    fCloneMkGitDir()
+        fCloneCheckProjConfig
+        fCloneCheckHostConfig
+        fCloneCheckLocalConfig
+
+    fCloneMkRawDir()
+
+    fCloneUpdateHostConfig()
+        fComSetConfig
+
+    fCloneSummary()
+
+    fCloneFromRemoteDir()
+        fCloneGettingStarted
+        fCloneValidRemoteDir
+        fCloneMkGitDir
+        fCloneMkRawDir
+        fCloneUpdateHostConfig
+        fCloneSummary
+        fComIntroText
+        fComPreProjSetGlobals</code></pre>
+  <h3 id="gitproj-com.inc">gitproj-com.inc</h3>
+  <pre><code>    fComGitProjInternalDoc()
+
+    fComIntroText()
+
+    fComConfigCopy()
+        fError
+        fComConfigCopy
+
+    fComFirstTimeSet()
+        fComGetConfig
+        fComConfigCopy
+
+    fComSetGlobals()
+
+    fComPreProjSetGlobals()
+        fComFirstTimeSet
+        fComGetConfig
+
+    fComCheckDeps()
+
+    fComInternalDoc()
+        awk
+
+    fComUsage()
+        fComInternalDoc
+        fError
+        pod2html
+        pod2man
+        pod2markdown
+        pod2text
+        pod2usage
+        tidy
+
+    fComStackTrace()
+
+    fComSelect()
+
+    fComYesNo()
+
+    fComFmtLog()
+
+    fLog()
+        fComFmtLog
+
+    fError()
+        fComStackTrace
+
+    fComGit()
+
+    fComSetConfig()
+        fError
+        fComSetConfig
+
+    fComGetConfig()
+        fError
+        fComGetConfig
+
+    fComUnsetConfig()
+        fError
+
+    fComSaveVar2Config()
+
+    fComConfigSetupGlobal()
+        fComConfigCopy
+
+    fComConfigSetupLocal()
+        fComMustBeInGitRepo
+        fComConfigCopy
+
+    fComCheckPkg()
+        fLog
+
+    fComMustBeInGitRepo()
+
+    fComMustNotBeInGit()
+
+    fComMustBeInProjRepo()
+        fComStackTrace
+
+    fComAllMustBeReadable()
+
+    fComIsRemoteMounted()
+        fComGetConfig
+
+    fComGetProjGlobals()
+        fComGetConfig
+        fComGetVer
+
+    fComGetVer()
+        fComGetConfig
+        fComSetConfig
+
+    fComFmt()
+        fmt
+        fComSetGlobals</code></pre>
+  <h3 id="gitproj-init.inc">gitproj-init.inc</h3>
+  <pre><code>    fInitGettingStarted()
+        fLog
+
+    fInitValidLocalPath()
+
+    fInitGetLocalPath()
+
+    fInitValidSize()
+
+    fInitGetSize()
+
+    fInitGetBinaryFiles()
+
+    fInitGetMoveFiles()
+
+    fInitGetGitFlow()
+        fComCheckPkg
+
+    fInitSummary()
+
+    fInitMkRaw()
+
+    fInitMoveBinaryFiles()
+        fInitGetBinaryFiles
+
+    fInitMkGitFlow()
+        fComSetConfig
+
+    fInitMkGitDir()
+        fInitMkGitFlow
+
+    fInitMkLocalConfig()
+        fComConfigCopy
+
+    fInitSaveVarsToConfigs()
+        fComSaveVar2Config
+
+    fInitCreateLocalGit()
+        fInitGettingStarted
+        fInitGetLocalPath
+        fInitGetSize
+        fInitGetMoveFiles
+        fInitGetGitFlow
+        fInitSummary
+        fInitMkRaw
+        fInitMoveBinaryFiles
+        fInitMkGitDir
+        fInitMkLocalConfig
+        fInitSaveVarsToConfigs
+        fComIntroText
+        fComPreProjSetGlobals</code></pre>
+  <h3 id="gitproj-pull.inc">gitproj-pull.inc</h3>
+  <pre><code>    fPullRawFiles()
+        fComSelect
+
+    fPullGit()
+        fComGit
+
+    fPullFromOrigin()
+        fComGetProjGlobals
+        fComIsRemoteMounted
+        fPullRawFiles
+        fPullGit</code></pre>
+  <h3 id="gitproj-push.inc">gitproj-push.inc</h3>
+  <pre><code>    fPushRawFiles()
+        fComSelect
+
+    fPushGit()
+        fComGit
+
+    fPushToOrigin()
+        fComGetProjGlobals
+        fComIsRemoteMounted
+        fPushRawFiles
+        fPushGit</code></pre>
+  <h3 id="gitproj-remote.inc">gitproj-remote.inc</h3>
+  <pre><code>    fRemoteSetGlobals()
+        fComGetConfig
+        fComGetVer
+
+    fRemoteCheckDir()
+
+    fRemoteCheckDirSpace()
+
+    fRemoteGetDirList()
+
+    fRemoteGetAnotherMountDir()
+
+    fRemoteGetMountDir()
+        fRemoteGetDirList
+        fComSelect
+        fRemoteGetAnotherMountDir
+        fRemoteGetDirList
+
+    fRemoteGetRemoteRawDir()
+
+    fRemoteMkRemote()
+        fComSetConfig
+
+    fRemoteReport()
+        fComGetConfig
+        fComSetConfig
+
+    fRemoteCommit()
+        fComGit
+
+    fRemoteCreateRemoteGit()
+        fRemoteGetMountDir
+        fRemoteGetRemoteRawDir
+        fRemoteMkRemote
+        fRemoteReport
+        fRemoteCommit</code></pre>
+  <h3 id="gitproj-status.inc">gitproj-status.inc</h3>
+  <pre><code>    fStatusGit()
+
+    fStatusRaw()
+
+    fStatusOutput()
+        fStatusGit
+        fStatusRaw
+        fComGetProjGlobals</code></pre>
+  <h3 id="Get-List">Get List</h3>
+  <pre><code>    #!/bin/bash
+
+    cd git-core
+    for i in git-proj* gitproj-*.inc; do
+        echo '&lt;pre&gt;'
+        echo
+        echo "### $i"
+        echo
+        echo '&lt;pre&gt;'
+        grep -E '\(\)| \$tTidy | awk | tr | rsync |fCom|fInit|fRemote|fPush|fPull|fStatus|fClone|fmt|pod2|git config ' $i | grep -Ev '\}|if|#|^=| local ' | awk '/\(\)/ {print "\n" $1; next} {print "\t" $1}'
+    done &gt;t.txt</code></pre>
+</body>
+</html>

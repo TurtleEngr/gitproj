@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Coding Convention</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body id="_podtop_">
+  <h1>Coding Convention</h1>
+  <h2>TOC</h2>
+  <ul id="index">
+    <li><a href="#Git-Config-Definition-Order">Git Config Definition
+    Order</a></li>
+    <li><a href="#Variable-Naming-Convention">Variable Naming
+    Convention</a></li>
+    <li><a href="#Function-Naming-Convention">Function Naming
+    Convention</a></li>
+    <li><a href="#Coding-patterns">Coding patterns</a></li>
+    <li><a href="#File-include-pattern---prod">File include pattern -
+    prod</a></li>
+    <li><a href="#File-include-pattern---dev">File include pattern -
+    dev</a></li>
+    <li><a href="#File-include-pattern---dev-test">File include pattern -
+    dev-test</a></li>
+  </ul>
+  <h2 id="Git-Config-Definition-Order"><a href="#_podtop_">Git Config
+  Definition Order</a></h2>
+  <p>The last definition 'wins".</p>
+  <ol>
+    <li>/etc/gitconfig - optional</li>
+    <li>/home/USER/.gitconfig</li>
+    <li>/home/USER/.gitproj.config.global (include.path at end of
+    .gitconfig)</li>
+    <li>GIT_DIR/.git/config</li>
+    <li>GIT<em>DIR/.gitproj.config.$HOSTNAME (include.path at end of
+    GIT</em>DIR/.git/config)</li>
+    <li>Env. var. will override corresponding .git config vars.</li>
+    <li>Command line options will override env. var. and corresponding .git
+    config vars.</li>
+  </ol>
+  <h2 id="Variable-Naming-Convention"><a href="#_podtop_">Variable Naming
+  Convention</a></h2>
+  <ul>
+    <li>
+      <p>Globals that came from command line, config files, or external to
+      the scripts, begin with "gp" (global parameter). For example: gpVAR (if
+      they are not already defined before script (#7), set the initial value
+      to files #1 through #6. The command line option can always set the
+      value (#7)</p>
+    </li>
+    <li>
+      <p>Global variables should begin with a "g"</p>
+    </li>
+    <li>
+      <p>Global constants should begin with a "c"</p>
+    </li>
+    <li>
+      <p>Local variables should begin with a "t" (temporary)</p>
+    </li>
+    <li>
+      <p>git config vars are usually all lower case with words separated by
+      hyphens (-).</p>
+    </li>
+    <li>
+      <p>Bash variables usually use CamelCase, with each word beginning with
+      an upper case letter (no hyphens or underscores).</p>
+    </li>
+  </ul>
+  <h2 id="Function-Naming-Convention"><a href="#_podtop_">Function Naming
+  Convention</a></h2>
+  <ul>
+    <li>
+      <p>All gitproj functions begin with a "f"</p>
+    </li>
+    <li>
+      <p>Functions in the include files, begin with command base. For
+      example: functions in gitproj-init.inc begin with "fInit".</p>
+    </li>
+  </ul>
+  <h2 id="Coding-patterns"><a href="#_podtop_">Coding patterns</a></h2>
+  <ul>
+    <li>
+      <p>At the top of include files define exports for all the globals that
+      the include file reads/writes to.</p>
+    </li>
+    <li>
+      <p>At the end of an include file, call a function that will define
+      defaults for the important globals used by the include file.
+      [optional]</p>
+    </li>
+    <li>
+      <p>For the user callable scripts, do minimal setup--mainly collect the
+      and validate the options. Include files with common functions and
+      functions specific to the script. Put as much as possible into
+      functions in the include file, so that the functions can be directly
+      tested with unit test scripts found in doc/test.</p>
+    </li>
+    <li>
+      <p>Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test script. All
+      other vars can be defined from include files or from git config
+      vars.</p>
+    </li>
+    <li>
+      <p>Define gpCmdName at the top of each each script that is called by a
+      user.</p>
+    </li>
+    <li>
+      <p>Clean-Coding style (well I try).</p>
+      <ul>
+        <li>
+          <p>Ifs</p>
+          <ul>
+            <li>
+              <p>Avoid if/then/else. Replace with: if problem, then exit</p>
+            </li>
+            <li>
+              <p>Avoid long contents in ifs. Make functions.</p>
+            </li>
+            <li>
+              <p>Don't nest ifs more than 2 levels. One level is
+              preferred.</p>
+            </li>
+            <li>
+              <p>Don't clutter the code with "pass-through" error-handling
+              ifs. (see below)</p>
+            </li>
+            <li>
+              <p>Rather than using debug ifs, use fLog with its debug level
+              support. Using TDD, the need for internal debug output should
+              be reduced.</p>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Identify problems or defaults early in a function so it can exit
+          early.</p>
+        </li>
+        <li>
+          <p>Most of the code is structured so that if a function returns,
+          you can assume it executed OK, or it took an acceptable default
+          action. There should be no need to continually check exit codes
+          from functions.</p>
+        </li>
+        <li>
+          <p>In other words, if there is a "fatal" error, cleanup, and exit
+          with an error msg. Don't pass around exit codes, through multiple
+          levels (one level is OK for the "utility" functions). Exit codes
+          are mainly for the immediate calling function--if there was and
+          error, exit, don't pass the error up to another level.</p>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <p>Use TDD: Every function should have tests to exercise all the input
+      boundary conditions, and all of the error-handling states that are
+      unique to the function.</p>
+    </li>
+    <li>
+      <p>shunit2 is used for the TDD framework. See test/Makefile</p>
+    </li>
+    <li>
+      <p>TDD is done with the git development environment structure. It is
+      not done with "installed" code.</p>
+    </li>
+    <li>
+      <p>The -p option is not used with the "read" command, because the
+      prompt is not "captured" with the test scripts. So use "echo -n" for
+      the prompts before the read command.</p>
+    </li>
+    <li>
+      <p>fLog and fError messages</p>
+      <ul>
+        <li>
+          <p>Put this at the beginning or end of each file</p>
+          <p>export tSrc=${BASH_SOURCE##*/}</p>
+        </li>
+        <li>
+          <p>Put this in each function that calls fError or fLog</p>
+          <p>local tSrc=${BASH_SOURCE##*/}</p>
+        </li>
+        <li>
+          <p>in Error and Log always pass this argument:</p>
+          <p>-l $tSrc:$LINENO</p>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <h2 id="File-include-pattern---prod"><a href="#_podtop_">File include
+  pattern - prod</a></h2>
+  <pre><code>    gpBin=/usr/lib/git-core - set when a CMD is run
+    gpDoc=/usr/share/doc/gitproj
+
+        $gpBin/git-proj-CMD
+            . $gpBin/gitproj-com.inc
+                fComSetGlobals
+            . $gpBin/gitproj-CMD.inc
+                fCMDSetGlobals</code></pre>
+  <h2 id="File-include-pattern---dev"><a href="#_podtop_">File include
+  pattern - dev</a></h2>
+  <pre><code>    gpBin=DIR/gitproj/git-core - set when a CMD is run
+    gpDoc=$gpBin/../doc or DIR/gitproj/doc
+
+        $gpBin/git-proj-CMD
+            . $gpBin/gitproj-com.inc
+                fComSetGlobals
+            . $gpBin/gitproj-CMD.inc
+                fCMDSetGlobals</code></pre>
+  <h2 id="File-include-pattern---dev-test"><a href="#_podtop_">File include
+  pattern - dev-test</a></h2>
+  <pre><code>    gpTest=DIR/gitproj/test - set when a test-*.inc is run
+    gpBin=$gpTest/../git-core or DIR/gitproj/git-core
+    gpDoc=$gpTest/../doc or DIR/gitproj/doc
+
+        $gpTest/test-com.sh*
+            . $gpTest/test.inc
+                fTestSetupEnv
+                . $gpBin/gitproj-com.inc
+                    fComSetGlobals
+            fComRunTests
+                . $gpTest/shunit2.1*
+
+        $gpTest/test-CMD.sh
+            . $gpTest/test.inc
+                fTestSetupEnv
+                . $gpBin/gitproj-com.inc
+                    fComSetGlobals
+            fTestCreateEnv
+            . $gpBin/gitproj-CMD.inc
+                fCMDSetGlobals
+            fTestConfigSetup</code></pre>
+</body>
+</html>
