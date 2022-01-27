@@ -16,17 +16,6 @@
       Internal Documentation</a>
       <ul>
         <li>
-          <a href="#Template-Use">Template Use</a>
-          <ul>
-            <li><a href="#Configuration">Configuration</a></li>
-            <li><a href="#Block-Organization">Block Organization</a></li>
-            <li><a href="#Variable-Naming-Convention">Variable Naming
-            Convention</a></li>
-            <li><a href="#Global-Variables">Global Variables</a></li>
-            <li><a href="#Documentation-Format">Documentation Format</a></li>
-          </ul>
-        </li>
-        <li>
           <a href="#Common-Script-Functions">Common Script Functions</a>
           <ul>
             <li><a href="#fComSetGlobals">fComSetGlobals</a></li>
@@ -74,113 +63,6 @@
   <hr />
   <h1 id="gitproj-com.inc-Internal-Documentation">gitproj-com.inc Internal
   Documentation</h1>
-  <h2 id="Template-Use">Template Use</h2>
-  <h3 id="Configuration">Configuration</h3>
-  <ul>
-    <li>
-      <p>Copy template.sh to your script file.</p>
-    </li>
-    <li>
-      <p>Your script, gitproj-com.inc, and gitproj-com.test need to be in the
-      same directory.</p>
-    </li>
-    <li>
-      <p>Globally replace SCRIPTNAME with the name of your script file.</p>
-    </li>
-    <li>
-      <p>Update the getopts in the "Get Args Section". Add your script's
-      options.</p>
-    </li>
-    <li>
-      <p>Loop: document (with POD), add tests, add validate functions</p>
-    </li>
-    <li>
-      <p>Loop: add unit test function, add functions, test</p>
-    </li>
-  </ul>
-  <h3 id="Block-Organization">Block Organization</h3>
-  <ul>
-    <li>
-      <p>Configuration - exit if errors</p>
-    </li>
-    <li>
-      <p>Get Args - exit if errors</p>
-    </li>
-    <li>
-      <p>Verify external progs - exit if errors</p>
-    </li>
-    <li>
-      <p>Run tests - if gpTest is set</p>
-    </li>
-    <li>
-      <p>Validate Args - exit if errors</p>
-    </li>
-    <li>
-      <p>Verify connections work - exit if errors</p>
-    </li>
-    <li>
-      <p>Read-only functional work - exit if errors</p>
-    </li>
-    <li>
-      <p>Write functional work - now you are committed! Try to keep going if
-      errors</p>
-    </li>
-    <li>
-      <p>Output results and/or launch next process</p>
-    </li>
-  </ul>
-  <p>To avoid a lot of rework and manual rollbacks, put-off <i>writes</i>
-  that cannot undone. Do as much as possible to make sure the script will be
-  able to complete write operations.</p>
-  <p>For example, <b>do not do this:</b> collect information, transform it,
-  write it to a DB, then start the next process on another server. Whoops,
-  that server cannot be accessed, so the DB update is not valid! Gee, why
-  didn't you verify all the connections you will need, before committing to
-  the DB?! Even if you did check, the connection could have failed after the
-  check, so maybe write to a tmp DB, then when all is OK, then update the
-  master DB with the tmp DB changes.</p>
-  <p>Where ever possible make your scripts "re-entrant". Connections can fail
-  at anytime and scripts can be killed at anytime; How can any important work
-  be continued or work rolled-back? Planing for "failures" is NOT planning to
-  fail; it is what a professional engineer does to design in quality.</p>
-  <h3 id="Variable-Naming-Convention">Variable Naming Convention</h3>
-  <p>Prefix codes are used to show the <b>"scope"</b> of variables:</p>
-  <pre><code> gVar - global variable (may even be external to the script)
- pVar - a function parameter I&lt;local&gt;
- gpVar - global parameter, i.e. may be defined external to the script
- cVar - global constant (set once)
- tVar - temporary variable (usually I&lt;local&gt; to a function)
- fFun - function</code></pre>
-  <p>All UPPERCASE variables are <i>only</i> used when they are required by
-  other programs or scripts.</p>
-  <p>If you have exported variables that are shared across scritps, then this
-  convention can be extended by using prefixes that are related to where the
-  variables are set.</p>
-  <h3 id="Global-Variables">Global Variables</h3>
-  <p>For more help, see the Globals section in fUsage.</p>
-  <pre><code> gpSysLog - -l
- gpVerbose - -v, -vv
- gpDebug - -x, -xx, ...
- gpTest - -t
- gErr - error code (0 = no error)
- gpCmdName - script's name taken from $0
- cCurDir - current directory
- gpBin - directory where the script is executing from
- gpDoc - directory for config/, hooks/, test/</code></pre>
-  <h3 id="Documentation-Format">Documentation Format</h3>
-  <p>POD is use to format the script's documentation. Sure MarkDown could
-  have been used, but it didn't exist 20 years ago. POD text can be output as
-  text, man, html, pdf, texi, just usage, and even MarkDown</p>
-  <p>Help for POD can be found at: <a href=
-  "https://perldoc.perl.org/perlpod">perlpod - the Plain Old Documentation
-  format</a></p>
-  <p>The documentation is embedded in the script so that it is more likely to
-  be updated. Separate doc files seem to <i>always</i> drift from the code.
-  Feel free to delete any documentation, if the code is clear enough. BUT
-  <i>clean up your code</i> so that the code <i>really</i> is clear.</p>
-  <p>The internal documentation uses POD commands that begin with
-  "=internal-". See fComInternalDoc() for how this is used.</p>
-  <hr />
   <hr />
   <h2 id="Common-Script-Functions">Common Script Functions</h2>
   <hr />

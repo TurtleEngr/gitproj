@@ -13,21 +13,133 @@
   <h1>Coding Convention</h1>
   <h2>TOC</h2>
   <ul id="index">
+        <li>
+          <a href="#Script_Structure">Script Structure</a>
+          <ul>
+            <li><a href="#Configuration">Configuration</a></li>
+            <li><a href="#Block-Organization">Block Organization</a></li>
+            <li><a href="#Variable-Naming-Convention">Variable Naming
+            Convention</a></li>
+            <li><a href="#Global-Variables">Global Variables</a></li>
+            <li><a href="#Documentation-Format">Documentation Format</a></li>
+          </ul>
+        </li>
     <li><a href="#Git-Config-Definition-Order">Git Config Definition
     Order</a></li>
-    <li><a href="#Variable-Naming-Convention">Variable Naming
+    <li><a href="coding-convention.html#Variable-Naming-Convention">Variable Naming
     Convention</a></li>
-    <li><a href="#Function-Naming-Convention">Function Naming
+    <li><a href="coding-convention.html#Function-Naming-Convention">Function Naming
     Convention</a></li>
-    <li><a href="#Coding-patterns">Coding patterns</a></li>
-    <li><a href="#File-include-pattern---prod">File include pattern -
+    <li><a href="coding-convention.html#Coding-patterns">Coding patterns</a></li>
+    <li><a href="coding-convention.html#File-include-pattern---prod">File include pattern -
     prod</a></li>
-    <li><a href="#File-include-pattern---dev">File include pattern -
+    <li><a href="coding-convention.html#File-include-pattern---dev">File include pattern -
     dev</a></li>
-    <li><a href="#File-include-pattern---dev-test">File include pattern -
+    <li><a href="coding-convention.html#File-include-pattern---dev-test">File include pattern -
     dev-test</a></li>
   </ul>
-  <h2 id="Git-Config-Definition-Order"><a href="#_podtop_">Git Config
+  <h2 id="Script_Structure">Script Structure</h2>
+  <h3 id="Configuration">Configuration</h3>
+  <ul>
+    <li>
+      <p>Copy an existing git-proj-CMD file, and gitproj-CMD.inc file. The files should be in the same directory.</p>
+    </li>
+    <li>
+      <p>Globally replace the "git proj CMD" with the name of the new CMD.</p>
+    </li>
+    <li>
+      <p>Update the getopts and case statement, adding your script's options.</p>
+    </li>
+    <li>
+      <p>TDD Loop: document (with POD), add tests, add validate functions</p>
+    </li>
+    <li>
+      <p>TDD Loop: add unit test functions, add functions, test</p>
+    </li>
+  </ul>
+  <h3 id="Block-Organization">Block Organization</h3>
+  <ul>
+    <li>
+      <p>Configuration - exit if errors</p>
+    </li>
+    <li>
+      <p>Get Args - exit if errors</p>
+    </li>
+    <li>
+      <p>Validate Args - exit if errors</p>
+    </li>
+    <li>
+      <p>Verify external progs - exit if errors</p>
+    </li>
+    <li>
+      <p>Verify connections work - exit if errors</p>
+    </li>
+    <li>
+      <p>Read-only functional work - exit if errors</p>
+    </li>
+    <li>
+      <p>Write functional work - now you are committed! Try to keep going if
+      errors. Or rollback any work that was corrupted.</p>
+    </li>
+    <li>
+      <p>Output results and/or launch the next process</p>
+    </li>
+  </ul>
+  <p>To avoid a lot of rework and manual rollbacks, put-off <i>writes</i>
+  that cannot undone. Do as much as possible to make sure the script will be
+  able to complete write operations.</p>
+  <p>For example, <b>do not do this:</b> collect information, transform it,
+  write it to a DB, then start the next process on another server. Whoops,
+  that server cannot be accessed, so the DB update is not valid! Gee, why
+  didn't you verify all the connections you will need, before committing to
+  the DB?! Even if you did check, the connection could have failed after the
+  check, so maybe write to a tmp DB, then when all is OK, then update the
+  master DB with the tmp DB changes.</p>
+  <p>Where ever possible make your scripts "re-entrant". Connections can fail
+  at anytime and scripts can be killed at anytime; How can any important work
+  be continued or work rolled-back? Planing for "failures" is NOT planning to
+  fail; it is what a professional engineer does to design in quality.</p>
+  <h3 id="Variable-Naming-Convention">Variable Naming Convention</h3>
+  <p>Prefix codes are used to show the <b>"scope"</b> of variables:</p>
+  <pre><code> gVar - global variable (may even be external to the script)
+ pVar - a function parameter <i>local</i>
+ gpVar - global parameter, i.e. may be defined external to the script
+ cVar - global constant (set once)
+ tVar - temporary variable (usually <i>local</i> to a function)
+ fFun - function
+ f[Prefix]FunName - Prefix is usually an abbreviation of the file it is in
+ </code></pre>
+  <p>All UPPERCASE variables are <i>only</i> used when they are required by
+  other programs or scripts.</p>
+  <p>If you have exported variables that are shared across scritps, then this
+  convention can be extended by using prefixes that are related to where the
+  variables are set.</p>
+  <h3 id="Global-Variables">Global Variables</h3>
+  <p>For more help, see the Globals section in fUsage. TBD</p>
+  <pre><code>
+ gpVerbose - -q -v, -V N
+ gpDebug - -x, -xx, ..., -X N
+ gErr - error code (0 = no error)
+ gpCmdName - script's name taken from $0
+ cCurDir - current directory
+ gpBin - directory where the script is executing from
+ gpDoc - directory for config/, hooks/, test/</code></pre>
+ gpTest - test directory
+ </code></pre>
+  <h3 id="Documentation-Format">Documentation Format</h3>
+  <p>POD is use to format the script's documentation. Sure MarkDown could
+  have been used, but it didn't exist 20 years ago. POD text can be output as
+  text, man, html, pdf, texi, just usage, and even MarkDown</p>
+  <p>Help for POD can be found at: <a href=
+  "https://perldoc.perl.org/perlpod">perlpod - the Plain Old Documentation
+  format</a></p>
+  <p>The documentation is embedded in the script so that it is more likely to
+  be updated. Separate doc files seem to <i>always</i> drift from the code.
+  Feel free to delete any documentation, if the code is clear enough. BUT
+  <i>clean up your code</i> so that the code <i>really</i> is clear.</p>
+  <p>The internal documentation uses POD commands that begin with
+  "=internal-". See fComInternalDoc() for how this is used.</p>
+  <h2 id="Git-Config-Definition-Order"><a href="coding-convention.html#_podtop_">Git Config
   Definition Order</a></h2>
   <p>The last definition 'wins".</p>
   <ol>
@@ -234,3 +346,6 @@
             fTestConfigSetup</code></pre>
 </body>
 </html>
+
+
+
