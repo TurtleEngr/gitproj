@@ -7,21 +7,28 @@
 
 # Local install (only for testing; use package intaller):
 #	cd package
-#	make dist-clean install
+#	make dist-clean
+#	make first
+#	make clean build install
 
 # To build installer packages:
 #	cd package
-#	make dist-clean package
+#	make dist-clean
+#	make first
+#	make clean build package
+#	make release tag
 
 # --------------------
 # Config
 
 mHtmlOpt = --cachedir=/tmp --index --backlink
+
 mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
+
 mTestDir = test
 
 # --------------------
-check : clean doc/user-doc git-core package test/dev-doc gen-doc
+check : clean doc/user-doc git-core package test/dev-doc
 
 clean :
 	-find . -name '*~' -exec rm {} \;
