@@ -384,10 +384,10 @@ fInitMkRaw()
     gpLocalRawDir=$gpLocalTopDir/raw
 
     cd $gpLocalTopDir >/dev/null 2>&1
-    fLog -p info -m "mkdir $gpLocalRawDir" -l $tSym:$LINENO
+    fLog -p info -m "mkdir $gpLocalRawDir" -l $tSrc:$LINENO
     mkdir $gpLocalRawDir
 
-    fLog -p info -m "Create: raw/README.txt" -l $tSym:$LINENO
+    fLog -p info -m "Create: raw/README.txt" -l $tSrc:$LINENO
     cat <<EOF | fmt >raw/README.txt
 
 Do NOT remove these files or this directory.
@@ -432,7 +432,7 @@ fInitMoveBinaryFiles()
         else
             if [ ! -d $gpLocalRawDir/$tDir ]; then
                 tResult=$(mkdir -v -p $gpLocalRawDir/$tDir 2>&1)
-                fLog -p info -m "$tResult" -l $tSym:$LINENO
+                fLog -p info -m "$tResult" -l $tSrc:$LINENO
             fi
             if [ ! -d $gpLocalRawDir/$tDir ]; then
                 fError -i -m "Could not create: $gpLocalRawDir/$tDir" -l $tSrc:$LINENO
@@ -440,7 +440,7 @@ fInitMoveBinaryFiles()
             fLog -p info -m "Exists: $gpLocalRawDir/$tDir" -l $tSrc:$LINENO
         fi
         tResult=$(mv -v $tFile $gpLocalRawDir/$tDir)
-        fLog -p info -m "mv: $tResult" -l $tSym:$LINENO
+        fLog -p info -m "mv: $tResult" -l $tSrc:$LINENO
         if [ ! -s $gpLocalRawDir/$tFile ]; then
             fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
         fi
