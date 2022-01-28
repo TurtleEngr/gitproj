@@ -65,15 +65,14 @@ where the variables are set.
 
 For more help, see the Globals section in fUsage. TBD
 
-       gpVerbose - -q -v, -V N
-       gpDebug - -x, -xx, ..., -X N
-       gErr - error code (0 = no error)
-       gpCmdName - script's name taken from $0
-       cCurDir - current directory
-       gpBin - directory where the script is executing from
-       gpDoc - directory for config/, hooks/, test/
-       gpTest - test directory
-
+    gpVerbose - -q -v, -V N
+    gpDebug - -x, -xx, ..., -X N
+    gErr - error code (0 = no error)
+    gpCmdName - script's name taken from $0
+    cCurDir - current directory
+    gpBin - directory where the script is executing from
+    gpDoc - directory for config/, hooks/, test/
+    gpTest - test directory
 
 ## Documentation Format
 
