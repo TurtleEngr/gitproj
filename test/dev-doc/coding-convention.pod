@@ -187,12 +187,12 @@ define defaults for the important globals used by the include file.
 =item * For the user callable scripts, do minimal setup--mainly
 collect the and validate the options. Include files with common
 functions and functions specific to the script. Put as much as
-possible into functions in the include file, so that the functions can
-be directly tested with unit test scripts found in doc/test.
+possible into functions in the include files, so that the functions can
+be directly tested with the unit test scripts found in test/.
 
-=item * Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test
-script. All other vars can be defined from include files or from git
-config vars.
+=item * Minimal vars are defined: gpBin, cCurDir, gpDoc, and gpTest if
+a test script. All other vars are defined from include files or from
+git config vars.
 
 =item * Define gpCmdName at the top of each each script that is called
 by a user.
@@ -254,6 +254,8 @@ the prompts before the read command.
 
 =item * fLog and fError messages
 
+=over 8
+
 =item * Put this at the beginning or end of each file
 
         export tSrc=${BASH_SOURCE##*/}
@@ -265,6 +267,17 @@ the prompts before the read command.
 =item * in Error and Log always pass this argument:
 
         -l $tSrc:$LINENO
+
+=back
+
+=item * The Makefile `fmt` target uses `shfmt` to normalize the
+indenting to 4 char.  `rm-trailing-sp -t` is used to remove any
+trailing spaces and tabs in text files. The pre-commit hook can be
+added (with the corresponding config hooks) to look for trailing
+spaces, invalid file names, and large binary files.
+
+=item * The `then` and `do` are on the same line as the opening
+statement (if they fit).
 
 =back
 

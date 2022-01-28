@@ -13,21 +13,19 @@ After 1.0, move these to github issues.
 
 ## documentation
 
-* Cleanup the user docs. (bump the "patch" number for doc-only changes)
-
-* Make and cleanup the internal docs. Describe more of the block-file
-structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
-[ $x -eq 1 ]
+* Write the tutorial: create_a_git-proj_repo
 
 --------------------
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
-* Write a script that convert "LINK{title|filepath}" to html anchors
+* Implement pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
+
+* Write a script that converts "LINK{title|filepath}" to html anchors
   or markdown links. The POD L<title|filepath> does not work for
   relative links.
 
-* git-proj-clone will initally copy all of PROJ/.gitproj (afer git
+* git-proj-clone will initally copy all of PROJ/.gitproj (after git
   clone).  Then update local config: local-status, local-host,
   proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig
 
@@ -40,16 +38,14 @@ structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
   from .git/config. But these vars must stay set to TBD, in .gitproj:
   local-status, local-host, proj-name, remote-status, remote-raw-dir
 
-  Also gitproj.config.ver should be set to $gpDoc/VERSION
-
 * Cleanup the saving of git-proj vars. Save to --local, then
   "frequently" update PROJ/.gitproj
 
 * Cleanup: break fComGetConfig in to two functions--it is doing too
   many things that are not used. (e.g. listing source)
 
-* Cleanup: change true/false integer tests to be internally "safer". Use "0" and
-"1", for input values, and do string tests:
+* Cleanup: change true/false integer tests to be internally
+"safer". Use "0" and "1", for input values, and do string tests:
 
     if [ "${flag:-0}" = "0" ]
     if [ "${flag:-0}" != "0" ]
@@ -68,9 +64,9 @@ syntax. Make first letter lower: ${ans,}. Return first char: ${ans::1}
     ans=${ans,}
     if [ "${ans::1}" = "y" ]
 
-* Cleanup: Is gpGitFlowPkg used?
+* Cleanup: Is gpGitFlowPkg used? If not remove it.
 
-* Cleanup: fixup log messages to follow the gpVerbose rules. (see flog
+* Cleanup: Make sure the log messages to follow the gpVerbose rules. (see flog
   and git-proj)
 
 * Cleanup: fixup gpVar settings to follow the precedence rules (see
@@ -88,13 +84,21 @@ syntax. Make first letter lower: ${ans,}. Return first char: ${ans::1}
 * Copy the test-env*.tgz files to a "public" place. And implement the
 Makefile targets for managing them.
 
-* Get travis-ci working. Run tests.
+* Get travis-ci working, to run the tests
 
 * More travis-ci.
+
     * Run tests with changes to develop or main branches.
-    * Build the package.
+
+    * Build a test package.
+
     * Install the package.
+
     * Verify the install.
+
+    * Remove old test packages.
+
+    * How can a RC or final package build be "signaled"?
 
 --------------------
 
@@ -106,45 +110,40 @@ Makefile targets for managing them.
   copy git-proj vars between PROJ/.gitproj, PROJ/.git/config, and
   ~/.gitconfig, using update or force.
 
-* Implement a command that with show the files in REMOTE-PATH/PROJ.raw
-  git proj status does a diff, which is good, maybe just add the
-  option to have th diff show the files that are the same.
-
 * Code git-proj-add (support adding whole directory trees looking for
   binary files to be moved to "raw" files). See function in pre-commit
   hook script, for identifying those files.
+
+* Implement a command that will show the files in REMOTE-PATH/PROJ.raw
+  `git proj status` does a diff, which is good, maybe just add the
+  option to have the diff show the files that are the same. - done
 
 ----
 
 ## Enhancement Major
 
-* Implement pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
-
 * Version increment wizard script. Increment the
   major/minor/path/rc/build vars based on Q/A. See
   See: `test/dev-doc/enhancements/version-wizard.md`
 
-* Implement: allow-tabs pre-commit check.
-
-* Add "expand" to
-  rm-trailing-sp script.
-
-* Put rm-trailing-sp script in $gpDoc/contrib dir?
-
 * Decided on which remote network service to implement. Do all, only
-  do one or two? Some methods are not compatable.
+  do one or two? Some methods are not compatable. See raw-pros-cons.md
 
 * Future feature: manage different versions of binary files with a
-  process similar to rsnapshot. See `test/dev-doc/enhancements/raw-rsnapshot.md`
-  and `test/dev-doc/enhancements/raw-ssh.md`
+  process similar to rsnapshot. See
+  `test/dev-doc/enhancements/raw-rsnapshot.md` and
+  `test/dev-doc/enhancements/raw-ssh.md`
 
-* Manage the different versions of large binary files with "cvs".
-  See `test/dev-doc/enhancements/raw-cvs.md` and `test/dev-doc/enhancements/raw-pros-cons.md`
+* Manage the different versions of large binary files with "cvs".  See
+  `test/dev-doc/enhancements/raw-cvs.md` and
+  `test/dev-doc/enhancements/raw-pros-cons.md`
 
-* To use a true remote (over network) with cvs and git, use ssh protocol.
-  Requires: ssh-client and ssh-server. See `test/dev-doc/enhancements/raw-ssh.md`
+* To use a true remote (over network) with cvs and git, use ssh
+  protocol.  Requires: ssh-client and ssh-server. See
+  `test/dev-doc/enhancements/raw-ssh.md`
 
-* Use rclone for raw/ files. See `test/dev-doc/enhancements/raw-rclone.md`
+* Use rclone for raw/ files. See
+  `test/dev-doc/enhancements/raw-rclone.md`
 
 ----
 
@@ -292,4 +291,16 @@ Fix: look for first arg so see if it is a CMD. - done
   .gitproj.config.HOST files are not needed. .gitproj.config.HOST vars
   are put in PROJ/.git/config. This works because git-proj-init or
   git-proj-clone will set the HOST relevant values. - done
+
+* Cleanup the user docs. (bump the "patch" number for doc-only changes)
+
+* Make and cleanup the internal docs. Describe more of the block-file
+structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
+[ $x -eq 1 ]
+
+* Also gitproj.config.ver should be set to $gpDoc/VERSION
+
+* Add "expand" to rm-trailing-sp script.
+
+* Put rm-trailing-sp script in $gpDoc/contrib dir
 

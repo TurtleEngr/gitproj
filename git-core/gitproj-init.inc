@@ -17,7 +17,7 @@ fInitGettingStarted()
     local tSrc=${BASH_SOURCE##*/}
     local tMaxLoop=5
 
-    cat <<EOF
+    cat <<EOF | fComFmt
 
 Be sure you are "cd" to the "top" project directory,then use "-l
 $PWD".  The directory name will be used for the git repo name. The

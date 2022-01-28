@@ -13,7 +13,8 @@
 
 File: github:/README.md
 
-File: /usr/share/doc/git-proj/README.md - remove dev. doc. section from top/README.md
+File: /usr/share/doc/git-proj/README.md - remove dev. doc. section
+from top/README.md
 
 File: /usr/share/doc/git-proj/README.html - gen: /usr/bin/markdown README.md
 
