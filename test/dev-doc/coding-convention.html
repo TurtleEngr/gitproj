@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Coding Convention</title>
@@ -10,45 +10,48 @@
         href="mailto:root@localhost" />
 </head>
 <body id="_podtop_">
-  <h1>Coding Convention</h1>
-  <h2>TOC</h2>
   <ul id="index">
-        <li>
-          <a href="#Script_Structure">Script Structure</a>
-          <ul>
-            <li><a href="#Configuration">Configuration</a></li>
-            <li><a href="#Block-Organization">Block Organization</a></li>
-            <li><a href="#Variable-Naming-Convention">Variable Naming
-            Convention</a></li>
-            <li><a href="#Global-Variables">Global Variables</a></li>
-            <li><a href="#Documentation-Format">Documentation Format</a></li>
-          </ul>
-        </li>
+    <li><a href="#Coding-Convention">Coding Convention</a></li>
+    <li>
+      <a href="#Script-Structure">Script Structure</a>
+      <ul>
+        <li><a href="#Configuration">Configuration</a></li>
+        <li><a href="#Block-Organization">Block Organization</a></li>
+        <li><a href="#Variable-Naming-Convention">Variable Naming
+        Convention</a></li>
+        <li><a href="#Global-Variables">Global Variables</a></li>
+        <li><a href="#Documentation-Format">Documentation Format</a></li>
+      </ul>
+    </li>
     <li><a href="#Git-Config-Definition-Order">Git Config Definition
     Order</a></li>
-    <li><a href="coding-convention.html#Variable-Naming-Convention">Variable Naming
+    <li><a href="#Variable-Naming-Convention1">Variable Naming
     Convention</a></li>
-    <li><a href="coding-convention.html#Function-Naming-Convention">Function Naming
+    <li><a href="#Function-Naming-Convention">Function Naming
     Convention</a></li>
-    <li><a href="coding-convention.html#Coding-patterns">Coding patterns</a></li>
-    <li><a href="coding-convention.html#File-include-pattern---prod">File include pattern -
+    <li><a href="#Coding-Patterns">Coding Patterns</a></li>
+    <li><a href="#File-Include-Pattern---prod">File Include Pattern -
     prod</a></li>
-    <li><a href="coding-convention.html#File-include-pattern---dev">File include pattern -
+    <li><a href="#File-Include-Pattern---dev">File Include Pattern -
     dev</a></li>
-    <li><a href="coding-convention.html#File-include-pattern---dev-test">File include pattern -
+    <li><a href="#File-include-pattern---dev-test">File include pattern -
     dev-test</a></li>
   </ul>
-  <h2 id="Script_Structure">Script Structure</h2>
-  <h3 id="Configuration">Configuration</h3>
+  <h1 id="Coding-Convention"><a href="#_podtop_">Coding Convention</a></h1>
+  <h1 id="Script-Structure"><a href="#_podtop_">Script Structure</a></h1>
+  <h2 id="Configuration">Configuration</h2>
   <ul>
     <li>
-      <p>Copy an existing git-proj-CMD file, and gitproj-CMD.inc file. The files should be in the same directory.</p>
+      <p>Copy an existing git-proj-CMD file, and gitproj-CMD.inc file. The
+      files should be in the same directory.</p>
     </li>
     <li>
-      <p>Globally replace the "git proj CMD" with the name of the new CMD.</p>
+      <p>Globally replace the "git proj CMD" with the name of the new
+      CMD.</p>
     </li>
     <li>
-      <p>Update the getopts and case statement, adding your script's options.</p>
+      <p>Update the getopts and case statement, adding your script's
+      options.</p>
     </li>
     <li>
       <p>TDD Loop: document (with POD), add tests, add validate functions</p>
@@ -57,7 +60,7 @@
       <p>TDD Loop: add unit test functions, add functions, test</p>
     </li>
   </ul>
-  <h3 id="Block-Organization">Block Organization</h3>
+  <h2 id="Block-Organization">Block Organization</h2>
   <ul>
     <li>
       <p>Configuration - exit if errors</p>
@@ -85,7 +88,7 @@
       <p>Output results and/or launch the next process</p>
     </li>
   </ul>
-  <p>To avoid a lot of rework and manual rollbacks, put-off <i>writes</i>
+  <p>To avoid a lot of rework and manual rollbacks, put-off <b>writes</b>
   that cannot undone. Do as much as possible to make sure the script will be
   able to complete write operations.</p>
   <p>For example, <b>do not do this:</b> collect information, transform it,
@@ -99,34 +102,32 @@
   at anytime and scripts can be killed at anytime; How can any important work
   be continued or work rolled-back? Planing for "failures" is NOT planning to
   fail; it is what a professional engineer does to design in quality.</p>
-  <h3 id="Variable-Naming-Convention">Variable Naming Convention</h3>
+  <h2 id="Variable-Naming-Convention">Variable Naming Convention</h2>
   <p>Prefix codes are used to show the <b>"scope"</b> of variables:</p>
-  <pre><code> gVar - global variable (may even be external to the script)
- pVar - a function parameter <i>local</i>
- gpVar - global parameter, i.e. may be defined external to the script
- cVar - global constant (set once)
- tVar - temporary variable (usually <i>local</i> to a function)
- fFun - function
- f[Prefix]FunName - Prefix is usually an abbreviation of the file it is in
- </code></pre>
-  <p>All UPPERCASE variables are <i>only</i> used when they are required by
+  <pre><code>   gVar - global variable (may even be external to the script)
+   pVar - a function parameter B&lt;local&gt;
+   gpVar - global parameter, i.e. may be defined external to the script
+   cVar - global constant (set once)
+   tVar - temporary variable (usually B&lt;local&gt; to a function)
+   fFun - function
+   f[Prefix]FunName - Prefix is usually an abbreviation of the file it is in</code></pre>
+  <p>All UPPERCASE variables are <b>only</b> used when they are required by
   other programs or scripts.</p>
   <p>If you have exported variables that are shared across scritps, then this
   convention can be extended by using prefixes that are related to where the
   variables are set.</p>
-  <h3 id="Global-Variables">Global Variables</h3>
+  <h2 id="Global-Variables">Global Variables</h2>
   <p>For more help, see the Globals section in fUsage. TBD</p>
-  <pre><code>
- gpVerbose - -q -v, -V N
- gpDebug - -x, -xx, ..., -X N
- gErr - error code (0 = no error)
- gpCmdName - script's name taken from $0
- cCurDir - current directory
- gpBin - directory where the script is executing from
- gpDoc - directory for config/, hooks/, test/</code></pre>
- gpTest - test directory
+  <pre><code>    gpVerbose - -q -v, -V N
+    gpDebug - -x, -xx, ..., -X N
+    gErr - error code (0 = no error)
+    gpCmdName - script's name taken from $0
+    cCurDir - current directory
+    gpBin - directory where the script is executing from
+    gpDoc - directory for config/, hooks/, test/
+    gpTest - test directory
  </code></pre>
-  <h3 id="Documentation-Format">Documentation Format</h3>
+  <h2 id="Documentation-Format">Documentation Format</h2>
   <p>POD is use to format the script's documentation. Sure MarkDown could
   have been used, but it didn't exist 20 years ago. POD text can be output as
   text, man, html, pdf, texi, just usage, and even MarkDown</p>
@@ -134,28 +135,42 @@
   "https://perldoc.perl.org/perlpod">perlpod - the Plain Old Documentation
   format</a></p>
   <p>The documentation is embedded in the script so that it is more likely to
-  be updated. Separate doc files seem to <i>always</i> drift from the code.
+  be updated. Separate doc files seem to <b>always</b> drift from the code.
   Feel free to delete any documentation, if the code is clear enough. BUT
-  <i>clean up your code</i> so that the code <i>really</i> is clear.</p>
+  <b>clean up your code</b> so that the code <b>really</b> is clear.</p>
   <p>The internal documentation uses POD commands that begin with
   "=internal-". See fComInternalDoc() for how this is used.</p>
-  <h2 id="Git-Config-Definition-Order"><a href="coding-convention.html#_podtop_">Git Config
-  Definition Order</a></h2>
+  <h1 id="Git-Config-Definition-Order"><a href="#_podtop_">Git Config
+  Definition Order</a></h1>
   <p>The last definition 'wins".</p>
-  <ol>
-    <li>/etc/gitconfig - optional</li>
-    <li>/home/USER/.gitconfig</li>
-    <li>/home/USER/.gitproj.config.global (include.path at end of
-    .gitconfig)</li>
-    <li>GIT_DIR/.git/config</li>
-    <li>GIT<em>DIR/.gitproj.config.$HOSTNAME (include.path at end of
-    GIT</em>DIR/.git/config)</li>
-    <li>Env. var. will override corresponding .git config vars.</li>
-    <li>Command line options will override env. var. and corresponding .git
-    config vars.</li>
-  </ol>
-  <h2 id="Variable-Naming-Convention"><a href="#_podtop_">Variable Naming
-  Convention</a></h2>
+  <ul>
+    <li>
+      <p>1. /etc/gitconfig - optional</p>
+    </li>
+    <li>
+      <p>2. /home/USER/.gitconfig</p>
+    </li>
+    <li>
+      <p>3. /home/USER/.gitproj.config.global (include.path at end of
+      .gitconfig)</p>
+    </li>
+    <li>
+      <p>4. GIT_DIR/.git/config</p>
+    </li>
+    <li>
+      <p>5. GIT_DIR/.gitproj.config.$HOSTNAME (include.path at end of
+      GIT_DIR/.git/config)</p>
+    </li>
+    <li>
+      <p>6. Env. var. will override corresponding .git config vars.</p>
+    </li>
+    <li>
+      <p>7. Command line options will override env. var. and corresponding
+      .git config vars.</p>
+    </li>
+  </ul>
+  <h1 id="Variable-Naming-Convention1"><a href="#_podtop_">Variable Naming
+  Convention</a></h1>
   <ul>
     <li>
       <p>Globals that came from command line, config files, or external to
@@ -182,8 +197,8 @@
       an upper case letter (no hyphens or underscores).</p>
     </li>
   </ul>
-  <h2 id="Function-Naming-Convention"><a href="#_podtop_">Function Naming
-  Convention</a></h2>
+  <h1 id="Function-Naming-Convention"><a href="#_podtop_">Function Naming
+  Convention</a></h1>
   <ul>
     <li>
       <p>All gitproj functions begin with a "f"</p>
@@ -193,7 +208,7 @@
       example: functions in gitproj-init.inc begin with "fInit".</p>
     </li>
   </ul>
-  <h2 id="Coding-patterns"><a href="#_podtop_">Coding patterns</a></h2>
+  <h1 id="Coding-Patterns"><a href="#_podtop_">Coding Patterns</a></h1>
   <ul>
     <li>
       <p>At the top of include files define exports for all the globals that
@@ -270,82 +285,79 @@
       <p>Use TDD: Every function should have tests to exercise all the input
       boundary conditions, and all of the error-handling states that are
       unique to the function.</p>
-    </li>
-    <li>
-      <p>shunit2 is used for the TDD framework. See test/Makefile</p>
-    </li>
-    <li>
-      <p>TDD is done with the git development environment structure. It is
-      not done with "installed" code.</p>
-    </li>
-    <li>
-      <p>The -p option is not used with the "read" command, because the
-      prompt is not "captured" with the test scripts. So use "echo -n" for
-      the prompts before the read command.</p>
-    </li>
-    <li>
-      <p>fLog and fError messages</p>
       <ul>
         <li>
-          <p>Put this at the beginning or end of each file</p>
-          <p>export tSrc=${BASH_SOURCE##*/}</p>
+          <p>shunit2 is used for the TDD framework. See test/Makefile</p>
         </li>
         <li>
-          <p>Put this in each function that calls fError or fLog</p>
-          <p>local tSrc=${BASH_SOURCE##*/}</p>
+          <p>TDD is done with the git development environment structure. It
+          is NOT done with "installed" code.</p>
         </li>
         <li>
-          <p>in Error and Log always pass this argument:</p>
-          <p>-l $tSrc:$LINENO</p>
+          <p>The -p option is not used with the "read" command, because the
+          prompt is not "captured" with the test scripts. So use "echo -n"
+          for the prompts before the read command.</p>
         </li>
       </ul>
     </li>
+    <li>
+      <p>fLog and fError messages</p>
+    </li>
+    <li>
+      <p>Put this at the beginning or end of each file</p>
+      <pre><code>        export tSrc=${BASH_SOURCE##*/}</code></pre>
+    </li>
+    <li>
+      <p>Put this in each function that calls fError or fLog</p>
+      <pre><code>        local tSrc=${BASH_SOURCE##*/}</code></pre>
+    </li>
+    <li>
+      <p>in Error and Log always pass this argument:</p>
+      <pre><code>        -l $tSrc:$LINENO</code></pre>
+    </li>
   </ul>
-  <h2 id="File-include-pattern---prod"><a href="#_podtop_">File include
-  pattern - prod</a></h2>
-  <pre><code>    gpBin=/usr/lib/git-core - set when a CMD is run
+  <h1 id="File-Include-Pattern---prod"><a href="#_podtop_">File Include
+  Pattern - prod</a></h1>
+  <pre><code>    gpBin=/usr/lib/git-core     # set when a CMD is run
     gpDoc=/usr/share/doc/gitproj
 
         $gpBin/git-proj-CMD
-            . $gpBin/gitproj-com.inc
+            source $gpBin/gitproj-com.inc
                 fComSetGlobals
-            . $gpBin/gitproj-CMD.inc
+            source $gpBin/gitproj-CMD.inc
                 fCMDSetGlobals</code></pre>
-  <h2 id="File-include-pattern---dev"><a href="#_podtop_">File include
-  pattern - dev</a></h2>
-  <pre><code>    gpBin=DIR/gitproj/git-core - set when a CMD is run
+  <h1 id="File-Include-Pattern---dev"><a href="#_podtop_">File Include
+  Pattern - dev</a></h1>
+  <pre><code>    gpBin=DIR/gitproj/git-core  # set when a CMD is run
     gpDoc=$gpBin/../doc or DIR/gitproj/doc
 
         $gpBin/git-proj-CMD
-            . $gpBin/gitproj-com.inc
+            source $gpBin/gitproj-com.inc
                 fComSetGlobals
-            . $gpBin/gitproj-CMD.inc
+            source $gpBin/gitproj-CMD.inc
                 fCMDSetGlobals</code></pre>
-  <h2 id="File-include-pattern---dev-test"><a href="#_podtop_">File include
-  pattern - dev-test</a></h2>
-  <pre><code>    gpTest=DIR/gitproj/test - set when a test-*.inc is run
+  <h1 id="File-include-pattern---dev-test"><a href="#_podtop_">File include
+  pattern - dev-test</a></h1>
+  <pre><code>    gpTest=DIR/gitproj/test   # set when a test-*.inc is run
     gpBin=$gpTest/../git-core or DIR/gitproj/git-core
     gpDoc=$gpTest/../doc or DIR/gitproj/doc
 
         $gpTest/test-com.sh*
-            . $gpTest/test.inc
+            source $gpTest/test.inc
                 fTestSetupEnv
-                . $gpBin/gitproj-com.inc
+                source $gpBin/gitproj-com.inc
                     fComSetGlobals
             fComRunTests
-                . $gpTest/shunit2.1*
+                source $gpTest/shunit2.1*
 
         $gpTest/test-CMD.sh
-            . $gpTest/test.inc
+            source $gpTest/test.inc
                 fTestSetupEnv
-                . $gpBin/gitproj-com.inc
+                source $gpBin/gitproj-com.inc
                     fComSetGlobals
             fTestCreateEnv
-            . $gpBin/gitproj-CMD.inc
+            source $gpBin/gitproj-CMD.inc
                 fCMDSetGlobals
             fTestConfigSetup</code></pre>
 </body>
 </html>
-
-
-
