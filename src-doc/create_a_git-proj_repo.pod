@@ -2,7 +2,7 @@
 
 =head1 Create a git-proj Repo
 
-* Download and install git-proj.
+=head1 Download and install git-proj.
 
     tUrl=https://moria.whyayh.com/rel/released/software/own/git-proj/deb
     tPkg=git-proj-0.4.1-1-mx-x86_64.deb
@@ -11,7 +11,11 @@
 
     sudo apt-get install ./$tPkg
 
-* Set up a project directory with some dummy files
+=head1 Runnig git proj commands
+
+=over 4
+
+=item * Set up a project directory with some dummy files
 
     mkdir -p tmp/project/hello-world
     cd tmp/project/hello-world
@@ -23,7 +27,7 @@
     if ls ~/.gitignore; then more ~/.gitignore; fi
     tree -aF $PWD
 
-* Run `git proj init`
+=item * Run `git proj init`
 
     # You are in directory: tmp/project/hello-world
 
@@ -67,7 +71,7 @@ hello-world already had some large binary files then, before the git
 repo is created, those files would have been moved into raw/ and
 symlinks created to point to the files.
 
-* Try some git commands
+=item * Try some git commands
 
     git status
     git log
@@ -76,7 +80,7 @@ symlinks created to point to the files.
     git ci -am "Added foo.txt"
     git status -s --ignored
 
-* Try `git proj status`
+=item * Try `git proj status`
 
     git proj stats
 
@@ -92,7 +96,7 @@ log messages have these parts:
 This is telling us a remote raw origin has not be defined. So let's
 define one.
 
-* First we need to create a directory for the remote. We could mount
+=item * First we need to create a directory for the remote. We could mount
 an external disk and create the directory there. But for this tutorial
 we will create it under the tmp directory.
 
@@ -100,7 +104,7 @@ we will create it under the tmp directory.
     cd ../..
     mkdir -p mounted-drive/repo
 
-* Now we can run `git proj remote`
+=item * Now we can run `git proj remote`
 
     cd tmp/project/hello-world
     git proj remote -d ../../mounted-drive/repo
@@ -133,7 +137,7 @@ Scroll back and you can see what was done. Here are the important parts:
     git remote origin is now: ../../mounted-drive/repo/hello-world.git
     raw remote origin is now: ../../mounted-drive/repo/hello-world.raw
 
-* Now let's try `git proj status` again
+=item * Now let's try `git proj status` again
 
     git proj status
 
@@ -147,7 +151,7 @@ You should see:
     REMOTE/ = ../../mounted-drive/repo/hello-world.raw/
     No differences.
 
-* Let's put a file in raw/. It doesn't have to be a binary file and it
+=item * Let's put a file in raw/. It doesn't have to be a binary file and it
 can be any size. Mainly the raw/ area is just "synced" to the
 remote-raw-origin dir.
 
@@ -163,7 +167,7 @@ Now you should see:
     Only in raw/: another-file.txt
     Only in raw/: testing-raw
 
-* To "save" the raw/ files to remote-raw we run `git proj push`
+=item * To "save" the raw/ files to remote-raw we run `git proj push`
 
     git proj push
 
@@ -174,7 +178,7 @@ would be done. And the question:
 
 If it looks OK, type 'y'
 
-* New let's change a file in raw/ and remove a file, then push.
+=item * New let's change a file in raw/ and remove a file, then push.
 
     rm raw/testing-raw
     echo "Add a line" >>raw/another-file.txt
@@ -214,7 +218,7 @@ When you look at the proj push help, you might have noticed this
 command can also run "git push origin develop" if you also give the
 '-g' option.
 
-* What about pull? If raw files in the remote are changed, added, or
+=item * What about pull? If raw files in the remote are changed, added, or
 deleted, then we could do a pull. Since we have access to the remote-raw
 dir we an make a manual change.
 
@@ -223,7 +227,7 @@ dir we an make a manual change.
     echo "Add another line" >>another-file.txt
     rm README.txt
 
-* Now for the pull. It also has a '-d' option.
+=item * Now for the pull. It also has a '-d' option.
 
     cd tmp/project/hello-world
     git proj pull -d
@@ -244,19 +248,19 @@ Type 'y' and do another status:
     REMOTE/ = ../../mounted-drive/repo/hello-world.raw/
     No differences.
 
-* That was a simulation of a remote-raw change. How about a
+=item * That was a simulation of a remote-raw change. How about a
 typical scenario? The disk was unmounted, moved to another computer.
 For other computer to access remote with git and git-proj commands,
 `git proj clone` will need to be run to setup the git workspace.
 
-* We'll simulate this some by cloning into another place under the tmp
+=item * We'll simulate this some by cloning into another place under the tmp
 dir. We'll create a place where bob puts his project files.
 
     cd tmp/project/hello-world
     cd ../..
     mkdir -p bob/ver/proj
 
-* Run `git proj clone`
+=item * Run `git proj clone`
 
     cd bob/ver/proj
     git proj clone -h
@@ -285,7 +289,7 @@ won't be changed.
 
     Continue (commit the changes) [y/n]? y
 
-* Now you can do a `git proj status`
+=item * Now you can do a `git proj status`
 
     cd hello-world
     git proj status
@@ -299,5 +303,7 @@ won't be changed.
      ../../../../mounted-drive/repo/hello-world.raw/
  or better, an absolute path!
      /home/bruce/test/tmp/mounted-drive/repo/hello-world.raw
+
+==back
 
 =cut

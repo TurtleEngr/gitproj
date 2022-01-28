@@ -21,15 +21,16 @@
 
 - **-g "pGitOpt"**
 
-    Git status options. For example:
+    Git status options. For example to give a "short" status and show
+    ignored files, use::
 
         git proj status -g "-s --ignored"
 
 - **-r "pRawOpt"**
 
-    Raw options. Currently these will be options passed to the diff
+    Raw options. Currently these options will be passed to the diff
     command. (This will be added after the default options: -qr) For
-    example:
+    example to show the files that are the same between local and remote:
 
         git proj status -r "-s"
 
