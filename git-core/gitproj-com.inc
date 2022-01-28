@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------------------
-export cGitProjVersion cGetOrigin cGetTopDir cGetCurBranch cPID
+export cGitProjVersion cGetOrigin cGetTopDir cGetCurBranch cRemoteProjFile cPID
 
 export PWD gErr gSavedOptE gGetConfigOrigin gGetConfigValue gResponse
 
@@ -501,6 +501,9 @@ fComSetGlobals()
 
     cGetCurBranch='git rev-parse --abbrev-ref HEAD'
     # Use: tBranch=$($cGetCurBranch)
+
+    cRemoteProjFile=.remote.proj
+    # File will contain cGetOrigin value. Put in remote raw dir
 
     gpMaxLoop=${gpMaxLoop:-20}
     # Used internally to limit number of invalid responses to prompts.
