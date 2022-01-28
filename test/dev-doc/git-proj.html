@@ -18,6 +18,26 @@
         <li>
           <a href="#Common-Script-Functions">Common Script Functions</a>
           <ul>
+            <li>
+              <a href="#try-catch-functions">try/catch functions</a>
+              <ul>
+                <li><a href="#tcTry">tcTry</a></li>
+                <li><a href="#tcSaveEnv">tcSaveEnv</a></li>
+                <li><a href="#tcReturn">tcReturn</a></li>
+                <li><a href="#tcThrow">tcThrow</a></li>
+                <li><a href="#tcCatch">tcCatch</a></li>
+                <li><a href="#tcThrowErrors">tcThrowErrors</a></li>
+                <li><a href="#tcIgnoreErrors">tcIgnoreErrors</a></li>
+                <li><a href="#Sample-Use">Sample Use</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#fComConfigCopy">fComConfigCopy</a>
+              <ul>
+                <li><a href="#Synopsis">Synopsis</a></li>
+                <li><a href="#Description">Description</a></li>
+              </ul>
+            </li>
             <li><a href="#fComSetGlobals">fComSetGlobals</a></li>
             <li><a href=
             "#fComCheckDeps-pRequired-List-pOptional-List">fComCheckDeps
@@ -30,8 +50,8 @@
             <li><a href="#fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog
             pLevel "pMsg" pLine pErr</a></li>
             <li>
-              <a href="#fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr">fLog -m
-              pMsg [-p pLevel] [-l $LINENO] [-e pErr]</a>
+              <a href="#fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr--f">fLog -m
+              pMsg [-p pLevel] [-l $LINENO] [-e pErr] [-f]</a>
               <ul>
                 <li><a href="#fLog-Examples">fLog Examples:</a></li>
               </ul>
@@ -42,16 +62,16 @@
             <li>
               <a href="#fComGetConfig">fComGetConfig</a>
               <ul>
-                <li><a href="#Synopsis">Synopsis</a></li>
-                <li><a href="#Description">Description</a></li>
+                <li><a href="#Synopsis1">Synopsis</a></li>
+                <li><a href="#Description1">Description</a></li>
                 <li><a href="#Options">Options</a></li>
               </ul>
             </li>
             <li>
               <a href="#fComGetConfig1">fComGetConfig</a>
               <ul>
-                <li><a href="#Synopsis1">Synopsis</a></li>
-                <li><a href="#Description1">Description</a></li>
+                <li><a href="#Synopsis2">Synopsis</a></li>
+                <li><a href="#Description2">Description</a></li>
                 <li><a href="#Options1">Options</a></li>
               </ul>
             </li>
@@ -65,6 +85,133 @@
   Documentation</h1>
   <hr />
   <h2 id="Common-Script-Functions">Common Script Functions</h2>
+  <h3 id="try-catch-functions">try/catch functions</h3>
+  <p><b>NOTE the env. var. part does not reliably work. So don't use the "tc"
+  functions until they are fixed.</b></p>
+  <p>These functions were inspired by:
+  https://gist.github.com/e7d/e43e6586c1c2ecb67ae2</p>
+  <p>Changes: This version doesn't save the previous state of "set -e".
+  Exported env. var. changes in the subshell are saved, so they can be
+  restored when the subshell is done.</p>
+  <h4 id="tcTry">tcTry</h4>
+  <p>Call this just before the required subshell section.</p>
+  <h4 id="tcSaveEnv">tcSaveEnv</h4>
+  <p>Call this when env changes must not be lost. This is called by the other
+  related commands.</p>
+  <h4 id="tcReturn">tcReturn</h4>
+  <p>Call this at end of the tcTry subshell. Calls tcSaveEnv.</p>
+  <h4 id="tcThrow">tcThrow</h4>
+  <p>Call this to throw error (1..255) to tcCatch Calls tcSaveEnv.</p>
+  <h4 id="tcCatch">tcCatch</h4>
+  <p>Save throw or cmd errors, and restore any env. var. changes in the
+  subshell. If a commnd exits before a tcSaveEnv call, env. var. changes will
+  be lost. Calls tcSaveEnv.</p>
+  <h4 id="tcThrowErrors">tcThrowErrors</h4>
+  <p>Now, if a cmd returns non-zero, exit the try subshell. Calls
+  tcSaveEnv.</p>
+  <h4 id="tcIgnoreErrors">tcIgnoreErrors</h4>
+  <p>Now, if a cmd returns non-zero, execution will continue. Calls
+  tcSaveEnv.</p>
+  <h4 id="Sample-Use">Sample Use</h4>
+  <pre><code>    #!/bin/bash
+    . try_catch.sh
+
+    export cFatal=100
+    export cWarn=101
+    export cmd1 cmd2 foo1 foo2 foo3
+
+    fCmd1()
+    {
+        tcMsg="fCmd1 error"
+        if [ $((RANDOM % 3)) = 1 ]; then
+            rm /x/y/zz/y
+        fi
+        echo cmd1="fCmd1 ran OK"
+    }
+
+    fCmd2()
+    {
+        tcMsg="fCmd2 error"
+        if [ $((RANDOM % 4)) = 1 ]; then
+            rm /x/y/zz/y
+        fi
+        if [ $((RANDOM % 4)) = 1 ]; then
+          tcThrow 42 "fCmd2 threw this"
+        fi
+        echo cmd2="fCmd2 ran OK"
+    }
+
+    fTestIt()
+    {
+        tcMessage="Default message for exits"
+        tcTry
+        (
+            # This is an error, but execution will continue
+            rm /x/y/zz/y
+
+            tcThrowErrors
+            # Commands will now go to tcCatch if non-zero return
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                tcThrow $cFatal "Throw message. Line=$LINENO"
+            fi
+            export foo1="this will not be set if tcThrow is run"
+            tcSaveEnv
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                rm /x/y/zz/y
+            fi
+            export foo2="this is set because 'rm' was not run", and tcSaveEnv ran
+            tcSaveEnv
+
+            fCmd1
+            fCmd2
+
+            # This will fail after it is created, second run, if no throws
+            mkdir foo-bar
+            export foo3="This not be set on second run"
+
+            tcReturn
+        )
+        tcCatch || {
+            case $tcErr in
+                $cFatal)
+                    echo "Caught: Throw happened. $tcMsg"
+                    ;;
+                $cWarn)
+                    echo "Caught: Warning. $tcMsg"
+                    ;;
+                *)  echo "Caught: Unknown exit: $tcErr. $tcMsg" ;;
+            esac
+        }
+        echo
+        echo foo1=$foo1
+        echo foo2=$foo2
+        echo foo3=$foo3
+        echo cmd1=$cmd1
+        echo cmd2=$cmd1
+    } # fTestIt
+
+    fTestIt</code></pre>
+  <hr />
+  <h3 id="fComConfigCopy">fComConfigCopy</h3>
+  <h4 id="Synopsis">Synopsis</h4>
+  <pre><code>    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]</code></pre>
+  <h4 id="Description">Description</h4>
+  <p>Copy values from git config file pSource to pDest. If -f (force), the
+  pSource values will override the pDest values, otherwise the pSource value
+  will only be copied to pDest if it does not exist there.</p>
+  <p>The -i pIncPat is a "grep" pattern that only selects the variable names
+  that match the pattern. For example: <span style="white-space: nowrap;">-i
+  'gitproj\.config\.|gitflow\.'</span></p>
+  <p>The -e pExcPat is a "grep" pattern that removes variable names that
+  match the pattern. For example: <span style="white-space: nowrap;">-e
+  'gitproj.config.remote-raw-origin'</span> pExcPat is applied after
+  pIncPat.</p>
+  <p>pSource and pDest files must exist. pSource must be readable, and pDest
+  must be writable.</p>
+  <p>A backup copy of pDest is made with this command: <span style=
+  "white-space: nowrap;">cp -backup=t $pDest $pDest.bak</span></p>
   <hr />
   <h3 id="fComSetGlobals">fComSetGlobals</h3>
   <p>Set initial values for all of the globals use by this script. The ones
@@ -115,19 +262,98 @@
   <p>This function formats and outputs a consistent log message output. See:
   fLog and fError.</p>
   <hr />
-  <h3 id="fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr">fLog -m pMsg [-p pLevel]
-  [-l $LINENO] [-e pErr]</h3>
+  <h3 id="fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr--f">fLog -m pMsg [-p
+  pLevel] [-l $LINENO] [-e pErr] [-f]</h3>
   <p>pLevel - emerg alert crit err warning notice info debug debug-N</p>
-  <pre><code> if gpVerbose = 0, don't output notice or info
- if gpVerbose = 1, don't output info
- if gpVerbose &gt;= 2, output all logs</code></pre>
+  <pre><code> emerg, alert, crit, and err levels will always be output.
+
+ emerg, alert, crit - exit gErr (or 1 if gErr=0, or not -e)
+ err - return gErr (or 1 if gErr=0, or not -e)
+ all other levels - return 0
+
+ (fError defaults to "crit". -n changes it too "err")
+ (-i adds "Internal: to message, an it calls fComStackTrace)
+
+ -q   set gpVerbose=0
+ -v   set gpVerbose=2 (default)
+ -V N set gpVerbose=N (0..4)
+ gitproj.config.verbose=N set gpVerbose=N
+
+ if gpVerbose = 0, don't output warning, notice or info
+ if gpVerbose = 1, don't output notice, info
+ if gpVerbose = 2, don't output info (default verbose level)
+ if gpVerbose &gt;= 3, output all non-debug levels
+ if -f, ignore the gpVerbose setting
+
+ -x - set gpDebug=1
+ -xx - set gpDebug=2
+ -X N - set gpDebug=N (0..100)
+
+ if gpDebug = 0, don't output andy debug msgs
+ if gpDebug &gt; 0, output any "debug" msgs, or
+ if gpDebug = N1, output "debug-N2" msgs, if N1 &gt;= N2</code></pre>
   <p>See Globals: gpSysLog, gpFacility, gpVerbose, gpDebug</p>
   <h4 id="fLog-Examples">fLog Examples:</h4>
-  <pre><code> fLog -p warning -m "Missing awk" -l $LINENO -e 8
- fLog -p notice -m "Output only if -v"  -e 8 -l $LINENO
- fLog -p info -m "Output only if -vv" -l $LINENO
+  <pre><code> local tFile=${BASH_SOURCE##*/}
+ local tFile=file.inc
+ gpCmdName=program.sh
+
+ fError -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh crit: Error: Message [file.inc:234](8)
+    gErr=8
+    exit 8
+
+ fError -n -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Error: Message [file.inc:234](8)
+    gErr=8
+    return 8
+
+ fError -i [-n] -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Internal: Error: Message [file.inc:234](8)
+    gErr=8
+    call: fComStackTrace
+    return 8, if -n
+    exit 8, if ! -n
+
+ fLog -p err -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Message [file.inc:234](8)
+    gErr=8
+    return 8
+
+ fLog -p warning -m "Output if gpVerbose" -e 8
+
+    if gpVerbose &gt;= 1
+    Output: program.sh warning: Message (8)
+    gErr=8
+    return 0
+
+ fLog -p notice -m "Notice msg"  -e 8 -l $LINENO
+
+    if gpVerbose &gt;= 2
+    Output: program.sh notice: Notice msg [234]
+    gErr=0
+    return 0
+
+ fLog -p info -m "Info message"
+
+    if gpVerbose &gt;= 3
+    Output: program.sh info: Info message
+    gErr=0
+    return 0
+
  fLog -p debug -m "Output only if $gpDebug &gt; 0" -l $LINENO
- fLog -p debug-3 -m "Output only if $gpDebug &gt; 0 and $gpDebug &lt;= 3" -l $LINENO</code></pre>
+
+    Output: program.sh debug: Output only if $gpDebug &gt; 0 [234]
+    return 0
+
+ fLog -p debug-3 -m "Output only if $gpDebug &gt;= 3" -l $LINENO
+
+    Output: program.sh debug-3: Output only if $gpDebug &gt;= 3 [234]
+    return 0</code></pre>
   <hr />
   <h3 id="fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg [-l $LINENO]
   [-e pErr] [-i]</h3>
@@ -135,6 +361,7 @@
   <p>If no -i, then "fUsage short", will be called.</p>
   <hr />
   <h3 id="fComGit-pArgs">fComGit [pArgs...]</h3>
+  <p>TBD: replace this with set/try/catch</p>
   <p>This is a wrapper for "git". If gpVerbose is &gt;= 2, the git call will
   will be echoed. If the git call exits with a non-0, then an error message
   is output and the script exits (if not called in a sub-shell).</p>
@@ -144,13 +371,13 @@
   because if it failed, the script would exit.</p>
   <hr />
   <h3 id="fComGetConfig">fComGetConfig</h3>
-  <h4 id="Synopsis">Synopsis</h4>
-  <pre><code>    fComSetConfig -k pKey -v pValue [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-a]</code></pre>
-  <h4 id="Description">Description</h4>
+  <h4 id="Synopsis1">Synopsis</h4>
+  <pre><code>    fComSetConfig -k pKey -v pValue [-g|-l|-L|-f pFile] [-b|-i] [-a]</code></pre>
+  <h4 id="Description1">Description</h4>
   <h4 id="Options">Options</h4>
-  <p>Only one of these will be used: -g, -l, -L, -H -f. The last one in the
-  list of options will be used if there is more than one. If none, then -l is
-  the default.</p>
+  <p>Only one of these will be used: -g, -l, -L, -f. The last one in the list
+  of options will be used if there is more than one. If none, then -l is the
+  default.</p>
   <p>Only one or none of these can be specified: -b, -i. If more than one,
   then the last one will be used.</p>
   <dl>
@@ -164,20 +391,17 @@
     </dd>
     <dt id="g"><b>-g</b></dt>
     <dd>
-      <p>Write to ~/.gitconfig</p>
+      <p>Write to ~/.gitconfig (--global)</p>
     </dd>
     <dt id="l"><b>-l</b></dt>
     <dd>
-      <p>You must be in a git workspace for this option to work.</p>
+      <p>You must be in a git workspace for this option to work.
+      (--local)</p>
       <p>Write to GIT_DIR/.git/config</p>
     </dd>
     <dt id="L"><b>-L</b></dt>
     <dd>
-      <p>Write to GIT_DIR/$cConfigLocal</p>
-    </dd>
-    <dt id="H"><b>-H</b></dt>
-    <dd>
-      <p>Write to GIT_DIR/$cConfigHost</p>
+      <p>Write to GIT_DIR/.gitproj</p>
     </dd>
     <dt id="f-pFile"><b>-f pFile</b></dt>
     <dd>
@@ -204,10 +428,10 @@
   </dl>
   <hr />
   <h3 id="fComGetConfig1">fComGetConfig</h3>
-  <h4 id="Synopsis1">Synopsis</h4>
-  <pre><code>    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
+  <h4 id="Synopsis2">Synopsis</h4>
+  <pre><code>    fComGetConfig -k pKey [-g|-l|-L|-f pFile] [-b|-i]
                   [-d pDefault] [-e] [-v pFilter]</code></pre>
-  <h4 id="Description1">Description</h4>
+  <h4 id="Description2">Description</h4>
   <p>If pKey is found, the last defined value is echoed. And the value is
   saved in global gGetConfigValue. And the file location of the value is
   saved in gGetConfigOrigin.</p>
@@ -220,8 +444,8 @@
   <pre><code>    0 - OK (even for no value found)
     1 - Errors</code></pre>
   <h4 id="Options1">Options</h4>
-  <p>Only one of these will be used: -g, -l, -f. The last one in the list of
-  options will be if there is more than one. If none, then all the config
+  <p>Only one of these will be used: -g, -l, -L, -f. The last one in the list
+  of options will be if there is more than one. If none, then all the config
   files will be used.</p>
   <p>Only one or none of these can be specified: -b, -i. If more than one,
   then the last one will be used.</p>
@@ -240,7 +464,7 @@
     <dd>
       <p>You must be in a git workspace for this option to work.</p>
       <p>Look in GIT_DIR/.git/config Includes are followed so these files
-      will be included: GIT_DIR/$cConfigLocal and GIT_DIR/$cConfigHost</p>
+      will be included: GIT_DIR/.gitproj and GIT_DIR/.git/config</p>
     </dd>
     <dt id="f-pFile1"><b>-f pFile</b></dt>
     <dd>

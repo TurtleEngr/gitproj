@@ -21,7 +21,8 @@ following order, where the last definition wins.
 If the "Access" is defined for "set" or "get", then that is the only
 location "git config" will use.
 
-git-proj doesn't do anything with ".git/config.worktree".
+git-proj doesn't do anything with "/etc/config" or
+".git/config.worktree".
 
 =head2 System, /etc/gitconfg
 
@@ -200,6 +201,28 @@ is the logical result.)
 
 =head2 Notation: gp[Var]; -[A]; git.config.[var]; (default)
 
+    gp[Var];          - a global env. var. name (NA means there is none)
+    -[A];             - a CLI option (-NA means there is none)
+    git.config.[var]; - git config var name (NA means there is none)
+    (default) 	      - its default value, if not defined anywhere
+
+=head2 gpAuto; -a; NA; (false)
+
+This is used to run the scripts in batch mode.
+
+=head2 gpAutoMove; -m; NA; (false)
+
+This it used by the S<"git proj init"> command.
+
+=head2 gpYesNo; -y; -n; NA; (No)
+
+If gpAuto is true, then gpYesNo can be used to define default answers.
+
+=head2 NA; -NA, gitproj.config.proj-status; (TBD)
+
+Once the gitproj package is installed and configured, this will be
+changed to "installed"
+
 =head2 gpSysLog; -NA; gitproj.config.syslog; (false)
 
 If set to 0, log messages will only be sent to stderr.
@@ -215,8 +238,6 @@ by by gpFacility.
 
 "user" log messages will be sent to /var/log/user.log, or
 /var/log/syslog, or /var/log/messages.log
-
-See: fLog
 
 Default: user
 
@@ -247,54 +268,6 @@ These are some suggested uses for the localN facilities:
  local6 - available
  local7 - available
 
-=head2 gpVerbose; -q, -v, -V N; gitproj.config.verbose; (2)
-
- -q - gpVerbose=0
- -v - gpVerbose=2
- -v N - gpVerbose=N
-
- gpVerbose  = 0 - output error messages (corrections must be made)
- gpVerbose >= 1 - output warnings messages (corrections may be needed)
- gpVerbose >= 2 - output notice messages (important information)
- gpVerbose >= 3 - output info messages (give more information)
-
-Default: 2
-
-Normal log message:
-
- Command [warning, notice, info]: Message [File:LineNo](ErrCode)
-
-Error messages (crit will exit, err might continue):
-
- Command [crit, err]: Error: Message [File:LineNo](ErrCode)
-
-An internal error. This is probably a defect in the code (collect all
-the output for a bug report):
-
- Command [crit, err]: Internal: Error: Message [File:LineNo](ErrCode)
- StackTrace:
-
-=head2 gpDebug; -x, -X N; NA; (0)
-
-Default: 0
-
-There is no config variable for gpDebug.
-
-If set to 0, all "debug" and "debug-N" level messages will be skipped.
-
-If not 0, all "debug" level messages will be output.
-
-If "debug-N" level is used, then if gpDebug is >= N, then the log
-message will be output, otherwise it is skipped.
-
-=head2 gpAuto; -a; NA; (false)
-
-=head2 gpYesNo; -y; -n; NA; (No)
-
-If gpAuto is true, then gpYesNo can be used to define default answers.
-
-=head2 gpAutoMove; -NA; NA; (false)
-
 =head2 gpBin; -NA; gitproj.config.bin; (/usr/lib/git-core)
 
 The location of the executing command will override this.
@@ -303,28 +276,125 @@ The location of the executing command will override this.
 
 If not found, then set to: $gpBin/../doc  If still not found: error.
 
-=head2 gpCheckFileNames; -NA; gitproj.hook.check-file-names; (true)
+=head2 gpDebug; -x, -xx..., -X N; NA; (0)
 
-=head2 gpCheckForBigFiles; -NA; gitproj.hook.check-for-big-files; (true)
+See the "common-options" section in L<git-proj|git-proj.html> for details.
 
-=head2 gpCheckInRaw; -NA; gitproj.hook.check-in-raw; (true)
+There is no config variable for gpDebug.
 
-=head2 gpCheckWhitespace; -NA; gitproj.hook.check-whitespace; (true)
+=head2 NA; -NA, gitproj.config.git-flow-pkg, (git-flow)
 
-See rm-trailing-sp to fix.
+=head2 gpGitFlow; -NA; gitproj.config.flow; (true)
 
-=head2 gpAllowTabs; -NA; gitproj.hook.allow-tabs; (false)
+If true, git-flow will be setup for the project.
 
-See rm-trailing-sp to fix (-t option)
+=head2  NA; -NA, gitproj.config.local-status; (TBD)
 
-=head2 gpHookVerbose; -NA; gitproj.hook.verbose; (true)
+When a project has been successfully setup by S<git proj init> or
+S<git proj clone>, this will be set to "defined" in PROJ/.gitproj and
+PROJ/.git/config.  If should always be "TBD" in ~/.gitconfig
 
-=head2 gpPreCommitEnabled; -NA; gitproj.hook.pre-commit-enable; (true)
+=head2 NA; -NA, gitproj.config.local-host; (TBD)
 
-=head2 gpMaxSize; -NA; gitproj.hook.binary-file-size; (10k)
+When a project has been successfully setup by S<git proj init> or
+S<git proj clone>, this will be set to "$HOSTNAME" in PROJ/.git/config
+only.
+
+=head2 gpProjName; -NA, gitproj.config.proj-name; (TBD)
+
+When a project has been successfully setup by S<git proj init> or
+S<git proj clone>, this will be set to the project's name in
+PROJ/.gitproj and PROJ/.git/config. Usually this is the top direcory
+name. If should always be "TBD" in ~/.gitconfig
+
+=head2 NA; -NA, gitproj.config.remote-status; (TBD)
+
+When S<git proj remote> runs OK this is changed to "defined", in
+PROJ/.gitproj and PROJ/.git/config. If should always be "TBD" in
+~/.gitconfig
+
+=head2 gpRemoteRawOrigin, -d, gitproj.config.remote-raw-origin, (TBD)
+
+This is set by S<git proj remote> and S<git proj clone> to the remote
+raw location. It is set in PROJ/.git/config. If should always be "TBD"
+in ~/.gitconfig and PROJ/.gitproj.
 
 =head2 gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (20g)
 
-=head2 gpGitFlow; -NA; gitproj.config.flow; (true)
+This is the minium space that should be available on the external
+drive.  The S<git proj remote> command will not continue if there is
+not enough space.  The available space should be at least twice the
+size of the space used by ProjName.raw.
+
+=head2 gpVerbose; -q, -v, -V N; gitproj.config.verbose; (2)
+
+See the "common-options" section in L<git-proj|git-proj.html> for details.
+
+=head2 gpVer, -NA; gitproj.config.ver, ()
+
+This is set by S<git proj init> in the PROJ/.gitproj and
+PROJ/.git/config files. The value will be the currently installed
+version of gitproj. The version is defined in the file:
+/usr/share/doc/git-proj/VERSION
+
+S<git proj clone> will compare ver in PROJ/.gitproj to
+/usr/share/doc/git-proj/VERSION. If the major or minor numbers of the
+checked out project are greater than the installed version there could
+be problems. If the installed version is greater, this should not be a
+problem, because gitproj tried to be backward compatable. And it might
+try to upgrade the project.
+
+A warning message will be output if there are differences.
+
+=head2 gpHookVerbose; -NA; gitproj.hook.verbose; (true)
+
+If false, there will be output from pre-commit only if problems are
+identified.
+
+=head2 gpPreCommitEnabled; -NA; gitproj.hook.pre-commit-enable; (true)
+
+Use this to turn all pre-commit check off.
+
+=head2 gpCheckFileNames; -NA; gitproj.hook.check-file-names; (true)
+
+If true, only these chacters can be used in file and directory names:
+[-_.a-zA-z0-9]
+
+=head2 gpCheckInRaw; -NA; gitproj.hook.check-in-raw; (true)
+
+If true, files in the top raw/ dir will not be alloed in the git
+repository. The files should have been ignored with the rule in
+.gitignore, but maybe someone "forced" the add.
+
+Setting this to "false" defeats the whole purpose for gitproj.
+
+=head2 gpCheckWhitespace; -NA; gitproj.hook.check-whitespace; (true)
+
+If true, don't allow trailing spaces in text files.
+
+See rm-trailing-sp to fix.
+
+=head2 gpAllowTabs; -NA; gitproj.hook.check-for-tabs; (false)
+
+If true, don't allow tabs for files with the extentions found in:
+gitproj.hook.tabs-ext-list
+
+To fix, use "rm-trailing-sp -f FILE"
+
+=head2 gpTabExtList; -NA; gitproj.hook.tabs-ext-list; (c sh md html pod)
+	tab-ext-list = c sh md html pod
+
+List the file extentions for filse that will be checked for tabs.
+
+=head2 gpCheckForBigFiles; -NA; gitproj.hook.check-for-big-files; (true)
+
+If true, look for large binary files. Ones greater than
+gitproj.hook.binary-file-size will not be allowed into the git repo.
+
+=head2 gpMaxSize; -i, --int; gitproj.hook.binary-file-size; (10k)
+
+Valid suffixes: k, m, g
+
+If no suffix, then bytes are assumed.
 
 =cut

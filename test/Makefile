@@ -6,6 +6,10 @@
 # --------------------
 # Config
 
+mHtmlOpt = --cachedir=/tmp --index --backlink
+
+mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
+
 mCore = ../git-core
 
 # Note: the order matters, when *recreating* these files.
@@ -71,9 +75,18 @@ clear-logs :
 stats :
 	./stats.sh
 
-gen-dev-doc :
-	-$(mCore)/git-proj -H int-md >dev-doc/git-proj.md
-	-$(mCore)/git-proj -H int-html >dev-doc/git-proj.html
+gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html
+
+dev-doc/git-proj.md : $(mCore)/git-proj
+	-$? -H int-md >$@
+
+dev-doc/git-proj.html : $(mCore)/git-proj
+	-$? -H int-html >$@
+
+dev-doc/outline.html : dev-doc/outline.pod
+	-pod2html --title='Outline of Files' $(mHtmlOpt) <$? >$@
+	-$(mTidy) $@
+	-pod2markdown <dev-doc/outline.pod >dev-doc/outline.md
 
 # rm-trailing-sp :
 rm-trailing-sp : ~/bin/rm-trailing-sp

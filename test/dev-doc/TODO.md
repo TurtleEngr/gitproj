@@ -114,9 +114,11 @@ Makefile targets for managing them.
 
 ## Enhancement Major
 
+* Implement pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
+
 * Version increment wizard script. Increment the
   major/minor/path/rc/build vars based on Q/A. See
-  `test/dev-doc/enh-ver-wizard.md`
+  See: `test/dev-doc/enhancements/version-wizard.md`
 
 * Implement: allow-tabs pre-commit check.
 
@@ -129,16 +131,16 @@ Makefile targets for managing them.
   do one or two? Some methods are not compatable.
 
 * Future feature: manage different versions of binary files with a
-  process similar to rsnapshot. See `test/dev-doc/enh-raw-rsnapshot.md`
-  and `test/dev-doc/enh-raw-ssh.md`
+  process similar to rsnapshot. See `test/dev-doc/enhancements/raw-rsnapshot.md`
+  and `test/dev-doc/enhancements/raw-ssh.md`
 
 * Manage the different versions of large binary files with "cvs".
-  See `test/dev-doc/enh-raw-cvs.md`
+  See `test/dev-doc/enhancements/raw-cvs.md` and `test/dev-doc/enhancements/raw-pros-cons.md`
 
 * To use a true remote (over network) with cvs and git, use ssh protocol.
-  Requires: ssh-client and ssh-server. See `test/dev-doc/enh-raw-ssh.md`
+  Requires: ssh-client and ssh-server. See `test/dev-doc/enhancements/raw-ssh.md`
 
-* Use rclone for raw/ files. See `test/dev-doc/enh-raw-rclone.md`
+* Use rclone for raw/ files. See `test/dev-doc/enhancements/raw-rclone.md`
 
 ----
 

@@ -4,109 +4,171 @@
 
 # gitproj-com.inc Internal Documentation
 
-## Template Use
-
-### Configuration
-
-- Copy template.sh to your script file.
-- Your script, gitproj-com.inc, and gitproj-com.test
-need to be in the same directory.
-- Globally replace SCRIPTNAME with the name of your
-script file.
-- Update the getopts in the "Get Args Section". Add
-your script's options.
-- Loop: document (with POD), add tests, add validate functions
-- Loop: add unit test function, add functions, test
-
-### Block Organization
-
-- Configuration - exit if errors
-- Get Args - exit if errors
-- Verify external progs - exit if errors
-- Run tests - if gpTest is set
-- Validate Args - exit if errors
-- Verify connections work - exit if errors
-- Read-only functional work - exit if errors
-- Write functional work - now you are committed! Try to keep going if errors
-- Output results and/or launch next process
-
-To avoid a lot of rework and manual rollbacks, put-off _writes_ that
-cannot undone. Do as much as possible to make sure the script will be able
-to complete write operations.
-
-For example, **do not do this:** collect information, transform it,
-write it to a DB, then start the next process on another server.
-Whoops, that server cannot be accessed, so the DB update is not valid!
-Gee, why didn't you verify all the connections you will need, before
-committing to the DB?!  Even if you did check, the connection could
-have failed after the check, so maybe write to a tmp DB, then when all
-is OK, then update the master DB with the tmp DB changes.
-
-Where ever possible make your scripts "re-entrant". Connections can
-fail at anytime and scripts can be killed at anytime; How can any
-important work be continued or work rolled-back? Planing for
-"failures" is NOT planning to fail; it is what a professional engineer
-does to design in quality.
-
-### Variable Naming Convention
-
-Prefix codes are used to show the **"scope"** of variables:
-
-    gVar - global variable (may even be external to the script)
-    pVar - a function parameter I<local>
-    gpVar - global parameter, i.e. may be defined external to the script
-    cVar - global constant (set once)
-    tVar - temporary variable (usually I<local> to a function)
-    fFun - function
-
-All UPPERCASE variables are _only_ used when they are required by other
-programs or scripts.
-
-If you have exported variables that are shared across scritps, then
-this convention can be extended by using prefixes that are related to
-where the variables are set.
-
-### Global Variables
-
-For more help, see the Globals section in fUsage.
-
-    gpSysLog - -l
-    gpVerbose - -v, -vv
-    gpDebug - -x, -xx, ...
-    gpTest - -t
-    gErr - error code (0 = no error)
-    gpCmdName - script's name taken from $0
-    cCurDir - current directory
-    gpBin - directory where the script is executing from
-    gpDoc - directory for config/, hooks/, test/
-
-### Documentation Format
-
-POD is use to format the script's documentation. Sure MarkDown could
-have been used, but it didn't exist 20 years ago. POD text can be
-output as text, man, html, pdf, texi, just usage, and even MarkDown
-
-Help for POD can be found at:
-[perlpod - the Plain Old Documentation format](https://perldoc.perl.org/perlpod)
-
-The documentation is embedded in the script so that it is more likely
-to be updated. Separate doc files seem to _always_ drift from the
-code. Feel free to delete any documentation, if the code is clear
-enough.  BUT _clean up your code_ so that the code _really_ is
-clear.
-
-The internal documentation uses POD commands that begin with "=internal-".
-See fComInternalDoc() for how this is used.
-
-<div>
-    <hr/>
-</div>
-
 <div>
     <hr/>
 </div>
 
 ## Common Script Functions
+
+### try/catch functions
+
+**NOTE the env. var. part does not reliably work. So don't use the
+"tc" functions until they are fixed.**
+
+These functions were inspired by:
+https://gist.github.com/e7d/e43e6586c1c2ecb67ae2
+
+Changes: This version doesn't save the previous state of "set -e".  Exported
+env. var. changes in the subshell are saved, so they can be restored
+when the subshell is done.
+
+#### tcTry
+
+Call this just before the required subshell section.
+
+#### tcSaveEnv
+
+Call this when env changes must not be lost. This is called by the
+other related commands.
+
+#### tcReturn
+
+Call this at end of the tcTry subshell.
+Calls tcSaveEnv.
+
+#### tcThrow
+
+Call this to throw error (1..255) to tcCatch
+Calls tcSaveEnv.
+
+#### tcCatch
+
+Save throw or cmd errors, and restore any env. var. changes in the subshell.
+If a commnd exits before a tcSaveEnv call, env. var. changes will be lost.
+Calls tcSaveEnv.
+
+#### tcThrowErrors
+
+Now, if a cmd returns non-zero, exit the try subshell.
+Calls tcSaveEnv.
+
+#### tcIgnoreErrors
+
+Now, if a cmd returns non-zero, execution will continue.
+Calls tcSaveEnv.
+
+#### Sample Use
+
+    #!/bin/bash
+    . try_catch.sh
+
+    export cFatal=100
+    export cWarn=101
+    export cmd1 cmd2 foo1 foo2 foo3
+
+    fCmd1()
+    {
+        tcMsg="fCmd1 error"
+        if [ $((RANDOM % 3)) = 1 ]; then
+            rm /x/y/zz/y
+        fi
+        echo cmd1="fCmd1 ran OK"
+    }
+
+    fCmd2()
+    {
+        tcMsg="fCmd2 error"
+        if [ $((RANDOM % 4)) = 1 ]; then
+            rm /x/y/zz/y
+        fi
+        if [ $((RANDOM % 4)) = 1 ]; then
+          tcThrow 42 "fCmd2 threw this"
+        fi
+        echo cmd2="fCmd2 ran OK"
+    }
+
+    fTestIt()
+    {
+        tcMessage="Default message for exits"
+        tcTry
+        (
+            # This is an error, but execution will continue
+            rm /x/y/zz/y
+
+            tcThrowErrors
+            # Commands will now go to tcCatch if non-zero return
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                tcThrow $cFatal "Throw message. Line=$LINENO"
+            fi
+            export foo1="this will not be set if tcThrow is run"
+            tcSaveEnv
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                rm /x/y/zz/y
+            fi
+            export foo2="this is set because 'rm' was not run", and tcSaveEnv ran
+            tcSaveEnv
+
+            fCmd1
+            fCmd2
+
+            # This will fail after it is created, second run, if no throws
+            mkdir foo-bar
+            export foo3="This not be set on second run"
+
+            tcReturn
+        )
+        tcCatch || {
+            case $tcErr in
+                $cFatal)
+                    echo "Caught: Throw happened. $tcMsg"
+                    ;;
+                $cWarn)
+                    echo "Caught: Warning. $tcMsg"
+                    ;;
+                *)  echo "Caught: Unknown exit: $tcErr. $tcMsg" ;;
+            esac
+        }
+        echo
+        echo foo1=$foo1
+        echo foo2=$foo2
+        echo foo3=$foo3
+        echo cmd1=$cmd1
+        echo cmd2=$cmd1
+    } # fTestIt
+
+    fTestIt
+
+<div>
+    <hr/>
+</div>
+
+### fComConfigCopy
+
+#### Synopsis
+
+    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]
+
+#### Description
+
+Copy values from git config file pSource to pDest. If -f (force), the pSource
+values will override the pDest values, otherwise the pSource value will
+only be copied to pDest if it does not exist there.
+
+The -i pIncPat is a "grep" pattern that only selects the variable
+names that match the pattern. For example:
+\-i 'gitproj\\.config\\.|gitflow\\.'
+
+The -e pExcPat is a "grep" pattern that removes variable names that
+match the pattern. For example: -e 'gitproj.config.remote-raw-origin'
+pExcPat is applied after pIncPat.
+
+pSource and pDest files must exist. pSource must be readable, and
+pDest must be writable.
+
+A backup copy of pDest is made with this command:
+cp -backup=t $pDest $pDest.bak
 
 <div>
     <hr/>
@@ -183,23 +245,102 @@ See: fLog and fError.
     <hr/>
 </div>
 
-### fLog -m pMsg \[-p pLevel\] \[-l $LINENO\] \[-e pErr\]
+### fLog -m pMsg \[-p pLevel\] \[-l $LINENO\] \[-e pErr\] \[-f\]
 
 pLevel - emerg alert crit err warning notice info debug debug-N
 
-    if gpVerbose = 0, don't output notice or info
-    if gpVerbose = 1, don't output info
-    if gpVerbose >= 2, output all logs
+    emerg, alert, crit, and err levels will always be output.
+
+    emerg, alert, crit - exit gErr (or 1 if gErr=0, or not -e)
+    err - return gErr (or 1 if gErr=0, or not -e)
+    all other levels - return 0
+
+    (fError defaults to "crit". -n changes it too "err")
+    (-i adds "Internal: to message, an it calls fComStackTrace)
+
+    -q   set gpVerbose=0
+    -v   set gpVerbose=2 (default)
+    -V N set gpVerbose=N (0..4)
+    gitproj.config.verbose=N set gpVerbose=N
+
+    if gpVerbose = 0, don't output warning, notice or info
+    if gpVerbose = 1, don't output notice, info
+    if gpVerbose = 2, don't output info (default verbose level)
+    if gpVerbose >= 3, output all non-debug levels
+    if -f, ignore the gpVerbose setting
+
+    -x - set gpDebug=1
+    -xx - set gpDebug=2
+    -X N - set gpDebug=N (0..100)
+
+    if gpDebug = 0, don't output andy debug msgs
+    if gpDebug > 0, output any "debug" msgs, or
+    if gpDebug = N1, output "debug-N2" msgs, if N1 >= N2
 
 See Globals: gpSysLog, gpFacility, gpVerbose, gpDebug
 
 #### fLog Examples:
 
-    fLog -p warning -m "Missing awk" -l $LINENO -e 8
-    fLog -p notice -m "Output only if -v"  -e 8 -l $LINENO
-    fLog -p info -m "Output only if -vv" -l $LINENO
+    local tFile=${BASH_SOURCE##*/}
+    local tFile=file.inc
+    gpCmdName=program.sh
+
+    fError -m "Message" -l $tFile:$LINENO -e 8
+
+       Output: program.sh crit: Error: Message [file.inc:234](8)
+       gErr=8
+       exit 8
+
+    fError -n -m "Message" -l $tFile:$LINENO -e 8
+
+       Output: program.sh err: Error: Message [file.inc:234](8)
+       gErr=8
+       return 8
+
+    fError -i [-n] -m "Message" -l $tFile:$LINENO -e 8
+
+       Output: program.sh err: Internal: Error: Message [file.inc:234](8)
+       gErr=8
+       call: fComStackTrace
+       return 8, if -n
+       exit 8, if ! -n
+
+    fLog -p err -m "Message" -l $tFile:$LINENO -e 8
+
+       Output: program.sh err: Message [file.inc:234](8)
+       gErr=8
+       return 8
+
+    fLog -p warning -m "Output if gpVerbose" -e 8
+
+       if gpVerbose >= 1
+       Output: program.sh warning: Message (8)
+       gErr=8
+       return 0
+
+    fLog -p notice -m "Notice msg"  -e 8 -l $LINENO
+
+       if gpVerbose >= 2
+       Output: program.sh notice: Notice msg [234]
+       gErr=0
+       return 0
+
+    fLog -p info -m "Info message"
+
+       if gpVerbose >= 3
+       Output: program.sh info: Info message
+       gErr=0
+       return 0
+
     fLog -p debug -m "Output only if $gpDebug > 0" -l $LINENO
-    fLog -p debug-3 -m "Output only if $gpDebug > 0 and $gpDebug <= 3" -l $LINENO
+
+       Output: program.sh debug: Output only if $gpDebug > 0 [234]
+       return 0
+
+    fLog -p debug-3 -m "Output only if $gpDebug >= 3" -l $LINENO
+
+       Output: program.sh debug-3: Output only if $gpDebug >= 3 [234]
+       return 0
 
 <div>
     <hr/>
@@ -216,6 +357,8 @@ If no -i, then "fUsage short", will be called.
 </div>
 
 ### fComGit \[pArgs...\]
+
+TBD: replace this with set/try/catch
 
 This is a wrapper for "git". If gpVerbose is >= 2, the git call will
 will be echoed. If the git call exits with a non-0, then an error
@@ -234,13 +377,13 @@ OK, because if it failed, the script would exit.
 
 #### Synopsis
 
-    fComSetConfig -k pKey -v pValue [-g|-G-l|-L|-H|-f pFile] [-b|-i] [-a]
+    fComSetConfig -k pKey -v pValue [-g|-l|-L|-f pFile] [-b|-i] [-a]
 
 #### Description
 
 #### Options
 
-Only one of these will be used: -g, -l, -L, -H -f. The last one in the
+Only one of these will be used: -g, -l, -L, -f. The last one in the
 list of options will be used if there is more than one.  If none, then
 \-l is the default.
 
@@ -257,21 +400,17 @@ then the last one will be used.
 
 - **-g**
 
-    Write to ~/.gitconfig
+    Write to ~/.gitconfig (--global)
 
 - **-l**
 
-    You must be in a git workspace for this option to work.
+    You must be in a git workspace for this option to work. (--local)
 
     Write to GIT\_DIR/.git/config
 
 - **-L**
 
-    Write to GIT\_DIR/$cConfigLocal
-
-- **-H**
-
-    Write to GIT\_DIR/$cConfigHost
+    Write to GIT\_DIR/.gitproj
 
 - **-f pFile**
 
@@ -304,7 +443,7 @@ then the last one will be used.
 
 #### Synopsis
 
-    fComGetConfig -k pKey [-g|-G-l|-L|-H|-f pFile] [-b|-i]
+    fComGetConfig -k pKey [-g|-l|-L|-f pFile] [-b|-i]
                   [-d pDefault] [-e] [-v pFilter]
 
 #### Description
@@ -327,7 +466,7 @@ Command Returns
 
 #### Options
 
-Only one of these will be used: -g, -l, -f. The last one in the list
+Only one of these will be used: -g, -l, -L, -f. The last one in the list
 of options will be if there is more than one.  If none, then all the
 config files will be used.
 
@@ -349,8 +488,8 @@ then the last one will be used.
     You must be in a git workspace for this option to work.
 
     Look in GIT\_DIR/.git/config Includes are followed so these files will
-    be included: GIT\_DIR/$cConfigLocal and
-    GIT\_DIR/$cConfigHost
+    be included: GIT\_DIR/.gitproj and
+    GIT\_DIR/.git/config
 
 - **-f pFile**
 

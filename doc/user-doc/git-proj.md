@@ -40,51 +40,27 @@ no need to save every rendered version.
 
 ## pSubCmd
 
-- **init - Initialize the git project repo**
-
-        git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]
-
-- **clone - Clone a previously saved project**
-
-        git proj clone pExternalPath
-
-- **add - Add a large binary file to the "raw" remote**
-
-        git proj add pFilePath
-
-- **push - Push files to the "raw" remote**
-
-        git proj push [-b]
-
-- **pull - Pull files from the "raw" remote**
-
-        git proj pull [-b]
-
-- **config - Redefine config values**
-
-        git proj config [-l pExternalPath] [-e pRawPath]
-
-- **status - Show the staus of "raw" files, and more**
-
-        git proj status [-b] [-v]
+- **init** - Initialize the git project repo
+- **remote** - Define the remote git repo and raw location
+- **clone** - Clone a previously saved project
+- **push** - Push files to the "raw" remote (and optionally git)
+- **pull** - Pull files from the "raw" remote> (and optionally git)
+- **status** - Show the staus of "raw" files, and git
+- **add** - Add a large binary file to the "raw" remote
+- **config** - Redefine config values
 
 ## pSubCmdOpt
 
-- **git proj \[pSubCmd\]**
+Use "git proj CMD -H usage" to get a quick summary of a command's options.
 
-    For most pSubCmds this outputs short usage help.
-
-- **git proj \[pSubCmd -h\]**
-
-    This outputs full usage help for pSubCmd.
-
-- **git proj \[pSubCmd -H pStyle\]**
-
-    See **-H pStyle** in pComOpt section, for the output styles.
+Use "git prog CMD -h" for full help.
 
 ## \[common-options\]
 
-minimum
+    -h
+    -H usage|text|html|md|man|int|int-html|int-md
+    -q, -v, -V N     (gpVerbose)
+    -x, -xx..., -X N (gpDebug)
 
 - **-h**
 
@@ -96,77 +72,97 @@ minimum
 
     Supported styles:
 
-            short|usage - Output short usage help as text.
-            long|text   - Output long usage help as text. All subcommands.
-            man         - Output long usage help as a man page.
-            html        - Output long usage help as html. All subcommands.
-            md          - Output long usage help as markdown.
-            int         - Output internal documentation as text.
-            int-html    - Output internal documentation as html.
-            int-md      - Output internal documentation as markdown.
+        short|usage - Output short usage help as text.
+        long|text   - Output long usage help as text. All subcommands.
+        html        - Output long usage help as html. All subcommands.
+        md          - Output long usage help as markdown.
+        man         - Output long usage help as a man page.
+        int         - Output internal documentation as text.
+        int-html    - Output internal documentation as html.
+        int-md      - Output internal documentation as markdown.
 
 - **-q**
 
-    Set verbose to lowest level: 0
+    Set verbose (gpVerbose=0) to lowest level: 0
 
     Only very important log messages will be output.
 
 - **-v**
 
-    This sets the verbose lovel to 2, which is the default.
+    This sets the verbose lovel (gpVerbose=2) to 2, which is the default.
 
     At level 2, warning and notice messages will be output.
 
 - **-V N**
 
-    Set the verbose level to N.
+    Set the verbose level to N (gpVerbose=N)
 
-        0 - critical, errors, and important warning are output
-        1 - warnings and above are output
-        2 - notice and above are output
-        3 - info and above are output
+                 N
+        0 - -q,-V0 critical, errors, and important warning are output
+        1 -    -V1 warnings and above are output
+        2 - -v,-V2  notice and above are output
+        3 -    -V3 info and above are output
 
     The verbose level can also be set with env. var. gpVerbose. However
     the command line option will override the variable.
 
+    gpVerbose and gpDebug control what log messages are output. This is
+    what the log messages look like:
+
+    \* Normal log messages:
+
+        [Command] [warning|notice|info]: [Message] [File:LineNo](ErrCode)
+
+    \* Error messages (crit will exit, err might continue):
+
+        [Command] [crit|err]: Error: [Message] [File:LineNo](ErrCode)
+        If gpDebug >= 2, a StackTrace will be output.
+
+    \* An internal error. This is probably a defect in the code (collect all
+    the output for a bug report):
+
+        [Command] [crit|err]: Internal: Error: [Message] [File:LineNo](ErrCode)
+        StackTrace: ...
+
+    Key:
+
+        [Command] - the top level command
+        [crit|err|warning|notice|info|debug] - log levels
+        [File:LineNo](ErrCode) - exacly where the error message came from (optional)
+
 - **-x**
 
-    Set the gpDebug level number. Add 1 for each -x argumen.  Or you can set
-    gpDebug before running the script. Or you can use the -X option.
-
-        "fLog -p debug" messages will be output if gpDebug != 0.
-        "fLog -p debug-N" messages will be output if gpDebug >= N.
-
-    See: fLog Internal documentation for more details.
+    Set the gpDebug level number. Add 1 for each -x argument.  Or you can
+    set gpDebug before running the script. Or you can use the -X option.
 
 - **-X N**
 
     Set the gpDebug level to N. The command line options will override the
     gpDebug env. var.
 
-        0 - no debug messages
+        0  - no debug messages
         >0 - "debug" messages
-        1 - "debug-1" messages
-        2 - "debug-2" and "debug-1" messages
+        1  - "debug-1" messages
+        2  - "debug-2" and "debug-1" messages
         ...
-        N - "debug-N" and messages less than N
+        N  - "debug-N" and messages less than N
 
-## ~/.gitconfig
+    Debug log messages look like this::
 
-Source: gpDoc/config/gitconfig
+        [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)
 
-If this doesn't exist, git proj init will create it from "Source"
+## Confiiguration
 
-Section: \[gitproj config\]
+These are the main configuration files you will need to know about.
 
-git proj init, will copy this... TBD
+    /usr/share/doc/config/gitconfig
+    ~/.gitconfig
+    PROJ/.gitproj
+    PROJ/.git/config
 
-    remote-min-space = 20g
-
-This is the minium space that should be available on the external
-drive.  The command will not continue if there is not enough space.
-The available space must also be twice the size of the space used by
-ProjName.raw.
+See [gitproj Configuration Documentation](https://metacpan.org/pod/config.html) for details
+about these files and all the important gitproj variables.
+The pre-commit hook and its config vars are also described.
 
     remote-raw-origin
 
@@ -436,7 +432,7 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
 - **\[common-options\]**
 
         -h
-        -H pStyle
+        -H usage|text|html|md|man|int|int-html|int-md
         -q, -v, -V N     (gpVerbose)
         -x, -xx..., -X N (gpDebug)
 
@@ -505,9 +501,9 @@ rsync access.)
 - **\[common-options\]**
 
         -h                     (-H text)
-        -H pStyle
-        -q | -v | -V N         (gpVerbose level)
-        -x | -xx... | -X N     (gpDebug level)
+        -H usage|text|html|md|man|int|int-html|int-md
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
         -y | -n                (only used with -a option)
 
     Run "git proj -h" for details.
@@ -574,9 +570,9 @@ mounted drive.
 - **\[common-options\]**
 
         -h
-        -H pStyle
-        -v, -vv
-        -x, -xx
+        -H usage|text|html|md|man|int|int-html|int-md
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h"  for details.
 
@@ -662,9 +658,9 @@ GPLv3 Copyright 2021 by TurtleEngr
 - **\[common-options\]**
 
         -h
-        -H pStyle
-        -v, -vv
-        -x, -xx
+        -H usage|text|html|md|man|int|int-html|int-md
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h" for details.
 
@@ -756,9 +752,9 @@ If the -g option is given then run:
 - **\[common-options\]**
 
         -h
-        -H pStyle
-        -v, -vv
-        -x, -xx
+        -H usage|text|html|md|man|int|int-html|int-md
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h" for details.
 
@@ -826,7 +822,7 @@ GPLv3 Copyright 2021 by TurtleEngr
 - **\[common-options\]**
 
         -h
-        -H pStyle
+        -H usage|text|html|md|man|int|int-html|int-md
         -q, -v, -V N     (gpVerbose)
         -x, -xx..., -X N (gpDebug)
 

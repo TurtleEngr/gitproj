@@ -35,9 +35,9 @@ mounted drive.
 - **\[common-options\]**
 
         -h
-        -H pStyle
-        -v, -vv
-        -x, -xx
+        -H usage|text|html|md|man|int|int-html|int-md
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h"  for details.
 

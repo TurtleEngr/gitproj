@@ -20,7 +20,7 @@
         <li><a href="#pSubCmd">pSubCmd</a></li>
         <li><a href="#pSubCmdOpt">pSubCmdOpt</a></li>
         <li><a href="#common-options">[common-options]</a></li>
-        <li><a href="#gitconfig">~/.gitconfig</a></li>
+        <li><a href="#Confiiguration">Confiiguration</a></li>
         <li><a href="#top-dir-.gitproj">top-dir/.gitproj</a></li>
         <li><a href="#top-dir-.git-config">top-dir/.git/config</a></li>
         <li><a href="#Global-Env.-Var.-Config">Global Env. Var.
@@ -118,60 +118,42 @@
   <h1 id="OPTIONS">OPTIONS</h1>
   <h2 id="pSubCmd">pSubCmd</h2>
   <dl>
-    <dt id="init---Initialize-the-git-project-repo"><b>init - Initialize the
-    git project repo</b></dt>
-    <dd>
-      <pre><code> git proj init [-l [pDirPath]] [-e pDirPath] [-r [pDirPath]</code></pre>
-    </dd>
-    <dt id="clone---Clone-a-previously-saved-project"><b>clone - Clone a
-    previously saved project</b></dt>
-    <dd>
-      <pre><code> git proj clone pExternalPath</code></pre>
-    </dd>
-    <dt id="add---Add-a-large-binary-file-to-the-raw-remote"><b>add - Add a
-    large binary file to the "raw" remote</b></dt>
-    <dd>
-      <pre><code> git proj add pFilePath</code></pre>
-    </dd>
-    <dt id="push---Push-files-to-the-raw-remote"><b>push - Push files to the
-    "raw" remote</b></dt>
-    <dd>
-      <pre><code> git proj push [-b]</code></pre>
-    </dd>
-    <dt id="pull---Pull-files-from-the-raw-remote"><b>pull - Pull files from
-    the "raw" remote</b></dt>
-    <dd>
-      <pre><code> git proj pull [-b]</code></pre>
-    </dd>
-    <dt id="config---Redefine-config-values"><b>config - Redefine config
-    values</b></dt>
-    <dd>
-      <pre><code> git proj config [-l pExternalPath] [-e pRawPath]</code></pre>
-    </dd>
-    <dt id="status---Show-the-staus-of-raw-files-and-more"><b>status - Show
-    the staus of "raw" files, and more</b></dt>
-    <dd>
-      <pre><code> git proj status [-b] [-v]</code></pre>
-    </dd>
+    <dt id="init---Initialize-the-git-project-repo"><b>init</b> - Initialize
+    the git project repo</dt>
+    <dd></dd>
+    <dt id="remote---Define-the-remote-git-repo-and-raw-location">
+    <b>remote</b> - Define the remote git repo and raw location</dt>
+    <dd></dd>
+    <dt id="clone---Clone-a-previously-saved-project"><b>clone</b> - Clone a
+    previously saved project</dt>
+    <dd></dd>
+    <dt id="push---Push-files-to-the-raw-remote-and-optionally-git">
+    <b>push</b> - Push files to the "raw" remote (and optionally git)</dt>
+    <dd></dd>
+    <dt id="pull---Pull-files-from-the-raw-remote-and-optionally-git">
+    <b>pull</b> - Pull files from the "raw" remote&gt; (and optionally
+    git)</dt>
+    <dd></dd>
+    <dt id="status---Show-the-staus-of-raw-files-and-git"><b>status</b> -
+    Show the staus of "raw" files, and git</dt>
+    <dd></dd>
+    <dt id="add---Add-a-large-binary-file-to-the-raw-remote"><b>add</b> - Add
+    a large binary file to the "raw" remote</dt>
+    <dd></dd>
+    <dt id="config---Redefine-config-values"><b>config</b> - Redefine config
+    values</dt>
+    <dd></dd>
   </dl>
   <h2 id="pSubCmdOpt">pSubCmdOpt</h2>
-  <dl>
-    <dt id="git-proj-pSubCmd"><b>git proj [pSubCmd]</b></dt>
-    <dd>
-      <p>For most pSubCmds this outputs short usage help.</p>
-    </dd>
-    <dt id="git-proj-pSubCmd--h"><b>git proj [pSubCmd -h]</b></dt>
-    <dd>
-      <p>This outputs full usage help for pSubCmd.</p>
-    </dd>
-    <dt id="git-proj-pSubCmd--H-pStyle"><b>git proj [pSubCmd -H
-    pStyle]</b></dt>
-    <dd>
-      <p>See <b>-H pStyle</b> in pComOpt section, for the output styles.</p>
-    </dd>
-  </dl>
+  <p>Use <span style="white-space: nowrap;">"git proj CMD -H usage"</span> to
+  get a quick summary of a command's options.</p>
+  <p>Use <span style="white-space: nowrap;">"git prog CMD -h"</span> for full
+  help.</p>
   <h2 id="common-options">[common-options]</h2>
-  <p>minimum</p>
+  <pre><code> -h
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
   <dl>
     <dt id="h"><b>-h</b></dt>
     <dd>
@@ -182,65 +164,81 @@
       <p>pStyle is used to select the type of help and how it is
       formatted.</p>
       <p>Supported styles:</p>
-      <pre><code>        short|usage - Output short usage help as text.
-        long|text   - Output long usage help as text. All subcommands.
-        man         - Output long usage help as a man page.
-        html        - Output long usage help as html. All subcommands.
-        md          - Output long usage help as markdown.
-        int         - Output internal documentation as text.
-        int-html    - Output internal documentation as html.
-        int-md      - Output internal documentation as markdown.</code></pre>
+      <pre><code>    short|usage - Output short usage help as text.
+    long|text   - Output long usage help as text. All subcommands.
+    html        - Output long usage help as html. All subcommands.
+    md          - Output long usage help as markdown.
+    man         - Output long usage help as a man page.
+    int         - Output internal documentation as text.
+    int-html    - Output internal documentation as html.
+    int-md      - Output internal documentation as markdown.</code></pre>
     </dd>
     <dt id="q"><b>-q</b></dt>
     <dd>
-      <p>Set verbose to lowest level: 0</p>
+      <p>Set verbose (gpVerbose=0) to lowest level: 0</p>
       <p>Only very important log messages will be output.</p>
     </dd>
     <dt id="v"><b>-v</b></dt>
     <dd>
-      <p>This sets the verbose lovel to 2, which is the default.</p>
+      <p>This sets the verbose lovel (gpVerbose=2) to 2, which is the
+      default.</p>
       <p>At level 2, warning and notice messages will be output.</p>
     </dd>
     <dt id="V-N"><b>-V N</b></dt>
     <dd>
-      <p>Set the verbose level to N.</p>
-      <pre><code> 0 - critical, errors, and important warning are output
- 1 - warnings and above are output
- 2 - notice and above are output
- 3 - info and above are output</code></pre>
+      <p>Set the verbose level to N (gpVerbose=N)</p>
+      <pre><code>             N
+    0 - -q,-V0 critical, errors, and important warning are output
+    1 -    -V1 warnings and above are output
+    2 - -v,-V2  notice and above are output
+    3 -    -V3 info and above are output</code></pre>
       <p>The verbose level can also be set with env. var. gpVerbose. However
       the command line option will override the variable.</p>
+      <p>gpVerbose and gpDebug control what log messages are output. This is
+      what the log messages look like:</p>
+      <p>* Normal log messages:</p>
+      <pre><code>    [Command] [warning|notice|info]: [Message] [File:LineNo](ErrCode)</code></pre>
+      <p>* Error messages (crit will exit, err might continue):</p>
+      <pre><code>    [Command] [crit|err]: Error: [Message] [File:LineNo](ErrCode)
+    If gpDebug &gt;= 2, a StackTrace will be output.</code></pre>
+      <p>* An internal error. This is probably a defect in the code (collect
+      all the output for a bug report):</p>
+      <pre><code>    [Command] [crit|err]: Internal: Error: [Message] [File:LineNo](ErrCode)
+    StackTrace: ...</code></pre>
+      <p>Key:</p>
+      <pre><code>    [Command] - the top level command
+    [crit|err|warning|notice|info|debug] - log levels
+    [File:LineNo](ErrCode) - exacly where the error message came from (optional)</code></pre>
     </dd>
     <dt id="x"><b>-x</b></dt>
     <dd>
-      <p>Set the gpDebug level number. Add 1 for each -x argumen. Or you can
+      <p>Set the gpDebug level number. Add 1 for each -x argument. Or you can
       set gpDebug before running the script. Or you can use the -X
       option.</p>
-      <pre><code>    "fLog -p debug" messages will be output if gpDebug != 0.
-    "fLog -p debug-N" messages will be output if gpDebug &gt;= N.</code></pre>
-      <p>See: fLog Internal documentation for more details.</p>
     </dd>
     <dt id="X-N"><b>-X N</b></dt>
     <dd>
       <p>Set the gpDebug level to N. The command line options will override
       the gpDebug env. var.</p>
-      <pre><code> 0 - no debug messages
- &gt;0 - "debug" messages
- 1 - "debug-1" messages
- 2 - "debug-2" and "debug-1" messages
- ...
- N - "debug-N" and messages less than N</code></pre>
+      <pre><code>    0  - no debug messages
+    &gt;0 - "debug" messages
+    1  - "debug-1" messages
+    2  - "debug-2" and "debug-1" messages
+    ...
+    N  - "debug-N" and messages less than N</code></pre>
+      <p>Debug log messages look like this::</p>
+      <pre><code>    [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)</code></pre>
     </dd>
   </dl>
-  <h2 id="gitconfig">~/.gitconfig</h2>
-  <p>Source: gpDoc/config/gitconfig</p>
-  <p>If this doesn't exist, git proj init will create it from "Source"</p>
-  <p>Section: [gitproj config]</p>
-  <p>git proj init, will copy this... TBD</p>
-  <pre><code>    remote-min-space = 20g</code></pre>
-  <p>This is the minium space that should be available on the external drive.
-  The command will not continue if there is not enough space. The available
-  space must also be twice the size of the space used by ProjName.raw.</p>
+  <h2 id="Confiiguration">Confiiguration</h2>
+  <p>These are the main configuration files you will need to know about.</p>
+  <pre><code> /usr/share/doc/config/gitconfig
+ ~/.gitconfig
+ PROJ/.gitproj
+ PROJ/.git/config</code></pre>
+  <p>See <a>gitproj Configuration Documentation</a> for details about these
+  files and all the important gitproj variables. The pre-commit hook and its
+  config vars are also described.</p>
   <pre><code>    remote-raw-origin</code></pre>
   <p>Default: -d pMountDir/ProjName.raw</p>
   <p>Section: [gitproj hook]</p>
@@ -448,7 +446,7 @@
     <dt id="common-options1"><b>[common-options]</b></dt>
     <dd>
       <pre><code> -h
- -H pStyle
+ -H usage|text|html|md|man|int|int-html|int-md
  -q, -v, -V N     (gpVerbose)
  -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details. Or "man git-proj" for help with all
@@ -499,9 +497,9 @@
     <dt id="common-options2"><b>[common-options]</b></dt>
     <dd>
       <pre><code> -h                     (-H text)
- -H pStyle
- -q | -v | -V N         (gpVerbose level)
- -x | -xx... | -X N     (gpDebug level)
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)
  -y | -n                (only used with -a option)</code></pre>
       <p>Run "git proj -h" for details.</p>
     </dd>
@@ -551,9 +549,9 @@
     <dt id="common-options3"><b>[common-options]</b></dt>
     <dd>
       <pre><code> -h
- -H pStyle
- -v, -vv
- -x, -xx</code></pre>
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
@@ -616,9 +614,9 @@
     <dt id="common-options4"><b>[common-options]</b></dt>
     <dd>
       <pre><code> -h
- -H pStyle
- -v, -vv
- -x, -xx</code></pre>
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
@@ -687,9 +685,9 @@
     <dt id="common-options5"><b>[common-options]</b></dt>
     <dd>
       <pre><code> -h
- -H pStyle
- -v, -vv
- -x, -xx</code></pre>
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
@@ -738,10 +736,10 @@
     </dd>
     <dt id="common-options6"><b>[common-options]</b></dt>
     <dd>
-      <pre><code>    -h
-    -H pStyle
-    -q, -v, -V N     (gpVerbose)
-    -x, -xx..., -X N (gpDebug)</code></pre>
+      <pre><code> -h
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details. Or "man git-proj" for help with all
       the subcommands.</p>
     </dd>

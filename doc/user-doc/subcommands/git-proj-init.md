@@ -81,7 +81,7 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
 - **\[common-options\]**
 
         -h
-        -H pStyle
+        -H usage|text|html|md|man|int|int-html|int-md
         -q, -v, -V N     (gpVerbose)
         -x, -xx..., -X N (gpDebug)
 

@@ -34,9 +34,9 @@ rsync access.)
 - **\[common-options\]**
 
         -h                     (-H text)
-        -H pStyle
-        -q | -v | -V N         (gpVerbose level)
-        -x | -xx... | -X N     (gpDebug level)
+        -H usage|text|html|md|man|int|int-html|int-md
+        -q, -v, -V N     (gpVerbose)
+        -x, -xx..., -X N (gpDebug)
         -y | -n                (only used with -a option)
 
     Run "git proj -h" for details.
