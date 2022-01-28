@@ -21,7 +21,7 @@
 # --------------------
 # Config
 
-mHtmlOpt = --cachedir=/tmp --index --backlink
+mHtmlOpt = --cachedir=/tmp --index --backlink --podpath=.
 
 mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
 
@@ -51,13 +51,13 @@ cmd-doc :
 		$(mTidy) doc/user-doc/$${tCmd##*/}.html 2>/dev/null; \
 	done
 
-tutorial-doc : doc/user-doc/tutoral/create_a_git-proj_repo.html
+tutorial-doc : doc/user-doc/tutorial/create_a_git-proj_repo.html
 
-doc/user-doc/tutoral/create_a_git-proj_repo.html : src-doc/create_a_git-proj_repo.pod
-	-mkdir -p doc/user-doc/tutoral
+doc/user-doc/tutorial/create_a_git-proj_repo.html : src-doc/create_a_git-proj_repo.pod
+	-mkdir -p doc/user-doc/tutorial
 	-pod2html --title='Create a git-proj Repo' $(mHtmlOpt) <$? >$@
 	-$(mTidy) doc/user-doc/config.html
-	-pod2markdown <$? >doc/user-doc/tutoral/config.podcreate_a_git-proj_repo.md
+	-pod2markdown <$? >doc/user-doc/tutorial/config.podcreate_a_git-proj_repo.md
 
 doc/CHANGES.md : CHANGES.md
 	-grep -Ev 'INT:' <$? | uniq >$@
@@ -70,11 +70,13 @@ doc/README.md : README.md
 
 doc/user-doc/git-proj.md : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
-	-$? -H md >$@
+	-cd doc/user-doc; \
+	../../git-core/git-proj -H md >git-proj.md
 
 doc/user-doc/git-proj.html : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
-	-$? -H html >$@
+	-cd doc/user-doc; \
+	../../git-core/git-proj -H html >git-proj.html
 
 # Remove internal doc. Any line with 'INT:' in it.
 # "uniq" is a quick way of removing any extra blank lines

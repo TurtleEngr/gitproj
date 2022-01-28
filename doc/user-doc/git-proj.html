@@ -21,17 +21,15 @@
         <li><a href="#pSubCmdOpt">pSubCmdOpt</a></li>
         <li><a href="#common-options">[common-options]</a></li>
         <li><a href="#Confiiguration">Confiiguration</a></li>
-        <li><a href="#top-dir-.gitproj">top-dir/.gitproj</a></li>
-        <li><a href="#top-dir-.git-config">top-dir/.git/config</a></li>
-        <li><a href="#Global-Env.-Var.-Config">Global Env. Var.
-        Config</a></li>
       </ul>
     </li>
+    <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
     <li><a href="#EXAMPLES">EXAMPLES</a></li>
     <li><a href="#ENVIRONMENT">ENVIRONMENT</a></li>
     <li><a href="#FILES">FILES</a></li>
     <li><a href="#SEE-ALSO">SEE ALSO</a></li>
     <li><a href="#CAVEATS">CAVEATS</a></li>
+    <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
     <li><a href="#BUGS">BUGS</a></li>
     <li><a href="#AUTHOR">AUTHOR</a></li>
     <li><a href="#HISTORY">HISTORY</a></li>
@@ -39,7 +37,7 @@
     <li><a href="#SYNOPSIS1">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION1">DESCRIPTION</a></li>
     <li><a href="#OPTIONS1">OPTIONS</a></li>
-    <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
+    <li><a href="#RETURN-VALUE1">RETURN VALUE</a></li>
     <li><a href="#SEE-ALSO1">SEE ALSO</a></li>
     <li><a href="#AUTHOR1">AUTHOR</a></li>
     <li><a href="#HISTORY1">HISTORY</a></li>
@@ -47,7 +45,7 @@
     <li><a href="#SYNOPSIS2">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION2">DESCRIPTION</a></li>
     <li><a href="#OPTIONS2">OPTIONS</a></li>
-    <li><a href="#RETURN-VALUE1">RETURN VALUE</a></li>
+    <li><a href="#RETURN-VALUE2">RETURN VALUE</a></li>
     <li><a href="#SEE-ALSO2">SEE ALSO</a></li>
     <li><a href="#AUTHOR2">AUTHOR</a></li>
     <li><a href="#HISTORY2">HISTORY</a></li>
@@ -55,7 +53,7 @@
     <li><a href="#SYNOPSIS3">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION3">DESCRIPTION</a></li>
     <li><a href="#OPTIONS3">OPTIONS</a></li>
-    <li><a href="#RETURN-VALUE2">RETURN VALUE</a></li>
+    <li><a href="#RETURN-VALUE3">RETURN VALUE</a></li>
     <li><a href="#EXAMPLES1">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO3">SEE ALSO</a></li>
     <li><a href="#AUTHOR3">AUTHOR</a></li>
@@ -64,7 +62,7 @@
     <li><a href="#SYNOPSIS4">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION4">DESCRIPTION</a></li>
     <li><a href="#OPTIONS4">OPTIONS</a></li>
-    <li><a href="#RETURN-VALUE3">RETURN VALUE</a></li>
+    <li><a href="#RETURN-VALUE4">RETURN VALUE</a></li>
     <li><a href="#EXAMPLES2">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO4">SEE ALSO</a></li>
     <li><a href="#AUTHOR4">AUTHOR</a></li>
@@ -73,7 +71,7 @@
     <li><a href="#SYNOPSIS5">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION5">DESCRIPTION</a></li>
     <li><a href="#OPTIONS5">OPTIONS</a></li>
-    <li><a href="#RETURN-VALUE4">RETURN VALUE</a></li>
+    <li><a href="#RETURN-VALUE5">RETURN VALUE</a></li>
     <li><a href="#SEE-ALSO5">SEE ALSO</a></li>
     <li><a href="#AUTHOR5">AUTHOR</a></li>
     <li><a href="#HISTORY5">HISTORY</a></li>
@@ -81,7 +79,7 @@
     <li><a href="#SYNOPSIS6">SYNOPSIS</a></li>
     <li><a href="#DESCRIPTION6">DESCRIPTION</a></li>
     <li><a href="#OPTIONS6">OPTIONS</a></li>
-    <li><a href="#RETURN-VALUE5">RETURN VALUE</a></li>
+    <li><a href="#RETURN-VALUE6">RETURN VALUE</a></li>
     <li><a href="#SEE-ALSO6">SEE ALSO</a></li>
     <li><a href="#AUTHOR6">AUTHOR</a></li>
     <li><a href="#HISTORY6">HISTORY</a></li>
@@ -236,132 +234,36 @@
  ~/.gitconfig
  PROJ/.gitproj
  PROJ/.git/config</code></pre>
-  <p>See <a>gitproj Configuration Documentation</a> for details about these
-  files and all the important gitproj variables. The pre-commit hook and its
-  config vars are also described.</p>
-  <pre><code>    remote-raw-origin</code></pre>
-  <p>Default: -d pMountDir/ProjName.raw</p>
-  <p>Section: [gitproj hook]</p>
-  <p>TODO</p>
-  <h2 id="top-dir-.gitproj">top-dir/.gitproj</h2>
-  <p>TODO</p>
-  <h2 id="top-dir-.git-config">top-dir/.git/config</h2>
-  <p>TODO - this needs to be rewritten.</p>
-  <p>Where HOSTNAME will be set to $HOSTNAME. This allows for different
-  locations of file, based on the host. For example the remote-raw-url (mount
-  point) could be very different between hosts.</p>
-  <p>Initial Source: ~/.gitconfig Sections [gitproj *]</p>
-  <p>This will be created when git project repo is first created on a
-  host.</p>
-  <p>This will be put at the beginning of the config file, so that common
-  project defaults can be defined. Then .gitproj.config.HOSTNAME can override
-  variables. Any changed to the variables in .gitproj.config.local variables
-  will be written to .gitproj.config.HOSTNAME</p>
-  <p>Uncomment the variables that should override ~/.gitconfig or
-  ~/.gitproj.config.global. If the variables are host specific, then the
-  variable should be put in the correspoinding .gitproj.config.$HOSTNAME
-  file.</p>
-  <pre><code>        [gitproj "config"]
-                # Expected version, only first N must be the same.
-                # Use backward compatible code, or exit.
-                # Warn if second N is different
-                ver = 0.1.2
-
-                # States: not-installed, installed, config-errors
-                proj-status = not-installed
-
-                syslog = true
-                facility = user
-
-                bin = /usr/lib/git-core
-                # bin = $(git --exec-path)
-
-                doc = /usr/share/doc/git-proj
-                test = /usr/share/doc/git-proj/test
-
-                # See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
-
-                # States: not-defined, defined, config-errors
-                local-status = not-set-up
-
-                # States: not-defined, defined, multiple-defined
-                remote-status = not-defined
-
-                # origin-url with path and .git remote
-                proj-name = TBD
-
-                # This should only be changed on the matching host
-                # git rev-parse --show-toplevel
-                local-top-dir = TBD
-
-                # Set by init. Changing these will require manual repair.
-                # If no ~ or /, this is relative to top-dir
-
-                git-flow-pkg = TBD
-
-                # Local mount examples
-                remote-raw-origin = TBD
-                #remote.origin.url = /MOUNT-DIR/DIR/NAME.git
-
-                # Remote examples (not implemented. TODO)
-                #remote-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
-                #remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
-                #remote.origin-url=git@github.com:TurtleEngr/gitproj.git
-
-        [gitproj "hook"]
-                # If pre-commit-enabled = true, pre-commit hook script will be
-                # installed into .git/hooks/
-                # Relative to gpDoc
-                source = hooks/pre-commit
-                pre-commit-enabled = true
-                check-file-names = true
-                check-for-big-files = true
-                # End size with b, k, m, or g
-                binary-file-size = 1k</code></pre>
-  <h2 id="Global-Env.-Var.-Config">Global Env. Var. Config</h2>
-  <p>See... TODO</p>
+  <p>See LINK{gitproj Configuration Documentation|config.html} for details
+  about these files and all the important gitproj variables. The pre-commit
+  hook and its config vars are also described.</p>
+  <h1 id="RETURN-VALUE">RETURN VALUE</h1>
+  <p>The subcommands will return 0, if there were no serious errors. Even if
+  0, pay attention to the log messages that are output.</p>
+  <p>If a subcommand retuns a non-0 code, then some change is needed before
+  trying again. Hoepfully the error and warning message describe what needs
+  to change.</p>
   <h1 id="EXAMPLES">EXAMPLES</h1>
-  <p>[create a blank git-proj]</p>
-  <p>[create a git-proj from existing files]</p>
+  <p>See the tutorial document for some examples.</p>
   <h1 id="ENVIRONMENT">ENVIRONMENT</h1>
-  <p>See Globals section for details.</p>
-  <p>HOME, USER, HOSTNAME, gpSysLog, gpFacility, gpVerbose, gpDebug,
-  gpAuto</p>
+  <p>HOME, USER, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto</p>
+  <p>See the LINK{gitproj Configuration Documentation|config.html} for a
+  complete list of env. vars.</p>
   <h1 id="FILES">FILES</h1>
-  <p>Config files:</p>
-  <pre><code>    ~/.gitconfig - --global (gitproj sections setup with 'init' or 'clone')
-    PROJ/.gitproj - set up with 'init' and used by 'clone'
-    PROJ/.git/config --local (setup with 'init' or 'clone')</code></pre>
-  <p>Subcommand files:</p>
-  <pre><code>    /usr/share/doc/git-proj/
-        VERSION - current installed version (git proj --version)
-        CHANGES.md - changes for each version
-        README.md - getting started
-        LICENSE - GNU GPL V3
-    /usr/share/doc/git-proj/config/
-        gitconfig - global config template
-        gitignore - default ignore file
-    /usr/share/doc/git-proj/hooks/
-        pre-commit - see gitproj.hooks section for configuring this
-    /usr/share/doc/git-proj/contrib/
-        bash-fmt - format bash scripts
-        rm-trailing-sp - fix pre-commit whitespace issues
-    /usr/share/doc/git-proj/user-doc/
-        git-proj.html - all documentation in one file (git proj -h)
-        git-proj.md - all documentation in one file (git proj -h)
-        git-proj-CMD*.html (git proj CMD -h)
-        git-proj-CMD*.md (git proj CMD -h)
-    /usr/lib/git-core/git-proj/
-        git-proj - get overall help "git proj -h"
-        git-proj-CMD - called with "git proj CMD"
-        gitproj-CMD.inc - all the code for CMD</code></pre>
+  <p>See the LINK{gitproj Configuration Documentation|config.html} for a
+  complete list of important files.</p>
+  <p>All the User Documentation can also be found online in github at:
+  <a href=
+  "https://github.com/TurtleEngr/gitproj/tree/develop/doc/user-doc">/doc/user-doc</a></p>
   <h1 id="SEE-ALSO">SEE ALSO</h1>
   <pre><code>    git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
-    git proj status</code></pre>
+    git proj status
+    git proj add
+    git proj config</code></pre>
   <h1 id="CAVEATS">CAVEATS</h1>
   <p>Currently gitproj only supports <b>local</b> git repos. The repos are
   called "remote" but that is only because the repo could be put on a
@@ -369,18 +271,23 @@
   workspace can have its own "origin" definition, because the mount points
   could be different between systems.</p>
   <p>An existing remote git repo can be used, BUT manual work will be needed
-  to set it up. TODO</p>
+  to set it up. A tutorial may be created to describe the manual changes.</p>
   <p>A future implementation could support git repos that are truly remote,
   on other systems. When that is implemented, an existing repo could be
   "upgraded" to be a gitproj repo. The "raw" file remote could also be saved
   on other systems (via rsync, rclone, or even cvs).</p>
+  <p>The list of feature requests can be found at: <a href=
+  "https://github.com/TurtleEngr/gitproj/labels/enhancement">enhancements</a></p>
+  <h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
   <p>Use use the -x or -X options, or gpDebug env. var. to turn on debug
   levels. Larger numbers, more debug. There is only a little bit of debug
   output, because the code uses "test code" to identify problems, before the
   code is released. See the github repo for the development process.</p>
   <h1 id="BUGS">BUGS</h1>
   <p>Please report bugs at: <a href=
-  "https://github.com/TurtleEngr/gitproj/issues">issues</a></p>
+  "https://github.com/TurtleEngr/gitproj/issues">issues</a>.</p>
+  <p>Use the "Bug Report" or "Feature Request" templates to submit your
+  issue.</p>
   <h1 id="AUTHOR">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY">HISTORY</h1>
@@ -453,7 +360,7 @@
       the subcommands.</p>
     </dd>
   </dl>
-  <h1 id="RETURN-VALUE">RETURN VALUE</h1>
+  <h1 id="RETURN-VALUE1">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="SEE-ALSO1">SEE ALSO</h1>
@@ -504,7 +411,7 @@
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
-  <h1 id="RETURN-VALUE1">RETURN VALUE</h1>
+  <h1 id="RETURN-VALUE2">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="SEE-ALSO2">SEE ALSO</h1>
@@ -555,7 +462,7 @@
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
-  <h1 id="RETURN-VALUE2">RETURN VALUE</h1>
+  <h1 id="RETURN-VALUE3">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="EXAMPLES1">EXAMPLES</h1>
@@ -620,7 +527,7 @@
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
-  <h1 id="RETURN-VALUE3">RETURN VALUE</h1>
+  <h1 id="RETURN-VALUE4">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="EXAMPLES2">EXAMPLES</h1>
@@ -691,7 +598,7 @@
       <p>Run "git proj -h" for details.</p>
     </dd>
   </dl>
-  <h1 id="RETURN-VALUE4">RETURN VALUE</h1>
+  <h1 id="RETURN-VALUE5">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="SEE-ALSO5">SEE ALSO</h1>
@@ -744,7 +651,7 @@
       the subcommands.</p>
     </dd>
   </dl>
-  <h1 id="RETURN-VALUE5">RETURN VALUE</h1>
+  <h1 id="RETURN-VALUE6">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="SEE-ALSO6">SEE ALSO</h1>

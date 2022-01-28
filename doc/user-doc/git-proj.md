@@ -160,151 +160,37 @@ These are the main configuration files you will need to know about.
     PROJ/.gitproj
     PROJ/.git/config
 
-See [gitproj Configuration Documentation](https://metacpan.org/pod/config.html) for details
-about these files and all the important gitproj variables.
+See LINK{gitproj Configuration Documentation|config.html} for
+details about these files and all the important gitproj variables.
 The pre-commit hook and its config vars are also described.
 
-    remote-raw-origin
+# RETURN VALUE
 
-Default: -d pMountDir/ProjName.raw
+The subcommands will return 0, if there were no serious errors. Even
+if 0, pay attention to the log messages that are output.
 
-Section: \[gitproj hook\]
-
-TODO
-
-## top-dir/.gitproj
-
-TODO
-
-## top-dir/.git/config
-
-TODO - this needs to be rewritten.
-
-Where HOSTNAME will be set to $HOSTNAME. This allows for different
-locations of file, based on the host. For example the remote-raw-url
-(mount point) could be very different between hosts.
-
-Initial Source: ~/.gitconfig Sections \[gitproj \*\]
-
-This will be created when git project repo is first created on a host.
-
-This will be put at the beginning of the config file, so that common
-project defaults can be defined. Then .gitproj.config.HOSTNAME can
-override variables. Any changed to the variables in
-.gitproj.config.local variables will be written to
-.gitproj.config.HOSTNAME
-
-Uncomment the variables that should override ~/.gitconfig or
-~/.gitproj.config.global. If the variables are host specific, then the
-variable should be put in the correspoinding .gitproj.config.$HOSTNAME
-file.
-
-        [gitproj "config"]
-                # Expected version, only first N must be the same.
-                # Use backward compatible code, or exit.
-                # Warn if second N is different
-                ver = 0.1.2
-
-                # States: not-installed, installed, config-errors
-                proj-status = not-installed
-
-                syslog = true
-                facility = user
-
-                bin = /usr/lib/git-core
-                # bin = $(git --exec-path)
-
-                doc = /usr/share/doc/git-proj
-                test = /usr/share/doc/git-proj/test
-
-                # See .gitproj.config.local and/or .gitproj.config.$HOSTNAME
-
-                # States: not-defined, defined, config-errors
-                local-status = not-set-up
-
-                # States: not-defined, defined, multiple-defined
-                remote-status = not-defined
-
-                # origin-url with path and .git remote
-                proj-name = TBD
-
-                # This should only be changed on the matching host
-                # git rev-parse --show-toplevel
-                local-top-dir = TBD
-
-                # Set by init. Changing these will require manual repair.
-                # If no ~ or /, this is relative to top-dir
-
-                git-flow-pkg = TBD
-
-                # Local mount examples
-                remote-raw-origin = TBD
-                #remote.origin.url = /MOUNT-DIR/DIR/NAME.git
-
-                # Remote examples (not implemented. TODO)
-                #remote-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
-                #remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
-                #remote.origin-url=git@github.com:TurtleEngr/gitproj.git
-
-        [gitproj "hook"]
-                # If pre-commit-enabled = true, pre-commit hook script will be
-                # installed into .git/hooks/
-                # Relative to gpDoc
-                source = hooks/pre-commit
-                pre-commit-enabled = true
-                check-file-names = true
-                check-for-big-files = true
-                # End size with b, k, m, or g
-                binary-file-size = 1k
-
-## Global Env. Var. Config
-
-See... TODO
+If a subcommand retuns a non-0 code, then some change is needed before
+trying again. Hoepfully the error and warning message describe what
+needs to change.
 
 # EXAMPLES
 
-\[create a blank git-proj\]
-
-\[create a git-proj from existing files\]
+See  the tutorial document for some examples.
 
 # ENVIRONMENT
 
-See Globals section for details.
+HOME, USER, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
 
-HOME, USER, HOSTNAME, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
+See the LINK{gitproj Configuration Documentation|config.html} for a
+complete list of env. vars.
 
 # FILES
 
-Config files:
+See the LINK{gitproj Configuration Documentation|config.html} for a
+complete list of important files.
 
-    ~/.gitconfig - --global (gitproj sections setup with 'init' or 'clone')
-    PROJ/.gitproj - set up with 'init' and used by 'clone'
-    PROJ/.git/config --local (setup with 'init' or 'clone')
-
-Subcommand files:
-
-    /usr/share/doc/git-proj/
-        VERSION - current installed version (git proj --version)
-        CHANGES.md - changes for each version
-        README.md - getting started
-        LICENSE - GNU GPL V3
-    /usr/share/doc/git-proj/config/
-        gitconfig - global config template
-        gitignore - default ignore file
-    /usr/share/doc/git-proj/hooks/
-        pre-commit - see gitproj.hooks section for configuring this
-    /usr/share/doc/git-proj/contrib/
-        bash-fmt - format bash scripts
-        rm-trailing-sp - fix pre-commit whitespace issues
-    /usr/share/doc/git-proj/user-doc/
-        git-proj.html - all documentation in one file (git proj -h)
-        git-proj.md - all documentation in one file (git proj -h)
-        git-proj-CMD*.html (git proj CMD -h)
-        git-proj-CMD*.md (git proj CMD -h)
-    /usr/lib/git-core/git-proj/
-        git-proj - get overall help "git proj -h"
-        git-proj-CMD - called with "git proj CMD"
-        gitproj-CMD.inc - all the code for CMD
+All the User Documentation can also be found online in github at:
+[/doc/user-doc](https://github.com/TurtleEngr/gitproj/tree/develop/doc/user-doc)
 
 # SEE ALSO
 
@@ -314,6 +200,8 @@ Subcommand files:
     git proj push
     git proj pull
     git proj status
+    git proj add
+    git proj config
 
 # CAVEATS
 
@@ -324,12 +212,18 @@ workspace can have its own "origin" definition, because the mount
 points could be different between systems.
 
 An existing remote git repo can be used, BUT manual work will be
-needed to set it up. TODO
+needed to set it up. A tutorial may be created to describe the
+manual changes.
 
 A future implementation could support git repos that are truly remote,
 on other systems. When that is implemented, an existing repo could be
 "upgraded" to be a gitproj repo. The "raw" file remote could also be
 saved on other systems (via rsync, rclone, or even cvs).
+
+The list of feature requests can be found at:
+[enhancements](https://github.com/TurtleEngr/gitproj/labels/enhancement)
+
+# DIAGNOSTICS
 
 Use use the -x or -X options, or gpDebug env. var.  to turn on debug
 levels. Larger numbers, more debug. There is only a little bit of
@@ -339,7 +233,9 @@ process.
 
 # BUGS
 
-Please report bugs at: [issues](https://github.com/TurtleEngr/gitproj/issues)
+Please report bugs at: [issues](https://github.com/TurtleEngr/gitproj/issues).
+
+Use the "Bug Report" or "Feature Request" templates to submit your issue.
 
 # AUTHOR
 

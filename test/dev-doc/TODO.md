@@ -23,6 +23,10 @@ structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
+* Write a script that convert "LINK{title|filepath}" to html anchors
+  or markdown links. The POD L<title|filepath> does not work for
+  relative links.
+
 * git-proj-clone will initally copy all of PROJ/.gitproj (afer git
   clone).  Then update local config: local-status, local-host,
   proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig

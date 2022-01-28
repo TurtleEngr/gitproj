@@ -34,7 +34,7 @@ variables.
 
 ## gitproj, global, /usr/share/doc/git-proj/config/gitconfig
 
-    L</usr/share/doc/git-proj/config/gitconfig|../config/gitconfig>
+    LINK{/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig}
 
 gitproj default variable values for all users and projects are defined
 in this file. The values are only copied at selected times and unless
@@ -164,7 +164,7 @@ vars in PROJ/.gitproj to PROJ/.git/config.
 
 ## /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit
 
-    L</usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit>
+    LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
     ~/.pre-commit (optinal)
     PROJ/.pre-commit (optinal)
     PROJ/.git/hooks/pre-commit
@@ -274,7 +274,7 @@ If not found, then set to: $gpBin/../doc  If still not found: error.
 
 ## gpDebug; -x, -xx..., -X N; NA; (0)
 
-See the "common-options" section in [git-proj](https://metacpan.org/pod/git-proj.html) for details.
+See the "common-options" section in LINK{git-proj|git-proj.html} for details.
 
 There is no config variable for gpDebug.
 
@@ -324,7 +324,7 @@ size of the space used by ProjName.raw.
 
 ## gpVerbose; -q, -v, -V N; gitproj.config.verbose; (2)
 
-See the "common-options" section in [git-proj](https://metacpan.org/pod/git-proj.html) for details.
+See the "common-options" section in LINK{git-proj|git-proj.html} for details.
 
 ## gpVer, -NA; gitproj.config.ver, ()
 

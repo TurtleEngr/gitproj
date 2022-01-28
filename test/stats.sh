@@ -16,10 +16,15 @@ tTotalLines=$(cat $(find * -type f | grep -Ev 'dist|subcommands') | wc -l)
 tLinesInTest=$(cat $(find test -type f) | wc -l)
 
 tLinesInDoc=$(cat $(find doc -type f) | wc -l)
+tWordsInDoc=$(cat $(find doc -type f) | wc -w)
+
 tDoc=$(cat $(find * -prune -type f) | wc -l)
 let tLinesInDoc+=tDoc
+tDoc=$(cat $(find * -prune -type f) | wc -w)
+let tWordsInDoc+=tDoc
 
 tLinesInCode=$(cat $(find git-core -type f) | wc -l)
+
 tDoc=$(
     awk '
         /=pod/,/=cut/ {
@@ -33,10 +38,25 @@ tDoc=$(
 let tLinesInDoc+=tDoc
 let tLinesInCode-=tDoc
 
+tDoc=$(
+    awk '
+        /=pod/,/=cut/ {
+            print $0
+        }
+        /=internal-pod/,/=internal-cut/ {
+            print $0
+        }
+    ' $(find test/* git-core/* -type f) | wc -w
+)
+let tWordsInDoc+=tDoc
+
+
 tNumFun=$(grep '()' git-core/* | grep -Ev '#' | wc -l)
 tNumCmds=$('ls' git-core/git-proj-* | wc -l)
 
 let tLinesPerWeek=tTotalLines*7/tProjDuration
+
+let tPagesInDoc=tWordsInDoc/250
 
 # --------------------
 cat <<EOF
@@ -45,7 +65,9 @@ Tests
         Number of asserts:  $tNumAsserts
         Lines in test/:     $tLinesInTest
 Doc
-        Lines of doc:       $tLinesInDoc
+        Lines in doc:       $tLinesInDoc
+        Word  in doc:       $tWordsInDoc
+	Pages of doc:	    $tPagesInDoc
 Code
         Number of git SubCmds: $tNumCmds
         Number of Functions:   $tNumFun

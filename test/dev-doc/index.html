@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>dev-doc index</title>
+  <style type="text/css">
+  <!--
+/*<![CDATA[*/
+  body {
+        margin-left: 2%;
+        margin-right: 2%;
+        font-family: Times, serif;
+        font-size: 110%;
+  }
+  pre {
+        font-size: 100%;
+        line-height: 100%;
+        font-family: Courier New, monospace;
+  }
+  ins {
+        color: green;
+  }
+  del {
+        color: red;
+  }
+  dt {
+        font-weight: bold
+  }
+  p.red {
+        color: red;
+  }
+  span.red {
+        color: red;
+  }
+  div.red {
+        color: red;
+  }
+  /*]]>*/
+  // -->
+  </style>
+</head>
+<body>
+  <h1>dev-doc index</h1>
+
+<!-- If the headings of the document referenced in this file have
+changed, they will need to be updated. Just cut/paste the index
+section in the generated html files.  -->
+
+  <hr />
+  <!-- ******************** -->
+  <h2>TOC</h2>
+
+<hr />
+    <!-- ******************** -->
+  <h2>Outline of Files</h2>
+<p>outline.html</p>
+
+    <ul>
+    <li><a href="outline.html#Outline-of-Files">Outline of Files</a></li>
+    <li><a href="outline.html#gitproj-Source-Repo---dev">gitproj Source Repo -
+    dev</a></li>
+    <li><a href="outline.html#gitproj-Installed-Files---prod">gitproj Installed Files -
+    prod</a></li>
+    <li><a href="outline.html#After-running-git-proj-init-local-or-git-proj-clone">After
+    running git-proj-init local, or git-proj-clone</a></li>
+    <li><a href="outline.html#After-running-git-proj-remote">After running
+    git-proj-remote</a></li>
+    <li><a href="outline.html#dev-test-Environment">dev-test Environment</a></li>
+    <li>
+      <a href="outline.html#Function-Call-Map">Function Call Map</a>
+      <ul>
+        <li><a href="outline.html#git-proj">git-proj</a></li>
+        <li><a href="outline.html#git-proj-add">git-proj-add</a></li>
+        <li><a href="outline.html#git-proj-check">git-proj-check</a></li>
+        <li><a href="outline.html#git-proj-clone">git-proj-clone</a></li>
+        <li><a href="outline.html#git-proj-config">git-proj-config</a></li>
+        <li><a href="outline.html#git-proj-init">git-proj-init</a></li>
+        <li><a href="outline.html#git-proj-pull">git-proj-pull</a></li>
+        <li><a href="outline.html#git-proj-push">git-proj-push</a></li>
+        <li><a href="outline.html#git-proj-remote">git-proj-remote</a></li>
+        <li><a href="outline.html#git-proj-status">git-proj-status</a></li>
+        <li><a href="outline.html#gitproj-clone.inc">gitproj-clone.inc</a></li>
+        <li><a href="outline.html#gitproj-com.inc">gitproj-com.inc</a></li>
+        <li><a href="outline.html#gitproj-init.inc">gitproj-init.inc</a></li>
+        <li><a href="outline.html#gitproj-pull.inc">gitproj-pull.inc</a></li>
+        <li><a href="outline.html#gitproj-push.inc">gitproj-push.inc</a></li>
+        <li><a href="outline.html#gitproj-remote.inc">gitproj-remote.inc</a></li>
+        <li><a href="outline.html#gitproj-status.inc">gitproj-status.inc</a></li>
+        <li><a href="outline.html#Get-List">Get List</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <hr />
+    <!-- ******************** -->
+  <h2>Coding Convention</h2>
+  <p>coding-convention.html</p>
+
+    <ul>
+    <li><a href="coding-convention.html#Coding-Convention">Coding Convention</a></li>
+    <li>
+      <a href="coding-convention.html#Script-Structure">Script Structure</a>
+      <ul>
+        <li><a href="coding-convention.html#Configuration">Configuration</a></li>
+        <li><a href="coding-convention.html#Block-Organization">Block Organization</a></li>
+        <li><a href="coding-convention.html#Variable-Naming-Convention">Variable Naming
+        Convention</a></li>
+        <li><a href="coding-convention.html#Global-Variables">Global Variables</a></li>
+        <li><a href="coding-convention.html#Documentation-Format">Documentation Format</a></li>
+      </ul>
+    </li>
+    <li><a href="coding-convention.html#Git-Config-Definition-Order">Git Config Definition
+    Order</a></li>
+    <li><a href="coding-convention.html#Variable-Naming-Convention1">Variable Naming
+    Convention</a></li>
+    <li><a href="coding-convention.html#Function-Naming-Convention">Function Naming
+    Convention</a></li>
+    <li><a href="coding-convention.html#Coding-Patterns">Coding Patterns</a></li>
+    <li><a href="coding-convention.html#File-Include-Pattern---prod">File Include Pattern -
+    prod</a></li>
+    <li><a href="coding-convention.html#File-Include-Pattern---dev">File Include Pattern -
+    dev</a></li>
+    <li><a href="coding-convention.html#File-include-pattern---dev-test">File include pattern -
+    dev-test</a></li>
+  </ul>
+
+    <hr />
+    <!-- ******************** -->
+    <h2>git-proj Internal Doc</h2>
+  <p>git-proj.html</p>
+
+  <ul>
+    <li>
+      <a href="#gitproj-com.inc-Internal-Documentation">gitproj-com.inc
+      Internal Documentation</a>
+      <ul>
+        <li>
+          <a href="#Common-Script-Functions">Common Script Functions</a>
+          <ul>
+            <li>
+              <a href="#try-catch-functions">try/catch functions</a>
+              <ul>
+                <li><a href="#tcTry">tcTry</a></li>
+                <li><a href="#tcSaveEnv">tcSaveEnv</a></li>
+                <li><a href="#tcReturn">tcReturn</a></li>
+                <li><a href="#tcThrow">tcThrow</a></li>
+                <li><a href="#tcCatch">tcCatch</a></li>
+                <li><a href="#tcThrowErrors">tcThrowErrors</a></li>
+                <li><a href="#tcIgnoreErrors">tcIgnoreErrors</a></li>
+                <li><a href="#Sample-Use">Sample Use</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#fComConfigCopy">fComConfigCopy</a>
+              <ul>
+                <li><a href="#Synopsis">Synopsis</a></li>
+                <li><a href="#Description">Description</a></li>
+              </ul>
+            </li>
+            <li><a href="#fComSetGlobals">fComSetGlobals</a></li>
+            <li><a href=
+            "#fComCheckDeps-pRequired-List-pOptional-List">fComCheckDeps
+            "pRequired List" "pOptional List"</a></li>
+            <li><a href="#fComInternalDoc">fComInternalDoc</a></li>
+            <li><a href=
+            "#fComUsage--f-pFileList--s-pStyle--t-pTitle--i--a">fComUsage -f
+            pFileList -s pStyle [-t pTitle] [-i] [-a]</a></li>
+            <li><a href="#fComYesNo-pPrompt">fComYesNo pPrompt</a></li>
+            <li><a href="#fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog
+            pLevel "pMsg" pLine pErr</a></li>
+            <li>
+              <a href="#fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr--f">fLog -m
+              pMsg [-p pLevel] [-l $LINENO] [-e pErr] [-f]</a>
+              <ul>
+                <li><a href="#fLog-Examples">fLog Examples:</a></li>
+              </ul>
+            </li>
+            <li><a href="#fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg
+            [-l $LINENO] [-e pErr] [-i]</a></li>
+            <li><a href="#fComGit-pArgs">fComGit [pArgs...]</a></li>
+            <li>
+              <a href="#fComGetConfig">fComGetConfig</a>
+              <ul>
+                <li><a href="#Synopsis1">Synopsis</a></li>
+                <li><a href="#Description1">Description</a></li>
+                <li><a href="#Options">Options</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#fComGetConfig1">fComGetConfig</a>
+              <ul>
+                <li><a href="#Synopsis2">Synopsis</a></li>
+                <li><a href="#Description2">Description</a></li>
+                <li><a href="#Options1">Options</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <hr />
+  <hr />
+  <!-- ******************** -->
+<h1>User Docs</h1>
+
+  <hr />
+  <!-- ******************** -->
+  <ul>
+    <li><a href="../../doc/user-doc/git-proj.html">git proj Usage</a> - All the subcommand usages in one file. </li>
+
+    <li><a href="../../doc/user-doc/config.html">Configuration Documentation</a></li>
+
+    <li><a href="../../doc/user-doc/tutorial/create_a_git-proj_repo.html">Create a git-proj Repo</a></li>
+
+    </ul>
+
+  <!-- ******************** -->
+  <hr />
+</body>
+</html>

@@ -358,7 +358,7 @@ If no -i, then "fUsage short", will be called.
 
 ### fComGit \[pArgs...\]
 
-TBD: replace this with set/try/catch
+TODO: replace this with set/try/catch
 
 This is a wrapper for "git". If gpVerbose is >= 2, the git call will
 will be echoed. If the git call exits with a non-0, then an error
