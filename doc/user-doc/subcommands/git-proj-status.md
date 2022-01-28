@@ -56,8 +56,8 @@
     git proj clone
     git proj push
     git proj pull
-    git proj add   TBD
-    git proj config TBD
+    git proj add   TODO
+    git proj config TODO
     git flow
 
 # AUTHOR

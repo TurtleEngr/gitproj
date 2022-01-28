@@ -739,7 +739,7 @@ testInitSaveVarsToConfigs()
     tResult=$(fInitSaveVarsToConfigs 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 
-    # TBD refactor to use for loops with hash array maps?
+    # TODO refactor to use for loops with hash array maps?
     # cMapConf[gpBin]=gitproj.config.bin
     # generated from cMapConf: cMapVar[gitproj.config.bin]=gpBin
     # cMapFile[gitproj.config.bin]=global
@@ -815,18 +815,18 @@ testInitCreateLocalGitAuto()
 } # testInitCreateLocalGitAuto
 
 # --------------------------------
-TBDtestInitCreateLocalGitPrompted()
+TODOtestInitCreateLocalGitPrompted()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } # testInitCreateLocalGitPrompted
 
 # --------------------------------
-TBDtestGetProjInitLocalAutoCLI()
+TODOtestGetProjInitLocalAutoCLI()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 
     cd $HOME/$cDatProj1
@@ -834,10 +834,10 @@ TBDtestGetProjInitLocalAutoCLI()
 } # testGetProjInitLocalAutoCLI
 
 # --------------------------------
-TBDtestGetProjInitLocalPromptedCLI()
+TODOtestGetProjInitLocalPromptedCLI()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 
     cd $HOME/$cDatProj1

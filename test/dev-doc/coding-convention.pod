@@ -84,7 +84,7 @@ where the variables are set.
 
 =head2 Global Variables
 
-For more help, see the Globals section in fUsage. TBD
+For more help, see the Globals section in fUsage.
 
     gpVerbose - -q -v, -V N
     gpDebug - -x, -xx, ..., -X N

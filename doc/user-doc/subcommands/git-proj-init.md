@@ -102,8 +102,8 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     git proj pull
     git proj set
     git proj status
-    git proj add   TBD
-    git proj config TBD
+    git proj add   TODO
+    git proj config TDO
     git flow
 
 # AUTHOR

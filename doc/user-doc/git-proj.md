@@ -170,15 +170,15 @@ Default: -d pMountDir/ProjName.raw
 
 Section: \[gitproj hook\]
 
-TBD
+TODO
 
 ## top-dir/.gitproj
 
-TBD
+TODO
 
 ## top-dir/.git/config
 
-TBD - this needs to be rewritten.
+TODO - this needs to be rewritten.
 
 Where HOSTNAME will be set to $HOSTNAME. This allows for different
 locations of file, based on the host. For example the remote-raw-url
@@ -241,7 +241,7 @@ file.
                 remote-raw-origin = TBD
                 #remote.origin.url = /MOUNT-DIR/DIR/NAME.git
 
-                # Remote examples (not implemented. TBD)
+                # Remote examples (not implemented. TODO)
                 #remote-raw-url = joe@example.com:/repo/git/video-2021-09-24/NAME.raw
                 #remote.origin-url=USER@example.com:/repo/git/video-2021-09-24/NAME.git
                 #remote.origin-url=git@github.com:TurtleEngr/gitproj.git
@@ -259,7 +259,7 @@ file.
 
 ## Global Env. Var. Config
 
-See... TBD
+See... TODO
 
 # EXAMPLES
 
@@ -324,7 +324,7 @@ workspace can have its own "origin" definition, because the mount
 points could be different between systems.
 
 An existing remote git repo can be used, BUT manual work will be
-needed to set it up. TBD
+needed to set it up. TODO
 
 A future implementation could support git repos that are truly remote,
 on other systems. When that is implemented, an existing repo could be
@@ -453,8 +453,8 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     git proj pull
     git proj set
     git proj status
-    git proj add   TBD
-    git proj config TBD
+    git proj add   TODO
+    git proj config TDO
     git flow
 
 # AUTHOR
@@ -554,7 +554,7 @@ mounted drive.
 
 - **-d pRemoteDir**
 
-    TBD
+    TODO
 
 - **-a**
 
@@ -842,8 +842,8 @@ GPLv3 Copyright 2021 by TurtleEngr
     git proj clone
     git proj push
     git proj pull
-    git proj add   TBD
-    git proj config TBD
+    git proj add   TODO
+    git proj config TODO
     git flow
 
 # AUTHOR

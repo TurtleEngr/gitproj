@@ -279,8 +279,8 @@ testPullGit()
     assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
-    # TBD: what if a current local branch has no remote branch?
-    # TBD: merge conflicts with changed local files?
+    # TODO: what if a current local branch has no remote branch?
+    # TODO: merge conflicts with changed local files?
 
     return 0
 } # testPullGit

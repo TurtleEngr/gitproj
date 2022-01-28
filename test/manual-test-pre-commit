@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "TBD test pre-commit to see how the hook works, so it can be made better."
+echo "Test pre-commit to see how the hook works, so it can be made better."
 
 # Mainly make sure files in ProjName/raw/ are not committed.  I.e. do
 # not depend on .gitignore to prevent files in raw/ from being

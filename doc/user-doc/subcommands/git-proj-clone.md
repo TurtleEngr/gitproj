@@ -19,7 +19,7 @@ mounted drive.
 
 - **-d pRemoteDir**
 
-    TBD
+    TODO
 
 - **-a**
 

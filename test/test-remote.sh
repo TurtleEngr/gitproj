@@ -219,7 +219,7 @@ testRemoteSetGlobals()
     assertTrue "$LINENO $tResult" "$?"
     #    assertNotContains "$LINENO $tResult" "$tResult" "warning"
 
-    # TBD: add tests to force errors and warnings. See REMOVEDtestRemoteVerifyState
+    # TODO: add tests to force errors and warnings. See REMOVEDtestRemoteVerifyState
     return 0
 } # testRemoteSetGlobals
 

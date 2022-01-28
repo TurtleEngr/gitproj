@@ -130,8 +130,8 @@ subcommands.
  git proj pull
  git proj set
  git proj status
- git proj add   TBD
- git proj config TBD
+ git proj add   TODO
+ git proj config TDO
  git flow
 
 =for comment =head1 NOTES

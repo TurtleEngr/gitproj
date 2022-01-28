@@ -136,7 +136,7 @@ testSetup()
 testComGitProjInternalDoc()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } # testComGitProjInternalDoc
 
@@ -144,7 +144,7 @@ testComGitProjInternalDoc()
 testComIntroText()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } # testComIntroText
 
@@ -288,7 +288,7 @@ EOF
 testComFmtLog()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } # testComFmtLog
 
@@ -842,7 +842,7 @@ testComFmt()
 testComSetConfigMore()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } # testComSetConfigMore
 
@@ -850,7 +850,7 @@ testComSetConfigMore()
 testComGetConfigMore()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } # testComGetConfigMore
 
@@ -858,7 +858,7 @@ testComGetConfigMore()
 testComUnsetConfigMore()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } #testComUnsetConfigMore
 

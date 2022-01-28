@@ -1302,7 +1302,7 @@ fComGit()
 
 =internal-head3 fComGit [pArgs...]
 
-TBD: replace this with set/try/catch
+TODO: replace this with set/try/catch
 
 This is a wrapper for "git". If gpVerbose is >= 2, the git call will
 will be echoed. If the git call exits with a non-0, then an error
@@ -1755,7 +1755,7 @@ fComSaveVar2Config()
     if [ -z "$tValue" ]; then
         tValue="Undefined"
     fi
-    # TBD: Use fComSetConfig? because it has more error handling.
+    # TODO: Use fComSetConfig? because it has more error handling.
     ##fComSetConfig -f $pFile -k $pKey -v "$tValue"
     git config --replace-all --file $pFile $pKey "$tValue"
     if [ $? -ne 0 ]; then
@@ -1885,7 +1885,7 @@ fComAllMustBeReadable()
 # --------------------
 fComIsGitRemoteAvailable()
 {
-    # TBD not used yet
+    # TODO not used yet
     local pLevel="${1:-debug}"
     local tSrc=${BASH_SOURCE##*/}
     local tOrigin
@@ -1905,7 +1905,7 @@ fComIsGitRemoteAvailable()
 # --------------------
 fComIsRawRemoteAvailable()
 {
-    # TBD not used yet
+    # TODO not used yet
     local pLevel="${1:-debug}"
     local tSrc=${BASH_SOURCE##*/}
 
@@ -1914,7 +1914,7 @@ fComIsRawRemoteAvailable()
         fLog -p $pLevel -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
         return 1
     fi
-    # TBD: change this to use rclone
+    # TODO: change this to use rclone
     if [ -d $gpRemoteRawOrigin ]; then
         return 0
     fi

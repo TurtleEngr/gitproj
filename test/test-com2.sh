@@ -318,7 +318,7 @@ testComConfigUpdateLocal()
 testComGetConfigMore()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     # untar a git env., test in and out of git dir
     return 0
 } # testComGetConfigMore
@@ -327,7 +327,7 @@ testComGetConfigMore()
 testComUnsetConfigMore()
 {
     startSkipping
-    fail "TBD"
+    fail "TODO"
     return 0
 } #testComUnsetConfigMore
 
