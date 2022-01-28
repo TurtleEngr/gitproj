@@ -146,18 +146,16 @@ cd - >/dev/null 2>&1
 # Calls: fCloneSetGlobals
 
 gpRemoteGitDir=""
+gpRemoteRawOrigin=""
+gpProjName=""
 gpAuto=0
 gpYesNo="No"
+pRemoteGitDir=""
 while getopts :ad:nyhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
-        d)
-            gpRemoteGitDir="$OPTARG"
-            gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
-            gpProjName=${gpRemoteGitDir##*/}
-            gpProjName=${gpProjName%.git}
-            ;;
+        d) pRemoteGitDir="$OPTARG" ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -177,8 +175,8 @@ shift $((OPTIND - 1))
 if [ $# -ne 0 ]; then
     fError -m "Unknown option: $*" -l $tSrc:$LINENO
 fi
-if [ -z "$gpRemoteGitDir" ]; then
-    fError -m "-d pRemoteDir option is required." -l $tSrc:$LINENO
+if [ -z "$pRemoteGitDir" ]; then
+    fError -m "-d pRemoteGitDir option is required." -l $tSrc:$LINENO
 fi
 
 if [ ${gpAuto:-0} -eq 0 ]; then
@@ -186,5 +184,5 @@ if [ ${gpAuto:-0} -eq 0 ]; then
 fi
 
 # ----------
-fCloneFromRemoteDir
+fCloneFromRemoteDir "$pRemoteGitDir"
 exit $?
