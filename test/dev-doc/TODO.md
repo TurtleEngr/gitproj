@@ -19,6 +19,12 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
+* Add check: on creation of remote raw, create a file with the git
+origin in it. On clone, push, pull, the actual origin can be compared
+to the origin in the remote raw file. Problem: the git origin can be
+different on differnt systems, because of different mount points. Fix,
+just compare the last dir name--it should match origin.git
+
 * Implement pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
 
 * Write a script that converts "LINK{title|filepath}" to html anchors
