@@ -174,69 +174,83 @@ testCloneValidRemoteDir()
 {
     local tResult
     local tSave
+    local tRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    local tRemoteRawOrigin=$cDatMount3/video-2020-04-02/george.raw
+    local tProjName=george
 
-    #gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    #gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
-    #gpProjName=${gpRemoteGitDir##*/}
-    #gpProjName=${gpProjName%.git}
+    gpRemoteGitDir=""
+    gpRemoteRawOrigin=""
+    gpProjName=""
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "must NOT be in a git repo"
 
     cd $HOME/project >/dev/null 2>&1
 
     chmod a-w $HOME/project
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Current dir is not writable"
     chmod ug+w $HOME/project
 
-    tSave=$gpRemoteGitDir
-    gpRemoteGitDir=$cDatMount3/video-2020-04-xx/george.git
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    tSave=$tRemoteGitDir
+    tRemoteGitDir=$cDatMount3/video-2020-04-xx/george.git
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteGitDir does not exist"
-    gpRemoteGitDir=$tSave
+    assertContains "$LINENO $tResult" "$tResult" "$tRemoteGitDir does not exist"
+    tRemoteGitDir=$tSave
 
-    tSave=$gpRemoteRawOrigin
-    gpRemoteRawOrigin=$cDatMount3/video-2020-04-xx/george.git
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    tSave=$tRemoteGitDir
+    tRemoteGitDir=$cDatMount3/video-2020-04-xx/george.git
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawOrigin does not exist"
-    gpRemoteRawOrigin=$tSave
+    assertContains "$LINENO $tResult" "$tResult" "$tRemoteGitDir does not exist"
+    tRemoteGitDir=$tSave
 
-    chmod a-r $gpRemoteGitDir/objects
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    chmod a-r $tRemoteGitDir/objects
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $gpRemoteGitDir"
-    chmod -R a+r $gpRemoteGitDir/objects
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $tRemoteGitDir"
+    chmod -R a+r $tRemoteGitDir/objects
 
-    chmod a-x $gpRemoteGitDir/objects
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    chmod a-x $tRemoteGitDir/objects
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteGitDir"
-    chmod a+x $gpRemoteGitDir/objects
+    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $tRemoteGitDir"
+    chmod a+x $tRemoteGitDir/objects
 
-    chmod a-r $gpRemoteRawOrigin/src
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    rm $tRemoteRawOrigin/$cRemoteProjFile >/dev/null 2>&1
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $gpRemoteRawOrigin"
-    chmod -R a+r $gpRemoteRawOrigin/src
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Missing /home/bruce/ver/public/app/gitproj/test/root/mnt/usb-video/video-2020-04-02/george.raw/.remote.proj"
 
-    chmod a-x $gpRemoteRawOrigin/src/raw
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    echo "bob.git" >$tRemoteRawOrigin/$cRemoteProjFile
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $gpRemoteRawOrigin"
-    chmod a+x $gpRemoteRawOrigin/src/raw
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Mismatch:"
+
+    echo "$tRemoteGitDir" >$tRemoteRawOrigin/$cRemoteProjFile
+
+    chmod a-r $tRemoteRawOrigin/src
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "All directories and files must be readable, under $tRemoteRawOrigin"
+    chmod -R a+r $tRemoteRawOrigin/src
+
+    chmod a-x $tRemoteRawOrigin/src/raw
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "All directories must be executable, under $tRemoteRawOrigin"
+    chmod a+x $tRemoteRawOrigin/src/raw
 
     cd $HOME/project >/dev/null 2>&1
-    touch $gpProjName
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    touch $tProjName
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "A $gpProjName already exists in this dir"
-    rm $gpProjName
+    assertContains "$LINENO $tResult" "$tResult" "A $tProjName already exists in this dir"
+    rm $tProjName
 
     # Test for not enough room. Mock "df" to return a small value.
     df()
@@ -245,11 +259,42 @@ testCloneValidRemoteDir()
     }
     tResult=$(df -BM $PWD --output=avail | tail -n1)
     assertEquals "$LINENO" "2M" "$tResult"
-    tResult=$(fCloneValidRemoteDir 2>&1)
+    tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "There is not enough space in current directory. Project '$gpProjName' needs 6MB"
+    assertContains "$LINENO $tResult" "$tResult" "warning: The current directory should have 2048MB available"
+    assertContains "$LINENO $tResult" "$tResult" "2MB is not enough space in current directory. Project '$tProjName' needs 6MB"
+    ##assertContains "$LINENO $tResult" "$tResult" "uncomment to see"
     unset -f df
 
+    df()
+    {
+        echo "19M"
+    }
+
+    fCloneValidRemoteDir $tRemoteGitDir >/tmp/test-clone.tmp 2>&1
+    assertTrue "$LINENO" "$?"
+    tResult=$(cat /tmp/test-clone.tmp)
+#    assertContains "$LINENO $tResult" "$tResult" "warning: The current directory should have 20480MB available"
+    assertEquals "$LINENO" "$tRemoteGitDir" "$gpRemoteGitDir"
+    assertEquals "$LINENO" "$RemoteRawOrigin" "$RemoteRawOrigin"
+    assertEquals "$LINENO" "$tProjName" "$gpProjName"
+    unset -f df
+
+    df()
+    {
+        echo "30000M"
+    }
+
+    fCloneValidRemoteDir $tRemoteGitDir >/tmp/test-clone.tmp 2>&1
+    assertTrue "$LINENO" "$?"
+    tResult=$(cat /tmp/test-clone.tmp)
+    assertNotContains "$LINENO $tResult" "$tResult" "warning: The current directory should have 20480MB available"
+    assertEquals "$LINENO" "$tRemoteGitDir" "$gpRemoteGitDir"
+    assertEquals "$LINENO" "$RemoteRawOrigin" "$RemoteRawOrigin"
+    assertEquals "$LINENO" "$tProjName" "$gpProjName"
+    unset -f df
+
+    rm /tmp/test-clone.tmp
     return 0
 } # testCloneValidRemoteDir
 
@@ -308,7 +353,7 @@ testCloneCheckLocalConfig()
     assertContains "$LINENO $tResult" "$tResult" "warning: Missing file: .gitproj It should have been versioned! Will try to recreate it from ~/.gitconfig"
 
     #tResult=$(grep remote-raw-origin $c ConfigHost 2>&1)
-    #assertContains "$LINENO $tResult" "$tResult" "$gpRemoteRawOrigin"
+    #assertContains "$LINENO $tResult" "$tResult" "$tRemoteRawOrigin"
     return 0
     rm .gitproj
     #rm $c ConfigHost
@@ -566,18 +611,23 @@ testCloneSummary()
 testCloneFromRemoteDir()
 {
     local tResult
+    local tRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    local tRemoteRawOrigin=$cDatMount3/video-2020-04-02/george.raw
+    local tProjName=george
 
     # Setup
-    cd $cDatHome3 >/dev/null 2>&1
-    gpRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
-    gpRemoteRawOrigin=${gpRemoteGitDir%.git}.raw
-    gpProjName=george
+    gpRemoteGitDir=""
+    gpRemoteRawOrigin=""
+    gpProjName=""
     gpAuto=1
     gpYesNo=Yes
     gpVerbose=3
     cd $HOME/project >/dev/null 2>&1
 
-    tResult=$(fCloneFromRemoteDir 2>&1)
+    # TODO remove this when cRemoteProjFile is added to test-env files (remote)
+    echo "$tRemoteGitDir" >$tRemoteRawOrigin/$cRemoteProjFile
+
+    tResult=$(fCloneFromRemoteDir $tRemoteGitDir 2>&1)
     assertTrue $LINENO $?
     assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
@@ -589,9 +639,20 @@ testCloneFromRemoteDir()
 testGetProjCloneCLI()
 {
     local tResult
+    local tRemoteGitDir=$cDatMount3/video-2020-04-02/george.git
+    local tRemoteRawOrigin=$cDatMount3/video-2020-04-02/george.raw
+
+    # TODO remove this when cRemoteProjFile is added to test-env files (remote)
+    echo "$tRemoteGitDir" >$tRemoteRawOrigin/$cRemoteProjFile
 
     cd $cDatHome3/project >/dev/null 2>&1
-    tResult=$($gpBin/git-proj-clone -a -V 1 -d $cDatMount3/video-2020-04-02/george.git -y 2>&1)
+    tResult=$($gpBin/git-proj-clone -a -V 1 -d $tRemoteRawOrigin -y 2>&1)
+    assertFalse $LINENO $?
+    assertContains "$LINENO $tResult" "$tResult" "george.raw is not a git repo"
+    #assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
+
+    cd $cDatHome3/project >/dev/null 2>&1
+    tResult=$($gpBin/git-proj-clone -a -V 1 -d $tRemoteGitDir -y 2>&1)
     assertTrue $LINENO $?
     assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"

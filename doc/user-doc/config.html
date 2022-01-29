@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Configuration Documentation</title>
@@ -73,8 +73,8 @@
         "#gpRemoteRawOrigin--d-gitproj.config.remote-raw-origin-TBD">gpRemoteRawOrigin,
         -d, gitproj.config.remote-raw-origin, (TBD)</a></li>
         <li><a href=
-        "#gpRemoteMinSpace--NA-gitproj.config.remote-min-space-20g">gpRemoteMinSpace;
-        -NA; gitproj.config.remote-min-space; (20g)</a></li>
+        "#gpRemoteMinSpace--NA-gitproj.config.remote-min-space-2g">gpRemoteMinSpace;
+        -NA; gitproj.config.remote-min-space; (2g)</a></li>
         <li><a href=
         "#gpVerbose--q--v--V-N-gitproj.config.verbose-2">gpVerbose; -q, -v,
         -V N; gitproj.config.verbose; (2)</a></li>
@@ -96,7 +96,7 @@
         "#gpCheckWhitespace--NA-gitproj.hook.check-whitespace-true">gpCheckWhitespace;
         -NA; gitproj.hook.check-whitespace; (true)</a></li>
         <li><a href=
-        "#gpAllowTabs--NA-gitproj.hook.check-for-tabs-false">gpAllowTabs;
+        "#gpCheckForTabs--NA-gitproj.hook.check-for-tabs-false">gpCheckForTabs;
         -NA; gitproj.hook.check-for-tabs; (false)</a></li>
         <li><a href=
         "#gpTabExtList--NA-gitproj.hook.tabs-ext-list-c-sh-md-html-pod-tab-ext-list-c-sh-md-html-pod">
@@ -211,7 +211,7 @@
         proj-name = TBD         # set by init and clone
         remote-status=TBD       # set by remote and clone
         remote-raw-origin=TBD   # set by remote and clone
-        remote-min-space = 20g  # set by remote and clone
+        remote-min-space = 2g   # set by remote and clone
         verbose = 2
     [gitproj "hook"]
         verbose = true
@@ -385,8 +385,8 @@
   and <span style="white-space: nowrap;">git proj clone</span> to the remote
   raw location. It is set in PROJ/.git/config. If should always be "TBD" in
   ~/.gitconfig and PROJ/.gitproj.</p>
-  <h2 id="gpRemoteMinSpace--NA-gitproj.config.remote-min-space-20g">
-  gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (20g)</h2>
+  <h2 id="gpRemoteMinSpace--NA-gitproj.config.remote-min-space-2g">
+  gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (2g)</h2>
   <p>This is the minium space that should be available on the external drive.
   The <span style="white-space: nowrap;">git proj remote</span> command will
   not continue if there is not enough space. The available space should be at
@@ -429,8 +429,8 @@
   gpCheckWhitespace; -NA; gitproj.hook.check-whitespace; (true)</h2>
   <p>If true, don't allow trailing spaces in text files.</p>
   <p>See rm-trailing-sp to fix.</p>
-  <h2 id="gpAllowTabs--NA-gitproj.hook.check-for-tabs-false">gpAllowTabs;
-  -NA; gitproj.hook.check-for-tabs; (false)</h2>
+  <h2 id="gpCheckForTabs--NA-gitproj.hook.check-for-tabs-false">
+  gpCheckForTabs; -NA; gitproj.hook.check-for-tabs; (false)</h2>
   <p>If true, don't allow tabs for files with the extentions found in:
   gitproj.hook.tabs-ext-list</p>
   <p>To fix, use "rm-trailing-sp -f FILE"</p>

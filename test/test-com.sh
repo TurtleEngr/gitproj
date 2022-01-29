@@ -274,8 +274,13 @@ testComInternalDoc()
 
     cat <<EOF | fComInternalDoc >/tmp/testComInternalDoc.tmp
 =internal-pod
+
 =internal-head3 testing 123
+
 Just text.
+
+=internal-cut
+
 EOF
     assertTrue "$LINENO" "grep '^=pod' /tmp/testComInternalDoc.tmp"
     assertTrue "$LINENO" "grep '^=head3 testing 123' /tmp/testComInternalDoc.tmp"
@@ -562,22 +567,23 @@ testComUsage()
     #-----
     tResult=$(fComUsage -i -s long -f $tUsageScript -f $tInternalScript 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO Template" "$tResult" 'Template Use'
-    assertContains "$LINENO set" "$tResult" 'fComSetGlobals'
+    assertContains "$LINENO Template" "$tResult" 'fTestRun'
+    assertContains "$LINENO set" "$tResult" 'gitproj-com.inc Internal Documentation'
+    ##assertContains "$LINENO $tResult" "$tResult" 'uncomment to show'
 
     #-----
     tResult=$(fComUsage -i -s html -t "Internal Doc" -f $tUsageScript -f $tInternalScript 2>&1)
     fTestDebug "tResult=$tResult"
-    assertContains "$LINENO template" "$tResult" '<a href="#Template-Use">Template Use</a>'
-    assertContains "$LINENO set" "$tResult" '<h3 id="fComSetGlobals">fComSetGlobals</h3>'
-    assertContains "$LINENO int" "$tResult" '<title>Internal Doc</title>'
-    assertContains "$LINENO com" "$tResult" '<h3 id="testComUsage">testComUsage</h3>'
+    assertContains "$LINENO" "$tResult" '<h1 id="gitproj-com.inc-Internal-Documentation">gitproj-com.inc'
+    assertContains "$LINENO" "$tResult" '<h3 id="fComConfigCopy">fComConfigCopy</h3>'
+    assertContains "$LINENO" "$tResult" '<h3 id="fComGetConfig">fComGetConfig</h3>'
+
 
     #-----
     tResult=$(fComUsage -i -s md -f $tUsageScript -f $tInternalScript 2>&1)
-    assertContains "$LINENO template" "$tResult" '## Template Use'
-    assertContains "$LINENO set" "$tResult" '### fComSetGlobals'
-    assertContains "$LINENO com" "$tResult" '### testComUsage'
+    assertContains "$LINENO template" "$tResult" '# gitproj-com.inc Internal Documentation'
+    assertContains "$LINENO set" "$tResult" '### fComConfigCopy'
+    assertContains "$LINENO com" "$tResult" '### fComGetConfig'
 
     #-----
     tResult=$(fComUsage -s long -f $tUsageScript -f $tInternalScript 2>&1)

@@ -120,6 +120,28 @@ tearDown()
     return 0
 } # tearDown
 
+# --------------------------------
+NAoneTimeSetUp()
+{
+    local tDoc=../doc
+
+    cp $tDoc/config/gitconfig /tmp/gitconfig.sav2
+
+    sed -i 's/remote-min-space = .*/remote-min-space = 2g/' $tDoc/config/gitconfig
+    return 0
+} # oneTimeSetUp
+
+# --------------------------------
+NAoneTimeTearDown()
+{
+    local tDoc=../doc
+
+    if [ -f /tmp/gitconfig.sav2 ]; then
+        cp /tmp/gitconfig.sav2 $tDoc/config/gitconfig
+    fi
+    return 0
+} # oneTimeTearDown
+
 # ========================================
 
 # --------------------------------
@@ -298,12 +320,15 @@ testRemoteCheckDir()
     tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" ".git already exists"
-
     rm /tmp/foo/$gpProjName.git
-    touch /tmp/foo/$gpProjName.raw
+
+    mkdir /tmp/foo/$gpProjName.raw
+    echo "$cDatMount3/video-2020-01-01/$gpProjName.git" >/tmp/foo/$gpProjName.raw/$cRemoteProjFile
     tResult=$(fRemoteCheckDir /tmp/foo 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" ".raw already exists"
+    assertContains "$LINENO $tResult" "$tResult" ".raw already exists, and belongs to"
+    ##assertContains "$LINENO $tResult" "$tResult" "uncomment to see"
+    rm -rf /tmp/foo/$gpProjName.raw
 
     tResult=$(fRemoteCheckDir $cDatHome/$cDatProj1 2>&1)
     assertFalse "$LINENO $tResult" "$?"
@@ -513,6 +538,8 @@ testRemoteMkRemote()
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "'rsync' -azC"
     assertContains "$LINENO $tResult" "$tResult" "/$gpProjName.raw"
+    assertTrue "$LINENO" "[ -d $gpRemoteRawOrigin ]"
+    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/$cRemoteProjFile ]"
 
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
@@ -520,7 +547,7 @@ testRemoteMkRemote()
         echo -e "\tRestore $tTar relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTar test
+        tar -czf $tTar test
         echo
     fi
 
@@ -546,12 +573,24 @@ testRemoteReport()
     gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
 
     cd $gpLocalTopDir >/dev/null 2>&1
+    mv $gpRemoteRawOrigin/$cRemoteProjFile $gpRemoteRawOrigin/$cRemoteProjFile.sav
+    tResult=$(fRemoteReport 2>&1)
+    assertFalse "$LINENO" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Missing:"
+    assertContains "$LINENO $tResult" "$tResult" "The above errors need to be fixed"
+    ##assertContains "$LINENO $tResult" "$tResult" "uncomment to see"
+    mv $gpRemoteRawOrigin/$cRemoteProjFile.sav $gpRemoteRawOrigin/$cRemoteProjFile
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    # TODO remove this 'echo'  when test-env has this defined
+    echo "$($cGetOrigin)" >$gpRemoteRawOrigin/$cRemoteProjFile
+
     tResult=$(fRemoteReport 2>&1)
     tStatus=$?
-    assertTrue "$LINENO" "$tStatus"
+    assertTrue "$LINENO $tResult" "$tStatus"
 
     tResult=$(fComGetConfig -k "gitproj.config.remote-status" 2>&1)
-    assertTrue "$LINENO" "$?"
+    assertTrue "$LINENO $tResult" "$?"
     assertEquals "$LINENO" "defined" "$tResult"
 
     tResult=$(fComGetConfig -l -k "gitproj.config.remote-status" 2>&1)
@@ -568,7 +607,7 @@ testRemoteReport()
         echo -e "\tRestore $tTar2 relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTar2 test
+        tar -czf $tTar2 test
         echo
     fi
 
@@ -630,7 +669,7 @@ testRemoteCreateRemoteGit()
         echo -e "\tRestore $tTar relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTar test
+        tar -czf $tTar test
         echo
     fi
 

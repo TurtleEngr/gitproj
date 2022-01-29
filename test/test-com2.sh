@@ -86,7 +86,7 @@ setUp()
     cd $HOME >/dev/null 2>&1
     tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
 
-    cp $gpDoc/config/gitconfig $gpDoc/config/gitconfig.sav
+    cp $gpDoc/config/gitconfig /tmp/gitconfig.sav
 
     gpVerbose=3
     gpUnitDebug=0
@@ -107,7 +107,7 @@ EOF
 tearDown()
 {
     # fTestRmEnv
-    cp $gpDoc/config/gitconfig.sav $gpDoc/config/gitconfig
+    cp /tmp/gitconfig.sav $gpDoc/config/gitconfig
     gpUnitDebug=0
     if [ -n "$cHome" ]; then
         HOME=$cHome

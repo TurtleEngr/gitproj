@@ -43,7 +43,26 @@
     # Look at these files:
     if ls ~/.gitconfig; then more ~/.gitconfig; fi
     if ls ~/.gitignore; then more ~/.gitignore; fi
-    tree -aF $PWD</code></pre>
+    tree -aF $PWD
+
+    /home/bruce/test/tmp
+    &#x251C;&#x2500;&#x2500; bob/
+    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; ver/
+    &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; proj/
+    &#x251C;&#x2500;&#x2500; mounted-drive/
+    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; repo/
+    &#x2502;&nbsp;&nbsp;     &#x251C;&#x2500;&#x2500; hello-world.git/
+    &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; hello-world.raw/
+    &#x2514;&#x2500;&#x2500; project/
+        &#x2514;&#x2500;&#x2500; hello-world/
+            &#x251C;&#x2500;&#x2500; doc/
+            &#x251C;&#x2500;&#x2500; foo.txt
+            &#x251C;&#x2500;&#x2500; .git/
+            &#x251C;&#x2500;&#x2500; .gitignore
+            &#x251C;&#x2500;&#x2500; .gitproj
+            &#x251C;&#x2500;&#x2500; .gitproj.bak
+            &#x251C;&#x2500;&#x2500; raw/
+            &#x2514;&#x2500;&#x2500; src/</code></pre>
 
 </li>
 <li><p>Run `git proj init`</p>
@@ -327,6 +346,12 @@
 <dd>
 
 <p>=over without closing =back</p>
+
+</dd>
+<dt id="Around-line-31">Around line 31:</dt>
+<dd>
+
+<p>Non-ASCII character seen before =encoding in &#39;&#x251C;&#x2500;&#x2500;&#39;. Assuming UTF-8</p>
 
 </dd>
 </dl>

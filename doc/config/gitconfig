@@ -49,7 +49,7 @@
         proj-name = TBD
         remote-status=TBD
         remote-raw-origin=TBD
-        remote-min-space = 20g
+        remote-min-space = 2g
         verbose = 2
 [gitproj "hook"]
         verbose = true

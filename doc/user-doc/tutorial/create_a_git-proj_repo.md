@@ -23,6 +23,25 @@
         if ls ~/.gitignore; then more ~/.gitignore; fi
         tree -aF $PWD
 
+        /home/bruce/test/tmp
+        ├── bob/
+        │   └── ver/
+        │       └── proj/
+        ├── mounted-drive/
+        │   └── repo/
+        │       ├── hello-world.git/
+        │       └── hello-world.raw/
+        └── project/
+            └── hello-world/
+                ├── doc/
+                ├── foo.txt
+                ├── .git/
+                ├── .gitignore
+                ├── .gitproj
+                ├── .gitproj.bak
+                ├── raw/
+                └── src/
+
 - Run \`git proj init\`
 
         # You are in directory: tmp/project/hello-world
@@ -308,3 +327,7 @@ Hey! **The above document had some coding errors, which are explained below:**
 - Around line 16:
 
     &#x3d;over without closing =back
+
+- Around line 31:
+
+    Non-ASCII character seen before =encoding in '├──'. Assuming UTF-8

@@ -15,7 +15,7 @@ export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
 fComGitProjInternalDoc()
 {
     return
-    # This should be the first =internal-pod
+    # This should be the first "internal-pod"
     cat <<\EOF >/dev/null
 =internal-pod
 
@@ -564,7 +564,7 @@ fComPreProjSetGlobals()
     fi
 
     gpLocalRawDir=$gpLocalTopDir/raw
-    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #20g
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") #2g
 
     gpAutoMove="true"
     gpGitFlow="false"

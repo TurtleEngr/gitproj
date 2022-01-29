@@ -108,7 +108,7 @@ keep the existing config file (see man dpkg --force-confdef,
         proj-name = TBD         # set by init and clone
         remote-status=TBD       # set by remote and clone
         remote-raw-origin=TBD   # set by remote and clone
-        remote-min-space = 20g  # set by remote and clone
+        remote-min-space = 2g   # set by remote and clone
         verbose = 2
     [gitproj "hook"]
         verbose = true
@@ -315,7 +315,7 @@ This is set by git proj remote and git proj clone to the remote
 raw location. It is set in PROJ/.git/config. If should always be "TBD"
 in ~/.gitconfig and PROJ/.gitproj.
 
-## gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (20g)
+## gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (2g)
 
 This is the minium space that should be available on the external
 drive.  The git proj remote command will not continue if there is
@@ -370,7 +370,7 @@ If true, don't allow trailing spaces in text files.
 
 See rm-trailing-sp to fix.
 
-## gpAllowTabs; -NA; gitproj.hook.check-for-tabs; (false)
+## gpCheckForTabs; -NA; gitproj.hook.check-for-tabs; (false)
 
 If true, don't allow tabs for files with the extentions found in:
 gitproj.hook.tabs-ext-list

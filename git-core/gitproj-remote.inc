@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------
-export cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cRemoteProjFile cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
     gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMaxLoop gpMountDir \
@@ -50,6 +50,7 @@ fRemoteCheckDir()
 {
     local pDir=$1
     local tSrc=${BASH_SOURCE##*/}
+    local tRemoteGitProj
 
     if [ ! -d $pDir ]; then
         fError -n -m "Could not find: $pDir" -l $tSrc:$LINENO
@@ -72,7 +73,8 @@ fRemoteCheckDir()
     fi
 
     if [ -e $pDir/$gpProjName.raw ]; then
-        fError -n -m "$pDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
+        tRemoteGitProj=$(cat $pDir/$gpProjName.raw/$cRemoteProjFile)
+        fError -n -m "$pDir/$gpProjName.raw already exists, and belongs to remote: $tRemoteGitProj" -l $tSrc:$LINENO
         return 1
     fi
 
@@ -278,7 +280,7 @@ fRemoteGetRemoteRawDir()
 
     # gpMountDir has already been validated
     # gpProjName has already been validated
-    # $gpMountDir/$gpProjName.raw should have be verified to not exist
+    # $gpMountDir/$gpProjName.raw should have been verified to not exist
 
     gResponse=$gpMountDir/$gpProjName.raw
     if [ -e $gResponse ]; then
@@ -324,6 +326,11 @@ fRemoteMkRemote()
         fLog -p warning -m "Was there a problem with rsync?" -l $tSrc:$LINENO
     fi
 
+    # TODO test this
+    # Special file used to verify the remote raw/ belongs with this git
+    echo "$($cGetOrigin)" >$gpLocalTopDir/raw/$cRemoteProjFile
+    cp $gpLocalTopDir/raw/$cRemoteProjFile $gpRemoteRawOrigin/$cRemoteProjFile
+
     fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
@@ -338,6 +345,9 @@ fRemoteReport()
     local tGitOrigin
     local tRawOrigin
     local tProjName
+    local tRemoteGitProj
+    local tGitOrigin=$($cGetOrigin)
+    local tErr=0
 
     # Double check the settings
 
@@ -346,33 +356,51 @@ fRemoteReport()
     cd $gpLocalTopDir >/dev/null 2>&1
     tGitOrigin=$($cGetOrigin)
     if [ -z "$tGitOrigin" ]; then
+	tErr=1
         fError -i -n -m "Git origin is not set." -l $tSrc:$LINENO
     fi
 
     tProjName=${tGitOrigin##*/}
     tProjName=${tProjName%.git}
     if [ "$tProjName" != "$gpProjName" ]; then
+	tErr=1
         fError -i -n -m "Origin name ($tProjName) does not match project name ($gpProjName)." -l $tSrc:$LINENO
     fi
 
     tRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "TBD")
     if [ "$tRawOrigin" = "TBD" ]; then
+	tErr=1
         fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
     if [ -z "$gpRemoteRawOrigin" ]; then
+	tErr=1
         fError -i -n -m "gitproj.config.remote-raw-origin is not defined." -l $tSrc:$LINENO
     fi
     if [ ! -d $gpRemoteRawOrigin ]; then
+	tErr=1
         fError -i -n -m "$gpRemoteRawOrigin does not exist." -l $tSrc:$LINENO
     fi
     if [ "${gpRemoteRawOrigin##*/}" != "$gpProjName.raw" ]; then
+	tErr=1
         fError -i -n -m "$gpRemoteRawOrigin does not match $gpProjName.raw" -l $tSrc:$LINENO
     fi
     if [ "$tRawOrigin" != "$gpRemoteRawOrigin" ]; then
+	tErr=1
         fError -i -n -m "$tRawOrigin != $gpRemoteRawOrigin" -l $tSrc:$LINENO
     fi
 
-    if [ $gErr -ne 0 ]; then
+    if [ ! -f $gpRemoteRawOrigin/$cRemoteProjFile ]; then
+	tErr=1
+        fError -i -n -m "Missing: $gpRemoteRawOrigin/$cRemoteProjFile" -l $tSrc:$LINENO
+    else
+        tRemoteGitProj=$(cat $gpRemoteRawOrigin/$cRemoteProjFile)
+    	if [ "$tRemoteGitProj" != "$tGitOrigin" ]; then
+	    tErr=1
+            fError -i -n -m "$tRemoteGitProj != $tGitOrigin" -l $tSrc:$LINENO
+    	fi
+    fi
+
+    if [ $tErr -ne 0 ]; then
         fError -i -m "The above errors need to be fixed." -l $tSrc:$LINENO
     fi
 

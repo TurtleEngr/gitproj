@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------
-export cGetOrigin cGetTopDir cTop
+export cGetOrigin cGetTopDir cRemoteProjFile cTop
 
 export gpAuto gpAutoMove gpBin gpCheckFileNames \
     gpCheckForBigFiles gpCmdName gpDebug gpDoc gpFacility gpGitFlow \
@@ -36,11 +36,17 @@ EOF
 # --------------------
 fCloneValidRemoteDir()
 {
+    # Input: possible gpRemoteGitDir
+    # If all valid, sets: gpRemoteGitDir, gpRemoteRawOrigin, gpProjName
+    local pRemoteGitDir="$1"
     local tSrc=${BASH_SOURCE##*/}
     local tAvail
     local tGitSize
     local tRawSize
     local tDesiredSize
+    local tSize
+    local tRemoteRawOrigin
+    local tProjName
 
     if ! fComMustNotBeInGit $PWD; then
         return 1
@@ -50,27 +56,70 @@ fCloneValidRemoteDir()
         fError -m "Current dir is not writable" -l $tSrc:$LINENO
     fi
 
-    if [ ! -d $gpRemoteGitDir ]; then
-        fError -m "$gpRemoteGitDir does not exist." -l $tSrc:$LINENO
+    if [ ! -d $pRemoteGitDir ]; then
+        fError -m "$pRemoteGitDir does not exist." -l $tSrc:$LINENO
     fi
 
-    if [ ! -d $gpRemoteRawOrigin ]; then
-        fError -m "$gpRemoteRawOrigin does not exist." -l $tSrc:$LINENO
+    if [ ! -d $pRemoteGitDir/objects ]; then
+        fError -m "$pRemoteGitDir is not a git repo." -l $tSrc:$LINENO
     fi
 
-    if ! fComAllMustBeReadable $gpRemoteGitDir; then
+    if [ "${pRemoteGitDir%.git}" = "$pRemoteGitDir" ]; then
+        fError -m "$pRemoteGitDir does not have '.git' at end." -l $tSrc:$LINENO
+    fi
+
+    if ! fComAllMustBeReadable $pRemoteGitDir; then
         exit 1
     fi
-    if ! fComAllMustBeReadable $gpRemoteRawOrigin; then
+    # Probably valid
+    gpRemoteGitDir=$pRemoteGitDir
+
+    # Make it an absolute path, relative paths are messy
+    cd $gpRemoteGitDir >/dev/null 2>&2
+    gpRemoteGitDir=$PWD
+    cd - >/dev/null 2>&2
+
+    tRemoteRawOrigin=${pRemoteGitDir%.git}.raw
+    if [ ! -d $tRemoteRawOrigin ]; then
+        fError -m "$tRemoteRawOrigin does not exist." -l $tSrc:$LINENO
+    fi
+
+    # TODO test this
+    # Verify the remote raw belongs to the remote git
+    if [ ! -r $tRemoteRawOrigin/$cRemoteProjFile ]; then
+        fError -m "Missing $tRemoteRawOrigin/$cRemoteProjFile" -l $tSrc:$LINENO
+    fi
+    tRemoteGitProj=$(cat $tRemoteRawOrigin/$cRemoteProjFile)
+    tRemoteGitProj=${tRemoteGitProj##*/}
+    tLocalGitProj=${gpRemoteGitDir##*/}
+    if [ "$tRemoteGitProj" != "$tLocalGitProj" ]; then
+        fError -m "Mismatch: $tRemoteRawOrigin belongs to $tRemoteGitProj not $tLocalGitProj See file: $cRemoteProjFile" -l $tSrc:$LINENO
+    fi
+
+    if ! fComAllMustBeReadable $tRemoteRawOrigin; then
         exit 1
     fi
 
-    if [ -e $gpProjName ]; then
-        fError -m "A $gpProjName already exists in this dir." -l $tSrc:$LINENO
+    # Probably valid
+    gpRemoteRawOrigin=$tRemoteRawOrigin
+
+    tProjName=${gpRemoteGitDir##*/}
+    tProjName=${tProjName%.git}
+    if [ -e $tProjName ]; then
+        fError -m "A $tProjName already exists in this dir." -l $tSrc:$LINENO
     fi
 
-    # Is there enough room in current dir for the clone? (s/b 2x size
-    # of remote git and raw)
+    # TODO test this
+    if [ "${tLocalGitProj%.git}" != "$tProjName" ]; then
+        fError -m "$tProjName does not match expected ${tLocalGitProj%.git}" -l $tSrc:$LINENO
+    fi
+
+    # Probably valid
+    gpProjName=$tProjName
+
+    # Is there enough room in current dir for the clone?
+    # s/b 2x size of remote git and raw, or remote-min-size, which
+    #  ever is larger.
 
     tAvail=$(df -BM $PWD --output=avail | tail -n1)
     tAvail=${tAvail%M}
@@ -81,10 +130,18 @@ fCloneValidRemoteDir()
     tRawSize=$(du -sm $gpRemoteRawOrigin | awk '{print $1}')
     let tRawSize*=2
 
+    gpRemoteMinSpace=$(fComGetConfig -i -k "gitproj.config.remote-min-space" -d "2147483648") # 2g
+    let tSize=gpRemoteMinSpace/1024/1024
     let tDesiredSize=tGitSize+tRawSize
+    if [ $tSize -gt $tDesiredSize ]; then
+        if [ $tAvail -lt $tSize ]; then
+	   # TODO test this
+           fLog -f -p warning -m "The current directory should have ${tSize}MB available. Found: ${tAvail}MB" -l $tSrc:$LINENO
+	fi
+    fi
 
     if [ $tAvail -lt $tDesiredSize ]; then
-        fError -m "There is not enough space in current directory. Project '$gpProjName' needs ${tDesiredSize}MB" -l $tSrc:$LINENO
+        fError -m "${tAvail}MB is not enough space in current directory. Project '$gpProjName' needs ${tDesiredSize}MB" -l $tSrc:$LINENO
     fi
 
     return 0
@@ -147,7 +204,6 @@ fCloneMkGitDir()
 {
     local tSrc=${BASH_SOURCE##*/}
     local tFound
-    local tSave=$gpVerbose
     local tBranch
 
     # Assumes you are cd'd to the dir you want to clone into.
@@ -307,11 +363,12 @@ fCloneFromRemoteDir()
     # Called by "git-proj-clone"
     # Minimum settings:
     # All the common vars set by gitproj-com.inc fComSetGlobals()
-    # Required: gpRemoteGitDir, gpRemoteRawOrigin, gpProjName
+    # Required: $1 <- gpRemoteGitDir
     # gpYesNo, if gpAuto=1
+    local pRemoteGitDir="$1"
     local tSrc=${BASH_SOURCE##*/}
 
-    fCloneValidRemoteDir
+    fCloneValidRemoteDir "$pRemoteGitDir"
     fCloneGettingStarted
 
     echo

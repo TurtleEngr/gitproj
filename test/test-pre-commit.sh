@@ -338,7 +338,7 @@ testCheckBigFiles()
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
 
     tResult=$(git commit -m "Testing" 2>&1)
-    assertFalse $LINENO $?
+    assertFalse "$LINENO $tResult" $?
     assertContains "$LINENO" "$tResult" "edit/test-MOV001.MP3 size 15360 > 10240"
     assertContains "$LINENO" "$tResult" "src/final/test-MOV001.mp4 size 20480 > 10240"
     assertContains "$LINENO" "$tResult" "test-george.mp4 size 1048576 > 10240"
