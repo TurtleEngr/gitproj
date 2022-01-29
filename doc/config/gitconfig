@@ -57,6 +57,6 @@
         check-file-names = true
         check-in-raw = true
         check-whitespace = true
-        allow-tabs = false
+        check-for-tabs = false
         check-for-big-files = true
         binary-file-size = 10k
