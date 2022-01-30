@@ -27,7 +27,7 @@ I recommend you start with:
 [git-prog](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/git-proj.md)
 
 Then the
-[Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/tutorial/config.podcreate_a_git-proj_repo.md)
+[Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/tutorial/create_a_git-proj_repo.md)
 tutorial shows the git-proj commands in action.
 
 # Installing
