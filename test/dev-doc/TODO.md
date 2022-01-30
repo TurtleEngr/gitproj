@@ -19,6 +19,25 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
+* Why was git-flow pkg not found by init? Line: 264
+
+* ../.. is still showing up
+
+* git-prog typo in readme
+
+* tutorial
+	fix headings, not bullets
+	fix POD error
+	C<cmd> cannot be used in <pre> areas
+
+* Show the git-proj in action:
+     scenarios
+     why would you want this
+     what does it solve
+
+* Run spell check on all the docs.
+
+
 * Add check: on creation of remote raw, create a file with the git
 origin in it. On clone, push, pull, the actual origin can be compared
 to the origin in the remote raw file. Problem: the git origin can be
