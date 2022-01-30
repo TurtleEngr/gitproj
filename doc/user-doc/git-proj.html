@@ -93,7 +93,7 @@
         git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
         pSubCmd: init, remote, clone, push, pull, status
-        pSubCmdOpt: Just run: "git proj [pSubCmd]"
+        pSubCmdOpt: Just run: "git proj [pSubCmd] -H usage"
         [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]</code></pre>
   <h1 id="DESCRIPTION">DESCRIPTION</h1>
   <p>The "git proj" subcommand supports using git repo for versioning files
@@ -135,11 +135,11 @@
     <dt id="status---Show-the-staus-of-raw-files-and-git"><b>status</b> -
     Show the staus of "raw" files, and git</dt>
     <dd></dd>
-    <dt id="add---Add-a-large-binary-file-to-the-raw-remote"><b>add</b> - Add
-    a large binary file to the "raw" remote</dt>
+    <dt id="add---TBD-Add-a-large-binary-file-to-the-raw-remote"><b>add</b> -
+    TBD Add a large binary file to the "raw" remote</dt>
     <dd></dd>
-    <dt id="config---Redefine-config-values"><b>config</b> - Redefine config
-    values</dt>
+    <dt id="config---TBD-Redefine-config-values"><b>config</b> - TBD Redefine
+    config values</dt>
     <dd></dd>
   </dl>
   <h2 id="pSubCmdOpt">pSubCmdOpt</h2>
@@ -631,14 +631,16 @@
   <dl>
     <dt id="g-pGitOpt"><b>-g "pGitOpt"</b></dt>
     <dd>
-      <p>Git status options. For example:</p>
+      <p>Git status options. For example to give a "short" status and show
+      ignored files, use::</p>
       <pre><code>    git proj status -g "-s --ignored"</code></pre>
     </dd>
     <dt id="r-pRawOpt"><b>-r "pRawOpt"</b></dt>
     <dd>
-      <p>Raw options. Currently these will be options passed to the diff
+      <p>Raw options. Currently these options will be passed to the diff
       command. (This will be added after the default options: -qr) For
-      example:</p>
+      example to show the files that are the same between local and
+      remote:</p>
       <pre><code>    git proj status -r "-s"</code></pre>
     </dd>
     <dt id="common-options6"><b>[common-options]</b></dt>

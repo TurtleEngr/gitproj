@@ -77,7 +77,7 @@ files, and repositiories on external drives.
         git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
         pSubCmd: init, remote, clone, push, pull, status
-        pSubCmdOpt: Just run: "git proj [pSubCmd]"
+        pSubCmdOpt: Just run: "git proj [pSubCmd] -H usage"
         [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
 
 =head1 DESCRIPTION
@@ -121,9 +121,9 @@ no need to save every rendered version.
 
 =item B<status> - Show the staus of "raw" files, and git
 
-=item B<add> - Add a large binary file to the "raw" remote
+=item B<add> - TBD Add a large binary file to the "raw" remote
 
-=item B<config> - Redefine config values
+=item B<config> - TBD Redefine config values
 
 =back
 

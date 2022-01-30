@@ -20,7 +20,7 @@ fInitGettingStarted()
     cat <<EOF | fComFmt
 
 Be sure you are "cd" to the "top" project directory,then use "-l
-$PWD".  The directory name will be used for the git repo name. The
+\$PWD".  The directory name will be used for the git repo name. The
 project directory should not already be a git repo, and it cannot
 contain any git repos under it.  Also, all of the directories and
 files need to be readable by your user (git proj init will verify

@@ -246,25 +246,10 @@ You now have a local git repository project (${gpProjName}) setup at
 ${gpLocalTopDir} with support for managing large binary files (larger
 than $gpMaxSize).
 
-~/.gitconfig will include the ~/.gitproj.config.global file, which
-will be used for defaults when you create other "git proj" projects on
-your system.  The global variables can be overridden by a project's
-config definitions. See: Project/.gitproj.config.locall and
-Project/.gitproj.config.\$HOSTNAME You should version these files with
-your project.
-
-When you "clone" your git project on another system, a new
-Project/.gitproj.config.\$HOSTNAME file will be created, so that
-differences between systems are saved. For example, mount points and
-filesystem differences will be saved.
-
-For a more complete overview type: "git proj -h" or "man
-git-proj"
-
-For a quick list of the git proj subcommands just type: "git proj"
-
-All subcommands will output help text with the -h option. For example:
-"git proj SubCmd -h
+~/.gitconfig the '[gitproj "config"]' and '[gitproj "hooks"]'
+sections, which will defined the inititial gitproj variables for new
+projects.  The global variables can be overridden by a project's local
+config definitions (in .git/config).
 
 EOF
     return 0

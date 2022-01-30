@@ -331,7 +331,7 @@ fRemoteMkRemote()
     echo "$($cGetOrigin)" >$gpLocalTopDir/raw/$cRemoteProjFile
     cp $gpLocalTopDir/raw/$cRemoteProjFile $gpRemoteRawOrigin/$cRemoteProjFile
 
-    fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
+    fComSetConfig -L -k "gitproj.config.remote-raw-origin" -v "TBD"
     fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.local-host" -v "$HOSTNAME"
 
@@ -407,7 +407,7 @@ fRemoteReport()
     # All looks OK, so set remote-status to "defined"
     gpRemoteStatus="defined"
     fComSetConfig -l -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
-    fComSetConfig -L -k "gitproj.config.remote-status" -v "$gpRemoteStatus"
+    fComSetConfig -L -k "gitproj.config.remote-status" -v "TBD"
 
     return 0
 } # fRemoteReport

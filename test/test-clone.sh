@@ -629,7 +629,7 @@ testCloneFromRemoteDir()
 
     tResult=$(fCloneFromRemoteDir $tRemoteGitDir 2>&1)
     assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
+    assertContains "$LINENO $tResult" "$tResult" "You now have a local git repository project"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0
@@ -654,7 +654,7 @@ testGetProjCloneCLI()
     cd $cDatHome3/project >/dev/null 2>&1
     tResult=$($gpBin/git-proj-clone -a -V 1 -d $tRemoteGitDir -y 2>&1)
     assertTrue $LINENO $?
-    assertContains "$LINENO $tResult" "$tResult" "All subcommands will output"
+    assertContains "$LINENO $tResult" "$tResult" "You now have a local git repository project"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"
 
     return 0

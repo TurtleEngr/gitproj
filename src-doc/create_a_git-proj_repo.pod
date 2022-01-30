@@ -11,87 +11,160 @@
 
     sudo apt-get install ./$tPkg
 
-=head1 Runnig git proj commands
+git proj is now ready.
 
-=over 4
+=head1 Get some quick usage help
 
-=item * Set up a project directory with some dummy files
+Run:
+
+    git proj
+
+Output:
+
+    Version: 0.5.1
+    Usage:
+                git proj [-v] [-V] [--version] [-h] [-H pStyle]
+
+                git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
+
+                pSubCmd: init, remote, clone, push, pull, status
+                pSubCmdOpt: Just run: "git proj [pSubCmd] -H usage"
+                [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
+
+For even more usage help see the Documentation section at the end.
+
+=item Create a "test" project
+
+Set up a project directory with some dummy files:
 
     mkdir -p tmp/project/hello-world
     cd tmp/project/hello-world
     mkdir src doc
     touch src/prog1.sh doc/prog1.txt
 
-    # Look at these files:
-    if ls ~/.gitconfig; then more ~/.gitconfig; fi
-    if ls ~/.gitignore; then more ~/.gitignore; fi
-    tree -aF $PWD
+=head1 Create the "local" git project repo
 
-    /home/bruce/test/tmp
-    ├── bob/
-    │   └── ver/
-    │       └── proj/
-    ├── mounted-drive/
-    │   └── repo/
-    │       ├── hello-world.git/
-    │       └── hello-world.raw/
-    └── project/
-        └── hello-world/
-            ├── doc/
-            ├── foo.txt
-            ├── .git/
-            ├── .gitignore
-            ├── .gitproj
-            ├── .gitproj.bak
-            ├── raw/
-            └── src/
+Run `git proj init` in the "top" project directory:
 
-=item * Run `git proj init`
-
-    # You are in directory: tmp/project/hello-world
-
+    cd tmp/project/hello-world
     git proj init -l $PWD
 
-    # Look at these files:
-    ls ~/.gitconfig ~/.gitconfig.bak ~/.gitignore
-    more~/.gitconfig
-    tree -aF $PWD
+Answer the 5 questions. There is quite a lot of output.  This is only
+some of the output:
 
-If you didn't have a ~/.gitconfig file, you should edit it an update your
-user name and email.
+    Be sure you are "cd" to the "top" project directory,then use "-l $PWD.
+    The directory name will be used for the git repo name.
+    ...
+    Continue [y/n]? y
+    ...
+    Project Path: -l /home/bruce/test/tmp/project/hello-world
+    Project Name: [hello-world] Continue [y/n]? y
+    ...
+    Define the size for large binary files. Format: Nb, Nk, Nm, or Ng
+    Press enter to accept the value shown, or type a new value.  (^c to
+    quit this program.)
 
-If you have a ~/.gitconfig file, it was backed up to ~/.gitconfig.bak
+    Size (-s) [10k]?
+    ...
+    Summary
+    ...
+    Continue with creating a local git repo [y/n]? y
+    ...
+    Now would be a good time to setup an external drive for archiving
+    your project: "git proj remote -d pMountPath"
 
-In ~/.gitconfig the important sections are
+But first take a look at some of the files created or modified.
 
-    `[gitflow "branch"]`
-    `[gitflow "prefix"]`
-    `[gitproj "config"]`
-    `[gitproj "hook"]``
+* If you did not have a `~/.gitconfig` file, one was created for you.
 
-In the hello-world dir you have some new dirs and files. These are the
-interesting ones
+* You should edit `~/.gitconfig` and update your user name and email
+(these are required by git).
+
+* If you did have a `~/.gitconfig` file, it was backed up to
+`~/.gitconfig.bak`, and the sections were added for `gittflow` and
+`gitproj`.
+
+This if the project's directory tree now:
+
+    cd tmp/project
+    tree -aF hello-world/
 
     hello-world/
-	.gitproj
-	.gitignore
-	raw/
-	    README.txt
-        .git/
-	    config
-	    hooks/
-	        pre-commit
+    ├── doc/
+    │   └── prog1.txt
+    ├── .git/
+    │   ├── branches/
+    │   ├── COMMIT_EDITMSG
+    │   ├── config
+    │   ├── config.bak
+    │   ├── description
+    │   ├── HEAD
+    │   ├── hooks/
+    │   │   ├── applypatch-msg.sample*
+    ...
+    │   │   ├── pre-commit*
+    ...
+    │   │   └── update.sample*
+    │   ├── index
+    │   ├── info/
+    │   │   └── exclude
+    │   ├── logs/
+    │   │   ├── HEAD
+    │   │   └── refs/
+    │   │       └── heads/
+    │   │           ├── develop
+    │   │           └── main
+    │   ├── objects/
+    │   │   ├── 16/
+    │   │   │   └── 0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
+    ...
+    │   │   │   └── 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+    │   │   ├── info/
+    │   │   └── pack/
+    │   └── refs/
+    │       ├── heads/
+    │       │   ├── develop
+    │       │   └── main
+    │       └── tags/
+    ├── .gitignore
+    ├── .gitproj
+    ├── .gitproj.bak
+    ├── raw/
+    │   └── README.txt
+    └── src/
+        └── prog1.sh
 
-If you look in .gitproj it will have a copy of gitflow and getproj
-sections from ~/.gitconfig
+In the hello-world dir you have some new dirs and files. These are the
+interesting ones:
+
+    hello-world/
+    ├── .gitignore
+    ├── .gitproj
+    ├── .git/
+    │   ├── config
+    │   ├── hooks/
+    │   │   ├── pre-commit*
+    ├── raw/
+    │   └── README.txt
+
+If you look in `.gitproj` it will have a copy of the gitflow and getproj
+sections from `~/.gitconfig`. (This file is versioned in git, because
+when the this git repo is "cloned" this file will be used to create the
+getproj sections in the local `.git/config` file.)
 
 The raw/ directory is where you will put large binary files. If
 hello-world already had some large binary files then, before the git
 repo is created, those files would have been moved into raw/ and
-symlinks created to point to the files.
+symlinks created to point to the files. (The symlinks are versioned.)
 
-=item * Try some git commands
+Between `~/.gitignore` and `.git/hooks/pre-commit`, you will be
+prevented`q from saving large binary files in the git repo.
 
+=item Try out some git commands
+
+Now try out some git command in the project directory:
+
+    cd tmp/project/hello-world
     git status
     git log
     touch foo.txt
@@ -99,31 +172,48 @@ symlinks created to point to the files.
     git ci -am "Added foo.txt"
     git status -s --ignored
 
-=item * Try `git proj status`
+=item Try: `git proj status`
+
+`git proj status` will give you information about differences between
+your local raw/ directory and the remote raw/ directory.
 
     git proj stats
 
-This outputs an error and the short usage help. All error and other
-log messages have these parts:
+This outputs an error and the short usage help.
 
- `Cmd that ran:` git-proj-status
-    `Log level:` crit: Error:
-      `Message:` Unexpected: gitproj.config.remote-raw-origin
-               should not be set to: TBD
-     `Location:` [gitproj-com.inc:1545](1)
+     git-proj-status crit: Error: Unexpected:
+         gitproj.config.remote-raw-origin should not be set to: TBD
+         [gitproj-com.inc:1548](1)
+     ========================================
+     Usage:
+         git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]
 
-This is telling us a remote raw origin has not be defined. So let's
-define one.
+This is telling us a remote raw origin has not be defined. We'll do
+this in the next step. But first, this is a typical error log message.
+All error and other log messages have these parts:
 
-=item * First we need to create a directory for the remote. We could mount
-an external disk and create the directory there. But for this tutorial
-we will create it under the tmp directory.
+    `Cmd that ran:` git-proj-status
+       `Log level:` crit:
+         `Message:` Error: Unexpected: gitproj.config.remote-raw-origin
+                    should not be set to: TBD
+        `Location:` [gitproj-com.inc:1545](1)
+
+You can control the amount of output with config `verbose` variable
+or with the command line.
+
+=head1 Creating a remote directory location for files in raw/
+
+First we need to create a directory for the remote. We could mount an
+external disk and create the directory there. But for this tutorial we
+will create it under the `tmp` directory.
 
     cd tmp/project/hello-world
     cd ../..
     mkdir -p mounted-drive/repo
 
-=item * Now we can run `git proj remote`
+=head1 Creating a remote for files in raw/
+
+Now we can run `git proj remote`
 
     cd tmp/project/hello-world
     git proj remote -d ../../mounted-drive/repo
@@ -134,8 +224,8 @@ we will create it under the tmp directory.
 
     Use: ../../mounted-drive/repo [y/n]? y
 
-And a lot more output. A lot of it would be suppressed if the -q
-option is added.
+And there is a lot more output. A lot of it can be suppressed with
+the `-q` option.
 
 Scroll back and you can see what was done. Here are the important parts:
 
@@ -156,7 +246,7 @@ Scroll back and you can see what was done. Here are the important parts:
     git remote origin is now: ../../mounted-drive/repo/hello-world.git
     raw remote origin is now: ../../mounted-drive/repo/hello-world.raw
 
-=item * Now let's try `git proj status` again
+=head1 Running `git proj status` again
 
     git proj status
 
@@ -170,9 +260,11 @@ You should see:
     REMOTE/ = ../../mounted-drive/repo/hello-world.raw/
     No differences.
 
-=item * Let's put a file in raw/. It doesn't have to be a binary file and it
+=head1 Using the raw/ directory
+
+Let's put a file in raw/. It doesn't have to be a binary file and it
 can be any size. Mainly the raw/ area is just "synced" to the
-remote-raw-origin dir.
+`gitproj.config.remote-raw-origin dir`
 
     cd tmp/project/hello-world
     echo "New file for raw" >raw/testing-raw
@@ -186,18 +278,24 @@ Now you should see:
     Only in raw/: another-file.txt
     Only in raw/: testing-raw
 
-=item * To "save" the raw/ files to remote-raw we run `git proj push`
+=head1 Pushing files to remote raw
+
+To "save" the raw/ files to remote-raw we run `git proj push` (there
+no "commit" for files in raw/ because they are not versioned--existing
+files will be override.)
 
     git proj push
 
-Now you'll see a diff summary and a "rsync" dry run, showing what
+Now you'll see a "diff summary" and a "rsync dry run", showing what
 would be done. And the question:
 
     Are the above differences OK [y/n]?
 
 If it looks OK, type 'y'
 
-=item * New let's change a file in raw/ and remove a file, then push.
+=head1 Changing files in local raw/
+
+Now let's change a file in raw/ and remove a file, then push.
 
     rm raw/testing-raw
     echo "Add a line" >>raw/another-file.txt
@@ -215,6 +313,8 @@ Enter 'y' to the question and do another status
 
     git proj status
 
+Output:
+
     REMOTE/ = ../../mounted-drive/repo/hello-world.raw/
     Only in REMOTE/: testing-raw
 
@@ -222,7 +322,7 @@ Huh? But we deleted raw/testing-raw. Let's check help for proj push.
 
     git proj push -h
 
-Oh we need the '-d' option to allow deletes.
+Oh, we need the '-d' option to allow deletes.
 
     git proj push -d
 
@@ -234,19 +334,23 @@ Now we see:
     No differences.
 
 When you look at the proj push help, you might have noticed this
-command can also run "git push origin develop" if you also give the
-'-g' option.
+command can also run `git push origin develop` if you also give the
+`-g` option.
 
-=item * What about pull? If raw files in the remote are changed, added, or
-deleted, then we could do a pull. Since we have access to the remote-raw
-dir we an make a manual change.
+=head1 What about pulling from remote raw? First make some changes
+
+If raw files in the remote are changed, added, or deleted, then we
+could do a `git remote pull`. Since we have direct access to the
+remote-raw dir we an make a manual change.
 
     cd ../../mounted-drive/repo/hello-world.raw/
     echo "Simulate a change" >extra-file.txt
     echo "Add another line" >>another-file.txt
     rm README.txt
 
-=item * Now for the pull. It also has a '-d' option.
+=head1 Pulling from remote raw
+
+`git proj` pull also has a '-d' option.
 
     cd tmp/project/hello-world
     git proj pull -d
@@ -267,62 +371,143 @@ Type 'y' and do another status:
     REMOTE/ = ../../mounted-drive/repo/hello-world.raw/
     No differences.
 
-=item * That was a simulation of a remote-raw change. How about a
-typical scenario? The disk was unmounted, moved to another computer.
-For other computer to access remote with git and git-proj commands,
-`git proj clone` will need to be run to setup the git workspace.
+=head1 Other computers have changed the remote raw files
 
-=item * We'll simulate this some by cloning into another place under the tmp
-dir. We'll create a place where bob puts his project files.
+That was a simulation of a remote-raw change. How about a typical
+scenario? The disk was unmounted, moved to another computer.  For the
+other computer to access remote with git and git-proj commands,
+S<`git proj clone` will need to be run to setup the git workspace.
+Then files can be pushed and pulled from the remote raw repo area.
+
+=head1 Set up for `git proj clone` simulation
+
+We'll simulate this by cloning into another directory under the tmp
+dir. We'll create a place where "Bob" puts his project files.
 
     cd tmp/project/hello-world
     cd ../..
     mkdir -p bob/ver/proj
 
-=item * Run `git proj clone`
+=head1 Run `git proj clone`
 
     cd bob/ver/proj
     git proj clone -h
 
     git proj clone -d ../../../mounted-drive/repo/hello-world.git
 
-You should see:
+You should see something like:
 
     Be sure you are "cd" to the directory that the project will be cloned to.
-    Clone git from: ../../../mounted-drive/repo/hello-world.git
+    Clone git from: tmp/mounted-drive/repo/hello-world.git
     Clone raw from: ../../../mounted-drive/repo/hello-world.raw
     Project Name:   hello-world
-    Project Dir:    /home/bruce/test/tmp/bob/ver/proj/hello-world
+    Project Dir:    tmp/bob/ver/proj/hello-world
 
     Continue [y/n]?
 
 Type 'y' and you'll see another block of text describing what has been
 done so far.
 
- git-proj-clone err: Error: You must be in a git workspace for this command. [gitproj-com.inc:1800](1)
- git-proj-clone err: Error: You must be in a git workspace for this command. [gitproj-com.inc:1800](1)
+    ...
+    Summary
+    ...
+    Continue (commit the changes) [y/n]?
 
 You are being asked this question because some changes could have been
-made to the .gitproj file. If you say 'n' here then the remote git
-won't be changed.
+made to the .gitproj file that you may not want to save to the git
+repo.  If you say 'n' here then the remote git won't be changed. For
+this demo, type 'y'
 
-    Continue (commit the changes) [y/n]? y
+     tree -aF $PWD
 
-=item * Now you can do a `git proj status`
+     tmp/bob/ver/proj/hello-world
+     ├── doc/
+     │   └── prog1.txt
+     ├── foo.txt
+     ├── .git/
+     │   ├── branches/
+     │   ├── COMMIT_EDITMSG
+     │   ├── config
+     │   ├── config.bak
+     │   ├── description
+     │   ├── HEAD
+     │   ├── hooks/
+     │   │   ├── applypatch-msg.sample*
+     │   │   ├── commit-msg.sample*
+     │   │   ├── fsmonitor-watchman.sample*
+     │   │   ├── post-update.sample*
+     │   │   ├── pre-applypatch.sample*
+     │   │   ├── pre-commit*
+     │   │   ├── pre-commit.sample*
+     │   │   ├── prepare-commit-msg.sample*
+     │   │   ├── pre-push.sample*
+     │   │   ├── pre-rebase.sample*
+     │   │   ├── pre-receive.sample*
+     │   │   └── update.sample*
+     │   ├── index
+     │   ├── info/
+     │   │   └── exclude
+     │   ├── logs/
+     │   │   ├── HEAD
+     │   │   └── refs/
+     │   │       ├── heads/
+     │   │       │   ├── develop
+     │   │       │   └── main
+     │   │       └── remotes/
+     │   │           └── origin/
+     │   │               └── HEAD
+     │   ├── objects/
+     ...
+     │   │   ├── info/
+     │   │   └── pack/
+     │   ├── packed-refs
+     │   └── refs/
+     │       ├── heads/
+     │       │   ├── develop
+     │       │   └── main
+     │       ├── remotes/
+     │       │   └── origin/
+     │       │       └── HEAD
+     │       └── tags/
+     ├── .gitignore
+     ├── .gitproj
+     ├── raw/
+     │   ├── another-file.txt
+     │   ├── extra-file.txt
+     │   └── .remote.proj
+     └── src/
+         └── prog1.sh
 
-    cd hello-world
+=head1 Now try `git proj status` in bob's dir
+
+    tmp/bob/ver/proj/hello-world
     git proj status
 
- Defect:
- git-proj-status warning: ../../mounted-drive/repo/hello-world.raw was not found. Try again after mounting it or run 'git proj remote' to change the remote.raw.dir location. [gitproj-com.inc:1941]
+Output:
 
-  remote-raw-origin = ../../mounted-drive/repo/hello-world.raw
+    On branch develop
+    Your branch is up to date with 'origin/develop'.
 
- The path is wrong. It should be:
-     ../../../../mounted-drive/repo/hello-world.raw/
- or better, an absolute path!
-     /home/bruce/test/tmp/mounted-drive/repo/hello-world.raw
+    nothing to commit, working tree clean
 
-==back
+    REMOTE/ = /home/bruce/test/tmp/mounted-drive/repo/hello-world.raw/
+    No differences.
+
+
+=head1 Documentation
+
+Quick help:
+
+    $ git proj
+
+For more help, run:
+
+    $ man git-proj
+
+Or for help that lists all of the command with their help
+
+    $ git proj -h
+
+or
 
 =cut

@@ -10,7 +10,7 @@ files, and repositiories on external drives.
         git proj [pSubCmd] [pSubCmdOpt] [pComOpt]
 
         pSubCmd: init, remote, clone, push, pull, status
-        pSubCmdOpt: Just run: "git proj [pSubCmd]"
+        pSubCmdOpt: Just run: "git proj [pSubCmd] -H usage"
         [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
 
 # DESCRIPTION
@@ -46,8 +46,8 @@ no need to save every rendered version.
 - **push** - Push files to the "raw" remote (and optionally git)
 - **pull** - Pull files from the "raw" remote> (and optionally git)
 - **status** - Show the staus of "raw" files, and git
-- **add** - Add a large binary file to the "raw" remote
-- **config** - Redefine config values
+- **add** - TBD Add a large binary file to the "raw" remote
+- **config** - TBD Redefine config values
 
 ## pSubCmdOpt
 
@@ -703,15 +703,16 @@ GPLv3 Copyright 2021 by TurtleEngr
 
 - **-g "pGitOpt"**
 
-    Git status options. For example:
+    Git status options. For example to give a "short" status and show
+    ignored files, use::
 
         git proj status -g "-s --ignored"
 
 - **-r "pRawOpt"**
 
-    Raw options. Currently these will be options passed to the diff
+    Raw options. Currently these options will be passed to the diff
     command. (This will be added after the default options: -qr) For
-    example:
+    example to show the files that are the same between local and remote:
 
         git proj status -r "-s"
 

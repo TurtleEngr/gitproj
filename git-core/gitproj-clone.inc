@@ -101,7 +101,9 @@ fCloneValidRemoteDir()
     fi
 
     # Probably valid
-    gpRemoteRawOrigin=$tRemoteRawOrigin
+    cd $tRemoteRawOrigin >/dev/null 2>&1
+    gpRemoteRawOrigin=$PWD
+    cd - >/dev/null 2>&1
 
     tProjName=${gpRemoteGitDir##*/}
     tProjName=${tProjName%.git}
@@ -279,7 +281,7 @@ fCloneMkRawDir()
         fLog -f -p warning -m "$tCmd" -l $tSrc:$LINENO
     fi
 
-    cd $gpLocalTopDir/.. >/dev/null 2>&1
+    cd $gpLocalTopDir >/dev/null 2>&1
     fComSetConfig -l -k "gitproj.config.remote-raw-origin" -v "$gpRemoteRawOrigin"
     fComSetConfig -l -k "gitproj.config.remote-status" -v "defined"
 
@@ -373,7 +375,7 @@ fCloneFromRemoteDir()
 
     echo
     echo '================================================================='
-    exho
+    echo
     fCloneMkGitDir
     fCloneMkRawDir
 
