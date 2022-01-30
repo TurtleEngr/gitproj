@@ -75,14 +75,25 @@
 <pre><code>    mkdir -p tmp/project/hello-world
     cd tmp/project/hello-world
     mkdir src doc
-    touch src/prog1.sh doc/prog1.txt</code></pre>
+    touch src/prog1.sh doc/prog1.txt
+
+    cd ..
+    tree -aF hello-world</code></pre>
+
+<p>Output:</p>
+
+<pre><code>    hello-world/
+    &#x251C;&#x2500;&#x2500; doc/
+    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; prog1.txt
+    &#x2514;&#x2500;&#x2500; src/
+        &#x2514;&#x2500;&#x2500; prog1.sh</code></pre>
 
 </dd>
 </dl>
 
 <a href="#_podtop_"><h1 id="Create-the-local-git-project-repo">Create the &quot;local&quot; git project repo</h1></a>
 
-<p>Run `git proj init` in the &quot;top&quot; project directory:</p>
+<p>Run <code>git proj init</code> in the &quot;top&quot; project directory:</p>
 
 <pre><code>    cd tmp/project/hello-world
     git proj init -l $PWD</code></pre>
@@ -112,9 +123,9 @@
 
 <p>But first take a look at some of the files created or modified.</p>
 
-<p>* If you did not have a `~/.gitconfig` file, one was created for you.</p>
+<p>* If you did not have a <code>~/.gitconfig</code> file, one was created for you.</p>
 
-<p>* You should edit `~/.gitconfig` and update your user name and email (these are required by git).</p>
+<p>* You should edit <code>~/.gitconfig</code> and update your user name and email (these are required by git).</p>
 
 <p>* If you did have a `~/.gitconfig` file, it was backed up to `~/.gitconfig.bak`, and the sections were added for `gittflow` and `gitproj`.</p>
 
@@ -127,11 +138,9 @@
     &#x251C;&#x2500;&#x2500; doc/
     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; prog1.txt
     &#x251C;&#x2500;&#x2500; .git/
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; branches/
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; COMMIT_EDITMSG
+    ...
     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; config
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; config.bak
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; description
+    ...
     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; HEAD
     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; hooks/
     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; applypatch-msg.sample*
@@ -530,31 +539,31 @@
 <p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
 
 </dd>
-<dt id="Around-line-45">Around line 45:</dt>
-<dd>
-
-<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
-
-</dd>
-<dt id="Around-line-93">Around line 93:</dt>
+<dt id="Around-line-51">Around line 51:</dt>
 <dd>
 
 <p>Non-ASCII character seen before =encoding in &#39;&#x251C;&#x2500;&#x2500;&#39;. Assuming UTF-8</p>
 
 </dd>
-<dt id="Around-line-163">Around line 163:</dt>
-<dd>
-
-<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
-
-</dd>
-<dt id="Around-line-204">Around line 204:</dt>
+<dt id="Around-line-56">Around line 56:</dt>
 <dd>
 
 <p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
 
 </dd>
-<dt id="Around-line-376">Around line 376:</dt>
+<dt id="Around-line-172">Around line 172:</dt>
+<dd>
+
+<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
+
+</dd>
+<dt id="Around-line-213">Around line 213:</dt>
+<dd>
+
+<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
+
+</dd>
+<dt id="Around-line-385">Around line 385:</dt>
 <dd>
 
 <p>Unterminated S&lt;...&gt; sequence</p>

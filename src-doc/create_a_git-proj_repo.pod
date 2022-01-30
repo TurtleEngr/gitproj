@@ -42,9 +42,20 @@ Set up a project directory with some dummy files:
     mkdir src doc
     touch src/prog1.sh doc/prog1.txt
 
+    cd ..
+    tree -aF hello-world
+
+Output:
+
+    hello-world/
+    ├── doc/
+    │   └── prog1.txt
+    └── src/
+        └── prog1.sh
+
 =head1 Create the "local" git project repo
 
-Run `git proj init` in the "top" project directory:
+Run C<git proj init> in the "top" project directory:
 
     cd tmp/project/hello-world
     git proj init -l $PWD
@@ -75,9 +86,9 @@ some of the output:
 
 But first take a look at some of the files created or modified.
 
-* If you did not have a `~/.gitconfig` file, one was created for you.
+* If you did not have a C<~/.gitconfig> file, one was created for you.
 
-* You should edit `~/.gitconfig` and update your user name and email
+* You should edit C<~/.gitconfig> and update your user name and email
 (these are required by git).
 
 * If you did have a `~/.gitconfig` file, it was backed up to
@@ -93,11 +104,9 @@ This if the project's directory tree now:
     ├── doc/
     │   └── prog1.txt
     ├── .git/
-    │   ├── branches/
-    │   ├── COMMIT_EDITMSG
+    ...
     │   ├── config
-    │   ├── config.bak
-    │   ├── description
+    ...
     │   ├── HEAD
     │   ├── hooks/
     │   │   ├── applypatch-msg.sample*

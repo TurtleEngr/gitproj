@@ -40,9 +40,20 @@ For even more usage help see the Documentation section at the end.
         mkdir src doc
         touch src/prog1.sh doc/prog1.txt
 
+        cd ..
+        tree -aF hello-world
+
+    Output:
+
+        hello-world/
+        ├── doc/
+        │   └── prog1.txt
+        └── src/
+            └── prog1.sh
+
 # Create the "local" git project repo
 
-Run \`git proj init\` in the "top" project directory:
+Run `git proj init` in the "top" project directory:
 
     cd tmp/project/hello-world
     git proj init -l $PWD
@@ -73,9 +84,9 @@ some of the output:
 
 But first take a look at some of the files created or modified.
 
-\* If you did not have a \`~/.gitconfig\` file, one was created for you.
+\* If you did not have a `~/.gitconfig` file, one was created for you.
 
-\* You should edit \`~/.gitconfig\` and update your user name and email
+\* You should edit `~/.gitconfig` and update your user name and email
 (these are required by git).
 
 \* If you did have a \`~/.gitconfig\` file, it was backed up to
@@ -91,11 +102,9 @@ This if the project's directory tree now:
     ├── doc/
     │   └── prog1.txt
     ├── .git/
-    │   ├── branches/
-    │   ├── COMMIT_EDITMSG
+    ...
     │   ├── config
-    │   ├── config.bak
-    │   ├── description
+    ...
     │   ├── HEAD
     │   ├── hooks/
     │   │   ├── applypatch-msg.sample*
@@ -514,22 +523,22 @@ Hey! **The above document had some coding errors, which are explained below:**
 
     '=item' outside of any '=over'
 
-- Around line 45:
-
-    You forgot a '=back' before '=head1'
-
-- Around line 93:
+- Around line 51:
 
     Non-ASCII character seen before =encoding in '├──'. Assuming UTF-8
 
-- Around line 163:
-
-    '=item' outside of any '=over'
-
-- Around line 204:
+- Around line 56:
 
     You forgot a '=back' before '=head1'
 
-- Around line 376:
+- Around line 172:
+
+    '=item' outside of any '=over'
+
+- Around line 213:
+
+    You forgot a '=back' before '=head1'
+
+- Around line 385:
 
     Unterminated S<...> sequence
