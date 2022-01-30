@@ -90,8 +90,8 @@ But first take a look at some of the files created or modified.
 (these are required by git).
 
 \* If you did have a `~/.gitconfig` file, it was backed up to
-\`~/.gitconfig.bak\`, and the sections were added for `gittflow` and
-\`gitproj\`.
+`~/.gitconfig.bak`, and the sections were added for `gittflow` and
+`gitproj`.
 
 This if the project's directory tree now:
 
@@ -155,17 +155,17 @@ interesting ones:
     │   └── README.txt
 
 If you look in `.gitproj` it will have a copy of the gitflow and getproj
-sections from `` ~/.gitconfig`. (This file is versioned in git, because
+sections from `~/.gitconfig`. (This file is versioned in git, because
 when the this git repo is "cloned" this file will be used to create the
-getproj sections in the local `.git/config` file.) ``
+getproj sections in the local `.git/config` file.)
 
 The raw/ directory is where you will put large binary files. If
 hello-world already had some large binary files then, before the git
 repo is created, those files would have been moved into raw/ and
 symlinks created to point to the files. (The symlinks are versioned.)
 
-Between `~/.gitignore` and `` .git/hooks/pre-commit`, you will be
-prevented`q from saving large binary files in the git repo. ``
+Between `~/.gitignore` and `.git/hooks/pre-commit`, you will be
+prevented from saving large binary files in the git repo.
 
 - Try out some git commands
 
@@ -179,9 +179,9 @@ prevented`q from saving large binary files in the git repo. ``
         git ci -am "Added foo.txt"
         git status -s --ignored
 
-- Try: `` git proj status` ``
+- Try: `git proj status`
 
-    \`git proj status> will give you information about differences between
+    `git proj status` will give you information about differences between
     your local raw/ directory and the remote raw/ directory.
 
         git proj stats
@@ -220,7 +220,7 @@ will create it under the `tmp` directory.
 
 # Creating a remote for files in raw/
 
-Now we can run `` git proj remote` ``
+Now we can run `git proj remote`
 
     cd tmp/project/hello-world
     git proj remote -d ../../mounted-drive/repo
@@ -271,7 +271,7 @@ You should see:
 
 Let's put a file in raw/. It doesn't have to be a binary file and it
 can be any size. Mainly the raw/ area is just "synced" to the
-\`gitproj.config.remote-raw-origin dir\`
+`gitproj.config.remote-raw-origin dir`
 
     cd tmp/project/hello-world
     echo "New file for raw" >raw/testing-raw
@@ -342,13 +342,13 @@ Now we see:
 
 When you look at the proj push help, you might have noticed this
 command can also run `git push origin develop` if you also give the
-\`-g> option.
+`-g` option.
 
 # What about pulling from remote raw? First make some changes
 
 If raw files in the remote are changed, added, or deleted, then we
-could do a `` git remote pull`. Since we have direct access to the
-remote-raw dir we an make a manual change. ``
+could do a `git remote pull`. Since we have direct access to the
+remote-raw dir we an make a manual change.
 
     cd ../../mounted-drive/repo/hello-world.raw/
     echo "Simulate a change" >extra-file.txt
@@ -357,7 +357,7 @@ remote-raw dir we an make a manual change. ``
 
 # Pulling from remote raw
 
-\`git proj> pull also has a '-d' option.
+`git proj` pull also has a '-d' option.
 
     cd tmp/project/hello-world
     git proj pull -d
@@ -383,7 +383,7 @@ Type 'y' and do another status:
 That was a simulation of a remote-raw change. How about a typical
 scenario? The disk was unmounted, moved to another computer.  For the
 other computer to access remote with git and git-proj commands,
-\`git proj clone will need to be run to setup the git workspace.
+`git proj clone` will need to be run to setup the git workspace.
 Then files can be pushed and pulled from the remote raw repo area.
 
 # Set up for `git proj clone` simulation
@@ -395,7 +395,7 @@ dir. We'll create a place where "Bob" puts his project files.
     cd ../..
     mkdir -p bob/ver/proj
 
-# Run `` git proj clone` ``
+# Run `git proj clone`
 
     cd bob/ver/proj
     git proj clone -h
@@ -532,34 +532,10 @@ Hey! **The above document had some coding errors, which are explained below:**
 
     You forgot a '=back' before '=head1'
 
-- Around line 159:
-
-    Unterminated C<...> sequence
-
-- Around line 169:
-
-    Unterminated C<...> sequence
-
 - Around line 172:
 
     '=item' outside of any '=over'
 
-- Around line 184:
-
-    Unterminated C<...> sequence
-
 - Around line 213:
 
     You forgot a '=back' before '=head1'
-
-- Around line 225:
-
-    Unterminated C<...> sequence
-
-- Around line 351:
-
-    Unterminated C<...> sequence
-
-- Around line 400:
-
-    Unterminated C<...> sequence

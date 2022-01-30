@@ -26,7 +26,7 @@
   <li><a href="#Pulling-from-remote-raw">Pulling from remote raw</a></li>
   <li><a href="#Other-computers-have-changed-the-remote-raw-files">Other computers have changed the remote raw files</a></li>
   <li><a href="#Set-up-for-git-proj-clone-simulation">Set up for git proj clone simulation</a></li>
-  <li><a href="#Run-git-proj-clone">Run git proj clone`</a></li>
+  <li><a href="#Run-git-proj-clone">Run git proj clone</a></li>
   <li><a href="#Now-try-git-proj-status-in-bobs-dir">Now try git proj status in bob&#39;s dir</a></li>
   <li><a href="#Documentation">Documentation</a></li>
   <li><a href="#POD-ERRORS">POD ERRORS</a></li>
@@ -127,7 +127,7 @@
 
 <p>* You should edit <code>~/.gitconfig</code> and update your user name and email (these are required by git).</p>
 
-<p>* If you did have a <code>~/.gitconfig</code> file, it was backed up to `~/.gitconfig.bak`, and the sections were added for <code>gittflow</code> and `gitproj`.</p>
+<p>* If you did have a <code>~/.gitconfig</code> file, it was backed up to <code>~/.gitconfig.bak</code>, and the sections were added for <code>gittflow</code> and <code>gitproj</code>.</p>
 
 <p>This if the project&#39;s directory tree now:</p>
 
@@ -189,11 +189,11 @@
     &#x251C;&#x2500;&#x2500; raw/
     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; README.txt</code></pre>
 
-<p>If you look in <code>.gitproj</code> it will have a copy of the gitflow and getproj sections from <code>~/.gitconfig`. (This file is versioned in git, because when the this git repo is &quot;cloned&quot; this file will be used to create the getproj sections in the local <code>.git/config</code> file.)</code></p>
+<p>If you look in <code>.gitproj</code> it will have a copy of the gitflow and getproj sections from <code>~/.gitconfig</code>. (This file is versioned in git, because when the this git repo is &quot;cloned&quot; this file will be used to create the getproj sections in the local <code>.git/config</code> file.)</p>
 
 <p>The raw/ directory is where you will put large binary files. If hello-world already had some large binary files then, before the git repo is created, those files would have been moved into raw/ and symlinks created to point to the files. (The symlinks are versioned.)</p>
 
-<p>Between <code>~/.gitignore</code> and <code>.git/hooks/pre-commit`, you will be prevented`q from saving large binary files in the git repo.</code></p>
+<p>Between <code>~/.gitignore</code> and <code>.git/hooks/pre-commit</code>, you will be prevented from saving large binary files in the git repo.</p>
 
 <dl>
 
@@ -211,10 +211,10 @@
     git status -s --ignored</code></pre>
 
 </dd>
-<dt id="Try:-git-proj-status">Try: <code>git proj status`</code></dt>
+<dt id="Try:-git-proj-status">Try: <code>git proj status</code></dt>
 <dd>
 
-<p>`git proj status&gt; will give you information about differences between your local raw/ directory and the remote raw/ directory.</p>
+<p><code>git proj status</code> will give you information about differences between your local raw/ directory and the remote raw/ directory.</p>
 
 <pre><code>    git proj stats</code></pre>
 
@@ -250,7 +250,7 @@
 
 <a href="#_podtop_"><h1 id="Creating-a-remote-for-files-in-raw">Creating a remote for files in raw/</h1></a>
 
-<p>Now we can run <code>git proj remote`</code></p>
+<p>Now we can run <code>git proj remote</code></p>
 
 <pre><code>    cd tmp/project/hello-world
     git proj remote -d ../../mounted-drive/repo
@@ -298,7 +298,7 @@
 
 <a href="#_podtop_"><h1 id="Using-the-raw-directory">Using the raw/ directory</h1></a>
 
-<p>Let&#39;s put a file in raw/. It doesn&#39;t have to be a binary file and it can be any size. Mainly the raw/ area is just &quot;synced&quot; to the `gitproj.config.remote-raw-origin dir`</p>
+<p>Let&#39;s put a file in raw/. It doesn&#39;t have to be a binary file and it can be any size. Mainly the raw/ area is just &quot;synced&quot; to the <code>gitproj.config.remote-raw-origin dir</code></p>
 
 <pre><code>    cd tmp/project/hello-world
     echo &quot;New file for raw&quot; &gt;raw/testing-raw
@@ -364,11 +364,11 @@
 <pre><code>    REMOTE/a = ../../mounted-drive/repo/hello-world.raw/
     No differences.</code></pre>
 
-<p>When you look at the proj push help, you might have noticed this command can also run <code>git push origin develop</code> if you also give the `-g&gt; option.</p>
+<p>When you look at the proj push help, you might have noticed this command can also run <code>git push origin develop</code> if you also give the <code>-g</code> option.</p>
 
 <a href="#_podtop_"><h1 id="What-about-pulling-from-remote-raw-First-make-some-changes">What about pulling from remote raw? First make some changes</h1></a>
 
-<p>If raw files in the remote are changed, added, or deleted, then we could do a <code>git remote pull`. Since we have direct access to the remote-raw dir we an make a manual change.</code></p>
+<p>If raw files in the remote are changed, added, or deleted, then we could do a <code>git remote pull</code>. Since we have direct access to the remote-raw dir we an make a manual change.</p>
 
 <pre><code>    cd ../../mounted-drive/repo/hello-world.raw/
     echo &quot;Simulate a change&quot; &gt;extra-file.txt
@@ -377,7 +377,7 @@
 
 <a href="#_podtop_"><h1 id="Pulling-from-remote-raw">Pulling from remote raw</h1></a>
 
-<p>`git proj&gt; pull also has a &#39;-d&#39; option.</p>
+<p><code>git proj</code> pull also has a &#39;-d&#39; option.</p>
 
 <pre><code>    cd tmp/project/hello-world
     git proj pull -d</code></pre>
@@ -400,7 +400,7 @@
 
 <a href="#_podtop_"><h1 id="Other-computers-have-changed-the-remote-raw-files">Other computers have changed the remote raw files</h1></a>
 
-<p>That was a simulation of a remote-raw change. How about a typical scenario? The disk was unmounted, moved to another computer. For the other computer to access remote with git and git-proj commands, <span style="white-space: nowrap;">`git proj clone</span> will need to be run to setup the git workspace. Then files can be pushed and pulled from the remote raw repo area.</p>
+<p>That was a simulation of a remote-raw change. How about a typical scenario? The disk was unmounted, moved to another computer. For the other computer to access remote with git and git-proj commands, <span style="white-space: nowrap;"><code>git proj clone</code></span> will need to be run to setup the git workspace. Then files can be pushed and pulled from the remote raw repo area.</p>
 
 <a href="#_podtop_"><h1 id="Set-up-for-git-proj-clone-simulation">Set up for <code>git proj clone</code> simulation</h1></a>
 
@@ -410,7 +410,7 @@
     cd ../..
     mkdir -p bob/ver/proj</code></pre>
 
-<a href="#_podtop_"><h1 id="Run-git-proj-clone">Run <code>git proj clone`</code></h1></a>
+<a href="#_podtop_"><h1 id="Run-git-proj-clone">Run <code>git proj clone</code></h1></a>
 
 <pre><code>    cd bob/ver/proj
     git proj clone -h
@@ -551,52 +551,16 @@
 <p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
 
 </dd>
-<dt id="Around-line-159">Around line 159:</dt>
-<dd>
-
-<p>Unterminated C&lt;...&gt; sequence</p>
-
-</dd>
-<dt id="Around-line-169">Around line 169:</dt>
-<dd>
-
-<p>Unterminated C&lt;...&gt; sequence</p>
-
-</dd>
 <dt id="Around-line-172">Around line 172:</dt>
 <dd>
 
 <p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
 
 </dd>
-<dt id="Around-line-184">Around line 184:</dt>
-<dd>
-
-<p>Unterminated C&lt;...&gt; sequence</p>
-
-</dd>
 <dt id="Around-line-213">Around line 213:</dt>
 <dd>
 
 <p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
-
-</dd>
-<dt id="Around-line-225">Around line 225:</dt>
-<dd>
-
-<p>Unterminated C&lt;...&gt; sequence</p>
-
-</dd>
-<dt id="Around-line-351">Around line 351:</dt>
-<dd>
-
-<p>Unterminated C&lt;...&gt; sequence</p>
-
-</dd>
-<dt id="Around-line-400">Around line 400:</dt>
-<dd>
-
-<p>Unterminated C&lt;...&gt; sequence</p>
 
 </dd>
 </dl>
