@@ -92,8 +92,8 @@ But first take a look at some of the files created or modified.
 (these are required by git).
 
 * If you did have a C<~/.gitconfig> file, it was backed up to
-`~/.gitconfig.bak`, and the sections were added for C<gittflow> and
-`gitproj`.
+C<~/.gitconfig.bak>, and the sections were added for C<gittflow> and
+C<gitproj>.
 
 This if the project's directory tree now:
 
@@ -157,7 +157,7 @@ interesting ones:
     │   └── README.txt
 
 If you look in C<.gitproj> it will have a copy of the gitflow and getproj
-sections from C<~/.gitconfig`. (This file is versioned in git, because
+sections from C<~/.gitconfig>. (This file is versioned in git, because
 when the this git repo is "cloned" this file will be used to create the
 getproj sections in the local C<.git/config> file.)
 
@@ -166,8 +166,8 @@ hello-world already had some large binary files then, before the git
 repo is created, those files would have been moved into raw/ and
 symlinks created to point to the files. (The symlinks are versioned.)
 
-Between C<~/.gitignore> and C<.git/hooks/pre-commit`, you will be
-prevented`q from saving large binary files in the git repo.
+Between C<~/.gitignore> and C<.git/hooks/pre-commit>, you will be
+prevented from saving large binary files in the git repo.
 
 =item Try out some git commands
 
@@ -181,9 +181,9 @@ Now try out some git command in the project directory:
     git ci -am "Added foo.txt"
     git status -s --ignored
 
-=item Try: C<git proj status`
+=item Try: C<git proj status>
 
-`git proj status> will give you information about differences between
+C<git proj status> will give you information about differences between
 your local raw/ directory and the remote raw/ directory.
 
     git proj stats
@@ -222,7 +222,7 @@ will create it under the C<tmp> directory.
 
 =head1 Creating a remote for files in raw/
 
-Now we can run C<git proj remote`
+Now we can run C<git proj remote>
 
     cd tmp/project/hello-world
     git proj remote -d ../../mounted-drive/repo
@@ -273,7 +273,7 @@ You should see:
 
 Let's put a file in raw/. It doesn't have to be a binary file and it
 can be any size. Mainly the raw/ area is just "synced" to the
-`gitproj.config.remote-raw-origin dir`
+C<gitproj.config.remote-raw-origin dir>
 
     cd tmp/project/hello-world
     echo "New file for raw" >raw/testing-raw
@@ -344,12 +344,12 @@ Now we see:
 
 When you look at the proj push help, you might have noticed this
 command can also run C<git push origin develop> if you also give the
-`-g> option.
+C<-g> option.
 
 =head1 What about pulling from remote raw? First make some changes
 
 If raw files in the remote are changed, added, or deleted, then we
-could do a C<git remote pull`. Since we have direct access to the
+could do a C<git remote pull>. Since we have direct access to the
 remote-raw dir we an make a manual change.
 
     cd ../../mounted-drive/repo/hello-world.raw/
@@ -359,7 +359,7 @@ remote-raw dir we an make a manual change.
 
 =head1 Pulling from remote raw
 
-`git proj> pull also has a '-d' option.
+C<git proj> pull also has a '-d' option.
 
     cd tmp/project/hello-world
     git proj pull -d
@@ -385,7 +385,7 @@ Type 'y' and do another status:
 That was a simulation of a remote-raw change. How about a typical
 scenario? The disk was unmounted, moved to another computer.  For the
 other computer to access remote with git and git-proj commands,
-S<`git proj clone> will need to be run to setup the git workspace.
+S<C<git proj clone>> will need to be run to setup the git workspace.
 Then files can be pushed and pulled from the remote raw repo area.
 
 =head1 Set up for C<git proj clone> simulation
@@ -397,7 +397,7 @@ dir. We'll create a place where "Bob" puts his project files.
     cd ../..
     mkdir -p bob/ver/proj
 
-=head1 Run C<git proj clone`
+=head1 Run C<git proj clone>
 
     cd bob/ver/proj
     git proj clone -h

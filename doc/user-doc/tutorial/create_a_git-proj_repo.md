@@ -89,8 +89,8 @@ But first take a look at some of the files created or modified.
 \* You should edit `~/.gitconfig` and update your user name and email
 (these are required by git).
 
-\* If you did have a \`~/.gitconfig\` file, it was backed up to
-\`~/.gitconfig.bak\`, and the sections were added for \`gittflow\` and
+\* If you did have a `~/.gitconfig` file, it was backed up to
+\`~/.gitconfig.bak\`, and the sections were added for `gittflow` and
 \`gitproj\`.
 
 This if the project's directory tree now:
@@ -154,18 +154,18 @@ interesting ones:
     ├── raw/
     │   └── README.txt
 
-If you look in \`.gitproj\` it will have a copy of the gitflow and getproj
-sections from \`~/.gitconfig\`. (This file is versioned in git, because
+If you look in `.gitproj` it will have a copy of the gitflow and getproj
+sections from `` ~/.gitconfig`. (This file is versioned in git, because
 when the this git repo is "cloned" this file will be used to create the
-getproj sections in the local \`.git/config\` file.)
+getproj sections in the local `.git/config` file.) ``
 
 The raw/ directory is where you will put large binary files. If
 hello-world already had some large binary files then, before the git
 repo is created, those files would have been moved into raw/ and
 symlinks created to point to the files. (The symlinks are versioned.)
 
-Between \`~/.gitignore\` and \`.git/hooks/pre-commit\`, you will be
-prevented\`q from saving large binary files in the git repo.
+Between `~/.gitignore` and `` .git/hooks/pre-commit`, you will be
+prevented`q from saving large binary files in the git repo. ``
 
 - Try out some git commands
 
@@ -179,9 +179,9 @@ prevented\`q from saving large binary files in the git repo.
         git ci -am "Added foo.txt"
         git status -s --ignored
 
-- Try: \`git proj status\`
+- Try: `` git proj status` ``
 
-    \`git proj status\` will give you information about differences between
+    \`git proj status> will give you information about differences between
     your local raw/ directory and the remote raw/ directory.
 
         git proj stats
@@ -199,20 +199,20 @@ prevented\`q from saving large binary files in the git repo.
     this in the next step. But first, this is a typical error log message.
     All error and other log messages have these parts:
 
-        `Cmd that ran:` git-proj-status
-           `Log level:` crit:
-             `Message:` Error: Unexpected: gitproj.config.remote-raw-origin
+        C<Cmd that ran:> git-proj-status
+           C<Log level:> crit:
+             C<Message:> Error: Unexpected: gitproj.config.remote-raw-origin
                         should not be set to: TBD
-            `Location:` [gitproj-com.inc:1545](1)
+            C<Location:> [gitproj-com.inc:1545](1)
 
-    You can control the amount of output with config \`verbose\` variable
+    You can control the amount of output with config `verbose` variable
     or with the command line.
 
 # Creating a remote directory location for files in raw/
 
 First we need to create a directory for the remote. We could mount an
 external disk and create the directory there. But for this tutorial we
-will create it under the \`tmp\` directory.
+will create it under the `tmp` directory.
 
     cd tmp/project/hello-world
     cd ../..
@@ -220,7 +220,7 @@ will create it under the \`tmp\` directory.
 
 # Creating a remote for files in raw/
 
-Now we can run \`git proj remote\`
+Now we can run `` git proj remote` ``
 
     cd tmp/project/hello-world
     git proj remote -d ../../mounted-drive/repo
@@ -232,7 +232,7 @@ Now we can run \`git proj remote\`
     Use: ../../mounted-drive/repo [y/n]? y
 
 And there is a lot more output. A lot of it can be suppressed with
-the \`-q\` option.
+the `-q` option.
 
 Scroll back and you can see what was done. Here are the important parts:
 
@@ -247,13 +247,13 @@ Scroll back and you can see what was done. Here are the important parts:
     1 file changed, 2 insertions(+), 2 deletions(-)
     # the above a commit of a changed: .gitproj file
 
-    # Now merge the changes to the `main` branch
+    # Now merge the changes to the C<main> branch
     Switched to branch 'main'
 
     git remote origin is now: ../../mounted-drive/repo/hello-world.git
     raw remote origin is now: ../../mounted-drive/repo/hello-world.raw
 
-# Running \`git proj status\` again
+# Running `git proj status` again
 
     git proj status
 
@@ -287,7 +287,7 @@ Now you should see:
 
 # Pushing files to remote raw
 
-To "save" the raw/ files to remote-raw we run \`git proj push\` (there
+To "save" the raw/ files to remote-raw we run `git proj push` (there
 no "commit" for files in raw/ because they are not versioned--existing
 files will be override.)
 
@@ -341,14 +341,14 @@ Now we see:
     No differences.
 
 When you look at the proj push help, you might have noticed this
-command can also run \`git push origin develop\` if you also give the
-\`-g\` option.
+command can also run `git push origin develop` if you also give the
+\`-g> option.
 
 # What about pulling from remote raw? First make some changes
 
 If raw files in the remote are changed, added, or deleted, then we
-could do a \`git remote pull\`. Since we have direct access to the
-remote-raw dir we an make a manual change.
+could do a `` git remote pull`. Since we have direct access to the
+remote-raw dir we an make a manual change. ``
 
     cd ../../mounted-drive/repo/hello-world.raw/
     echo "Simulate a change" >extra-file.txt
@@ -357,7 +357,7 @@ remote-raw dir we an make a manual change.
 
 # Pulling from remote raw
 
-\`git proj\` pull also has a '-d' option.
+\`git proj> pull also has a '-d' option.
 
     cd tmp/project/hello-world
     git proj pull -d
@@ -383,9 +383,10 @@ Type 'y' and do another status:
 That was a simulation of a remote-raw change. How about a typical
 scenario? The disk was unmounted, moved to another computer.  For the
 other computer to access remote with git and git-proj commands,
-\`git proj clone\` will need to be run to setup the git workspace. Then files can be pushed and pulled from the remote raw repo area.
+\`git proj clone will need to be run to setup the git workspace.
+Then files can be pushed and pulled from the remote raw repo area.
 
-# Set up for \`git proj clone\` simulation
+# Set up for `git proj clone` simulation
 
 We'll simulate this by cloning into another directory under the tmp
 dir. We'll create a place where "Bob" puts his project files.
@@ -394,7 +395,7 @@ dir. We'll create a place where "Bob" puts his project files.
     cd ../..
     mkdir -p bob/ver/proj
 
-# Run \`git proj clone\`
+# Run `` git proj clone` ``
 
     cd bob/ver/proj
     git proj clone -h
@@ -484,7 +485,7 @@ this demo, type 'y'
      └── src/
          └── prog1.sh
 
-# Now try \`git proj status\` in bob's dir
+# Now try `git proj status` in bob's dir
 
     tmp/bob/ver/proj/hello-world
     git proj status
@@ -531,14 +532,34 @@ Hey! **The above document had some coding errors, which are explained below:**
 
     You forgot a '=back' before '=head1'
 
+- Around line 159:
+
+    Unterminated C<...> sequence
+
+- Around line 169:
+
+    Unterminated C<...> sequence
+
 - Around line 172:
 
     '=item' outside of any '=over'
+
+- Around line 184:
+
+    Unterminated C<...> sequence
 
 - Around line 213:
 
     You forgot a '=back' before '=head1'
 
-- Around line 385:
+- Around line 225:
 
-    Unterminated S<...> sequence
+    Unterminated C<...> sequence
+
+- Around line 351:
+
+    Unterminated C<...> sequence
+
+- Around line 400:
+
+    Unterminated C<...> sequence
