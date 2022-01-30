@@ -33,3 +33,8 @@ to: moria.whyayh.com:/rel/released/software/ThirdParty/git-proj/mx
 tag-0-4-1-1
 Released: git-proj-0.4.1-1-mx-x86_64.deb
 to: moria.whyayh.com:/rel/released/software/ThirdParty/git-proj/mx
+# --------------------
+2022-01-30 03:22 UTC
+tag-0-5-2-1
+Released: git-proj-0.5.2-1-mx-x86_64.deb
+to: moria.whyayh.com:/rel/released/software/own/git-proj/deb
