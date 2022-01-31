@@ -131,6 +131,8 @@ package : epm.list $(ProdOSDist).require
 	epm -v -f native -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
 	#epm -v -f portable -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
 	# Set ProdRC for Release Candidate packages
+	# Has CHANGES.md been updated?
+	# If stable release, merge develop to main branch
 
 release : ver.mak
 	+echo ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
