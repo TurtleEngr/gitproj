@@ -6,8 +6,11 @@ After 1.0, move these to github issues.
 
 ## bug (defect, fix, needs to be changed)
 
-* git config vars and section names are case-insensitive. Fix the 'git
-  config' related functions to lowercase the section and key names.
+* git config vars and section names are case-insensitive
+
+Upper-case in config var names could break the code with unexpected names.
+
+Fix the 'git config' related functions to lowercase the section and key names.
 
 --------------------
 
