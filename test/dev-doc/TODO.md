@@ -13,7 +13,10 @@ After 1.0, move these to github issues.
 
 ## documentation
 
-* Write the tutorial: create_a_git-proj_repo
+* Show the git-proj in action:
+     example scenarios
+     why would you want this?
+     what does it solve?
 
 --------------------
 
@@ -23,28 +26,11 @@ After 1.0, move these to github issues.
 
 * ../.. is still showing up
 
-* git-prog typo in readme
-
-* tutorial
-	fix headings, not bullets
-	fix POD error
-	C<cmd> cannot be used in <pre> areas
-
-* Show the git-proj in action:
-     scenarios
-     why would you want this
-     what does it solve
-
 * Run spell check on all the docs.
 
-
-* Add check: on creation of remote raw, create a file with the git
-origin in it. On clone, push, pull, the actual origin can be compared
-to the origin in the remote raw file. Problem: the git origin can be
-different on differnt systems, because of different mount points. Fix,
-just compare the last dir name--it should match origin.git
-
 * Implement pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
+
+* PROJ/.pre-commit can optionally overide $gpDoc/hooks/pre-commit
 
 * Write a script that converts "LINK{title|filepath}" to html anchors
   or markdown links. The POD L<title|filepath> does not work for
@@ -328,4 +314,20 @@ structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
 * Add "expand" to rm-trailing-sp script.
 
 * Put rm-trailing-sp script in $gpDoc/contrib dir
+
+* git-prog typo in readme - done
+
+* tutorial
+	fix headings, not bullets - done
+	C<cmd> cannot be used in <pre> areas - done
+	fix POD error - done
+* Change "subsystem" to "subcommand" - done
+
+* Write the tutorial: create_a_git-proj_repo - done
+
+* Add check: on creation of remote raw, create a file with the git
+origin in it. On clone, push, pull, the actual origin can be compared
+to the origin in the remote raw file. Problem: the git origin can be
+different on differnt systems, because of different mount points. Fix,
+just compare the last dir name--it should match origin.git - done
 

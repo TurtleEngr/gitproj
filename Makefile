@@ -57,7 +57,7 @@ doc/user-doc/tutorial/create_a_git-proj_repo.html : src-doc/create_a_git-proj_re
 	-mkdir -p doc/user-doc/tutorial
 	-pod2html --title='Create a git-proj Repo' $(mHtmlOpt) <$? >$@
 	-$(mTidy) doc/user-doc/config.html
-	-pod2markdown <src-doc/create_a_git-proj_repo.pod >doc/user-doc/tutorial/create_a_git-proj_repo.md
+	-pod2markdown src-doc/create_a_git-proj_repo.pod >doc/user-doc/tutorial/create_a_git-proj_repo.md
 
 doc/CHANGES.md : CHANGES.md
 	-grep -Ev 'INT:' <$? | uniq >$@

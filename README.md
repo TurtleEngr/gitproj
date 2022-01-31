@@ -2,8 +2,8 @@
 
 # Description
 
-`git-proj is a git subsystem` for managing large binary files.  Its
-setup and management is simpler than "git LFS", because it doesn't
+`git-proj implements git sub-commands` for managing large binary files.
+Its setup and management is simpler than "git LFS", because it doesn't
 require a git server.
 
 ## git proj sub-commands
@@ -24,7 +24,7 @@ The user docs can be browsed online at:
 [user-doc](https://github.com/TurtleEngr/gitproj/tree/develop/doc/user-doc)
 
 I recommend you start with:
-[git-prog](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/git-proj.md)
+[git-proj](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/git-proj.md)
 
 Then the
 [Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/tutorial/create_a_git-proj_repo.md)

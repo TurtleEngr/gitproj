@@ -15,7 +15,10 @@
   <li><a href="#Create-a-git-proj-Repo">Create a git-proj Repo</a></li>
   <li><a href="#Download-and-install-git-proj">Download and install git-proj.</a></li>
   <li><a href="#Get-some-quick-usage-help">Get some quick usage help</a></li>
+  <li><a href="#Create-a-test-project">Create a &quot;test&quot; project</a></li>
   <li><a href="#Create-the-local-git-project-repo">Create the &quot;local&quot; git project repo</a></li>
+  <li><a href="#Try-out-some-git-commands">Try out some git commands</a></li>
+  <li><a href="#Try:-git-proj-status">Try: git proj status</a></li>
   <li><a href="#Creating-a-remote-directory-location-for-files-in-raw">Creating a remote directory location for files in raw/</a></li>
   <li><a href="#Creating-a-remote-for-files-in-raw">Creating a remote for files in raw/</a></li>
   <li><a href="#Running-git-proj-status-again">Running git proj status again</a></li>
@@ -29,7 +32,6 @@
   <li><a href="#Run-git-proj-clone">Run git proj clone</a></li>
   <li><a href="#Now-try-git-proj-status-in-bobs-dir">Now try git proj status in bob&#39;s dir</a></li>
   <li><a href="#Documentation">Documentation</a></li>
-  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul>
 
 <a href="#_podtop_"><h1 id="Create-a-git-proj-Repo">Create a git-proj Repo</h1></a>
@@ -65,10 +67,7 @@
 
 <p>For even more usage help see the Documentation section at the end.</p>
 
-<dl>
-
-<dt id="Create-a-test-project">Create a &quot;test&quot; project</dt>
-<dd>
+<a href="#_podtop_"><h1 id="Create-a-test-project">Create a &quot;test&quot; project</h1></a>
 
 <p>Set up a project directory with some dummy files:</p>
 
@@ -83,13 +82,10 @@
 <p>Output:</p>
 
 <pre><code>    hello-world/
-    &#x251C;&#x2500;&#x2500; doc/
-    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; prog1.txt
-    &#x2514;&#x2500;&#x2500; src/
-        &#x2514;&#x2500;&#x2500; prog1.sh</code></pre>
-
-</dd>
-</dl>
+    |doc/
+    |   |prog1.txt
+    |src/
+    |   |prog1.sh</code></pre>
 
 <a href="#_podtop_"><h1 id="Create-the-local-git-project-repo">Create the &quot;local&quot; git project repo</h1></a>
 
@@ -135,59 +131,58 @@
     tree -aF hello-world/
 
     hello-world/
-    &#x251C;&#x2500;&#x2500; doc/
-    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; prog1.txt
-    &#x251C;&#x2500;&#x2500; .git/
+    |doc/
+    |   |prog1.txt
+    |.git/
+    |   |branches/
+    |   |hooks/
+    |   |   |pre-commit*
     ...
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; config
+    |   |info/
+    |   |   |exclude
+    |   |logs/
+    |   |   |refs/
+    |   |   |   |heads/
+    |   |   |   |   |develop
+    |   |   |   |   |main
+    |   |   |HEAD
+    |   |objects/
+    |   |   |16/
+    |   |   |   |0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
     ...
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; HEAD
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; hooks/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; applypatch-msg.sample*
-    ...
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-commit*
-    ...
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; update.sample*
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; index
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; info/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; exclude
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; logs/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; HEAD
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; refs/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; heads/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;         &#x251C;&#x2500;&#x2500; develop
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;         &#x2514;&#x2500;&#x2500; main
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; objects/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; 16/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; 0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
-    ...
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; info/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; pack/
-    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; refs/
-    &#x2502;&nbsp;&nbsp;     &#x251C;&#x2500;&#x2500; heads/
-    &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; develop
-    &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; main
-    &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; tags/
-    &#x251C;&#x2500;&#x2500; .gitignore
-    &#x251C;&#x2500;&#x2500; .gitproj
-    &#x251C;&#x2500;&#x2500; .gitproj.bak
-    &#x251C;&#x2500;&#x2500; raw/
-    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; README.txt
-    &#x2514;&#x2500;&#x2500; src/
-        &#x2514;&#x2500;&#x2500; prog1.sh</code></pre>
+    |   |   |info/
+    |   |   |pack/
+    |   |refs/
+    |   |   |heads/
+    |   |   |   |develop
+    |   |   |   |main
+    |   |   |tags/
+    |   |COMMIT_EDITMSG
+    |   |config
+    |   |config.bak
+    |   |description
+    |   |HEAD
+    |   |index
+    |raw/
+    |   |README.txt
+    |src/
+    |   |prog1.sh
+    |.gitignore
+    |.gitproj
+    |.gitproj.bak</code></pre>
 
 <p>In the hello-world dir you have some new dirs and files. These are the interesting ones:</p>
 
 <pre><code>    hello-world/
-    &#x251C;&#x2500;&#x2500; .gitignore
-    &#x251C;&#x2500;&#x2500; .gitproj
-    &#x251C;&#x2500;&#x2500; .git/
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; config
-    &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; hooks/
-    &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-commit*
-    &#x251C;&#x2500;&#x2500; raw/
-    &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; README.txt</code></pre>
+    |.git/
+    |   |branches/
+    |   |hooks/
+    |   |   |pre-commit*
+    |   |config
+    |raw/
+    |   |README.txt
+    |.gitignore
+    |.gitproj</code></pre>
 
 <p>If you look in <code>.gitproj</code> it will have a copy of the gitflow and getproj sections from <code>~/.gitconfig</code>. (This file is versioned in git, because when the this git repo is &quot;cloned&quot; this file will be used to create the getproj sections in the local <code>.git/config</code> file.)</p>
 
@@ -195,10 +190,7 @@
 
 <p>Between <code>~/.gitignore</code> and <code>.git/hooks/pre-commit</code>, you will be prevented from saving large binary files in the git repo.</p>
 
-<dl>
-
-<dt id="Try-out-some-git-commands">Try out some git commands</dt>
-<dd>
+<a href="#_podtop_"><h1 id="Try-out-some-git-commands">Try out some git commands</h1></a>
 
 <p>Now try out some git command in the project directory:</p>
 
@@ -210,9 +202,7 @@
     git ci -am &quot;Added foo.txt&quot;
     git status -s --ignored</code></pre>
 
-</dd>
-<dt id="Try:-git-proj-status">Try: <code>git proj status</code></dt>
-<dd>
+<a href="#_podtop_"><h1 id="Try:-git-proj-status">Try: <code>git proj status</code></h1></a>
 
 <p><code>git proj status</code> will give you information about differences between your local raw/ directory and the remote raw/ directory.</p>
 
@@ -229,16 +219,13 @@
 
 <p>This is telling us a remote raw origin has not be defined. We&#39;ll do this in the next step. But first, this is a typical error log message. All error and other log messages have these parts:</p>
 
-<pre><code>    C&lt;Cmd that ran:&gt; git-proj-status
-       C&lt;Log level:&gt; crit:
-         C&lt;Message:&gt; Error: Unexpected: gitproj.config.remote-raw-origin
+<pre><code>    Cmd that ran: git-proj-status
+       Log level: crit:
+         Message: Error: Unexpected: gitproj.config.remote-raw-origin
                     should not be set to: TBD
-        C&lt;Location:&gt; [gitproj-com.inc:1545](1)</code></pre>
+        Location: [gitproj-com.inc:1545](1)</code></pre>
 
 <p>You can control the amount of output with config <code>verbose</code> variable or with the command line.</p>
-
-</dd>
-</dl>
 
 <a href="#_podtop_"><h1 id="Creating-a-remote-directory-location-for-files-in-raw">Creating a remote directory location for files in raw/</h1></a>
 
@@ -276,7 +263,7 @@
     1 file changed, 2 insertions(+), 2 deletions(-)
     # the above a commit of a changed: .gitproj file
 
-    # Now merge the changes to the C&lt;main&gt; branch
+    # Now merge the changes to the &quot;main&quot; branch
     Switched to branch &#39;main&#39;
 
     git remote origin is now: ../../mounted-drive/repo/hello-world.git
@@ -438,63 +425,41 @@
 
 <pre><code>     tree -aF $PWD
 
-     tmp/bob/ver/proj/hello-world
-     &#x251C;&#x2500;&#x2500; doc/
-     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; prog1.txt
-     &#x251C;&#x2500;&#x2500; foo.txt
-     &#x251C;&#x2500;&#x2500; .git/
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; branches/
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; COMMIT_EDITMSG
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; config
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; config.bak
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; description
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; HEAD
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; hooks/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; applypatch-msg.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; commit-msg.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; fsmonitor-watchman.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; post-update.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-applypatch.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-commit*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-commit.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; prepare-commit-msg.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-push.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-rebase.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; pre-receive.sample*
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; update.sample*
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; index
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; info/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; exclude
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; logs/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; HEAD
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; refs/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;     &#x251C;&#x2500;&#x2500; heads/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; develop
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; main
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; remotes/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;         &#x2514;&#x2500;&#x2500; origin/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp;             &#x2514;&#x2500;&#x2500; HEAD
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; objects/
+     tmp/bob/ver/proj
+     |hello-world/
+     |   |doc/
+     |   |   |prog1.txt
+     |   |.git/
+     |   |   |branches/
+     |   |   |hooks/
+     |   |   |   |pre-commit*   # Copied from
      ...
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; info/
-     &#x2502;&nbsp;&nbsp; &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; pack/
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; packed-refs
-     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; refs/
-     &#x2502;&nbsp;&nbsp;     &#x251C;&#x2500;&#x2500; heads/
-     &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; develop
-     &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; main
-     &#x2502;&nbsp;&nbsp;     &#x251C;&#x2500;&#x2500; remotes/
-     &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; origin/
-     &#x2502;&nbsp;&nbsp;     &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; HEAD
-     &#x2502;&nbsp;&nbsp;     &#x2514;&#x2500;&#x2500; tags/
-     &#x251C;&#x2500;&#x2500; .gitignore
-     &#x251C;&#x2500;&#x2500; .gitproj
-     &#x251C;&#x2500;&#x2500; raw/
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; another-file.txt
-     &#x2502;&nbsp;&nbsp; &#x251C;&#x2500;&#x2500; extra-file.txt
-     &#x2502;&nbsp;&nbsp; &#x2514;&#x2500;&#x2500; .remote.proj
-     &#x2514;&#x2500;&#x2500; src/
-         &#x2514;&#x2500;&#x2500; prog1.sh</code></pre>
+     |   |   |info/
+     |   |   |   |exclude
+     |   |   |logs/
+     |   |   |   |refs/
+     ...
+     |   |   |   |HEAD
+     |   |   |objects/
+     ...
+     |   |   |refs/
+     ...
+     |   |   |COMMIT_EDITMSG
+     |   |   |config            # Updated from PROJ/.gitproj
+     |   |   |config.bak        # Before the update
+     |   |   |description
+     |   |   |HEAD
+     |   |   |index
+     |   |   |packed-refs
+     |   |raw/
+     |   |   |another-file.txt
+     |   |   |extra-file.txt
+     |   |   |.remote.proj      # Keep this file in raw/
+     |   |src/
+     |   |   |prog1.sh
+     |   |foo.txt
+     |   |.gitignore
+     |   |.gitproj</code></pre>
 
 <a href="#_podtop_"><h1 id="Now-try-git-proj-status-in-bobs-dir">Now try <code>git proj status</code> in bob&#39;s dir</h1></a>
 
@@ -526,44 +491,6 @@
 <pre><code>    $ git proj -h</code></pre>
 
 <p>or</p>
-
-<a href="#_podtop_"><h1 id="POD-ERRORS">POD ERRORS</h1></a>
-
-<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
-
-<dl>
-
-<dt id="Around-line-36">Around line 36:</dt>
-<dd>
-
-<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
-
-</dd>
-<dt id="Around-line-51">Around line 51:</dt>
-<dd>
-
-<p>Non-ASCII character seen before =encoding in &#39;&#x251C;&#x2500;&#x2500;&#39;. Assuming UTF-8</p>
-
-</dd>
-<dt id="Around-line-56">Around line 56:</dt>
-<dd>
-
-<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
-
-</dd>
-<dt id="Around-line-172">Around line 172:</dt>
-<dd>
-
-<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
-
-</dd>
-<dt id="Around-line-213">Around line 213:</dt>
-<dd>
-
-<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
-
-</dd>
-</dl>
 
 
 </body>

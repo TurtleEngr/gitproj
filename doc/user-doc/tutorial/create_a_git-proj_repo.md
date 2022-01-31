@@ -31,25 +31,25 @@ Output:
 
 For even more usage help see the Documentation section at the end.
 
-- Create a "test" project
+# Create a "test" project
 
-    Set up a project directory with some dummy files:
+Set up a project directory with some dummy files:
 
-        mkdir -p tmp/project/hello-world
-        cd tmp/project/hello-world
-        mkdir src doc
-        touch src/prog1.sh doc/prog1.txt
+    mkdir -p tmp/project/hello-world
+    cd tmp/project/hello-world
+    mkdir src doc
+    touch src/prog1.sh doc/prog1.txt
 
-        cd ..
-        tree -aF hello-world
+    cd ..
+    tree -aF hello-world
 
-    Output:
+Output:
 
-        hello-world/
-        ├── doc/
-        │   └── prog1.txt
-        └── src/
-            └── prog1.sh
+    hello-world/
+    |doc/
+    |   |prog1.txt
+    |src/
+    |   |prog1.sh
 
 # Create the "local" git project repo
 
@@ -99,60 +99,59 @@ This if the project's directory tree now:
     tree -aF hello-world/
 
     hello-world/
-    ├── doc/
-    │   └── prog1.txt
-    ├── .git/
+    |doc/
+    |   |prog1.txt
+    |.git/
+    |   |branches/
+    |   |hooks/
+    |   |   |pre-commit*
     ...
-    │   ├── config
+    |   |info/
+    |   |   |exclude
+    |   |logs/
+    |   |   |refs/
+    |   |   |   |heads/
+    |   |   |   |   |develop
+    |   |   |   |   |main
+    |   |   |HEAD
+    |   |objects/
+    |   |   |16/
+    |   |   |   |0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
     ...
-    │   ├── HEAD
-    │   ├── hooks/
-    │   │   ├── applypatch-msg.sample*
-    ...
-    │   │   ├── pre-commit*
-    ...
-    │   │   └── update.sample*
-    │   ├── index
-    │   ├── info/
-    │   │   └── exclude
-    │   ├── logs/
-    │   │   ├── HEAD
-    │   │   └── refs/
-    │   │       └── heads/
-    │   │           ├── develop
-    │   │           └── main
-    │   ├── objects/
-    │   │   ├── 16/
-    │   │   │   └── 0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
-    ...
-    │   │   │   └── 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
-    │   │   ├── info/
-    │   │   └── pack/
-    │   └── refs/
-    │       ├── heads/
-    │       │   ├── develop
-    │       │   └── main
-    │       └── tags/
-    ├── .gitignore
-    ├── .gitproj
-    ├── .gitproj.bak
-    ├── raw/
-    │   └── README.txt
-    └── src/
-        └── prog1.sh
+    |   |   |info/
+    |   |   |pack/
+    |   |refs/
+    |   |   |heads/
+    |   |   |   |develop
+    |   |   |   |main
+    |   |   |tags/
+    |   |COMMIT_EDITMSG
+    |   |config
+    |   |config.bak
+    |   |description
+    |   |HEAD
+    |   |index
+    |raw/
+    |   |README.txt
+    |src/
+    |   |prog1.sh
+    |.gitignore
+    |.gitproj
+    |.gitproj.bak
 
 In the hello-world dir you have some new dirs and files. These are the
 interesting ones:
 
     hello-world/
-    ├── .gitignore
-    ├── .gitproj
-    ├── .git/
-    │   ├── config
-    │   ├── hooks/
-    │   │   ├── pre-commit*
-    ├── raw/
-    │   └── README.txt
+    |.git/
+    |   |branches/
+    |   |hooks/
+    |   |   |pre-commit*
+    |   |config
+    |raw/
+    |   |README.txt
+    |.gitignore
+    |.gitproj
 
 If you look in `.gitproj` it will have a copy of the gitflow and getproj
 sections from `~/.gitconfig`. (This file is versioned in git, because
@@ -167,46 +166,46 @@ symlinks created to point to the files. (The symlinks are versioned.)
 Between `~/.gitignore` and `.git/hooks/pre-commit`, you will be
 prevented from saving large binary files in the git repo.
 
-- Try out some git commands
+# Try out some git commands
 
-    Now try out some git command in the project directory:
+Now try out some git command in the project directory:
 
-        cd tmp/project/hello-world
-        git status
-        git log
-        touch foo.txt
-        git add foo.txt
-        git ci -am "Added foo.txt"
-        git status -s --ignored
+    cd tmp/project/hello-world
+    git status
+    git log
+    touch foo.txt
+    git add foo.txt
+    git ci -am "Added foo.txt"
+    git status -s --ignored
 
-- Try: `git proj status`
+# Try: `git proj status`
 
-    `git proj status` will give you information about differences between
-    your local raw/ directory and the remote raw/ directory.
+`git proj status` will give you information about differences between
+your local raw/ directory and the remote raw/ directory.
 
-        git proj stats
+    git proj stats
 
-    This outputs an error and the short usage help.
+This outputs an error and the short usage help.
 
-         git-proj-status crit: Error: Unexpected:
-             gitproj.config.remote-raw-origin should not be set to: TBD
-             [gitproj-com.inc:1548](1)
-         ========================================
-         Usage:
-             git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]
+     git-proj-status crit: Error: Unexpected:
+         gitproj.config.remote-raw-origin should not be set to: TBD
+         [gitproj-com.inc:1548](1)
+     ========================================
+     Usage:
+         git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]
 
-    This is telling us a remote raw origin has not be defined. We'll do
-    this in the next step. But first, this is a typical error log message.
-    All error and other log messages have these parts:
+This is telling us a remote raw origin has not be defined. We'll do
+this in the next step. But first, this is a typical error log message.
+All error and other log messages have these parts:
 
-        C<Cmd that ran:> git-proj-status
-           C<Log level:> crit:
-             C<Message:> Error: Unexpected: gitproj.config.remote-raw-origin
-                        should not be set to: TBD
-            C<Location:> [gitproj-com.inc:1545](1)
+    Cmd that ran: git-proj-status
+       Log level: crit:
+         Message: Error: Unexpected: gitproj.config.remote-raw-origin
+                    should not be set to: TBD
+        Location: [gitproj-com.inc:1545](1)
 
-    You can control the amount of output with config `verbose` variable
-    or with the command line.
+You can control the amount of output with config `verbose` variable
+or with the command line.
 
 # Creating a remote directory location for files in raw/
 
@@ -247,7 +246,7 @@ Scroll back and you can see what was done. Here are the important parts:
     1 file changed, 2 insertions(+), 2 deletions(-)
     # the above a commit of a changed: .gitproj file
 
-    # Now merge the changes to the C<main> branch
+    # Now merge the changes to the "main" branch
     Switched to branch 'main'
 
     git remote origin is now: ../../mounted-drive/repo/hello-world.git
@@ -427,63 +426,41 @@ this demo, type 'y'
 
      tree -aF $PWD
 
-     tmp/bob/ver/proj/hello-world
-     ├── doc/
-     │   └── prog1.txt
-     ├── foo.txt
-     ├── .git/
-     │   ├── branches/
-     │   ├── COMMIT_EDITMSG
-     │   ├── config
-     │   ├── config.bak
-     │   ├── description
-     │   ├── HEAD
-     │   ├── hooks/
-     │   │   ├── applypatch-msg.sample*
-     │   │   ├── commit-msg.sample*
-     │   │   ├── fsmonitor-watchman.sample*
-     │   │   ├── post-update.sample*
-     │   │   ├── pre-applypatch.sample*
-     │   │   ├── pre-commit*
-     │   │   ├── pre-commit.sample*
-     │   │   ├── prepare-commit-msg.sample*
-     │   │   ├── pre-push.sample*
-     │   │   ├── pre-rebase.sample*
-     │   │   ├── pre-receive.sample*
-     │   │   └── update.sample*
-     │   ├── index
-     │   ├── info/
-     │   │   └── exclude
-     │   ├── logs/
-     │   │   ├── HEAD
-     │   │   └── refs/
-     │   │       ├── heads/
-     │   │       │   ├── develop
-     │   │       │   └── main
-     │   │       └── remotes/
-     │   │           └── origin/
-     │   │               └── HEAD
-     │   ├── objects/
+     tmp/bob/ver/proj
+     |hello-world/
+     |   |doc/
+     |   |   |prog1.txt
+     |   |.git/
+     |   |   |branches/
+     |   |   |hooks/
+     |   |   |   |pre-commit*   # Copied from
      ...
-     │   │   ├── info/
-     │   │   └── pack/
-     │   ├── packed-refs
-     │   └── refs/
-     │       ├── heads/
-     │       │   ├── develop
-     │       │   └── main
-     │       ├── remotes/
-     │       │   └── origin/
-     │       │       └── HEAD
-     │       └── tags/
-     ├── .gitignore
-     ├── .gitproj
-     ├── raw/
-     │   ├── another-file.txt
-     │   ├── extra-file.txt
-     │   └── .remote.proj
-     └── src/
-         └── prog1.sh
+     |   |   |info/
+     |   |   |   |exclude
+     |   |   |logs/
+     |   |   |   |refs/
+     ...
+     |   |   |   |HEAD
+     |   |   |objects/
+     ...
+     |   |   |refs/
+     ...
+     |   |   |COMMIT_EDITMSG
+     |   |   |config            # Updated from PROJ/.gitproj
+     |   |   |config.bak        # Before the update
+     |   |   |description
+     |   |   |HEAD
+     |   |   |index
+     |   |   |packed-refs
+     |   |raw/
+     |   |   |another-file.txt
+     |   |   |extra-file.txt
+     |   |   |.remote.proj      # Keep this file in raw/
+     |   |src/
+     |   |   |prog1.sh
+     |   |foo.txt
+     |   |.gitignore
+     |   |.gitproj
 
 # Now try `git proj status` in bob's dir
 
@@ -515,27 +492,3 @@ Or for help that lists all of the command with their help
     $ git proj -h
 
 or
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 36:
-
-    '=item' outside of any '=over'
-
-- Around line 51:
-
-    Non-ASCII character seen before =encoding in '├──'. Assuming UTF-8
-
-- Around line 56:
-
-    You forgot a '=back' before '=head1'
-
-- Around line 172:
-
-    '=item' outside of any '=over'
-
-- Around line 213:
-
-    You forgot a '=back' before '=head1'
