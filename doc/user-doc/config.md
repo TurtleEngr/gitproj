@@ -3,12 +3,12 @@
 # Precedence
 
 There are over 20 config variables for managing the git-proj
-subcommands. Their "scope" is defined by the file they are
+sub-commands. Their "scope" is defined by the file they are
 in. Definitions "closer" to the project directory have higher
 precedence. Think of this as a sieve, with variables looked for in the
 following order, where the last definition wins.
 
-       Scope           Access    Locaton
+       Scope           Access    Location
     1. System          --file    /etc/gitconfig
        gitproj, global --file    /usr/share/doc/config/gitconfig
     2. Global, user    --global  ~/.gitconfig
@@ -128,11 +128,11 @@ keep the existing config file (see man dpkg --force-confdef,
 
 If the ~/.gitconfig is not defined, it will be copied from
 /usr/share/doc/config/gitconfig. Also if ~/.gitignore is not defined,
-it will be copyied from /usr/share/doc/config/gitignore.
+it will be copied from /usr/share/doc/config/gitignore.
 
 "git proj init" and "git proj clone" will update ~/.gitconfig
 from /usr/share/doc/config/gitconfig, for any vars that are not
-defined in ~/.gitconfig. Existing variables will not be chnaged.
+defined in ~/.gitconfig. Existing variables will not be changed.
 
 ## gitproj, local, PROJ/.gitproj
 
@@ -148,7 +148,7 @@ only used to setup the initial PROJ/.git/config file.
 for use by git proj clone
 
 "git proj clone" will add vars from PROJ/.gitproj to PROJ/.git/config
-afer the files are created. If PROJ/.gitproj is missing, it will
+after the files are created. If PROJ/.gitproj is missing, it will
 create it with the "init" process.
 
 git-proj commands that change gitproj section vars in PROJ/.git/config
@@ -165,11 +165,11 @@ vars in PROJ/.gitproj to PROJ/.git/config.
 ## /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit
 
     LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
-    ~/.pre-commit (optinal)
-    PROJ/.pre-commit (optinal)
+    ~/.pre-commit (optimal)
+    PROJ/.pre-commit (optimal)
     PROJ/.git/hooks/pre-commit
 
-The pre-commit hook file is created with a precidence similar to the
+The pre-commit hook file is created with a precedence similar to the
 config vars.
 
 "git proj init" and "git proj clone" will create the
@@ -300,7 +300,7 @@ only.
 
 When a project has been successfully setup by git proj init or
 git proj clone, this will be set to the project's name in
-PROJ/.gitproj and PROJ/.git/config. Usually this is the top direcory
+PROJ/.gitproj and PROJ/.git/config. Usually this is the top directory
 name. If should always be "TBD" in ~/.gitconfig
 
 ## NA; -NA, gitproj.config.remote-status; (TBD)
@@ -317,7 +317,7 @@ in ~/.gitconfig and PROJ/.gitproj.
 
 ## gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (2g)
 
-This is the minium space that should be available on the external
+This is the minimum space that should be available on the external
 drive.  The git proj remote command will not continue if there is
 not enough space.  The available space should be at least twice the
 size of the space used by ProjName.raw.
@@ -337,7 +337,7 @@ git proj clone will compare ver in PROJ/.gitproj to
 /usr/share/doc/git-proj/VERSION. If the major or minor numbers of the
 checked out project are greater than the installed version there could
 be problems. If the installed version is greater, this should not be a
-problem, because gitproj tried to be backward compatable. And it might
+problem, because gitproj tried to be backward compatible. And it might
 try to upgrade the project.
 
 A warning message will be output if there are differences.
@@ -353,12 +353,12 @@ Use this to turn all pre-commit check off.
 
 ## gpCheckFileNames; -NA; gitproj.hook.check-file-names; (true)
 
-If true, only these chacters can be used in file and directory names:
+If true, only these characters can be used in file and directory names:
 \[-\_.a-zA-z0-9\]
 
 ## gpCheckInRaw; -NA; gitproj.hook.check-in-raw; (true)
 
-If true, files in the top raw/ dir will not be alloed in the git
+If true, files in the top raw/ dir will not be allowed in the git
 repository. The files should have been ignored with the rule in
 .gitignore, but maybe someone "forced" the add.
 
@@ -372,7 +372,7 @@ See rm-trailing-sp to fix.
 
 ## gpCheckForTabs; -NA; gitproj.hook.check-for-tabs; (false)
 
-If true, don't allow tabs for files with the extentions found in:
+If true, don't allow tabs for files with the extensions found in:
 gitproj.hook.tabs-ext-list
 
 To fix, use "rm-trailing-sp -f FILE"
@@ -380,7 +380,7 @@ To fix, use "rm-trailing-sp -f FILE"
 ## gpTabExtList; -NA; gitproj.hook.tabs-ext-list; (c sh md html pod)
 	tab-ext-list = c sh md html pod
 
-List the file extentions for filse that will be checked for tabs.
+List the file extensions for files that will be checked for tabs.
 
 ## gpCheckForBigFiles; -NA; gitproj.hook.check-for-big-files; (true)
 

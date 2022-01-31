@@ -29,4 +29,4 @@ https://github.com/TurtleEngr/my-utility-scripts/blob/develop/bin/vid-rm-ver
   git config -f [HOST] gitproj.config.cvsroot $CVSROOT
   git config -f [HOST] gitproj.config.cvsrepo [proj].raw
 
-...exmaples for removing all by HEAD version of raw files.
+...examples for removing all by HEAD version of raw files.

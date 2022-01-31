@@ -23,7 +23,7 @@ Be sure you are "cd" to the "top" project directory,then use "-l
 \$PWD".  The directory name will be used for the git repo name. The
 project directory should not already be a git repo, and it cannot
 contain any git repos under it.  Also, all of the directories and
-files need to be readable by your user (git proj init will verify
+files need to be readable by your user ("git proj init" will verify
 all of the above is true.
 
 You only need to answer 5 questions to create the git part of this
@@ -375,14 +375,14 @@ fInitMkRaw()
 
 Do NOT remove these files or this directory.
 
-These files are managed by the "git proj" subcommand. It's purpose is
+These files are managed by the "git proj" sub-command. It's purpose is
 to keep large binary files out of git repositories. Large files are
 put in this directory and symlinks may be put in the git managed
 directories to point to the files.
 
 The initial working directory was created at $HOSTNAME:$gpLocalTopDir
 
-For help with the "git proj" subcommand, just type "git proj -h".
+For help with the "git proj" sub-command, just type "git proj -h".
 EOF
     cd - >/dev/null 2>&1
     return 0
@@ -580,7 +580,7 @@ fInitSaveVarsToConfigs()
         $gpLocalTopDir/.gitproj \
         $gpLocalTopDir/.git/config; do
         tS=gitproj.config
-        fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlow
+        fComSaveVar2Config $tFile $tS.git-flow-pkg gpGitFlowPkg
         tS=gitproj.hook
         fComSaveVar2Config $tFile $tS.verbose gpHookVerbose
         fComSaveVar2Config $tFile $tS.pre-commit-enabled gpPreCommitEnabled

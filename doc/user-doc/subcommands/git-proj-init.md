@@ -21,14 +21,14 @@ default options, which can be overridden with other options.
 If there is no -a option, you will be prompted for the settings.  See
 the OPTION section for details.
 
-When the local and remote git repos are setup, all the setings
+When the local and remote git repos are setup, all the settings
 will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
 # OPTIONS
 
 - **-a**
 
-    The -a option will automattically run the whole init process with
+    The -a option will automatically run the whole init process with
     default settings. The other options can be defined to override the
     default settings.
 
@@ -62,8 +62,8 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     directory. A symlink will replace the moved file. The symlink will
     point to \[raw\].
 
-    The symlinks are only provided for backward compatability; it would be
-    best to remove those links and modifiy your code and apps to access
+    The symlinks are only provided for backward compatibility; it would be
+    best to remove those links and modify your code and apps to access
     the files directly from the raw directories.
 
     Prompt:
@@ -86,7 +86,7 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
         -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h" for details. Or "man git-proj" for help with all the
-    subcommands.
+    sub-commands.
 
 # RETURN VALUE
 

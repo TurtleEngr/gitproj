@@ -58,8 +58,8 @@ Run `git proj init` in the "top" project directory:
     cd tmp/project/hello-world
     git proj init -l $PWD
 
-Answer the 5 questions. There is quite a lot of output.  This is only
-some of the output:
+Answer the 5 to 6 questions. There is quite a lot of output.  This is
+only some of the output:
 
     Be sure you are "cd" to the "top" project directory,then use "-l $PWD.
     The directory name will be used for the git repo name.
@@ -74,7 +74,17 @@ some of the output:
     quit this program.)
 
     Size (-s) [10k]?
-    ...
+
+    git-proj-init notice: gitproj.hook.proj-binary-file-size =
+        gpMaxSize [gitproj-init.inc:170]
+    git-proj-init notice: Looking for binary files are greater than
+        19k: [gitproj-init.inc:210]
+    git-proj-init notice: No large binary files were
+        found. [gitproj-init.inc:213]
+
+    Setup git-flow (-f) [y/n]? y
+    git-proj-init notice: gitproj.config.git-flow = true [gitproj-init.inc:279]
+
     Summary
     ...
     Continue with creating a local git repo [y/n]? y
@@ -82,7 +92,7 @@ some of the output:
     Now would be a good time to setup an external drive for archiving
     your project: "git proj remote -d pMountPath"
 
-But first take a look at some of the files created or modified.
+But first, let's take a look at some of the files created or modified.
 
 \* If you did not have a `~/.gitconfig` file, one was created for you.
 
@@ -90,7 +100,7 @@ But first take a look at some of the files created or modified.
 (these are required by git).
 
 \* If you did have a `~/.gitconfig` file, it was backed up to
-`~/.gitconfig.bak`, and the sections were added for `gittflow` and
+`~/.gitconfig.bak`, and the sections were added for `git-flow` and
 `gitproj`.
 
 This if the project's directory tree now:

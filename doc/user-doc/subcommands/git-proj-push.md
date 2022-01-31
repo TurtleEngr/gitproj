@@ -24,7 +24,7 @@
 - **-d**
 
     If the -d option is used, then the remote raw/ will be made identical
-    to the local raw/. I.e. files might be deleated from the remote raw/.
+    to the local raw/. I.e. files might be deleted from the remote raw/.
 
     See the EXAMPLES section for a "save" way to use this option.
 
@@ -34,7 +34,7 @@
     select the action. -n will just display what would be done.
 
     If there is a -d option, that will be removed and the -n option
-    will be added. -d could be very distructive, so it needs to be
+    will be added. -d could be very destructive, so it needs to be
     run interactively.
 
 - **-y|-n**

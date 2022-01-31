@@ -482,12 +482,12 @@ fRemoteCreateRemoteGit()
 
     fRemoteStatus
 
-    # -d pMountPath (set with prompt/responnse, or required if -a)
-    #  pMountDir is required with -a, othherwise it is optional
+    # -d pMountPath (set with prompt/response, or required if -a)
+    #  pMountDir is required with -a, otherwise it is optional
     fRemoteGetMountDir "$pMountDir"
     pMountDir=$gResponse
 
-    # Define the remote raw dir name (currenly hardcoded)
+    # Define the remote raw dir name (currently hardcoded)
     fRemoteGetRemoteRawDir "$pMountDir"
     gpRemoteRawOrigin=$gResponse
 

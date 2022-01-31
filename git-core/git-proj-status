@@ -62,7 +62,7 @@ example to show the files that are the same between local and remote:
  -x, -xx..., -X N (gpDebug)
 
 Run "git proj -h" for details. Or "man git-proj" for help with all the
-subcommands.
+sub-commands.
 
 =back
 

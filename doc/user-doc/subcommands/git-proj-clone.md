@@ -23,7 +23,7 @@ mounted drive.
 
 - **-a**
 
-    Automated mode. Use this in batch (non-interactve) scripts. See the
+    Automated mode. Use this in batch (non-interactive) scripts. See the
     \-y|-n options.
 
 - **-y|-n**

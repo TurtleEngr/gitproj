@@ -1,4 +1,4 @@
-# Documentation Orgainizaton
+# Documentation Organization
 
 * Try to structure the documentation in an order that users will most
   likely need.
@@ -94,7 +94,7 @@ Dir: /usr/share/doc/git-proj/user-doc/
             PROJ/.gitpro
             PROJ/.gitignore
             PROJ/.git/config
-    Dir: subcommands/
+    Dir: sub-commands/
         File: git-proj-CMD.html - gen from git-proj-CMD
         File: git-proj-CMD.md - gen from git-proj-CMD
     Dir: tutorials/

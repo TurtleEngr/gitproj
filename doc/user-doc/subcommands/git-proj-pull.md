@@ -28,7 +28,7 @@ If the -g option is given then run:
 - **-d**
 
     If the -d option is used, then the local raw/ will be made identical
-    to the remote raw/. I.e. files might be deleated from the local raw/.
+    to the remote raw/. I.e. files might be deleted from the local raw/.
 
     See the help EXAMPLES section, in "git proj push", for a "save" way to
     use this option.
@@ -39,7 +39,7 @@ If the -g option is given then run:
     select the action. -n will just display what would be done.
 
     If there is a -d option, that will be removed and the -n option
-    will be added. -d could be very distructive, so it needs to be
+    will be added. -d could be very destructive, so it needs to be
     run interactively.
 
 - **-y|-n**

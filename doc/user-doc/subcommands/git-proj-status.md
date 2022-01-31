@@ -42,7 +42,7 @@
         -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h" for details. Or "man git-proj" for help with all the
-    subcommands.
+    sub-commands.
 
 # RETURN VALUE
 

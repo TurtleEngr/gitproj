@@ -20,7 +20,7 @@
         <li><a href="#pSubCmd">pSubCmd</a></li>
         <li><a href="#pSubCmdOpt">pSubCmdOpt</a></li>
         <li><a href="#common-options">[common-options]</a></li>
-        <li><a href="#Confiiguration">Confiiguration</a></li>
+        <li><a href="#Configuration">Configuration</a></li>
       </ul>
     </li>
     <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
@@ -85,8 +85,8 @@
     <li><a href="#HISTORY6">HISTORY</a></li>
   </ul>
   <h1 id="NAME-git-proj">NAME git proj</h1>
-  <p>This implements the "git proj" subcommand, for managing large binary
-  files, and repositiories on external drives.</p>
+  <p>This implements the "git proj" sub-command, for managing large binary
+  files, and repositories on external drives.</p>
   <h1 id="SYNOPSIS">SYNOPSIS</h1>
   <pre><code>        git proj [-v] [-V] [--version] [-h] [-H pStyle]
 
@@ -96,7 +96,7 @@
         pSubCmdOpt: Just run: "git proj [pSubCmd] -H usage"
         [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]</code></pre>
   <h1 id="DESCRIPTION">DESCRIPTION</h1>
-  <p>The "git proj" subcommand supports using git repo for versioning files
+  <p>The "git proj" sub-command supports using git repo for versioning files
   to locally mounted external drives.</p>
   <p>git-proj also mostly solves the issue with large binary files causing
   git repo "bloat". Large files are not versioned, they are only copied. So
@@ -104,7 +104,7 @@
   versioned to point to the large binary files.)</p>
   <p>This is a much simpler implementation than git-lfs for managing the
   versioning of large binary files. Since the large files are not versioned,
-  i.e. only the last version is saved, this is a comompromize on having
+  i.e. only the last version is saved, this is a compromise on having
   "perfect" version control of the files.</p>
   <p>The main inspiration for the proj tool came from the need to versioning
   video projects. Video files are HUGE, yet they don't change much. Since
@@ -132,8 +132,8 @@
     <b>pull</b> - Pull files from the "raw" remote&gt; (and optionally
     git)</dt>
     <dd></dd>
-    <dt id="status---Show-the-staus-of-raw-files-and-git"><b>status</b> -
-    Show the staus of "raw" files, and git</dt>
+    <dt id="status---Show-the-status-of-raw-files-and-git"><b>status</b> -
+    Show the status of "raw" files, and git</dt>
     <dd></dd>
     <dt id="add---TBD-Add-a-large-binary-file-to-the-raw-remote"><b>add</b> -
     TBD Add a large binary file to the "raw" remote</dt>
@@ -163,8 +163,8 @@
       formatted.</p>
       <p>Supported styles:</p>
       <pre><code>    short|usage - Output short usage help as text.
-    long|text   - Output long usage help as text. All subcommands.
-    html        - Output long usage help as html. All subcommands.
+    long|text   - Output long usage help as text. All sub-commands.
+    html        - Output long usage help as html. All sub-commands.
     md          - Output long usage help as markdown.
     man         - Output long usage help as a man page.
     int         - Output internal documentation as text.
@@ -178,7 +178,7 @@
     </dd>
     <dt id="v"><b>-v</b></dt>
     <dd>
-      <p>This sets the verbose lovel (gpVerbose=2) to 2, which is the
+      <p>This sets the verbose level (gpVerbose=2) to 2, which is the
       default.</p>
       <p>At level 2, warning and notice messages will be output.</p>
     </dd>
@@ -206,7 +206,7 @@
       <p>Key:</p>
       <pre><code>    [Command] - the top level command
     [crit|err|warning|notice|info|debug] - log levels
-    [File:LineNo](ErrCode) - exacly where the error message came from (optional)</code></pre>
+    [File:LineNo](ErrCode) - exactly where the error message came from (optional)</code></pre>
     </dd>
     <dt id="x"><b>-x</b></dt>
     <dd>
@@ -228,7 +228,7 @@
       <pre><code>    [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)</code></pre>
     </dd>
   </dl>
-  <h2 id="Confiiguration">Confiiguration</h2>
+  <h2 id="Configuration">Configuration</h2>
   <p>These are the main configuration files you will need to know about.</p>
   <pre><code> /usr/share/doc/config/gitconfig
  ~/.gitconfig
@@ -238,10 +238,10 @@
   about these files and all the important gitproj variables. The pre-commit
   hook and its config vars are also described.</p>
   <h1 id="RETURN-VALUE">RETURN VALUE</h1>
-  <p>The subcommands will return 0, if there were no serious errors. Even if
+  <p>The sub-commands will return 0, if there were no serious errors. Even if
   0, pay attention to the log messages that are output.</p>
-  <p>If a subcommand retuns a non-0 code, then some change is needed before
-  trying again. Hoepfully the error and warning message describe what needs
+  <p>If a sub-command retuns a non-0 code, then some change is needed before
+  trying again. Hopefully the error and warning message describe what needs
   to change.</p>
   <h1 id="EXAMPLES">EXAMPLES</h1>
   <p>See the tutorial document for some examples.</p>
@@ -305,13 +305,13 @@
   default options, which can be overridden with other options.</p>
   <p>If there is no -a option, you will be prompted for the settings. See the
   OPTION section for details.</p>
-  <p>When the local and remote git repos are setup, all the setings will be
+  <p>When the local and remote git repos are setup, all the settings will be
   saved to [project]/.git/config and [project]/.gitproj</p>
   <h1 id="OPTIONS1">OPTIONS</h1>
   <dl>
     <dt id="a"><b>-a</b></dt>
     <dd>
-      <p>The -a option will automattically run the whole init process with
+      <p>The -a option will automatically run the whole init process with
       default settings. The other options can be defined to override the
       default settings.</p>
     </dd>
@@ -338,8 +338,8 @@
       will be created in the raw directory that correspond to the project's
       directory. A symlink will replace the moved file. The symlink will
       point to [raw].</p>
-      <p>The symlinks are only provided for backward compatability; it would
-      be best to remove those links and modifiy your code and apps to access
+      <p>The symlinks are only provided for backward compatibility; it would
+      be best to remove those links and modify your code and apps to access
       the files directly from the raw directories.</p>
       <p>Prompt:</p>
       <pre><code>    Move the files (-m) [y/n]?</code></pre>
@@ -357,7 +357,7 @@
  -q, -v, -V N     (gpVerbose)
  -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details. Or "man git-proj" for help with all
-      the subcommands.</p>
+      the sub-commands.</p>
     </dd>
   </dl>
   <h1 id="RETURN-VALUE1">RETURN VALUE</h1>
@@ -444,7 +444,7 @@
     </dd>
     <dt id="a1"><b>-a</b></dt>
     <dd>
-      <p>Automated mode. Use this in batch (non-interactve) scripts. See the
+      <p>Automated mode. Use this in batch (non-interactive) scripts. See the
       -y|-n options.</p>
     </dd>
     <dt id="y--n"><b>-y|-n</b></dt>
@@ -500,7 +500,7 @@
     <dt id="d"><b>-d</b></dt>
     <dd>
       <p>If the -d option is used, then the remote raw/ will be made
-      identical to the local raw/. I.e. files might be deleated from the
+      identical to the local raw/. I.e. files might be deleted from the
       remote raw/.</p>
       <p>See the EXAMPLES section for a "save" way to use this option.</p>
     </dd>
@@ -509,7 +509,7 @@
       <p>This turns on automated push for raw/ files. Use the -y or -n to
       select the action. -n will just display what would be done.</p>
       <p>If there is a -d option, that will be removed and the -n option will
-      be added. -d could be very distructive, so it needs to be run
+      be added. -d could be very destructive, so it needs to be run
       interactively.</p>
     </dd>
     <dt id="y--n1"><b>-y|-n</b></dt>
@@ -571,7 +571,7 @@
     <dt id="d1"><b>-d</b></dt>
     <dd>
       <p>If the -d option is used, then the local raw/ will be made identical
-      to the remote raw/. I.e. files might be deleated from the local
+      to the remote raw/. I.e. files might be deleted from the local
       raw/.</p>
       <p>See the help EXAMPLES section, in "git proj push", for a "save" way
       to use this option.</p>
@@ -581,7 +581,7 @@
       <p>This turns on automated push for raw/ files. Use the -y or -n to
       select the action. -n will just display what would be done.</p>
       <p>If there is a -d option, that will be removed and the -n option will
-      be added. -d could be very distructive, so it needs to be run
+      be added. -d could be very destructive, so it needs to be run
       interactively.</p>
     </dd>
     <dt id="y--n2"><b>-y|-n</b></dt>
@@ -650,7 +650,7 @@
  -q, -v, -V N     (gpVerbose)
  -x, -xx..., -X N (gpDebug)</code></pre>
       <p>Run "git proj -h" for details. Or "man git-proj" for help with all
-      the subcommands.</p>
+      the sub-commands.</p>
     </dd>
   </dl>
   <h1 id="RETURN-VALUE6">RETURN VALUE</h1>

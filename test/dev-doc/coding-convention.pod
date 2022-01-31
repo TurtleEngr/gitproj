@@ -78,7 +78,7 @@ Prefix codes are used to show the B<"scope"> of variables:
 All UPPERCASE variables are B<only> used when they are required by
 other programs or scripts.
 
-If you have exported variables that are shared across scritps, then
+If you have exported variables that are shared across scripts, then
 this convention can be extended by using prefixes that are related to
 where the variables are set.
 

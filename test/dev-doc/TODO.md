@@ -22,21 +22,20 @@ After 1.0, move these to github issues.
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
-* Why was git-flow pkg not found by init? Line: 264
-
-* ../.. is still showing up
-
 * Run spell check on all the docs.
 
-* Implement pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
+* Implement the pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
 
-* PROJ/.pre-commit can optionally overide $gpDoc/hooks/pre-commit
+* git-proj-init creates .git/hooks/pre-commit and PROJ/.pre-commit
+  from $gpDoc/hooks/pre-commit, or ~/.pre-commit.
+  git-proj-clone creates.git/hooks/pre-commit from PROJ/.pre-commit,
+  which should have been versioned.
 
 * Write a script that converts "LINK{title|filepath}" to html anchors
   or markdown links. The POD L<title|filepath> does not work for
   relative links.
 
-* git-proj-clone will initally copy all of PROJ/.gitproj (after git
+* git-proj-clone will initially copy all of PROJ/.gitproj (after git
   clone).  Then update local config: local-status, local-host,
   proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig
 
@@ -138,7 +137,7 @@ Makefile targets for managing them.
   See: `test/dev-doc/enhancements/version-wizard.md`
 
 * Decided on which remote network service to implement. Do all, only
-  do one or two? Some methods are not compatable. See raw-pros-cons.md
+  do one or two? Some methods are not compatible. See raw-pros-cons.md
 
 * Future feature: manage different versions of binary files with a
   process similar to rsnapshot. See
@@ -287,7 +286,7 @@ Fix: look for first arg so see if it is a CMD. - done
 
 * Refactor: Move the [gitproj] sections in in .gitproj.config.global to
   .gitconfig so the include.path does not need to be maintained? Also
-  removing the include path from PROJ/.git/config will make is easer
+  removing the include path from PROJ/.git/config will make is easier
   to not forget to include the --include option to "git config". Also
   there will be fewer files for the user to manage.
   Only $gpDoc/gitconfig is needed. - done
@@ -328,6 +327,9 @@ structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
 * Add check: on creation of remote raw, create a file with the git
 origin in it. On clone, push, pull, the actual origin can be compared
 to the origin in the remote raw file. Problem: the git origin can be
-different on differnt systems, because of different mount points. Fix,
+different on different systems, because of different mount points. Fix,
 just compare the last dir name--it should match origin.git - done
 
+* Why was git-flow pkg not found by init? Line: 264 - fixed
+
+* ../.. is still showing up - fixed

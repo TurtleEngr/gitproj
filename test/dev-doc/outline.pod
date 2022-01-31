@@ -27,7 +27,7 @@
     |   |   |   |config.md - generated, versioned
     |   |   |   |subcommands/
     |   |   |   |   |git-proj-CMD.html - gen from git-proj-CMD
-    |   |   |   |   |git-proj-CMD.md - gen from git-proj-CM, versionedD
+    |   |   |   |   |git-proj-CMD.md - gen from git-proj-CM, versioned
     |   |   |   |tutorials/
     |   |   |   |   |create_a_git-proj_repo.html - generated, not versioned
     |   |   |   |   |create_a_git-proj_repo.md -  generated, versioned
@@ -124,7 +124,7 @@ See gitproj/package/dist/
     |   |   |   |   |.git/
     |   |   |   |   |   |config/ - see gitproj sections
     |   |   |   |   |   |hooks/
-    |   |   |   |   |   |   |pre-commmit
+    |   |   |   |   |   |   |pre-commit
     |   |   |   |   |.gitproj - version
     |   |   |   |   |.gitignore - version
     |   |   |   |   |.pre-commit - version

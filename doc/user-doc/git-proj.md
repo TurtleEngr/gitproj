@@ -1,7 +1,7 @@
 # NAME git proj
 
-This implements the "git proj" subcommand, for managing large binary
-files, and repositiories on external drives.
+This implements the "git proj" sub-command, for managing large binary
+files, and repositories on external drives.
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ files, and repositiories on external drives.
 
 # DESCRIPTION
 
-The "git proj" subcommand supports using git repo for versioning files to
+The "git proj" sub-command supports using git repo for versioning files to
 locally mounted external drives.
 
 git-proj also mostly solves the issue with large binary files causing
@@ -25,7 +25,7 @@ are used and versioned to point to the large binary files.)
 
 This is a much simpler implementation than git-lfs for managing the
 versioning of large binary files. Since the large files are not
-versioned, i.e. only the last version is saved, this is a comompromize
+versioned, i.e. only the last version is saved, this is a compromise
 on having "perfect" version control of the files.
 
 The main inspiration for the proj tool came from the need to
@@ -45,7 +45,7 @@ no need to save every rendered version.
 - **clone** - Clone a previously saved project
 - **push** - Push files to the "raw" remote (and optionally git)
 - **pull** - Pull files from the "raw" remote> (and optionally git)
-- **status** - Show the staus of "raw" files, and git
+- **status** - Show the status of "raw" files, and git
 - **add** - TBD Add a large binary file to the "raw" remote
 - **config** - TBD Redefine config values
 
@@ -73,8 +73,8 @@ Use "git prog CMD -h" for full help.
     Supported styles:
 
         short|usage - Output short usage help as text.
-        long|text   - Output long usage help as text. All subcommands.
-        html        - Output long usage help as html. All subcommands.
+        long|text   - Output long usage help as text. All sub-commands.
+        html        - Output long usage help as html. All sub-commands.
         md          - Output long usage help as markdown.
         man         - Output long usage help as a man page.
         int         - Output internal documentation as text.
@@ -89,7 +89,7 @@ Use "git prog CMD -h" for full help.
 
 - **-v**
 
-    This sets the verbose lovel (gpVerbose=2) to 2, which is the default.
+    This sets the verbose level (gpVerbose=2) to 2, which is the default.
 
     At level 2, warning and notice messages will be output.
 
@@ -128,7 +128,7 @@ Use "git prog CMD -h" for full help.
 
         [Command] - the top level command
         [crit|err|warning|notice|info|debug] - log levels
-        [File:LineNo](ErrCode) - exacly where the error message came from (optional)
+        [File:LineNo](ErrCode) - exactly where the error message came from (optional)
 
 - **-x**
 
@@ -151,7 +151,7 @@ Use "git prog CMD -h" for full help.
 
         [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)
 
-## Confiiguration
+## Configuration
 
 These are the main configuration files you will need to know about.
 
@@ -166,11 +166,11 @@ The pre-commit hook and its config vars are also described.
 
 # RETURN VALUE
 
-The subcommands will return 0, if there were no serious errors. Even
+The sub-commands will return 0, if there were no serious errors. Even
 if 0, pay attention to the log messages that are output.
 
-If a subcommand retuns a non-0 code, then some change is needed before
-trying again. Hoepfully the error and warning message describe what
+If a sub-command retuns a non-0 code, then some change is needed before
+trying again. Hopefully the error and warning message describe what
 needs to change.
 
 # EXAMPLES
@@ -268,14 +268,14 @@ default options, which can be overridden with other options.
 If there is no -a option, you will be prompted for the settings.  See
 the OPTION section for details.
 
-When the local and remote git repos are setup, all the setings
+When the local and remote git repos are setup, all the settings
 will be saved to \[project\]/.git/config and \[project\]/.gitproj
 
 # OPTIONS
 
 - **-a**
 
-    The -a option will automattically run the whole init process with
+    The -a option will automatically run the whole init process with
     default settings. The other options can be defined to override the
     default settings.
 
@@ -309,8 +309,8 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     directory. A symlink will replace the moved file. The symlink will
     point to \[raw\].
 
-    The symlinks are only provided for backward compatability; it would be
-    best to remove those links and modifiy your code and apps to access
+    The symlinks are only provided for backward compatibility; it would be
+    best to remove those links and modify your code and apps to access
     the files directly from the raw directories.
 
     Prompt:
@@ -333,7 +333,7 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
         -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h" for details. Or "man git-proj" for help with all the
-    subcommands.
+    sub-commands.
 
 # RETURN VALUE
 
@@ -454,7 +454,7 @@ mounted drive.
 
 - **-a**
 
-    Automated mode. Use this in batch (non-interactve) scripts. See the
+    Automated mode. Use this in batch (non-interactive) scripts. See the
     \-y|-n options.
 
 - **-y|-n**
@@ -530,7 +530,7 @@ GPLv3 Copyright 2021 by TurtleEngr
 - **-d**
 
     If the -d option is used, then the remote raw/ will be made identical
-    to the local raw/. I.e. files might be deleated from the remote raw/.
+    to the local raw/. I.e. files might be deleted from the remote raw/.
 
     See the EXAMPLES section for a "save" way to use this option.
 
@@ -540,7 +540,7 @@ GPLv3 Copyright 2021 by TurtleEngr
     select the action. -n will just display what would be done.
 
     If there is a -d option, that will be removed and the -n option
-    will be added. -d could be very distructive, so it needs to be
+    will be added. -d could be very destructive, so it needs to be
     run interactively.
 
 - **-y|-n**
@@ -625,7 +625,7 @@ If the -g option is given then run:
 - **-d**
 
     If the -d option is used, then the local raw/ will be made identical
-    to the remote raw/. I.e. files might be deleated from the local raw/.
+    to the remote raw/. I.e. files might be deleted from the local raw/.
 
     See the help EXAMPLES section, in "git proj push", for a "save" way to
     use this option.
@@ -636,7 +636,7 @@ If the -g option is given then run:
     select the action. -n will just display what would be done.
 
     If there is a -d option, that will be removed and the -n option
-    will be added. -d could be very distructive, so it needs to be
+    will be added. -d could be very destructive, so it needs to be
     run interactively.
 
 - **-y|-n**
@@ -724,7 +724,7 @@ GPLv3 Copyright 2021 by TurtleEngr
         -x, -xx..., -X N (gpDebug)
 
     Run "git proj -h" for details. Or "man git-proj" for help with all the
-    subcommands.
+    sub-commands.
 
 # RETURN VALUE
 

@@ -63,7 +63,7 @@ Calls tcSaveEnv.
 =internal-head4 tcCatch
 
 Save throw or cmd errors, and restore any env. var. changes in the subshell.
-If a commnd exits before a tcSaveEnv call, env. var. changes will be lost.
+If a command exits before a tcSaveEnv call, env. var. changes will be lost.
 Calls tcSaveEnv.
 
 =internal-head4 tcThrowErrors
@@ -247,7 +247,7 @@ ${gpLocalTopDir} with support for managing large binary files (larger
 than $gpMaxSize).
 
 ~/.gitconfig the '[gitproj "config"]' and '[gitproj "hooks"]'
-sections, which will defined the inititial gitproj variables for new
+sections, which will defined the initial gitproj variables for new
 projects.  The global variables can be overridden by a project's local
 config definitions (in .git/config).
 
@@ -719,7 +719,7 @@ fComUsage()
             ;;
         *)
             tProg=pod2text
-            fLog -p warning -m "Unknown style: '$pStyle' so usiing text" -l $tSrc:$LINENO
+            fLog -p warning -m "Unknown style: '$pStyle' so using text" -l $tSrc:$LINENO
             ;;
     esac
 
@@ -1120,7 +1120,7 @@ pLevel - emerg alert crit err warning notice info debug debug-N
  -xx - set gpDebug=2
  -X N - set gpDebug=N (0..100)
 
- if gpDebug = 0, don't output andy debug msgs
+ if gpDebug = 0, don't output any debug msgs
  if gpDebug > 0, output any "debug" msgs, or
  if gpDebug = N1, output "debug-N2" msgs, if N1 >= N2
 
@@ -1650,11 +1650,11 @@ will terminate. I.e. the config var is required.
 
 * or if the value for pKey is equal to pDefault, fError will be called
 and the script will terminate. I.e. the config var is still set to
-it's intitial "undefined" value.
+it's initial "undefined" value.
 
 * or if the value for pKey is equal to "TBD" or "not-defined", fError
 will be called and the script will terminate. I.e. the config var is
-still set to it's intitial "undefined" value.
+still set to it's initial "undefined" value.
 
 Note: -e will only exit the whole script if it is not in a subshell.
 I.e. don't use var=\$(cmd) style.

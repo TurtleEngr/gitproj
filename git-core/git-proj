@@ -67,8 +67,8 @@ fUsage()
 
 =head1 NAME git proj
 
-This implements the "git proj" subcommand, for managing large binary
-files, and repositiories on external drives.
+This implements the "git proj" sub-command, for managing large binary
+files, and repositories on external drives.
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ files, and repositiories on external drives.
 
 =head1 DESCRIPTION
 
-The "git proj" subcommand supports using git repo for versioning files to
+The "git proj" sub-command supports using git repo for versioning files to
 locally mounted external drives.
 
 git-proj also mostly solves the issue with large binary files causing
@@ -92,7 +92,7 @@ are used and versioned to point to the large binary files.)
 
 This is a much simpler implementation than git-lfs for managing the
 versioning of large binary files. Since the large files are not
-versioned, i.e. only the last version is saved, this is a comompromize
+versioned, i.e. only the last version is saved, this is a compromise
 on having "perfect" version control of the files.
 
 The main inspiration for the proj tool came from the need to
@@ -119,7 +119,7 @@ no need to save every rendered version.
 
 =item B<pull> - Pull files from the "raw" remote> (and optionally git)
 
-=item B<status> - Show the staus of "raw" files, and git
+=item B<status> - Show the status of "raw" files, and git
 
 =item B<add> - TBD Add a large binary file to the "raw" remote
 
@@ -153,8 +153,8 @@ pStyle is used to select the type of help and how it is formatted.
 Supported styles:
 
     short|usage - Output short usage help as text.
-    long|text   - Output long usage help as text. All subcommands.
-    html        - Output long usage help as html. All subcommands.
+    long|text   - Output long usage help as text. All sub-commands.
+    html        - Output long usage help as html. All sub-commands.
     md          - Output long usage help as markdown.
     man         - Output long usage help as a man page.
     int         - Output internal documentation as text.
@@ -169,7 +169,7 @@ Only very important log messages will be output.
 
 =item B<-v>
 
-This sets the verbose lovel (gpVerbose=2) to 2, which is the default.
+This sets the verbose level (gpVerbose=2) to 2, which is the default.
 
 At level 2, warning and notice messages will be output.
 
@@ -208,7 +208,7 @@ Key:
 
     [Command] - the top level command
     [crit|err|warning|notice|info|debug] - log levels
-    [File:LineNo](ErrCode) - exacly where the error message came from (optional)
+    [File:LineNo](ErrCode) - exactly where the error message came from (optional)
 
 =item B<-x>
 
@@ -233,7 +233,7 @@ Debug log messages look like this::
 
 =back
 
-=head2 Confiiguration
+=head2 Configuration
 
 These are the main configuration files you will need to know about.
 
@@ -248,11 +248,11 @@ The pre-commit hook and its config vars are also described.
 
 =head1 RETURN VALUE
 
-The subcommands will return 0, if there were no serious errors. Even
+The sub-commands will return 0, if there were no serious errors. Even
 if 0, pay attention to the log messages that are output.
 
-If a subcommand retuns a non-0 code, then some change is needed before
-trying again. Hoepfully the error and warning message describe what
+If a sub-command retuns a non-0 code, then some change is needed before
+trying again. Hopefully the error and warning message describe what
 needs to change.
 
 =for comment =head1 ERRORS

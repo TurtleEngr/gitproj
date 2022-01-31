@@ -59,7 +59,7 @@ Pros and Cons for the different ways of managing remote raw/ files.
 
 * Requires ssh access
 
-* cvs managment can be mostly hidden with `git proj`, but some
+* cvs management can be mostly hidden with `git proj`, but some
   understanding of CVS would be useful.
 
 * cvs is not "distributed", so you would want to pick "one" remote
@@ -103,7 +103,7 @@ Pros and Cons for the different ways of managing remote raw/ files.
 
 ### Cons
 
-* Files are versioned as a set. Will the user do it requently enough?
+* Files are versioned as a set. Will the user do it frequently enough?
 
 * Requires ssh/rsync access
 
