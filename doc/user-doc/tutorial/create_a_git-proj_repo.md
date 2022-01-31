@@ -46,10 +46,10 @@ Set up a project directory with some dummy files:
 Output:
 
     hello-world/
-    |doc/
-    |   |prog1.txt
-    |src/
-    |   |prog1.sh
+    |-- doc/
+    |   |-- prog1.txt
+    |-- src/
+    |   |-- prog1.sh
 
 # Create the "local" git project repo
 
@@ -99,59 +99,59 @@ This if the project's directory tree now:
     tree -aF hello-world/
 
     hello-world/
-    |doc/
-    |   |prog1.txt
-    |.git/
-    |   |branches/
-    |   |hooks/
-    |   |   |pre-commit*
+    |-- doc/
+    |   |  -prog1.txt
+    |-- .git/
+    |   |-- branches/
+    |   |-- hooks/
+    |   |   |-- pre-commit*
     ...
-    |   |info/
-    |   |   |exclude
-    |   |logs/
-    |   |   |refs/
-    |   |   |   |heads/
-    |   |   |   |   |develop
-    |   |   |   |   |main
-    |   |   |HEAD
-    |   |objects/
-    |   |   |16/
-    |   |   |   |0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
+    |   |-- info/
+    |   |   |-- exclude
+    |   |-- logs/
+    |   |   |-- refs/
+    |   |   |   |-- heads/
+    |   |   |   |   |-- develop
+    |   |   |   |   |-- main
+    |   |   |-- HEAD
+    |   |-- objects/
+    |   |   |-- 16/
+    |   |   |   |-- 0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
     ...
-    |   |   |info/
-    |   |   |pack/
-    |   |refs/
-    |   |   |heads/
-    |   |   |   |develop
-    |   |   |   |main
-    |   |   |tags/
-    |   |COMMIT_EDITMSG
-    |   |config
-    |   |config.bak
-    |   |description
-    |   |HEAD
-    |   |index
-    |raw/
-    |   |README.txt
-    |src/
-    |   |prog1.sh
-    |.gitignore
-    |.gitproj
-    |.gitproj.bak
+    |   |   |-- info/
+    |   |   |-- pack/
+    |   |-- refs/
+    |   |   |-- heads/
+    |   |   |   |-- develop
+    |   |   |   |-- main
+    |   |   |-- tags/
+    |   |-- COMMIT_EDITMSG
+    |   |-- config
+    |   |-- config.bak
+    |   |-- description
+    |   |-- HEAD
+    |   |-- index
+    |-- raw/
+    |   |-- README.txt
+    |-- src/
+    |   |-- prog1.sh
+    |-- .gitignore
+    |-- .gitproj
+    |-- .gitproj.bak
 
 In the hello-world dir you have some new dirs and files. These are the
 interesting ones:
 
     hello-world/
-    |.git/
-    |   |branches/
-    |   |hooks/
-    |   |   |pre-commit*
-    |   |config
+    |-- .git/
+    |   |-- branches/
+    |   |-- hooks/
+    |   |   |-- pre-commit*
+    |   |-- config
     |raw/
-    |   |README.txt
-    |.gitignore
-    |.gitproj
+    |   |-- README.txt
+    |--.gitignore
+    |-- .gitproj
 
 If you look in `.gitproj` it will have a copy of the gitflow and getproj
 sections from `~/.gitconfig`. (This file is versioned in git, because
@@ -426,41 +426,41 @@ this demo, type 'y'
 
      tree -aF $PWD
 
-     tmp/bob/ver/proj
-     |hello-world/
-     |   |doc/
-     |   |   |prog1.txt
-     |   |.git/
-     |   |   |branches/
-     |   |   |hooks/
-     |   |   |   |pre-commit*   # Copied from
+     tmp/bob/ver/proj/
+     |-- hello-world/
+     |   |-- doc/
+     |   |   |-- prog1.txt
+     |   |-- .git/
+     |   |   |-- branches/
+     |   |   |-- hooks/
+     |   |   |   |-- pre-commit*        # Copied from
      ...
-     |   |   |info/
-     |   |   |   |exclude
-     |   |   |logs/
-     |   |   |   |refs/
+     |   |   |-- info/
+     |   |   |   |-- exclude
+     |   |   |-- logs/
+     |   |   |   |-- refs/
      ...
-     |   |   |   |HEAD
-     |   |   |objects/
+     |   |   |   |-- HEAD
+     |   |   |-- objects/
      ...
-     |   |   |refs/
+     |   |   |-- refs/
      ...
-     |   |   |COMMIT_EDITMSG
-     |   |   |config            # Updated from PROJ/.gitproj
-     |   |   |config.bak        # Before the update
-     |   |   |description
-     |   |   |HEAD
-     |   |   |index
-     |   |   |packed-refs
-     |   |raw/
-     |   |   |another-file.txt
-     |   |   |extra-file.txt
-     |   |   |.remote.proj      # Keep this file in raw/
-     |   |src/
-     |   |   |prog1.sh
-     |   |foo.txt
-     |   |.gitignore
-     |   |.gitproj
+     |   |   |-- COMMIT_EDITMSG
+     |   |   |-- config         # Updated from PROJ/.gitproj
+     |   |   |-- config.bak     # Before the update
+     |   |   |-- description
+     |   |   |-- HEAD
+     |   |   |-- index
+     |   |   |-- packed-refs
+     |   |-- raw/
+     |   |   |-- another-file.txt
+     |   |   |-- extra-file.txt
+     |   |   |-- .remote.proj   # Keep this file in raw/
+     |   |-- src/
+     |   |   |-- prog1.sh
+     |   |-- foo.txt
+     |   |-- .gitignore
+     |   |-- .gitproj
 
 # Now try `git proj status` in bob's dir
 

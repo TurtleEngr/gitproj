@@ -82,10 +82,10 @@
 <p>Output:</p>
 
 <pre><code>    hello-world/
-    |doc/
-    |   |prog1.txt
-    |src/
-    |   |prog1.sh</code></pre>
+    |-- doc/
+    |   |-- prog1.txt
+    |-- src/
+    |   |-- prog1.sh</code></pre>
 
 <a href="#_podtop_"><h1 id="Create-the-local-git-project-repo">Create the &quot;local&quot; git project repo</h1></a>
 
@@ -131,58 +131,58 @@
     tree -aF hello-world/
 
     hello-world/
-    |doc/
-    |   |prog1.txt
-    |.git/
-    |   |branches/
-    |   |hooks/
-    |   |   |pre-commit*
+    |-- doc/
+    |   |  -prog1.txt
+    |-- .git/
+    |   |-- branches/
+    |   |-- hooks/
+    |   |   |-- pre-commit*
     ...
-    |   |info/
-    |   |   |exclude
-    |   |logs/
-    |   |   |refs/
-    |   |   |   |heads/
-    |   |   |   |   |develop
-    |   |   |   |   |main
-    |   |   |HEAD
-    |   |objects/
-    |   |   |16/
-    |   |   |   |0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
+    |   |-- info/
+    |   |   |-- exclude
+    |   |-- logs/
+    |   |   |-- refs/
+    |   |   |   |-- heads/
+    |   |   |   |   |-- develop
+    |   |   |   |   |-- main
+    |   |   |-- HEAD
+    |   |-- objects/
+    |   |   |-- 16/
+    |   |   |   |-- 0b28192d7c7fd93a4ffa7ff143f482f03c8cdf
     ...
-    |   |   |info/
-    |   |   |pack/
-    |   |refs/
-    |   |   |heads/
-    |   |   |   |develop
-    |   |   |   |main
-    |   |   |tags/
-    |   |COMMIT_EDITMSG
-    |   |config
-    |   |config.bak
-    |   |description
-    |   |HEAD
-    |   |index
-    |raw/
-    |   |README.txt
-    |src/
-    |   |prog1.sh
-    |.gitignore
-    |.gitproj
-    |.gitproj.bak</code></pre>
+    |   |   |-- info/
+    |   |   |-- pack/
+    |   |-- refs/
+    |   |   |-- heads/
+    |   |   |   |-- develop
+    |   |   |   |-- main
+    |   |   |-- tags/
+    |   |-- COMMIT_EDITMSG
+    |   |-- config
+    |   |-- config.bak
+    |   |-- description
+    |   |-- HEAD
+    |   |-- index
+    |-- raw/
+    |   |-- README.txt
+    |-- src/
+    |   |-- prog1.sh
+    |-- .gitignore
+    |-- .gitproj
+    |-- .gitproj.bak</code></pre>
 
 <p>In the hello-world dir you have some new dirs and files. These are the interesting ones:</p>
 
 <pre><code>    hello-world/
-    |.git/
-    |   |branches/
-    |   |hooks/
-    |   |   |pre-commit*
-    |   |config
+    |-- .git/
+    |   |-- branches/
+    |   |-- hooks/
+    |   |   |-- pre-commit*
+    |   |-- config
     |raw/
-    |   |README.txt
-    |.gitignore
-    |.gitproj</code></pre>
+    |   |-- README.txt
+    |--.gitignore
+    |-- .gitproj</code></pre>
 
 <p>If you look in <code>.gitproj</code> it will have a copy of the gitflow and getproj sections from <code>~/.gitconfig</code>. (This file is versioned in git, because when the this git repo is &quot;cloned&quot; this file will be used to create the getproj sections in the local <code>.git/config</code> file.)</p>
 
@@ -425,41 +425,41 @@
 
 <pre><code>     tree -aF $PWD
 
-     tmp/bob/ver/proj
-     |hello-world/
-     |   |doc/
-     |   |   |prog1.txt
-     |   |.git/
-     |   |   |branches/
-     |   |   |hooks/
-     |   |   |   |pre-commit*   # Copied from
+     tmp/bob/ver/proj/
+     |-- hello-world/
+     |   |-- doc/
+     |   |   |-- prog1.txt
+     |   |-- .git/
+     |   |   |-- branches/
+     |   |   |-- hooks/
+     |   |   |   |-- pre-commit*        # Copied from
      ...
-     |   |   |info/
-     |   |   |   |exclude
-     |   |   |logs/
-     |   |   |   |refs/
+     |   |   |-- info/
+     |   |   |   |-- exclude
+     |   |   |-- logs/
+     |   |   |   |-- refs/
      ...
-     |   |   |   |HEAD
-     |   |   |objects/
+     |   |   |   |-- HEAD
+     |   |   |-- objects/
      ...
-     |   |   |refs/
+     |   |   |-- refs/
      ...
-     |   |   |COMMIT_EDITMSG
-     |   |   |config            # Updated from PROJ/.gitproj
-     |   |   |config.bak        # Before the update
-     |   |   |description
-     |   |   |HEAD
-     |   |   |index
-     |   |   |packed-refs
-     |   |raw/
-     |   |   |another-file.txt
-     |   |   |extra-file.txt
-     |   |   |.remote.proj      # Keep this file in raw/
-     |   |src/
-     |   |   |prog1.sh
-     |   |foo.txt
-     |   |.gitignore
-     |   |.gitproj</code></pre>
+     |   |   |-- COMMIT_EDITMSG
+     |   |   |-- config         # Updated from PROJ/.gitproj
+     |   |   |-- config.bak     # Before the update
+     |   |   |-- description
+     |   |   |-- HEAD
+     |   |   |-- index
+     |   |   |-- packed-refs
+     |   |-- raw/
+     |   |   |-- another-file.txt
+     |   |   |-- extra-file.txt
+     |   |   |-- .remote.proj   # Keep this file in raw/
+     |   |-- src/
+     |   |   |-- prog1.sh
+     |   |-- foo.txt
+     |   |-- .gitignore
+     |   |-- .gitproj</code></pre>
 
 <a href="#_podtop_"><h1 id="Now-try-git-proj-status-in-bobs-dir">Now try <code>git proj status</code> in bob&#39;s dir</h1></a>
 
