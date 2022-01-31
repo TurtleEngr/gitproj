@@ -6,30 +6,21 @@ After 1.0, move these to github issues.
 
 ## bug (defect, fix, needs to be changed)
 
-* git config vars and section names are case-insensitive. Fix the
-  comConfig (and 'git config') functions to lowercase the key names.
+* git config vars and section names are case-insensitive. Fix the 'git
+  config' related functions to lowercase the section and key names.
 
 --------------------
 
 ## documentation
 
-* Show the git-proj in action:
-     example scenarios
-     why would you want this?
-     what does it solve?
+* Show the git-proj in action. Example scenarios Why would you want
+  this?  What does it solve?
 
 --------------------
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
-* Run spell check on all the docs.
-
 * Implement the pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
-
-* git-proj-init creates .git/hooks/pre-commit and PROJ/.pre-commit
-  from $gpDoc/hooks/pre-commit, or ~/.pre-commit.
-  git-proj-clone creates.git/hooks/pre-commit from PROJ/.pre-commit,
-  which should have been versioned.
 
 * Write a script that converts "LINK{title|filepath}" to html anchors
   or markdown links. The POD L<title|filepath> does not work for
@@ -51,11 +42,11 @@ After 1.0, move these to github issues.
 * Cleanup the saving of git-proj vars. Save to --local, then
   "frequently" update PROJ/.gitproj
 
-* Cleanup: break fComGetConfig in to two functions--it is doing too
+* Cleanup: break fComGetConfig into two functions--it is doing too
   many things that are not used. (e.g. listing source)
 
 * Cleanup: change true/false integer tests to be internally
-"safer". Use "0" and "1", for input values, and do string tests:
+  "safer". Use "0" and "1", for input values, and do string tests:
 
     if [ "${flag:-0}" = "0" ]
     if [ "${flag:-0}" != "0" ]
@@ -74,9 +65,7 @@ syntax. Make first letter lower: ${ans,}. Return first char: ${ans::1}
     ans=${ans,}
     if [ "${ans::1}" = "y" ]
 
-* Cleanup: Is gpGitFlowPkg used? If not remove it.
-
-* Cleanup: Make sure the log messages to follow the gpVerbose rules. (see flog
+* Cleanup: Make sure the log messages follow the gpVerbose rules. (see flog
   and git-proj)
 
 * Cleanup: fixup gpVar settings to follow the precedence rules (see
@@ -88,8 +77,6 @@ syntax. Make first letter lower: ${ans,}. Return first char: ${ans::1}
   - CLI option will override env. var.
 
   - Validate the settings, if any error, exit
-
-* Refactor the test setup so it is simpler.
 
 * Copy the test-env*.tgz files to a "public" place. And implement the
 Makefile targets for managing them.
@@ -110,11 +97,21 @@ Makefile targets for managing them.
 
     * How can a RC or final package build be "signaled"?
 
+* Version increment wizard script. Increment the
+  major/minor/path/rc/build vars based on Q/A. See
+  See: `test/dev-doc/enhancements/version-wizard.md`
+
 --------------------
 
-## enhancement
+## enhancement 1.0
 
 * Code git-proj-config.
+
+* Have git-proj-init create .git/hooks/pre-commit and PROJ/.pre-commit
+  from $gpDoc/hooks/pre-commit, or ~/.pre-commit.
+
+  And have git-proj-clone creates.git/hooks/pre-commit from
+  PROJ/.pre-commit, which should have been versioned.
 
 * In the git-proj-config command implement processes for a user to
   copy git-proj vars between PROJ/.gitproj, PROJ/.git/config, and
@@ -124,19 +121,11 @@ Makefile targets for managing them.
   binary files to be moved to "raw" files). See function in pre-commit
   hook script, for identifying those files.
 
-* Implement a command that will show the files in REMOTE-PATH/PROJ.raw
-  `git proj status` does a diff, which is good, maybe just add the
-  option to have the diff show the files that are the same. - done
-
 ----
 
-## Enhancement Major
+## Enhancement Major 2.0?
 
-* Version increment wizard script. Increment the
-  major/minor/path/rc/build vars based on Q/A. See
-  See: `test/dev-doc/enhancements/version-wizard.md`
-
-* Decided on which remote network service to implement. Do all, only
+* Decide on which remote network service to implement. Do all, only
   do one or two? Some methods are not compatible. See raw-pros-cons.md
 
 * Future feature: manage different versions of binary files with a
@@ -333,3 +322,9 @@ just compare the last dir name--it should match origin.git - done
 * Why was git-flow pkg not found by init? Line: 264 - fixed
 
 * ../.. is still showing up - fixed
+
+* Run spell check on all the docs.
+
+* Implement a command that will show the files in REMOTE-PATH/PROJ.raw
+  `git proj status` does a diff, which is good, maybe just add the
+  option to have the diff show the files that are the same. - done
