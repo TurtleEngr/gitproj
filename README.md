@@ -21,13 +21,13 @@ require a git server.
 # User Docs
 
 The user docs can be browsed online at:
-[user-doc](https://github.com/TurtleEngr/gitproj/tree/develop/doc/user-doc)
+[user-doc](https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc)
 
 I recommend you start with:
-[git-proj](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/git-proj.md)
+[git-proj](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md)
 
 Then the
-[Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/develop/doc/user-doc/tutorial/create_a_git-proj_repo.md)
+[Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/tutorial/create_a_git-proj_repo.md)
 tutorial shows the git-proj commands in action.
 
 # Installing
@@ -52,9 +52,16 @@ when prompted, use guest/guest for User/Password.
 Select the latest version (any OS). (the ones with 'RC' or 'test' in
 the names are not stable.
 
-Install Example:
+### Download example:
 
-    apt-get install ./git-proj-0.4.1-1-mx-x86_64.deb
+    tPkg=git-proj-0.5.4-1-mx-x86_64.deb
+    tUrl=https://moria.whyayh.com/rel/released/software/own/git-proj/deb
+    tOpt="--user=guest --password=guest"
+    wget $tOpt $tUrl/$tPkg
+
+### Install Example:
+
+    sudo apt-get install ./git-proj-0.4.1-1-mx-x86_64.deb
 
 ## Getting usage help
 

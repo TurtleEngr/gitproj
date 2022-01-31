@@ -190,7 +190,7 @@ See the LINK{gitproj Configuration Documentation|config.html} for a
 complete list of important files.
 
 All the User Documentation can also be found online in github at:
-[/doc/user-doc](https://github.com/TurtleEngr/gitproj/tree/develop/doc/user-doc)
+[/doc/user-doc](https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc)
 
 # SEE ALSO
 
@@ -202,6 +202,13 @@ All the User Documentation can also be found online in github at:
     git proj status
     git proj add
     git proj config
+
+    /usr/share/doc/git-proj/user-doc/
+        git-proj.html - all in one file
+        config.html - important configuration information
+    /usr/share/doc/git-proj/user-doc/tutorial/
+
+    Online docs: L<https://github.com/TurtleEngr/gitproj/tree/main/doc|https://github.com/TurtleEngr/gitproj/tree/main/doc>
 
 # CAVEATS
 

@@ -2,11 +2,41 @@
 
 ----------
 
-## tag-?
+## tag-0-5-4-1
 
-Date: ?
+Date: Mon 31 Jan 2022 09:56:47 AM PST
+
+* Updated docs
+
+* Created allcreate_a_git-proj_repo tutorial
+
+* Added raw/.remote.proj
+
+* Changed default remote-min-space to 2g
+
+* Renamed allow-tabs to check-for-tabs
+
+* Changed: binary-file-size-limit to binary-file-size
+
+* Added rm-trailing-sp, bash-fmt, and bash-lint to
+      /usr/share/doc/git-proj/contrib/
+
+* Create CODE_OF_CONDUCT.md
+
+* Created issue template: Bug Report
+
+* Created issue template: Feature Request
+
+* Added "requires" to package. See README "System requirements"
+    section.
 
 * Changed syslog default to `false`
+
+  TBD in variables.
+
+need for HOST config files.
+
+  options
 
 ----------
 
