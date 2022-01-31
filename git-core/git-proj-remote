@@ -148,13 +148,13 @@ fi
 fRemoteSetGlobals
 
 tSrc=${BASH_SOURCE##*/}
-gpMountDir=""
+export pMountDir=""
 gpYesNo=No
 while getopts :ad:hH:vxyn tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
-        d) gpMountDir="$OPTARG" ;;
+        d) pMountDir="$OPTARG" ;;
         # Common arguments
         h) fUsage long ;;
         H) fUsage "$OPTARG" ;;
@@ -173,5 +173,5 @@ if [ $# -ne 0 ]; then
 fi
 
 # ----------
-fRemoteCreateRemoteGit $gpMountDir
+fRemoteCreateRemoteGit $pMountDir
 exit 0

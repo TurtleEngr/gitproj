@@ -797,6 +797,9 @@ testCheckPkg()
 {
     local tResult
 
+    tResult=$(fComCheckPkg git-flow 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+
     tResult=$(fComCheckPkg less 2>&1)
     assertTrue "$LINENO $tResult" "$?"
 

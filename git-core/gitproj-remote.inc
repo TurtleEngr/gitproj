@@ -4,7 +4,7 @@
 export cGetOrigin cGetTopDir cRemoteProjFile cTop
 
 export gpAuto gpBin gpCmdName gpDebug gpDoc gpFacility gpLocalRawDir \
-    gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMaxLoop gpMountDir \
+    gpLocalTopDir gpLocalStatus gpRemoteMinSpace gpMaxLoop \
     gpPath gpProjName gpProjStatus gpRemoteRawOrigin gpRemoteStatus \
     gpSysLog gpVer gpVerbose gpYesNo gResponse
 
@@ -21,7 +21,6 @@ fRemoteSetGlobals()
     fi
 
     gpAuto=${gpAuto:-0}
-    gpMountDir=""
     gpSysLog=$(fComGetConfig -k "gitproj.config.syslog" -d "false")
     gpFacility=$(fComGetConfig -k "gitproj.config.facility" -d user)
 
@@ -198,7 +197,6 @@ fRemoteGetMountDir()
     local tDirList
     local tMaxLoop=$gpMaxLoop
     local tMountDir
-    local tResponse
     local tStatus
 
     # ----------
@@ -212,7 +210,9 @@ fRemoteGetMountDir()
         if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
             fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
         fi
-        gResponse="$pMountDir"
+	cd $pMountDir >/dev/null 2>&1
+        gResponse="$PWD"
+	cd - >/dev/null 2>&1
         return 0
     fi
 
@@ -269,22 +269,25 @@ EOF
         fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
     fi
 
-    gResponse="$tMountDir"
+    cd $pMountDir >/dev/null 2>&1
+    gResponse="$PWD"
+    cd - >/dev/null 2>&1
     return 0
 } # fRemoteGetMountDir
 
 # --------------------
 fRemoteGetRemoteRawDir()
 {
+    local pMountDir="$1"
     local tSrc=${BASH_SOURCE##*/}
 
-    # gpMountDir has already been validated
-    # gpProjName has already been validated
-    # $gpMountDir/$gpProjName.raw should have been verified to not exist
+    # pMountDir has already been validated
+    # pProjName has already been validated
+    # $pMountDir/$gpProjName.raw should have been verified to not exist
 
-    gResponse=$gpMountDir/$gpProjName.raw
+    gResponse=$pMountDir/$gpProjName.raw
     if [ -e $gResponse ]; then
-        fError -i -m "pMountDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
+        fError -i -m "$pMountDir/$gpProjName.raw already exists." -l $tSrc:$LINENO
     fi
 
     return 0
@@ -296,7 +299,7 @@ fRemoteMkRemote()
     local pMountDir=$1
     local tSrc=${BASH_SOURCE##*/}
     local tProjName=${PWD##*/}
-    local tVerbose
+    local tVerbose=""
     local tOpt="-azC"
 
     cd $pMountDir >/dev/null 2>&1
@@ -315,10 +318,10 @@ fRemoteMkRemote()
 
     mkdir -p $gpRemoteRawOrigin
     if [ $gpVerbose -ge 1 ]; then
-        tVervose=-v
+        tVerbose=-v
     fi
     if [ $gpVerbose -ge 2 ]; then
-        tVervose=-viP
+        tVerbose=-viP
     fi
     fLog -p notice -m "'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin"
     'rsync' $tOpt $tVerbose $gpLocalTopDir/raw/ $gpRemoteRawOrigin
@@ -350,8 +353,6 @@ fRemoteReport()
     local tErr=0
 
     # Double check the settings
-
-    gErr=0
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tGitOrigin=$($cGetOrigin)
@@ -482,18 +483,18 @@ fRemoteCreateRemoteGit()
     fRemoteStatus
 
     # -d pMountPath (set with prompt/responnse, or required if -a)
-    #  gpMountDir is required with -a, othherwise it is optional
-    fRemoteGetMountDir "$gpMountDir"
-    gpMountDir=$gResponse
+    #  pMountDir is required with -a, othherwise it is optional
+    fRemoteGetMountDir "$pMountDir"
+    pMountDir=$gResponse
 
     # Define the remote raw dir name (currenly hardcoded)
-    fRemoteGetRemoteRawDir
+    fRemoteGetRemoteRawDir "$pMountDir"
     gpRemoteRawOrigin=$gResponse
 
     echo
     echo "================================================================="
     echo
-    fRemoteMkRemote $gpMountDir
+    fRemoteMkRemote $pMountDir
     echo
     fRemoteReport
     echo

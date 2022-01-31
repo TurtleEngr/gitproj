@@ -258,11 +258,8 @@ EOF
 fInitGetGitFlow()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=5
-    declare -l tResult
 
-    fComCheckPkg $gpGitFlowPkg
-    if [ $? -ne 0 ]; then
+    if ! fComCheckPkg $gpGitFlowPkg; then
         echo
         fLog -p warning -m "git-flow is not installed. It can be added later." -l $tSrc:$LINENO
         echo
@@ -273,28 +270,14 @@ fInitGetGitFlow()
         return 0
     fi
 
-    while [ $tMaxLoop -gt 0 ]; do
-        let --tMaxLoop
-        echo
-        echo -n "Setup git-flow (-f) [y/n]? "
-        read -r tResult
-        tResult=${tResult%${tResult#[a-z]}}
-        echo
-        if [ "$tResult" = "y" ]; then
-            gpGitFlow="true"
-            fLog -p notice -m "gitproj.config.git-flow = true" -l $tSrc:$LINENO
-            echo
-            break
-        fi
-        if [ "$tResult" = "n" ]; then
-            gpGitFlow="false"
-            fLog -p notice -m "gitproj.config.git-flow = false" -l $tSrc:$LINENO
-            break
-        fi
-    done
-    if [ $tMaxLoop -eq 0 ]; then
-        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
+    if ! fComYesNo "Setup git-flow (-f)"; then
+        gpGitFlow="false"
+        fLog -p notice -m "gitproj.config.git-flow = false" -l $tSrc:$LINENO
+        return 0
     fi
+    gpGitFlow="true"
+    fLog -p notice -m "gitproj.config.git-flow = true" -l $tSrc:$LINENO
+    echo
 
     return 0
 } # fInitGetGitFlow

@@ -378,9 +378,6 @@ testRemoteGetMountDirAuto()
 
     gpAuto=1
     gpRemoteRawOrigin=TBD
-    if [ -n "$gpMountDir" ]; then
-        fail "$LINENO gpMountDir is not empty: ${gpMountDir}"
-    fi
     fRemoteGetMountDir "$cDatMount1"
     assertTrue $LINENO "$?"
     assertEquals "$LINENO" "$cDatMount1" "$gResponse"
@@ -412,23 +409,23 @@ testRemoteGetAnotherMountDir()
     gpRemoteMinSpace=2147483648
 
     tMountDir=$cDatMount1
-    tResult=$(fRemoteGetAnotherMountDir "$tMountDir" "2024" 2>&1 < <(echo -e "\nq\n"))
+    tResult=$(fRemoteGetAnotherMountDir "$tMountDir" 2>&1 < <(echo -e "\nq\n"))
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO tResult" "$tResult" "Quitting"
 
-    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" "2024" 2>&1 < <(echo -e "/tmp/foo\n/tmp/bar\nquit\n"))
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "/tmp/foo\n/tmp/bar\nquit\n"))
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/foo"
     assertContains "$LINENO $tResult" "$tResult" "Could not find: /tmp/bar"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
     gpProjName=example
-    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" "2024" 2>&1 < <(echo -e "$cDatMount3/video-2019-11-26\nquit\n"))
+    tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "$cDatMount3/video-2019-11-26\nquit\n"))
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "$gpProjName.git already exists"
     assertContains "$LINENO $tResult" "$tResult" "Quitting"
 
-    fRemoteGetAnotherMountDir "/tmp/foo" "2024" 2>&1 < <(echo -e "$cDatMount2\n4\n") >/dev/null
+    fRemoteGetAnotherMountDir "/tmp/foo" 2>&1 < <(echo -e "$cDatMount2\n4\n") >/dev/null
     assertTrue "$LINENO" "$?"
     assertEquals "$LINENO $gResponse" "$cDatMount2" "$gResponse"
 
@@ -496,21 +493,22 @@ testRemoteGetMountDirManual()
 testRemoteGetRemoteRawDir()
 {
     local tResult
+    local tMountDir
 
-    gpMountDir=/tmp/foo
+    tMountDir=/tmp/foo
     gpProjName=bar
-    mkdir $gpMountDir
-    touch $gpMountDir/$gpProjName.raw
-    tResult=$(fRemoteGetRemoteRawDir 2>&1)
+    mkdir $tMountDir
+    touch $tMountDir/$gpProjName.raw
+    tResult=$(fRemoteGetRemoteRawDir $tMountDir 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "raw already exists"
     assertContains "$LINENO $tResult" "$tResult" "Internal"
 
-    rm $gpMountDir/$gpProjName.raw
-    fRemoteGetRemoteRawDir
+    rm $tMountDir/$gpProjName.raw
+    fRemoteGetRemoteRawDir $tMountDir
     assertTrue "$LINENO" "$?"
-    assertEquals "$LINENO" "$gpMountDir/$gpProjName.raw" "$gResponse"
-    rmdir $gpMountDir
+    assertEquals "$LINENO" "$tMountDir/$gpProjName.raw" "$gResponse"
+    rmdir $tMountDir
 
     return 0
 } # testRemoteGetRemoteRawDir
@@ -519,6 +517,7 @@ testRemoteGetRemoteRawDir()
 testRemoteMkRemote()
 {
     local tResult
+    local tMountDir
     local tTar=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
 
     gpAuto=1
@@ -527,14 +526,14 @@ testRemoteMkRemote()
     gpLocalTopDir=$cDatHome/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
     gpProjName=george
-    gpMountDir=$cDatMount3/video-2020-04-02
-    gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
+    tMountDir=$cDatMount3/video-2020-04-02
+    gpRemoteRawOrigin=$tMountDir/$gpProjName.raw
 
     # Mount dir has already been valided
     tResult=$(fRemoteMkRemote $cDatMount3/video-2020-04-02 2>&1)
     tStatus=$?
     assertTrue "$LINENO" "$tStatus"
-    assertContains "$LINENO $tResult" "$tResult" "git clone to $gpMountDir"
+    assertContains "$LINENO $tResult" "$tResult" "git clone to $tMountDir"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO $tResult" "$tResult" "'rsync' -azC"
     assertContains "$LINENO $tResult" "$tResult" "/$gpProjName.raw"
@@ -559,6 +558,7 @@ testRemoteReport()
 {
     local tResult
     local tStatus
+    local tMountDir
     local tTar1=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
     local tTar2=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
 
@@ -569,8 +569,8 @@ testRemoteReport()
     gpVerbose=2
     gpLocalTopDir=$cDatHome/$cDatProj1
     gpProjName=george
-    gpMountDir=$cDatMount3/video-2020-04-02
-    gpRemoteRawOrigin=$gpMountDir/$gpProjName.raw
+    tMountDir=$cDatMount3/video-2020-04-02
+    gpRemoteRawOrigin=$tMountDir/$gpProjName.raw
 
     cd $gpLocalTopDir >/dev/null 2>&1
     mv $gpRemoteRawOrigin/$cRemoteProjFile $gpRemoteRawOrigin/$cRemoteProjFile.sav
@@ -620,19 +620,20 @@ testRemoteCreateRemoteGit()
     local tResult
     local tTopDir
     local tStatus
+    local tMountDir
     local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
 
     gpVerbose=3
     gpAuto=1
-    gpMountDir=""
-    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    tMountDir=""
+    tResult=$(fRemoteCreateRemoteGit "$tMountDir" 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "The -d option is required with -a auto option"
 
-    gpMountDir=$cDatMount3/video-2020-04-02
+    tMountDir=$cDatMount3/video-2020-04-02
 
     cd $cTestDestDir >/dev/null 2>&1
-    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    tResult=$(fRemoteCreateRemoteGit "$tMountDir" 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "err: Error: You must be in a git workspace for this command"
 
@@ -642,23 +643,23 @@ testRemoteCreateRemoteGit()
     fRemoteSetGlobals
     assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
 
-    gpMountDir=$cDatMount3/video-2020-04-02
-    chmod a-w $gpMountDir
-    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    tMountDir=$cDatMount3/video-2020-04-02
+    chmod a-w $tMountDir
+    tResult=$(fRemoteCreateRemoteGit "$tMountDir" 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "video-2020-04-02 is not writable for you"
 
     gpVerbose=3
     cd $tTopDir >/dev/null 2>&1
-    chmod ug+w $gpMountDir
-    tResult=$(fRemoteCreateRemoteGit "$gpMountDir" 2>&1)
+    chmod ug+w $tMountDir
+    tResult=$(fRemoteCreateRemoteGit "$tMountDir" 2>&1)
     tStatus=$?
     assertTrue "$LINENO $tResult" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO" "$tResult" "git remote origin is now"
     assertContains "$LINENO" "$tResult" "raw remote origin is now"
-    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.git"
-    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.raw"
+    assertContains "$LINENO" "$tResult" "$tMountDir/$gpProjName.git"
+    assertContains "$LINENO" "$tResult" "$tMountDir/$gpProjName.raw"
 
     #assertNotContains "$LINENO UPSTREAM $tResult" "$tResult" "but the upstream is gone"
     #assertContains "$LINENO $tResult" "$tResult" "uncoment-to-show"
@@ -765,9 +766,9 @@ testGitProjRemoteCLIManual()
     assertContains "$LINENO" "$tResult" "Cloning into bare repository 'george.git'"
     assertContains "$LINENO" "$tResult" "git remote origin is now"
     assertContains "$LINENO" "$tResult" "raw remote origin is now"
-    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.git"
-    assertContains "$LINENO" "$tResult" "$gpMountDir/$gpProjName.raw"
-    assertContains "$LINENO" "$tResult" "$tMountDir/video-2020-04-02/george.git"
+    assertContains "$LINENO" "$tResult" "$tMountDir/$gpProjName.git"
+    assertContains "$LINENO" "$tResult" "$tMountDir/$gpProjName.raw"
+    assertContains "$LINENO" "$tResult" "$tMountDir/george.git"
     assertContains "$LINENO" "$tResult" "If the mount path has changed"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment-To-Show"
 
