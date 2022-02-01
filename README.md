@@ -6,7 +6,7 @@
 Its setup and management is simpler than "git LFS", because it doesn't
 require a git server.
 
-![](https://travis-ci.org/TurtleEngr/gitproj.svg?branch=develop)
+[![](https://travis-ci.org/TurtleEngr/gitproj.svg?branch=develop)](https://app.travis-ci.com/github/TurtleEngr/gitproj)
 
 ## git proj sub-commands
 
