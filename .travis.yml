@@ -4,9 +4,8 @@ env:
   - gpVerbose=3
 
 script :
-  - cd test; make .ran-test-com.tmp
-
-#  - cd test; make test-all
+  - cd test; make test-all
+#  - cd test; make .ran-test-com.tmp
 
 before_install:
   - sudo apt-get update
