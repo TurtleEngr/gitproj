@@ -80,7 +80,7 @@ Pros and Cons for the different ways of managing remote raw/ files.
 * This initial configuration of all the different rclone service
   options makes it hard to make this "invisible". Most likely the user
   will be required to define the initial configuration, then set the
-  "name" of the service in a `gitproj-config-HOST` file.
+  "name" of the service in a `gitproj-config` variable.
 
 * The most storage services are not "distributed", so you would want
   to pick "one" remote service for "main".
@@ -115,5 +115,5 @@ Pros and Cons for the different ways of managing remote raw/ files.
 * The remote ssh server (used by rsnapshot) is not "distributed", so
   you would want to pick "one" remote ssh host for "main".
 
-* Backing up the remove raw/ area would require preserving the hard
+* Backing up the remote raw/ area would require preserving the hard
   links.  Or maybe only the latest directory would be backed up.
