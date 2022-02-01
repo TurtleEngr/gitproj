@@ -764,7 +764,8 @@ testInitSaveVarsToConfigs()
 
     for tFile in $HOME/.gitconfig $gpLocalTopDir/.gitproj; do
         tS=gitproj.config
-        fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlow true $LINENO
+        fTestCheckConfig2Var $tFile $tS.git-flow gpGitFlow true $LINENO
+        fTestCheckConfig2Var $tFile $tS.git-flow-pkg gpGitFlowPkg git-flow $LINENO
         tS=gitproj.hook
         fTestCheckConfig2Var $tFile $tS.verbose gpHookVerbose true $LINENO
         fTestCheckConfig2Var $tFile $tS.pre-commit-enabled gpPreCommitEnabled true $LINENO

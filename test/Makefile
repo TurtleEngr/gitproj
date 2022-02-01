@@ -1,16 +1,26 @@
 # gitproj/doc/test/Makefile
 
-# TBD add missing tar file rules
-# TBD add tar file deps to the tests scripts
+# Run tests for any dependencies that have changed:
+# 	make test
+
+# Force a run all tests, stop on any test group error
+# 	make test-all
+
+# Force a run all tests, and keep going, even if erros
+# 	make -k test-all
 
 # --------------------
 # Config
 
 mHtmlOpt = --cachedir=/tmp --index --backlink
+mRsyncOpt = -rlptzLP
 
 mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
 
 mCore = ../git-core
+
+mTestUrl=moria.whyayh.com:/rel/development/software/own/git-proj/test
+mTestOpt="--user=guest --password=guest"
 
 # Note: the order matters, when *recreating* these files.
 # The order of tests do not matter when *using* thise files.
@@ -32,18 +42,18 @@ mDepList = \
 	test-env.tgz
 
 mBaseList = \
-	test-com.log \
-	test-com2.log \
-	test-pre-commit.log
+	.ran-test-com.tmp \
+	.ran-test-com2.tmp \
+	.ran-test-pre-commit.tmp
 
 mCmdList = \
-	test-gitproj.log \
-	test-init.log \
-	test-remote.log \
-	test-push.log \
-	test-pull.log \
-	test-clone.log \
-	test-status.log
+	.ran-test-gitproj.tmp \
+	.ran-test-init.tmp \
+	.ran-test-remote.tmp \
+	.ran-test-push.tmp \
+	.ran-test-pull.tmp \
+	.ran-test-clone.tmp \
+	.ran-test-status.tmp
 
 # The might be implemented later
 mCmdToDo = \
@@ -57,7 +67,7 @@ mCmdToDo = \
 clean :
 	-find * -name '*~' -exec rm -f {} \;
 
-dist-clean : clear-logs
+dist-clean : clear-ran
 
 # --------------------
 # Test
@@ -66,10 +76,10 @@ dist-clean : clear-logs
 test : rm-trailing-sp bash-fmt bash-lint $(mDepList) $(mBaseList) $(mCmdList)
 
 # Use this for *force* all tests to be run
-test-all : rm-trailing-sp bash-fmt bash-lint clear-logs test
+test-all : rm-trailing-sp bash-fmt bash-lint clear-ran test
 
-clear-logs :
-	-rm test-*.log
+clear-ran :
+	-rm .ran-test-*.tmp
 
 # Get project statistics
 stats :
@@ -111,23 +121,28 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 # --------------------
 # Special non-CMD tests
 
-test-com.log : $(mDepList) test-com.sh
-	./test-com.sh 2>&1 | tee $@
+.ran-test-com.tmp : $(mDepList) test-com.sh
+	./test-com.sh 2>&1
+	touch $@
 
-test-com2.log : $(mDepList) test-com2.sh
-	./test-com2.sh 2>&1 | tee $@
+.ran-test-com2.tmp : $(mDepList) test-com2.sh
+	./test-com2.sh 2>&1
+	touch $@
 
-test-pre-commit.log : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
-	./test-pre-commit.sh 2>&1 | tee $@
+.ran-test-pre-commit.tmp : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
+	./test-pre-commit.sh 2>&1
+	touch $@
 
-test-gitproj.log : $(mDepList) test-gitproj.sh $(mCore)/git-proj
-	./test-gitproj.sh 2>&1 | tee $@
+.ran-test-gitproj.tmp : $(mDepList) test-gitproj.sh $(mCore)/git-proj
+	./test-gitproj.sh 2>&1
+	touch $@
 
 # --------------------
-# If a CMD log file is old, updated it by running its test script
+# If a CMD .ran file is old, updated it by running its test script
 
-test-%.log : test-%.sh $(mDepList) $(mCore)/gitproj-%.inc $(mCore)/git-proj-%
-	./$< 2>&1 | tee $@
+.ran-test-%.tmp : test-%.sh $(mDepList) $(mCore)/gitproj-%.inc $(mCore)/git-proj-%
+	./$< 2>&1
+	touch $@
 
 # --------------------
 # Define the test-env*.tgz dependencies here
@@ -144,6 +159,7 @@ test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3Afte
 
 # --------------------
 test-env.tgz :
+	wget $(mTestOpt) https://$(mTestUrl)/$@
 	@echo "$@ needs to be manually updated."
 	@echo "Do not remove: $@"
 	@echo "First run:  ./test-init.sh testGitProjInit"
@@ -160,31 +176,84 @@ test-env.tgz :
 test-env : $(mTestEnvFiles)
 	@echo "To update the test-env files:"
 	@echo "$^"
-	@echo "move them out of the way, then run this make target again"
+	@echo 'Move the above files out of the way (not the symlinks)'
+	@echo 'export gpSaveTestEnv=1'
+	@echo 'Then run: make test-env'
 
 test-env_HomeAfterBMove.tgz :
-	export gpSaveTestEnv=1; ./test-init.sh testInitMoveBinaryFiles
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh testInitMoveBinaryFiles; \
+	fi
 
 test-env_ProjAfterGInit.tgz :
-	export gpSaveTestEnv=1; ./test-init.sh testInitMkGitDir
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh testInitMkGitDir; \
+	fi
 
 test-env_ProjLocalDefined.tgz :
-	export gpSaveTestEnv=1; ./test-init.sh testInitCreateLocalGitAuto
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh testInitCreateLocalGitAuto; \
+	fi
 
 test-env_TestDestDirAfterMkRemote.tgz :
-	export gpSaveTestEnv=1; ./test-remote.sh testRemoteMkRemote
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-remote.sh testRemoteMkRemote; \
+	fi
 
 test-env_TestDestDirAfterRemoteReport.tgz :
-	export gpSaveTestEnv=1; ./test-remote.sh testRemoteReport
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-remote.sh testRemoteReport; \
+	fi
 
 test-env_TestDestDirAfterCreateRemoteGit.tgz :
-	export gpSaveTestEnv=1; ./test-remote.sh testRemoteCreateRemoteGit
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh $@; \
+		./test-remote.sh testRemoteCreateRemoteGit; \
+	fi
 
 test-env_Home2AfterPush.tgz :
-	export gpSaveTestEnv=1; ./test-push.sh testGitProjPushCLI
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh $@; \
+		./test-push.sh testGitProjPushCLI; \
+	fi
 
 test-env_Home3AfterCloneMkGit.tgz :
-	export gpSaveTestEnv=1; ./test-clone.sh testCloneMkGitDirPass
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh $@; \
+		./test-clone.sh testCloneMkGitDirPass; \
+	fi
 
 test-env_Home3AfterCloneSummary.tgz :
-	export gpSaveTestEnv=1; ./test-clone.sh testCloneSummary
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $tTestOpt $tTestUrl/$@; \
+	else \
+		./test-init.sh $@; \
+		./test-clone.sh testCloneSummary; \
+	fi
+
+# --------------------
+# Update test-env*.tgz files at $(mTestUrl)
+
+update-tgz-files :
+	for i in $(mTestEnvFiles); do \
+		'rsync' $(mRsyncOpt) $$i $(mTestUrl); \
+		if [ -z $$? ]; then \
+			exit 1; \
+		fi; \
+	done
