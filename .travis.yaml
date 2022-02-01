@@ -1,0 +1,37 @@
+language: bash
+
+env:
+  - gpVerbos=2
+
+script :
+  - cd test; make test-all
+
+addons:
+  apt:
+    packages:
+      - git
+      - bash
+      - coreutils
+      - gawk
+      -git-flow
+      - libpod-markdown-perl
+      - openssh-client
+      - openssh-server,
+      - perl
+      - rsync
+      - sed
+      -tidy
+
+matrix:
+  include:
+    - os: linux
+      dist: focal
+    - os: linux
+      dist: bionic
+    - os: linux
+      dist: xenial
+
+branches:
+  only:
+    - develop
+    - main
