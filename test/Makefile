@@ -19,8 +19,8 @@ mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes y
 
 mCore = ../git-core
 
-mTestUrl=moria.whyayh.com:/rel/development/software/own/git-proj/test
-mTestOpt="--user=guest --password=guest"
+mTestUrl = moria.whyayh.com:/rel/development/software/own/git-proj/test
+mTestOpt = --user=guest --password=guest
 
 # Note: the order matters, when *recreating* these files.
 # The order of tests do not matter when *using* thise files.
