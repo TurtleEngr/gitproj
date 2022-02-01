@@ -8,6 +8,9 @@ script :
 
 #  - cd test; make test-all
 
+before_install:
+  - sudo apt-get update
+
 addons:
   apt:
     packages:
