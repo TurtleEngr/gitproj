@@ -294,12 +294,13 @@ testComConfigUpdateLocal()
     tResult=$(fComConfigUpdateLocal 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "fComConfigUpdateLocal"
+    sleep 1
 
     cd $HOME/$cDatProj1
     # Restore
     mv .gitproj.sav .gitproj
     # Clean
-    rm .gitproj.bak 2>/dev/null
+    rm .gitproj.bak* 2>/dev/null
     # Change
     fComSetConfig -l -k "gitproj.config.verbose" -v 3
     # Check
@@ -312,10 +313,14 @@ testComConfigUpdateLocal()
     assertContains "$LINENO $tResult" "$tResult" "1 file changed"
     tValue=$(fComGetConfig -L -k "gitproj.config.verbose")
     assertEquals "$LINENO" "3" "$tValue"
+    sleep 1
 
+    cd $HOME/$cDatProj1
     tResult=$(fComConfigUpdateLocal 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertNull "$LINENO $tResult" "$tResult"
+    assertTrue "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "[ ./.git/config -ot ./.gitproj ]"
+    assertNull "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "$tResult"
+    ##assertContains "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "$tResult" "uncomment to show"
 
     return 0
 } # testComConfigUpdateLocal
