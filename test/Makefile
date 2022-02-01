@@ -94,16 +94,16 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 	-pod2markdown <dev-doc/coding-convention.pod >dev-doc/coding-convention.md
 
 # rm-trailing-sp :
-rm-trailing-sp : ~/bin/rm-trailing-sp
-	diff $@ $?
+##rm-trailing-sp : ~/bin/rm-trailing-sp
+##	diff $@ $?
 
 # bash-fmt :
-bash-fmt : ~/bin/bash-fmt
-	diff $@ $?
+##bash-fmt : ~/bin/bash-fmt
+##	diff $@ $?
 
 # bash-lint :
-bash-lint : ~/bin/bash-lint
-	diff $@ $?
+##bash-lint : ~/bin/bash-lint
+##	diff $@ $?
 
 # ========================================
 # Tests for each of the commands
