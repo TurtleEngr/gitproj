@@ -492,6 +492,9 @@ testComSysLog()
 	echo
 	ls -l /var/log/*.log
 	echo
+	echo ps
+	ps -ef | grep syslog
+	echo
 	set -x
 	sudo ls -F / | head -n 5
 	set +x
