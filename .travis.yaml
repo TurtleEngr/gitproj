@@ -13,14 +13,14 @@ addons:
       - bash
       - coreutils
       - gawk
-      -git-flow
+      - git-flow
       - libpod-markdown-perl
       - openssh-client
-      - openssh-server,
+      - openssh-server
       - perl
       - rsync
       - sed
-      -tidy
+      - tidy
 
 matrix:
   include:
