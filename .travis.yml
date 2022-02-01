@@ -5,6 +5,7 @@ env:
 
 script :
   - cd test; make .ran-test-com.tmp
+
 #  - cd test; make test-all
 
 addons:
