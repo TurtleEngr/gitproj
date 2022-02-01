@@ -480,7 +480,23 @@ testComSysLog()
     local tResult
     local tTestArg
 
-    # ADJUST? This is dependent on your syslog configuration.
+    if [ ! -f /var/log/user.logx ]; then
+        echo "/var/log/user.log not found" 1>&2
+	echo
+	uname -a  1>&2
+	for i in /etc/*-release; do
+	    echo
+	    echo $i 1>&2
+	    cat $i 1>&2
+	done
+	echo
+	ls -l /var/log/*.log
+	echo
+	set -x
+	sudo ls -F / | head -n 5
+	set +x
+        startSkipping
+    fi
     export tSysLog=/var/log/user.log
     #export tSysLog=/var/log/messages.log
     #export tSysLog=/var/log/syslog
