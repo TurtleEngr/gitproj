@@ -491,7 +491,7 @@ testComSysLog()
 	done
 	echo
 	ls -l /var/log/*.log /var/log/syslog
-	sudo chmod a+r
+	sudo chmod a+r /var/log/syslog
 	ls -l /var/log/syslog
 	echo
 	echo ps
