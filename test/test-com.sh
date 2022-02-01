@@ -500,6 +500,10 @@ testComSysLog()
 	set +x
         startSkipping
     fi
+
+    if [ ! -f /var/log/user.logx ]; then
+        startSkipping
+    fi
     export tSysLog=/var/log/user.log
     #export tSysLog=/var/log/messages.log
     #export tSysLog=/var/log/syslog
