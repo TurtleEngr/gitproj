@@ -191,42 +191,42 @@ test-env : $(mTestEnvFiles)
 
 test-env_HomeAfterBMove.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+	        wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh testInitMoveBinaryFiles; \
 	fi
 
 test-env_ProjAfterGInit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+	        wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh testInitMkGitDir; \
 	fi
 
 test-env_ProjLocalDefined.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh testInitCreateLocalGitAuto; \
 	fi
 
 test-env_TestDestDirAfterMkRemote.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-remote.sh testRemoteMkRemote; \
 	fi
 
 test-env_TestDestDirAfterRemoteReport.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-remote.sh testRemoteReport; \
 	fi
 
 test-env_TestDestDirAfterCreateRemoteGit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh $@; \
 		./test-remote.sh testRemoteCreateRemoteGit; \
@@ -234,7 +234,7 @@ test-env_TestDestDirAfterCreateRemoteGit.tgz :
 
 test-env_Home2AfterPush.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh $@; \
 		./test-push.sh testGitProjPushCLI; \
@@ -242,7 +242,7 @@ test-env_Home2AfterPush.tgz :
 
 test-env_Home3AfterCloneMkGit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh $@; \
 		./test-clone.sh testCloneMkGitDirPass; \
@@ -250,7 +250,7 @@ test-env_Home3AfterCloneMkGit.tgz :
 
 test-env_Home3AfterCloneSummary.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $tTestOpt $tTestUrl/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/$@
 	else \
 		./test-init.sh $@; \
 		./test-clone.sh testCloneSummary; \
