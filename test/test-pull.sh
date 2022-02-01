@@ -1,12 +1,14 @@
 #!/bin/bash
 
+export gpTest cTestCurDir gpTestList gpCmdName gpSaveTestEnv
+
 # ========================================
 fUsage()
 {
     fComUsage -s usage -f $cTestCurDir/test-pull.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -67,11 +69,31 @@ EOF
 # ========================================
 
 # --------------------------------
+oneTimeSetUp()
+{
+    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+
+    fTestSetupEnv
+    fTestCreateEnv
+    cd $HOME >/dev/null 2>&1
+    if [ ! -e $tTarIn ]; then
+        echo "Missing: $tTarIn" 1>&2
+        exit 1
+    fi
+    tar -xzf $tTarIn
+    cd - >/dev/null 2>&1
+
+    # Look for serious setup errors
+    fTestConfigSetup
+} # oneTimeSetUp
+
+# --------------------------------
 setUp()
 {
     local tVer=$(cat $gpDoc/VERSION)
     tVer=$(echo $tVer)
     local tConf
+    local tTarIn=$gpTest/test-env_Home2AfterPush.tgz
 
     # Restore default global values, before each test
 
@@ -85,7 +107,11 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     cd $cTestDestDir >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_Home2AfterPush.tgz
+    if [ ! -e $tTarIn ]; then
+        echo "Missing: $tTarIn" 1>&2
+        exit 1
+    fi
+    tar -xzf $tTarIn
     cd - >/dev/null 2>&1
 
     # Patch the version that was set in the tar file
@@ -365,7 +391,6 @@ EOF
 # ====================
 # Main
 
-export gpTest cTestCurDir gpTestList gpCmdName gpSaveTestEnv
 gpCmdName=git-proj-remote
 
 # -------------------
@@ -391,13 +416,5 @@ gpTestList="$*"
 
 # -----
 . $gpTest/test.inc
-fTestSetupEnv
-fTestCreateEnv
-cd $HOME >/dev/null 2>&1
-tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
-cd - >/dev/null 2>&1
-
-# Look for serious setup errors
-fTestConfigSetup
 
 fTestRun $gpTestList

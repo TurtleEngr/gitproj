@@ -4,7 +4,7 @@
 # Test globals
 
 export cCurDir cDatHome cDatHome2 cDatHome3 cHome cTestCurDir \
-    cTestDestDir cTestFiles cTestSrcDir HOSTNAME
+    cTestDestDir cTarIn HOSTNAME
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
@@ -76,10 +76,9 @@ fTestSetupEnv()
 
     . $gpBin/gitproj-com.inc
 
-    cTestSrcDir=$gpTest
-    cTestFiles=$cTestSrcDir/test-env.tgz
-    if [ ! -r $cTestFiles ]; then
-        echo "Error: Cannot find: $cTestFiles. [$tSrc:$LINENO]"
+    cTarIn=$gpTest/test-env.tgz
+    if [ ! -r $cTarIn ]; then
+        echo "Error: Cannot find: $cTarIn. [$tSrc:$LINENO]"
         exit 1
     fi
 
@@ -88,7 +87,7 @@ fTestSetupEnv()
     cTestDestDir=$PWD
     cd - >/dev/null
 
-    # These are found in the unpacked $cTestFiles
+    # These are found in the unpacked $cTarIn
     cDatHome=$cTestDestDir/test/root/home/john
     # Home dir for most tests
     cDatProj1=project/george
@@ -181,12 +180,12 @@ fTestCreateEnv()
     fTestRmEnv
     cd $cTestDestDir >/dev/null 2>&1
 
-    if [ ! -f $cTestFiles ]; then
-        echo "Missing $cTestFiles [$tSrc:$LINENO]"
+    if [ ! -f $cTarIn ]; then
+        echo "Missing $cTarIn [$tSrc:$LINENO]"
         exit 1
     fi
 
-    tar -xzf $cTestFiles
+    tar -xzf $cTarIn
     cd - >/dev/null 2>&1
 
     cHome=$HOME

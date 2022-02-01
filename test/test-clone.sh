@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-clone.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -69,7 +69,7 @@ EOF
 # --------------------------------
 setUp()
 {
-    local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTarIn=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
 
     # Restore default global values, before each test
 
@@ -86,11 +86,11 @@ setUp()
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
     cd $cTestDestDir >/dev/null 2>&1
-    if [ ! -r $tTar ]; then
-        echo "Could not find: $tTar [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        echo "Could not find: $tTarIn [$LINENO]" 1>&2
+        exit 1
     fi
-    tar -xzf $tTar
+    tar -xzf $tTarIn
     cd - >/dev/null 2>&1
 
     # git proj to be cloned:
@@ -404,7 +404,7 @@ testCloneMkGitDirPass()
     local tResult
     local tStatus
     local tTop
-    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarOut=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
@@ -456,10 +456,10 @@ testCloneMkGitDirPass()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after CloneMkGitDir."
-        echo -e "\tRestore $tTar relative to env cDatHome3=$cDatHome3"
+        echo -e "\tRestore $tTarOut relative to env cDatHome3=$cDatHome3"
         cd $cDatHome3 >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTar .
+        tar -cvzf $tTarOut .
         echo
     fi
 
@@ -470,7 +470,7 @@ testCloneMkGitDirPass()
 testCloneMkRawDirFail()
 {
     local tResult
-    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarIn=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
@@ -484,11 +484,11 @@ testCloneMkRawDirFail()
     # gpProjName=george
 
     cd $cDatHome3 >/dev/null 2>&1
-    if [ ! -r $tTar ]; then
-        fail "Could not find $tTar [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        fail "Could not find $tTarIn [$LINENO]"
+        exit 1
     fi
-    tar -xzf $tTar
+    tar -xzf $tTarIn
 
     gpLocalTopDir=$HOME/project/george
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -511,7 +511,7 @@ testCloneMkRawDirFail()
 testCloneMkRawDirPass()
 {
     local tResult
-    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarIn=$gpTest/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
     # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
@@ -526,11 +526,11 @@ testCloneMkRawDirPass()
 
     # Setup
     cd $cDatHome3 >/dev/null 2>&1
-    if [ ! -r $tTar ]; then
-        fail "Could not find $tTar [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        fail "Could not find $tTarIn [$LINENO]"
+        return
     fi
-    tar -xzf $tTar
+    tar -xzf $tTarIn
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=3
@@ -559,16 +559,16 @@ testCloneSummary()
 {
     local tResult
     local tStatus
-    local tTar=$gpTest/test-env_Home3AfterCloneMkGit.tgz
-    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tTarIn=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarOut=$gpTest/test-env_Home3AfterCloneSummary.tgz
 
     # Setup
     cd $cDatHome3 >/dev/null 2>&1
-    if [ ! -r $tTar ]; then
-        fail "Could not find $tTar [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        fail "Could not find $tTarIn [$LINENO]"
+        return
     fi
-    tar -xzf $tTar
+    tar -xzf $tTarIn
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=3
@@ -597,10 +597,10 @@ testCloneSummary()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after fCloneSummary."
-        echo -e "\tRestore $tTar2 relative to env cDatHome3=$cDatHome3"
+        echo -e "\tRestore $tTarOut relative to env cDatHome3=$cDatHome3"
         cd $cDatHome3 >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTar2 .
+        tar -cvzf $tTarOut .
         echo
     fi
 

@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-push.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -67,8 +67,29 @@ EOF
 # ========================================
 
 # --------------------------------
+oneTimeSetUp()
+{
+    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+
+    fTestSetupEnv
+    fTestCreateEnv
+    cd $HOME >/dev/null 2>&1
+    if [ ! -e $tTarIn ]; then
+        echo "Missing: $tTarIn" 1>&2
+        exit 1
+    fi
+    tar -xzf $tTarIn
+    cd - >/dev/null 2>&1
+
+    # Look for serious setup errors
+    fTestConfigSetup
+} # oneTimeSetUp
+
+# --------------------------------
 setUp()
 {
+    local tTarIn=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+
     # Restore default global values, before each test
 
     unset cGetOrigin cGetTopDir cGitProjVersion cInteractive cPID gErr
@@ -81,10 +102,11 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     cd $cTestDestDir >/dev/null 2>&1
-    if [ ! -e $gpTest/test-env_TestDestDirAfterRemoteReport.tgz ]; then
+    if [ ! -e $tTarIn ]; then
+        echo "Missing: $tTarIn" 1>&2
         exit 1
     fi
-    tar -xzf $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    tar -xzf $tTarIn
     cd - >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
@@ -276,7 +298,7 @@ testGitProjPushCLI()
 {
     local tResult
     local tStatus
-    local tTar=$gpTest/test-env_Home2AfterPush.tgz
+    local tTarOut=$gpTest/test-env_Home2AfterPush.tgz
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     echo "Make a change." >>README.html
@@ -299,14 +321,14 @@ testGitProjPushCLI()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after files pushed."
-        echo -e "\tRestore $tTar relative to cTestDestDir"
+        echo -e "\tRestore $tTarOut relative to cTestDestDir"
         mkdir -p $cDatHome2
         rsync -a $cDatHome/ $cDatHome2
         rm -rf $cDatHome2/project/beach
         rm -rf $cDatHome2/project/paulb
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -czf $tTar test
+        tar -czf $tTarOut test
         echo
     fi
 
@@ -375,13 +397,5 @@ gpTestList="$*"
 
 # -----
 . $gpTest/test.inc
-fTestSetupEnv
-fTestCreateEnv
-cd $HOME >/dev/null 2>&1
-tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
-cd - >/dev/null 2>&1
-
-# Look for serious setup errors
-fTestConfigSetup
 
 fTestRun $gpTestList

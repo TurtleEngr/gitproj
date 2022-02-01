@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-com.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null

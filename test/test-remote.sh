@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-remote.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -66,9 +66,28 @@ EOF
 # ========================================
 
 # --------------------------------
+oneTimeSetUp()
+{
+    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+
+    fTestSetupEnv
+    fTestCreateEnv
+    cd $HOME >/dev/null 2>&1
+    if [ ! -r $tTarIn ]; then
+        echo "Missing: $tTarIn [$LINENO]" 1>&2
+        exit 1
+    fi
+    tar -xzf $tTarIn
+    cd - >/dev/null 2>&1
+
+    # Look for serious setup errors
+    fTestConfigSetup
+} # oneTimeSetUp
+
+# --------------------------------
 setUp()
 {
-    local tTar=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
 
     # Restore default global values, before each test
 
@@ -82,7 +101,11 @@ setUp()
     fTestSetupEnv
     fTestCreateEnv
     cd $HOME >/dev/null 2>&1
-    tar -xzf $tTar
+    if [ ! -r $tTarIn ]; then
+        echo "Missing: $tTarIn [$LINENO]" 1>&2
+        exit 1
+    fi
+    tar -xzf $tTarIn
     cd - >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
@@ -518,7 +541,7 @@ testRemoteMkRemote()
 {
     local tResult
     local tMountDir
-    local tTar=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
+    local tTarOut=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
 
     gpAuto=1
     gpVerbose=2
@@ -543,10 +566,10 @@ testRemoteMkRemote()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteMkRemote is run."
-        echo -e "\tRestore $tTar relative to env cTestDestDir"
+        echo -e "\tRestore $tTarOut relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -czf $tTar test
+        tar -czf $tTarOut test
         echo
     fi
 
@@ -559,11 +582,15 @@ testRemoteReport()
     local tResult
     local tStatus
     local tMountDir
-    local tTar1=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
-    local tTar2=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    local tTarIn=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
+    local tTarOut=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
 
     cd $cTestDestDir >/dev/null 2>&1
-    tar -xzf $tTar1
+    if [ ! -r $tTarIn ]; then
+        fail "Missing: $tTarIn [$LINENO]"
+	return
+    fi
+    tar -xzf $tTarIn
 
     gpAuto=1
     gpVerbose=2
@@ -604,10 +631,10 @@ testRemoteReport()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteReport is run."
-        echo -e "\tRestore $tTar2 relative to env cTestDestDir"
+        echo -e "\tRestore $tTarOut relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -czf $tTar2 test
+        tar -czf $tTarOut test
         echo
     fi
 
@@ -621,7 +648,7 @@ testRemoteCreateRemoteGit()
     local tTopDir
     local tStatus
     local tMountDir
-    local tTar=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTarOut=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
 
     gpVerbose=3
     gpAuto=1
@@ -667,10 +694,10 @@ testRemoteCreateRemoteGit()
     # ----------
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteReport is run."
-        echo -e "\tRestore $tTar relative to env cTestDestDir"
+        echo -e "\tRestore $tTarOut relative to env cTestDestDir"
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
-        tar -czf $tTar test
+        tar -czf $tTarOut test
         echo
     fi
 
@@ -837,13 +864,5 @@ gpTestList="$*"
 
 # -----
 . $gpTest/test.inc
-fTestSetupEnv
-fTestCreateEnv
-cd $HOME >/dev/null 2>&1
-tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
-cd - >/dev/null 2>&1
-
-# Look for serious setup errors
-fTestConfigSetup
 
 fTestRun $gpTestList

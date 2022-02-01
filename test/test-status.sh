@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-gitproj.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -78,8 +78,8 @@ setUp()
         gpLocalTopDir gpMaxSize \
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
-    local tTar1=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
-    local tTar2=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tTarIn=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTarIn2=$gpTest/test-env_Home3AfterCloneSummary.tgz
     local tVer
     local tConf
 
@@ -89,19 +89,19 @@ setUp()
 
     mkdir -p $cDatHome3/project >/dev/null 2>&1
     cd $cTestDestDir >/dev/null 2>&1
-    if [ ! -r $tTar1 ]; then
-        echo "Could not find: $tTar1 [$LINENO]"
+    if [ ! -r $tTarIn ]; then
+        echo "Missing: $tTarIn [$LINENO]" 1>&2
         exit 1
     fi
-    tar -xzf $tTar1
+    tar -xzf $tTarIn
     cd - >/dev/null 2>&1
 
     cd $cDatHome3 >/dev/null 2>&1
-    if [ ! -r $tTar2 ]; then
-        echo "Could not find: $tTar2 [$LINENO]"
+    if [ ! -r $tTarIn2 ]; then
+        echo "Missing: $tTarIn2 [$LINENO]" 1>&2
         exit 1
     fi
-    tar -xzf $tTar2
+    tar -xzf $tTarIn2
 
     # git proj to be cloned:
     HOME=$cDatHome3

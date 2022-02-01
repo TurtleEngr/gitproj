@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-init.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -520,7 +520,7 @@ testInitMoveBinaryFiles()
 {
     local tResult
     local tStatus
-    local tTar=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTarOut=$gpTest/test-env_HomeAfterBMove.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -564,10 +564,10 @@ testInitMoveBinaryFiles()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after files have been moved."
-        echo -e "\tRestore $tTar relative to env cDatHome"
+        echo -e "\tRestore $tTarOut relative to env cDatHome"
         cd $HOME >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTar .
+        tar -cvzf $tTarOut .
         echo
     fi
 
@@ -607,16 +607,16 @@ testInitMkGitDir()
     local tResult
     local tStatus
     local tTop
-    local tTar1=$gpTest/test-env_HomeAfterBMove.tgz
-    local tTar2=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTarOut=$gpTest/test-env_ProjAfterGInit.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $HOME >/dev/null 2>&1
-    if [ ! -r $tTar1 ]; then
-        echo "Could not find: $tTar [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        fail "Missing: $tTarIn [$LINENO]"
+        return
     fi
-    tar -xzf $tTar1
+    tar -xzf $tTarIn
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -646,9 +646,9 @@ testInitMkGitDir()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after git init."
-        echo -e "\tRestore $tTar2 relative to cDatHome/project"
+        echo -e "\tRestore $tTarOut relative to cDatHome/project"
         cd $HOME/project >/dev/null 2>&1
-        tar -cvzf $tTar2 $gpProjName
+        tar -cvzf $tTarOut $gpProjName
     fi
 
     assertTrue "$LINENO not exec" "[ -x $tTop/.git/hooks/pre-commit ]"
@@ -661,27 +661,27 @@ testInitMkGitDir()
 testInitMkLocalConfig()
 {
     local tResult
-    local tTar1=$gpTest/test-env_HomeAfterBMove.tgz
-    local tTar2=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTarIn2=$gpTest/test-env_ProjAfterGInit.tgz
 
-    if [ ! -r $tTar1 ]; then
-        echo "Could not find: $tTar1 [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        fail "Missing: $tTarIn [$LINENO]"
+        return
     fi
-    if [ ! -r $tTar2 ]; then
-        echo "Could not find: $tTar2 [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn2 ]; then
+        fail "Missing: $tTarIn2 [$LINENO]"
+        return
     fi
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
 
     cd $HOME >/dev/null 2>&1
-    tar -xzf $tTar1
+    tar -xzf $tTarIn
     cd $gpTest
 
     cd $HOME/project >/dev/null 2>&1
-    tar -xzf $tTar2
+    tar -xzf $tTarIn2
     cd $gpTest
 
     gpProjName=${cDatProj1##*/}
@@ -712,14 +712,14 @@ testInitSaveVarsToConfigs()
     local tResult
     local tFile
     local tS
-    local tTar=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTest/test-env_ProjAfterGInit.tgz
 
     cd $HOME/project >/dev/null 2>&1
-    if [ ! -r $tTar ]; then
-        echo "Could not find: $tTar [$LINENO]"
-        return 1
+    if [ ! -r $tTarIn ]; then
+        fail "Missing: $tTarIn [$LINENO]"
+        return
     fi
-    tar -xzf $tTar
+    tar -xzf $tTarIn
     cd $gpTest
 
     gpLocalTopDir=$HOME/$cDatProj1
@@ -786,7 +786,7 @@ testInitCreateLocalGitAuto()
     local tStatus
     local tFile
     local tS
-    local tTar=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarOut=$gpTest/test-env_ProjLocalDefined.tgz
 
     gpGitFlow="true"
     gpMaxSize="10k"
@@ -807,9 +807,9 @@ testInitCreateLocalGitAuto()
 
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after git init."
-        echo -e "\tRestore $tTar relative to HOME/project"
+        echo -e "\tRestore $tTarOut relative to HOME/project"
         cd $HOME >/dev/null 2>&1
-        tar -cvzf $tTar .gitconfig .gitproj.config.global $cDatProj1
+        tar -cvzf $tTarOut .gitconfig .gitproj.config.global $cDatProj1
     fi
 
     return 0

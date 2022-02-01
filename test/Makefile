@@ -126,7 +126,7 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 	./test-com.sh 2>&1
 	touch $@
 
-.ran-test-com2.tmp : $(mDepList) test-com2.sh
+.ran-test-com2.tmp : $(mDepList) test-com2.sh test-env_ProjLocalDefined.tgz
 	./test-com2.sh 2>&1
 	touch $@
 
@@ -148,13 +148,21 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 # --------------------
 # Define the test-env*.tgz dependencies here
 
+test-clone.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneMkGit.tgz
+
+test-com2.sh : test-env_ProjLocalDefined.tgz
+
 test-init.sh : test-env_HomeAfterBMove.tgz test-env_ProjAfterGInit.tgz
+
+test-pre-commit.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
 
 test-remote.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
 
+test-pull.sh : test-env_ProjLocalDefined.tgz test-env_Home2AfterPush.tgz
+
 test-push.sh : test-env_TestDestDirAfterRemoteReport.tgz test-env_ProjLocalDefined.tgz
 
-test-pull.sh : test-env_ProjLocalDefined.tgz
+test-remore.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
 
 test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
 
@@ -258,3 +266,4 @@ update-tgz-files :
 			exit 1; \
 		fi; \
 	done
+

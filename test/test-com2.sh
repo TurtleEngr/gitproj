@@ -6,7 +6,7 @@ fUsage()
     fComUsage -s usage -f $cTestCurDir/test-com2.sh
 
     # This is the start of the testing internal documentation. See:
-    # fGitProjComInternalDoc()
+    # fGitProjComInternalDoc
     return
 
     cat <<\EOF >/dev/null
@@ -80,11 +80,17 @@ setUp()
         gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
+    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+
     fTestSetupEnv
     fTestCreateEnv
 
     cd $HOME >/dev/null 2>&1
-    tar -xzf $gpTest/test-env_ProjLocalDefined.tgz
+    if [ ! -r $tTarIn ]; then
+        echo "Missing: $tTarIn [$LINENO]" 1>&2
+	exit 1
+    fi
+    tar -xzf $tTarIn
 
     cp $gpDoc/config/gitconfig /tmp/gitconfig.sav
 
@@ -312,7 +318,7 @@ testComConfigUpdateLocal()
     assertNull "$LINENO $tResult" "$tResult"
 
     return 0
-} # testComConfigUpdateLocal()
+} # testComConfigUpdateLocal
 
 # --------------------------------
 testComGetConfigMore()
