@@ -1,151 +1,26 @@
 # TODO
 
-After 1.0, move these to github issues.
+Move these to github issues.
 
 --------------------
 
 ## bug (defect, fix, needs to be changed)
 
-* git config vars and section names are case-insensitive
-
-Upper-case in config var names could break the code with unexpected names.
-
-Fix the 'git config' related functions to lowercase the section and key names.
-
 --------------------
 
 ## documentation
-
-* Show the git-proj in action. Example scenarios Why would you want
-  this?  What does it solve?
 
 --------------------
 
 ## infrastructure (development, cleanup code, tests, build, package, etc)
 
-* Implement the pre-commit gitproj.hook.check-for-tabs, with tabs-ext-list
-
-* Write a script that converts "LINK{title|filepath}" to html anchors
-  or markdown links. The POD L<title|filepath> does not work for
-  relative links.
-
-* git-proj-clone will initially copy all of PROJ/.gitproj (after git
-  clone).  Then update local config: local-status, local-host,
-  proj-name. If PROG/.gitproj is missing, recreated it from ~/.gitconfig
-
-  After cloning remote, update local vars remote-status, remote-raw-dir
-
-  When in a git or git-proj dir, config vars s/b first saved to
-  .git/config
-
-  At the end of the command, update .gitprog with the gitproj values
-  from .git/config. But these vars must stay set to TBD, in .gitproj:
-  local-status, local-host, proj-name, remote-status, remote-raw-dir
-
-* Cleanup the saving of git-proj vars. Save to --local, then
-  "frequently" update PROJ/.gitproj
-
-* Cleanup: break fComGetConfig into two functions--it is doing too
-  many things that are not used. (e.g. listing source)
-
-* Cleanup: change true/false integer tests to be internally
-  "safer". Use "0" and "1", for input values, and do string tests:
-
-    if [ "${flag:-0}" = "0" ]
-    if [ "${flag:-0}" != "0" ]
-    if [ "$?" != "0" ]  # this is optional, since $? will always be an int
-
-* Cleanup: Tests for yes/no etc. can be cleaned up with this parameter
-syntax. Make first letter lower: ${ans,}. Return first char: ${ans::1}
-
-    Input: ans="Yes" or ans="NO"
-
-    declare -l ans
-    ans=${ans:-n}
-    if [ "${ans::1}" = "y" ]
-
-    ans=${ans:-n}
-    ans=${ans,}
-    if [ "${ans::1}" = "y" ]
-
-* Cleanup: Make sure the log messages follow the gpVerbose rules. (see flog
-  and git-proj)
-
-* Cleanup: fixup gpVar settings to follow the precedence rules (see
-  git-proj) Imp:
-
-  - if env. var not set, read var from ~/.gitconfig, PROJ/.git/config,
-     giving a "default" if var is not defined.
-
-  - CLI option will override env. var.
-
-  - Validate the settings, if any error, exit
-
-* Copy the test-env*.tgz files to a "public" place. And implement the
-Makefile targets for managing them.
-
-* Get travis-ci working, to run the tests
-
-* More travis-ci.
-
-    * Run tests with changes to develop or main branches.
-
-    * Build a test package.
-
-    * Install the package.
-
-    * Verify the install.
-
-    * Remove old test packages.
-
-    * How can a RC or final package build be "signaled"?
-
-* Version increment wizard script. Increment the
-  major/minor/path/rc/build vars based on Q/A. See
-  See: `test/dev-doc/enhancements/version-wizard.md`
-
 --------------------
 
 ## enhancement 1.0
 
-* Code git-proj-config.
-
-* Have git-proj-init create .git/hooks/pre-commit and PROJ/.pre-commit
-  from $gpDoc/hooks/pre-commit, or ~/.pre-commit.
-
-  And have git-proj-clone creates.git/hooks/pre-commit from
-  PROJ/.pre-commit, which should have been versioned.
-
-* In the git-proj-config command implement processes for a user to
-  copy git-proj vars between PROJ/.gitproj, PROJ/.git/config, and
-  ~/.gitconfig, using update or force.
-
-* Code git-proj-add (support adding whole directory trees looking for
-  binary files to be moved to "raw" files). See function in pre-commit
-  hook script, for identifying those files.
-
 ----
 
 ## Enhancement Major 2.0?
-
-* Decide on which remote network service to implement. Do all, only
-  do one or two? Some methods are not compatible. See raw-pros-cons.md
-
-* Future feature: manage different versions of binary files with a
-  process similar to rsnapshot. See
-  `test/dev-doc/enhancements/raw-rsnapshot.md` and
-  `test/dev-doc/enhancements/raw-ssh.md`
-
-* Manage the different versions of large binary files with "cvs".  See
-  `test/dev-doc/enhancements/raw-cvs.md` and
-  `test/dev-doc/enhancements/raw-pros-cons.md`
-
-* To use a true remote (over network) with cvs and git, use ssh
-  protocol.  Requires: ssh-client and ssh-server. See
-  `test/dev-doc/enhancements/raw-ssh.md`
-
-* Use rclone for raw/ files. See
-  `test/dev-doc/enhancements/raw-rclone.md`
 
 ----
 
@@ -331,3 +206,5 @@ just compare the last dir name--it should match origin.git - done
 * Implement a command that will show the files in REMOTE-PATH/PROJ.raw
   `git proj status` does a diff, which is good, maybe just add the
   option to have the diff show the files that are the same. - done
+
+* Copied the bug, infrastructure, and enhancements to "issues"
