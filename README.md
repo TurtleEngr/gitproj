@@ -12,7 +12,7 @@ require a git server.
 
 Have you ever had a developer commit their whole home directory into
 your project's git repository (on purpose or accidentally)? I have
-seen this. That includes their .ssh/ dir with their ssh key. They
+seen this. That includes their .ssh/ dir with their ssh keys. They
 better have passwords on their private keys! Someone making this
 mistake will likely have password-less keys. Yikes, what a security
 mess--all their keys, and shared keys, will need to be changed.
@@ -23,7 +23,7 @@ needed to rip it out. Yeah, there are tools that will do it, but they
 are not trivial, and your repo should be "locked" for a few hours
 until it is repaired. Maybe a faster solution: create a new repo, from
 a cleaned up HEAD on all active branches, and delete the compromized
-repo.
+repo. Yeah, faster, but you've lost all your change history.
 
 That is one scenario. A more common one? A developer doesn't realize
 they shouldn't be committing object files, exe files, log files, video

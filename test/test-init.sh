@@ -565,9 +565,10 @@ testInitMoveBinaryFiles()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after files have been moved."
         echo -e "\tRestore $tTarOut relative to env cDatHome"
+	fTestSavePath
         cd $HOME >/dev/null 2>&1
         echo -en "\t"
-        tar -cvzf $tTarOut .
+	tar -czf $tTarOut .
         echo
     fi
 
@@ -617,6 +618,7 @@ testInitMkGitDir()
         return
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
 
     gpProjName=${cDatProj1##*/}
     gpGitFlow="true"
@@ -647,6 +649,7 @@ testInitMkGitDir()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after git init."
         echo -e "\tRestore $tTarOut relative to cDatHome/project"
+	fTestSavePath
         cd $HOME/project >/dev/null 2>&1
         tar -cvzf $tTarOut $gpProjName
     fi
@@ -678,10 +681,12 @@ testInitMkLocalConfig()
 
     cd $HOME >/dev/null 2>&1
     tar -xzf $tTarIn
+    fTestPatchPath
     cd $gpTest
 
     cd $HOME/project >/dev/null 2>&1
     tar -xzf $tTarIn2
+    fTestPatchPath
     cd $gpTest
 
     gpProjName=${cDatProj1##*/}
@@ -720,6 +725,7 @@ testInitSaveVarsToConfigs()
         return
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
     cd $gpTest
 
     gpLocalTopDir=$HOME/$cDatProj1
@@ -808,6 +814,7 @@ testInitCreateLocalGitAuto()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after git init."
         echo -e "\tRestore $tTarOut relative to HOME/project"
+	fTestSavePath
         cd $HOME >/dev/null 2>&1
         tar -cvzf $tTarOut .gitconfig .gitproj.config.global $cDatProj1
     fi

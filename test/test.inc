@@ -173,9 +173,86 @@ fTestCheckConfig2Var()
 } # fTestCheckConfig2Var
 
 # --------------------------------
+fTestSavePath()
+{
+    # Call this just before creating tar files.
+    # saved-path.tgz should be saved with the other tgz files.
+
+    # This assumes gpTest is set, and the top test dir is at
+    # $gpTest/../../test/
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tCurDir=$PWD
+
+    if [ -z "$gpTest" ]; then
+        echo "Error: gpTest is not set [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+    cd $gpTest/../.. >/dev/null 2>&1
+    if [ ! -d test ]; then
+        echo "Error: $PWD/test does not exist [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+
+    echo "export cSavedPath=$PWD/test" >test/saved-path.inc
+    chmod a+rx test/saved-path.inc
+    tar -czf saved-path.tgz test/saved-path.inc
+
+    cd $gpTest >/dev/null 2>&1
+    ln -sf ../../saved-path.tgz .
+
+    cd $tCurDir >/dev/null 2>&1
+} # fTestSavePath
+
+# --------------------------------
+fTestPatchPath()
+{
+    # Call this after untaring files.  It may need to be called
+    # multiple times, after git clone or git checkouts, because the
+    # old path may be "in" the tared git repos.
+
+    local tSrc=${BASH_SOURCE##*/}
+    local tCurDir=$PWD
+    local tFile
+    local tNewPath=$PWD/test
+
+    if [ -z "$gpTest" ]; then
+        echo "Error: gpTest is not set [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+    if [ ! -r $gpTest/saved-path.tgz ]; then
+        echo "Error: Missing: $gpTest/saved-path.tgz [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+
+    cd $gpTest/../.. >/dev/null 2>&1
+    if [ ! -r saved-path.tgz ]; then
+        echo "Error: Missing: saved-path.tgz [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+    tar -xzf saved-path.tgz
+    if [ ! -e test/saved-path.inc ]; then
+        echo "Error: Missing: test/saved-path.inc [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+
+    . test/saved-path.inc
+    if [ -z "$cSavedPath" ]; then
+        echo "Error: cSavedPath is not set [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+    for tFile in $(find test -type f | grep -E '\.gitconfig|\.gitproj|config'); do
+        sed -i "s;$cSavedPath;$tNewPath;g" $tFile
+    done
+
+    cd $tCurDir >/dev/null 2>&1
+} # fTestPatchPath
+
+# --------------------------------
 fTestCreateEnv()
 {
     local tSrc=${BASH_SOURCE##*/}
+    local tCurDir=$PWD
 
     fTestRmEnv
     cd $cTestDestDir >/dev/null 2>&1
@@ -186,12 +263,13 @@ fTestCreateEnv()
     fi
 
     tar -xzf $cTarIn
-    cd - >/dev/null 2>&1
+    fTestPatchPath
 
     cHome=$HOME
     cd $cDatHome >/dev/null 2>&1
     HOME=$PWD
-    cd - >/dev/null 2>&1
+
+    cd $tCurDir >/dev/null 2>&1
     return 0
 } # fTestCreateEnv
 

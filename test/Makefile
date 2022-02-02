@@ -40,7 +40,8 @@ mDepList = \
 	shunit2.1 \
 	$(mCore)/gitproj-com.inc \
 	test.inc \
-	test-env.tgz
+	test-env.tgz \
+	saved-path.tgz
 
 mBaseList = \
 	.ran-test-com.tmp \
@@ -182,6 +183,19 @@ test-env.tgz :
 # Define the tests that create the test-env*.tgz files.
 # New files are manually moved and symlinks added.
 
+saved-path.tgz :
+	if [ -z "$$gpSaveTestEnv" ]; then \
+		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+	else \
+		cd ../..; \
+		mkdir test; \
+		echo "export cSavedPath=$$PWD/test" >test/saved-path.inc; \
+		chmod a+rx test/saved-path.inc; \
+		tar -czf saved-path.tgz test/saved-path.inc; \
+		cd -; \
+		ln -sf ../../saved-path.tgz .; \
+	fi
+
 test-env : $(mTestEnvFiles)
 	@echo "To update the test-env files:"
 	@echo "$^"
@@ -260,10 +274,9 @@ test-env_Home3AfterCloneSummary.tgz :
 # Update test-env*.tgz files at $(mTestUrl)
 
 update-tgz-files :
-	for i in $(mTestEnvFiles); do \
+	for i in saved-path.tgz $(mTestEnvFiles); do \
 		'rsync' $(mRsyncOpt) $$i $(mTestUrl); \
 		if [ -z $$? ]; then \
 			exit 1; \
 		fi; \
 	done
-
