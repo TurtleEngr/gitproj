@@ -1,6 +1,6 @@
 # Finding test tar file dependencies
 
-Steps for inding tar file dependnecies and who creates the tar files:
+Steps for finding tar file dependencies and who creates the tar files:
 
     echo 'Deps' >t.tmp
     grep -E '\(\)|TarIn.*=' test-*.sh >>t.tmp
@@ -25,7 +25,7 @@ Remove the tests that have no tar stms after them.
 
     test-com2.sh:    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
 
-###test-init.sh:
+### test-init.sh:
 
     test-init.sh:    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
     test-init.sh:    local tTarIn=$gpTest/test-env_ProjAfterGInit.tgz
