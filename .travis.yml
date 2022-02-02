@@ -4,8 +4,8 @@ env:
   - gpVerbose=3
 
 script :
-  - cd test; make test-all
-#  - cd test; make .ran-test-init.tmp
+  - cd test; make .ran-test-pre-commit.tmp
+#  - cd test; make test-all
 
 before_install:
   - sudo apt-get update

@@ -241,7 +241,7 @@ fTestPatchPath()
         echo "Error: cSavedPath is not set [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
-    for tFile in $(find test -type f | grep -E '\.gitconfig|\.gitproj|config'); do
+    for tFile in $(find test -type f | grep -E '\.gitconfig|\.gitproj|config|\.remote.proj'); do
         sed -i "s;$cSavedPath;$tNewPath;g" $tFile
     done
 
