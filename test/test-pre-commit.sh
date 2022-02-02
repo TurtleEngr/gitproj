@@ -166,7 +166,7 @@ testSetup()
     assertTrue "$LINENO $tOrigin $(echo; find $gpTest/../..)" "[ -d $tOrigin ]"
     gpRemoteRawOrigin=$(fComGetConfig -k "gitproj.config.remote-raw-origin" -d "None")
     assertNotContains "$LINENO" "$gpRemoteRawOrigin" "None"
-    assertTrue "$LINENO $gpRemoteRawOrigin" "[ -d $gpRemoteRawOrigin ]"
+    assertTrue "$LINENO $gpRemoteRawOrigin $(cat .git/config)" "[ -d $gpRemoteRawOrigin ]"
 
     return 0
 } # testSetup
