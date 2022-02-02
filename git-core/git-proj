@@ -95,13 +95,17 @@ versioning of large binary files. Since the large files are not
 versioned, i.e. only the last version is saved, this is a compromise
 on having "perfect" version control of the files.
 
-The main inspiration for the proj tool came from the need to
-versioning video projects. Video files are HUGE, yet they don't change
-much. Since most video files are rendered from files that do not
-change, it is only important to version the video editor's file, so
-that you can recreate a particular video file version. Since rendering
-takes time you will want to save the rendered file. But there is usually
-no need to save every rendered version.
+The main inspiration for this git-proj tool came from my desire to use
+git to version video projects. But video files are HUGE, yet they
+don't change much. Since most video files are rendered from files that
+do not change, it is only important to version the video editor's
+file, so that you can recreate a particular video file version. Since
+rendering takes time you will want to save the rendered files. But
+there is usually no need to save every rendered version.
+
+Currently this tool only supports git and large files on a local
+system. The "remotes" can be setup on mounted drives, and they can be
+used to clone the files to other systems.
 
 =head1 OPTIONS
 

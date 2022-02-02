@@ -25,15 +25,25 @@ until it is repaired. Maybe a faster solution: create a new repo, from
 a cleaned up HEAD on all active branches, and delete the compromized
 repo. Yeah, faster, but you've lost all your change history.
 
-That is one scenario. A more common one? A developer doesn't realize
-they shouldn't be committing object files, exe files, log files, video
-files, or generated PDFs to the repository. Your snappy repo will
-start to become huge and *slow*. There are some good reasons for
-wanting to save and track those kind of files, but a git repo is not
-the place. So git-lfs was created. If you are OK with that solution
-and don't mind paying for the storage, you can skip this tool.  I wanted
-something simpler to setup and with a more distributed approach. This
-tool is a start down that path.
+That is one scenario. This tool won't help with removing large binary
+files, but it can help with a more common sceanario. Beginning
+developers don't realize they shouldn't be committing object files,
+exe files, log files, video files, or generated PDFs to the
+repository. Your snappy repo will start to become huge and
+*slow*. There are some good reasons for wanting to save and track
+those kind of files, but a git repo is not the place. So git-lfs was
+created. If you are OK with that solution and don't mind paying for
+the storage, you can skip this tool.  I wanted something simpler to
+setup and with a more distributed approach. This tool is a start down
+that path.
+
+The main inspiration for this git-proj tool came from my desire to use
+git to version video projects. But video files are HUGE, yet they
+don't change much. Since most video files are rendered from files that
+do not change, it is only important to version the video editor's
+file, so that you can recreate a particular video file version. Since
+rendering takes time you will want to save the rendered files. But
+there is usually no need to save every rendered version.
 
 Currently this tool only supports git and large files on a local
 system. The "remotes" can be setup on mounted drives, and they can be
@@ -41,7 +51,8 @@ used to clone the files to other systems.
 
 See the
 [issues](https://github.com/TurtleEngr/gitproj/issues?q=is%3Aopen+is%3Aissue+milestone%3A%222.0+Release%22),
-milestone 2.0 tagged issues for future enhancements.
+milestone 2.0 tagged issues for future enhancements that will support
+remotes across a network.
 
 # git proj sub-commands
 
