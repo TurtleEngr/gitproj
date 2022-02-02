@@ -11,16 +11,19 @@ require a git server.
 ## Why git-proj?
 
 Have you ever had a developer commit their whole home directory into
-your project's git repository (on purpose or accidentally)? That includes
-their .ssh/ dir with their ssh key. They better have passwords on their
-private keys! Someone making this mistake will likely have password-less
-keys.Yikes, what a security mess--all their keys will need to be changed.
+your project's git repository (on purpose or accidentally)? I have
+seen this. That includes their .ssh/ dir with their ssh key. They
+better have passwords on their private keys! Someone making this
+mistake will likely have password-less keys. Yikes, what a security
+mess--all their keys, and shared keys, will need to be changed.
 
 Sure you can "delete" the mistake, but if it was pushed to your main
-git server, it will be in the repo forever, unless to do the work needed
-to rip it out. Yeah, there are tools that will do it, but they are not
-trivial, and your repo should be "locked" for a few hours until it is
-repaired.
+git server, it will be in the repo forever, unless to do the work
+needed to rip it out. Yeah, there are tools that will do it, but they
+are not trivial, and your repo should be "locked" for a few hours
+until it is repaired. Maybe a faster solution: create a new repo, from
+a cleaned up HEAD on all active branches, and delete the compromized
+repo.
 
 That is one scenario. A more common one? A developer doesn't realize
 they shouldn't be committing object files, exe files, log files, video
@@ -62,7 +65,7 @@ I recommend you start with:
 
 Then the
 [Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/tutorial/create_a_git-proj_repo.md)
-tutorial shows the git-proj commands in action.
+tutorial shows how to get started with the git-proj commands.
 
 # Installing
 
