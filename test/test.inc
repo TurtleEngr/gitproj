@@ -225,9 +225,9 @@ fTestPatchPath()
         exit 1
     fi
 
-    cd $gpTest/../.. >/dev/null 2>&1
+    cd $gpTest/../..
     if [ ! -r saved-path.tgz ]; then
-        echo "Error: Missing: saved-path.tgz [$tSrc:$LINENO]" 1>&2
+        echo "Error: Missing: $PWD/saved-path.tgz [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
     tar -xzf saved-path.tgz
