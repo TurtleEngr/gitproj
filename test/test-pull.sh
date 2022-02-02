@@ -82,6 +82,7 @@ oneTimeSetUp()
     fi
     tar -xzf $tTarIn
     cd - >/dev/null 2>&1
+    fTestPatchPath
 
     # Look for serious setup errors
     fTestConfigSetup
@@ -113,6 +114,7 @@ setUp()
     fi
     tar -xzf $tTarIn
     cd - >/dev/null 2>&1
+    fTestPatchPath
 
     # Patch the version that was set in the tar file
 

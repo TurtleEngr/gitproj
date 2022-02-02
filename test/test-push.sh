@@ -80,6 +80,7 @@ oneTimeSetUp()
     fi
     tar -xzf $tTarIn
     cd - >/dev/null 2>&1
+    fTestPatchPath
 
     # Look for serious setup errors
     fTestConfigSetup
@@ -108,6 +109,7 @@ setUp()
     fi
     tar -xzf $tTarIn
     cd - >/dev/null 2>&1
+    fTestPatchPath
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
@@ -322,6 +324,7 @@ testGitProjPushCLI()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after files pushed."
         echo -e "\tRestore $tTarOut relative to cTestDestDir"
+	fTestSavePath
         mkdir -p $cDatHome2
         rsync -a $cDatHome/ $cDatHome2
         rm -rf $cDatHome2/project/beach

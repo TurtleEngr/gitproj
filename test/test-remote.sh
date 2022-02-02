@@ -78,6 +78,7 @@ oneTimeSetUp()
         exit 1
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
     cd - >/dev/null 2>&1
 
     # Look for serious setup errors
@@ -106,6 +107,7 @@ setUp()
         exit 1
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
     cd - >/dev/null 2>&1
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
@@ -567,6 +569,7 @@ testRemoteMkRemote()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteMkRemote is run."
         echo -e "\tRestore $tTarOut relative to env cTestDestDir"
+	fTestSavePath
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
         tar -czf $tTarOut test
@@ -591,6 +594,7 @@ testRemoteReport()
 	return
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
 
     gpAuto=1
     gpVerbose=2
@@ -632,6 +636,7 @@ testRemoteReport()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteReport is run."
         echo -e "\tRestore $tTarOut relative to env cTestDestDir"
+	fTestSavePath
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
         tar -czf $tTarOut test
@@ -695,6 +700,7 @@ testRemoteCreateRemoteGit()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of test env after fRemoteReport is run."
         echo -e "\tRestore $tTarOut relative to env cTestDestDir"
+	fTestSavePath
         cd $cTestDestDir >/dev/null 2>&1
         echo -en "\t"
         tar -czf $tTarOut test

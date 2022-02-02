@@ -95,6 +95,7 @@ setUp()
     fi
     tar -xzf $tTarIn
     cd - >/dev/null 2>&1
+    fTestPatchPath
 
     cd $cDatHome3 >/dev/null 2>&1
     if [ ! -r $tTarIn2 ]; then
@@ -102,6 +103,7 @@ setUp()
         exit 1
     fi
     tar -xzf $tTarIn2
+    fTestPatchPath
 
     # git proj to be cloned:
     HOME=$cDatHome3

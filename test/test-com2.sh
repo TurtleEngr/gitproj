@@ -91,6 +91,7 @@ setUp()
 	exit 1
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
 
     cp $gpDoc/config/gitconfig /tmp/gitconfig.sav
 

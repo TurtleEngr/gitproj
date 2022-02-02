@@ -92,6 +92,7 @@ setUp()
     fi
     tar -xzf $tTarIn
     cd - >/dev/null 2>&1
+    fTestPatchPath
 
     # git proj to be cloned:
     HOME=$cDatHome3
@@ -457,6 +458,7 @@ testCloneMkGitDirPass()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after CloneMkGitDir."
         echo -e "\tRestore $tTarOut relative to env cDatHome3=$cDatHome3"
+	fTestSavePath
         cd $cDatHome3 >/dev/null 2>&1
         echo -en "\t"
         tar -cvzf $tTarOut .
@@ -489,6 +491,7 @@ testCloneMkRawDirFail()
         exit 1
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
 
     gpLocalTopDir=$HOME/project/george
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -531,6 +534,7 @@ testCloneMkRawDirPass()
         return
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=3
@@ -569,6 +573,7 @@ testCloneSummary()
         return
     fi
     tar -xzf $tTarIn
+    fTestPatchPath
     gpLocalTopDir=$HOME/project/george
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=3
@@ -598,6 +603,7 @@ testCloneSummary()
     if [ ${gpSaveTestEnv:-0} -ne 0 ] && [ $tStatus -eq 0 ]; then
         echo -e "\tCapture state of project after fCloneSummary."
         echo -e "\tRestore $tTarOut relative to env cDatHome3=$cDatHome3"
+	fTestSavePath
         cd $cDatHome3 >/dev/null 2>&1
         echo -en "\t"
         tar -cvzf $tTarOut .
