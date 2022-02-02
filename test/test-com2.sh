@@ -294,6 +294,7 @@ testComConfigUpdateLocal()
     tResult=$(fComConfigUpdateLocal 2>&1)
     assertFalse "$LINENO $tResult" "$?"
     assertContains "$LINENO $tResult" "$tResult" "fComConfigUpdateLocal"
+    # Make sure there will be a time difference with next tests
     sleep 1
 
     cd $HOME/$cDatProj1

@@ -59,34 +59,38 @@ doc/user-doc/tutorial/create_a_git-proj_repo.html : src-doc/create_a_git-proj_re
 	-$(mTidy) doc/user-doc/config.html
 	-pod2markdown src-doc/create_a_git-proj_repo.pod >doc/user-doc/tutorial/create_a_git-proj_repo.md
 
+# Remove all "INT:" lines. uniq removes duplicate blank lines.
 doc/CHANGES.md : CHANGES.md
 	-grep -Ev 'INT:' <$? | uniq >$@
 
+# Remove all "INT:" lines. uniq removes duplicate blank lines.
+# Also remove all after "For Developers"
 doc/README.md : README.md
 	-grep -Ev 'INT:' <$? | uniq | awk ' \
 	    /^## For Developers/ { exit 0 } \
 	    { print $$0 } \
 	' >$@
 
+# git-proj will collect ALL usage help, and format as markdown
 doc/user-doc/git-proj.md : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
 	-$? -H md >$@
 
+# git-proj will collect ALL usage help, and format as html, with a TOC
 doc/user-doc/git-proj.html : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
 	-$? -H html >$@
 
-# Remove internal doc. Any line with 'INT:' in it.
-# "uniq" is a quick way of removing any extra blank lines
-
+# Remove trailing whitespace, convert tabs to spaces, and normalized
+# indents in bash fiies.
 fmt : clean
 	command -v shfmt
 	command -v $(mTestDir)/rm-trailing-sp
 	-rm fmt-err.tmp
-	rm-trailing-sp -t doc/config/* doc/hooks/* git-core/* test/*.sh
-	rm-trailing-sp -t doc/LICENSE doc/VERSION
-	rm-trailing-sp -t README.md TODO.md CHANGES.md
-	rm-trailing-sp Makefile
+	$(mTestDir)/rm-trailing-sp -t doc/config/* doc/hooks/* git-core/* test/*.sh
+	$(mTestDir)/rm-trailing-sp -t doc/LICENSE doc/VERSION
+	$(mTestDir)/rm-trailing-sp -t README.md TODO.md CHANGES.md
+	$(mTestDir)/rm-trailing-sp Makefile
 	for i in $$(grep -rl '^#!/bin/bash' *); do \
 		echo $$i; \
 		if ! bash -n $$i; then \
