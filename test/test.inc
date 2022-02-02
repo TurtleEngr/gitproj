@@ -242,7 +242,7 @@ fTestPatchPath()
         exit 1
     fi
     for tFile in $(find test -type f | grep -E '\.gitconfig|\.gitproj|config|\.remote.proj'); do
-        sed -i "s;$cSavedPath;$tNewPath;g" $tFile
+        sed -i "s;$cSavedPath;$tNewPath;" $tFile
     done
 
     cd $tCurDir >/dev/null 2>&1
