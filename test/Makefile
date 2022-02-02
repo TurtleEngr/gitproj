@@ -170,7 +170,7 @@ test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3Afte
 # --------------------
 test-env.tgz :
 	wget $(mTestOpt) https://$(mTestUrl)/$@
-	sleep 0.5; \
+	sleep 0.5
 	@echo "$@ needs to be manually updated."
 	@echo "Do not remove: $@"
 	@echo "First run:  ./test-init.sh testGitProjInit"
