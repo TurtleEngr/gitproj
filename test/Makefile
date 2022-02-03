@@ -3,10 +3,10 @@
 # Run tests for any dependencies that have changed:
 # 	make test
 
-# Force a run all tests, stop on any test group error
+# Force a run of all tests, stop on any test group error
 # 	make test-all
 
-# Force a run all tests, and keep going, even if erros
+# Force a run of all tests, and keep going, even if errors
 # 	make -k test-all
 
 
