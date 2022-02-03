@@ -4,8 +4,8 @@ env:
   - gpVerbose=3
 
 script :
-  - cd test; make .ran-test-pre-commit.tmp .ran-test-com2.tmp
-#  - cd test; make test-all
+  - cd test; make test-all
+#  - cd test; make .ran-test-pre-commit.tmp .ran-test-com2.tmp
 #  - cd test; make .ran-test-pre-commit.tmp .ran-test-remote.tmp
 
 before_install:
