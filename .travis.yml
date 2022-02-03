@@ -4,7 +4,8 @@ env:
   - gpVerbose=3
 
 script :
-  - cd test; make test-all
+  - cd test; make .ran-test-pre-commit.tmp .ran-test-com2.tmp
+#  - cd test; make test-all
 #  - cd test; make .ran-test-pre-commit.tmp .ran-test-remote.tmp
 
 before_install:
@@ -28,18 +29,20 @@ addons:
 
 # https://docs.travis-ci.com/user/billing-overview/#partner-queue-solution
 # https://travis-ci.community/t/free-oss-credits-usage-calculation/10832/5?u=turtleengr
+#os: linux
+#dist: bionic
+#arch:
+#     - arm64
 
-os: linux
-dist: bionic
-arch:
-     - arm64
-
-#matrix:
-#  include:
+matrix:
+  include:
+    # 20
 #    - os: linux
 #      dist: focal
-#    - os: linux
-#      dist: bionic
+    # 18
+    - os: linux
+      dist: bionic
+    # 16
 #    - os: linux
 #      dist: xenial
 

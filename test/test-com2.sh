@@ -317,13 +317,14 @@ testComConfigUpdateLocal()
     assertEquals "$LINENO" "3" "$tValue"
     sleep 1
 
+    gpVerbose=3
     cd $HOME/$cDatProj1
     tResult=$(fComConfigUpdateLocal 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "[ ./.git/config -ot ./.gitproj ]"
     assertNull "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "$tResult"
-    ##assertContains "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "$tResult" "uncomment to show"
-
+    ##assertNull "$LINENO $(diff ./.git/config ./.gitproj)" "diff -q ./.git/config ./.gitproj"
+    assertContains "$LINENO $tResult $(echo ; stat  -c %y ./.git/config ./.gitproj )" "$tResult" "uncomment to show"
     return 0
 } # testComConfigUpdateLocal
 

@@ -58,7 +58,7 @@ fReport()
 # --------------------
 fEnabled()
 {
-    tEnabled=$(git config --get --bool --default=false gitproj.hook.pre-commit-enabled)
+    tEnabled=$(git config --get --bool gitproj.hook.pre-commit-enabled)
     if [ "$tEnabled" != "true" ]; then
         echo "Skipping pre-commit"
         exit 0
@@ -73,7 +73,7 @@ fCheckFileNames()
     local tFile
     local tResult
 
-    tResult=$(git config --get --bool --default=false gitproj.hook.check-file-names)
+    tResult=$(git config --get --bool gitproj.hook.check-file-names)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
@@ -122,7 +122,7 @@ fCheckWhiteSpace()
     local tFile
     # Note: DOS EOL files will give a false report.
 
-    tResult=$(git config --get --bool --default=false gitproj.hook.check-whitespace)
+    tResult=$(git config --get --bool gitproj.hook.check-whitespace)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
@@ -148,7 +148,7 @@ fCheckNotRaw()
     local tFile
     local tResult
 
-    tResult=$(git config --get --bool --default=false gitproj.hook.check-in-raw)
+    tResult=$(git config --get --bool gitproj.hook.check-in-raw)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
@@ -185,14 +185,17 @@ fCheckBigFiles()
     local tFile
     local tResult
 
-    tResult=$(git config --get --bool --default=false gitproj.hook.check-for-big-files)
+    tResult=$(git config --get --bool gitproj.hook.check-for-big-files)
     if [ "$tResult" != "true" ]; then
         return 0
     fi
 
-    tMaxSize=$(git config --get --int --default=0 gitproj.hook.binary-file-size)
-    if [ $tMaxSize -le 1000 ]; then
-        return 0
+    tMaxSize=$(git config --get --int gitproj.hook.binary-file-size)
+    if [ -z "$tMaxSize" ]; then
+        tMaxSize=10000
+    fi
+    if [ $tMaxSize -le 10000 ]; then
+        tMaxSize=10000
     fi
 
     gFileList=""
@@ -237,6 +240,9 @@ if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
 fi
 
 gVerbose=$(git config --get --bool gitproj.hook.verbose)
+if [ -z "$gVerbose" ]; then
+    gVerbose=true
+fi
 fEnabled
 fCheckFileNames
 fCheckWhiteSpace
