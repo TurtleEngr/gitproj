@@ -149,11 +149,11 @@ clean-rc-release : TBD
 tag : ver.mak
 	-git commit -am Updated
 	git tag -f -a -m "Released to: $(ProdRelServer):$(ProdRelDir)" $(ProdTag)
-	echo "# --------------------" >>VERSION
-	date -u +'%F %R UTC' >>VERSION
-	echo "$(ProdTag)" >>VERSION
-	echo "Released: $$(ls pkg)" >>VERSION
-	echo "to: $(ProdRelServer):$(ProdRelDir)" >>VERSION
+	echo "# --------------------" >>REL-VERSION
+	date -u +'%F %R UTC' >>REL-VERSION
+	echo "$(ProdTag)" >>REL-VERSION
+	echo "Released: $$(ls pkg)" >>REL-VERSION
+	echo "to: $(ProdRelServer):$(ProdRelDir)" >>REL-VERSION
 	#git commit -am Updated
 	#git push origin develop
 	#git push --tags -f
