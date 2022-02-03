@@ -2,9 +2,21 @@
 
 ----------
 
+## tag-0-5-5-2
+
+Thu 03 Feb 2022 11:42:47 AM PST
+
+* Updated docs
+
+* Added 'why' section to README. Spell corrections.
+
+* Updated most github links, in docs, to point to the "main" branch.
+
+----------
+
 ## tag-0-5-4-1
 
-Date: Mon 31 Jan 2022 09:56:47 AM PST
+Mon 31 Jan 2022 09:56:47 AM PST
 
 * Updated docs
 
@@ -42,7 +54,7 @@ need for HOST config files.
 
 ## tag-0-2-0-1
 
-Date:   Tue Jan 11 12:03:36 2022 -0800
+Tue Jan 11 12:03:36 2022 -0800
 
 * Updated documentation
 
@@ -64,7 +76,7 @@ Date:   Tue Jan 11 12:03:36 2022 -0800
 
 ## 0.1.2-2
 
-Date:   Mon Jan 10 17:12:39 2022 -0800
+Mon Jan 10 17:12:39 2022 -0800
 
 * Cleaned up the gen-doc.
 
@@ -72,6 +84,6 @@ Date:   Mon Jan 10 17:12:39 2022 -0800
 
 ## 0.1.1-2
 
-Date:   Mon Jan 10 15:02:39 2022 -0800
+Mon Jan 10 15:02:39 2022 -0800
 
 * First package.
