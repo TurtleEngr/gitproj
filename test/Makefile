@@ -44,6 +44,7 @@ mDepList = \
 	saved-path.tgz
 
 mBaseList = \
+	.ran-test-infra.tmp \
 	.ran-test-com.tmp \
 	.ran-test-com2.tmp \
 	.ran-test-pre-commit.tmp
@@ -122,6 +123,10 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 
 # --------------------
 # Special non-CMD tests
+
+.ran-test-infra.tmp : $(mDepList) test-infra.sh
+	./test-infra.sh 2>&1
+	touch $@
 
 .ran-test-com.tmp : $(mDepList) test-com.sh
 	./test-com.sh 2>&1

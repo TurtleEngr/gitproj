@@ -175,14 +175,16 @@ fTestCheckConfig2Var()
 # --------------------------------
 fTestSavePath()
 {
-    # Call this just before creating tar files.
-    # saved-path.tgz should be saved with the other tgz files.
-
-    # This assumes gpTest is set, and the top test dir is at
-    # $gpTest/../../test/
-
+    local pSaveTar=${1:-saved-path.tgz}
+    local pSaveFile=${2:-saved-path.inc}
+    local pSavePath="$3"
     local tSrc=${BASH_SOURCE##*/}
     local tCurDir=$PWD
+
+    # Call this just before creating tar files.  pSaveTar should be
+    # saved with the other tgz files.  The options are only used for
+    # testing This assumes gpTest is set, and the top test dir is at
+    # $gpTest/../../test/
 
     if [ -z "$gpTest" ]; then
         echo "Error: gpTest is not set [$tSrc:$LINENO]" 1>&2
@@ -190,13 +192,16 @@ fTestSavePath()
     fi
     cd $gpTest/../.. >/dev/null 2>&1
     if [ ! -d test ]; then
-        echo "Error: $PWD/test does not exist [$tSrc:$LINENO]" 1>&2
+        echo "Error: Missing: $PWD/test [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
+    if [ -z "$pSavePath" ]; then
+        pSavePath=$PWD
+    fi
 
-    echo "export cSavedPath=$PWD/test" >test/saved-path.inc
-    chmod a+rx test/saved-path.inc
-    tar -czf saved-path.tgz test/saved-path.inc
+    echo "export cSavedPath=$pSavePath/test" >test/$pSaveFile
+    chmod a+rx test/$pSaveFile
+    tar -czf $pSaveTar test/$pSaveFile
 
     cd $gpTest >/dev/null 2>&1
     ln -sf ../../saved-path.tgz .
@@ -207,45 +212,63 @@ fTestSavePath()
 # --------------------------------
 fTestPatchPath()
 {
-    # Call this after untaring files.  It may need to be called
-    # multiple times, after git clone or git checkouts, because the
-    # old path may be "in" the tared git repos.
-
+    local pSaveTar=${1:-saved-path.tgz}
+    local pSaveFile=${2:-saved-path.inc}
     local tSrc=${BASH_SOURCE##*/}
     local tCurDir=$PWD
     local tFile
-    local tNewPath=$PWD/test
+    local tNewPath
+
+    # Call this after untaring files.  It may need to be called
+    # multiple times, after git clone or git checkouts, because the
+    # old path may be "in" the tared git repos. The options are only
+    # used for testing.
 
     if [ -z "$gpTest" ]; then
         echo "Error: gpTest is not set [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
-    if [ ! -r $gpTest/saved-path.tgz ]; then
-        echo "Error: Missing: $gpTest/saved-path.tgz [$tSrc:$LINENO]" 1>&2
+    if [ ! -r $gpTest/$pSaveTar ]; then
+        echo "Error: Missing: $gpTest/$pSaveTar [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
 
     cd $gpTest/../..
-    if [ ! -r saved-path.tgz ]; then
-        echo "Error: Missing: $PWD/saved-path.tgz [$tSrc:$LINENO]" 1>&2
+    if [ ! -d test ]; then
+        echo "Error: Missing: $PWD/test [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
-    tar -xzf saved-path.tgz
-    if [ ! -e test/saved-path.inc ]; then
-        echo "Error: Missing: test/saved-path.inc [$tSrc:$LINENO]" 1>&2
+    tNewPath=$PWD/test
+
+    if [ ! -r $pSaveTar ]; then
+        echo "Error: Missing: $PWD/$pSaveTar [$tSrc:$LINENO]" 1>&2
+        exit 1
+    fi
+    tar -xzf $pSaveTar
+    if [ ! -e test/$pSaveFile ]; then
+        echo "Error: Missing: test/$pSaveFile [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
 
-    . test/saved-path.inc
+    . test/$pSaveFile
     if [ -z "$cSavedPath" ]; then
         echo "Error: cSavedPath is not set [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
+    if [ "$cSavedPath" = "$tNewPath" ]; then
+        if [ $gpDebug -ge 10 ]; then
+	    echo "Nothing done" 1>&2
+	fi
+    	cd $tCurDir >/dev/null 2>&1
+        return 0
+    fi
+
     for tFile in $(find test -type f | grep -E '\.gitconfig|\.gitproj|config|\.remote.proj'); do
         sed -i "s;$cSavedPath;$tNewPath;" $tFile
     done
 
     cd $tCurDir >/dev/null 2>&1
+    return 0
 } # fTestPatchPath
 
 # --------------------------------

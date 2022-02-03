@@ -64,11 +64,6 @@ EOF
 # --------------------------------
 setUp()
 {
-    # Restore default global values, before each test
-    unset gpBin cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
-    fTestSetupEnv
-    fTestCreateEnv
-
     gpUnitDebug=0
     return 0
 
@@ -99,6 +94,10 @@ tearDown()
 # --------------------------------
 testSetup()
 {
+    unset gpBin cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
+    fTestSetupEnv
+    fTestCreateEnv
+
     assertTrue "$LINENO" "[ -x $gpBin/gitproj-com.inc ]"
     assertTrue "$LINENO" "[ -x $gpBin/git-proj ]"
 
@@ -124,7 +123,112 @@ testSetup()
         fTestDebug "i=$i"
         assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj2/$i ]"
     done
+
+    return 0
 } # testSetup
+
+# --------------------------------
+testPatchPath()
+{
+    local tResult
+    local tTestSavedPath
+    local tExpectPath
+    local tStr1
+    local tStr2
+    local tExpectStr1
+    local tExpectStr2
+    local tFile
+
+    unset gpBin cPID gpCmdVer gErr gpFacility gpSysLog gpVerbose
+    fTestSetupEnv
+
+    fTestRmEnv
+    cd $cTestDestDir >/dev/null 2>&1
+    tExpectPath=$PWD
+    tar -xzf $cTarIn
+    cd $gpTest
+
+    # Create some config files with paths that are different from the
+    # existing path.
+    tTestSavedPath="/home/joe/project"
+    tStr1="  remote-raw-origin = $tTestSavedPath/test/root/mnt/usb-video/video-2020-04-02/george.raw"
+    tExpectStr1="  remote-raw-origin = $tExpectPath/test/root/mnt/usb-video/video-2020-04-02/george.raw"
+    tStr2="  url = $tTestSavedPath/test/root/mnt/usb-video/video-2020-04-02/george.git"
+    tExpectStr2="  url = $tExpectPath/test/root/mnt/usb-video/video-2020-04-02/george.git"
+    for tFile in .gitconfig .gitproj config .remote.proj; do
+        echo "$tStr1" >../../test/root/$tFile
+        echo "$tStr2" >>../../test/root/$tFile
+    done
+
+    # ----------
+    gpTest=""
+
+    tResult=$(fTestSavePath test-saved-path.tgz test-saved-path.inc $tTestSavedPath 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: gpTest is not set"
+
+    tResult=$(fTestPatchPath test-saved-path.tgz test-saved-path.inc 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: gpTest is not set"
+
+    gpTest=$PWD
+
+    # ----------
+    mv ../../test ../../test.sav
+
+    tResult=$(fTestSavePath test-saved-path.tgz test-saved-path.inc $tTestSavedPath 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: Missing:"
+
+    tResult=$(fTestPatchPath test-saved-path.tgz test-saved-path.inc 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: Missing:"
+
+    mv ../../test.sav ../../test
+
+    # ----------
+    tResult=$(fTestPatchPath test-xxx.tgz test-saved-path.inc 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: Missing: $gpTest/test-xxx.tgz"
+
+    # ----------
+    tResult=$(fTestPatchPath test-saved-path.tgz test-xxx-path.inc 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: Missing: test/test-xxx-path.inc"
+
+    # ----------
+    tResult=$(fTestSavePath test-saved-path.tgz test-saved-path.inc $tTestSavedPath 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertTrue "$LINENO" "[ -f ../../test-saved-path.tgz ]"
+    assertTrue "$LINENO" "[ -f ../../test/test-saved-path.inc ]"
+    assertTrue "$LINENO" "grep $tTestSavedPath ../../test/test-saved-path.inc"
+    ln -sf ../../test-saved-path.tgz .
+
+    # ----------
+    tResult=$(fTestPatchPath test-saved-path.tgz test-saved-path.inc 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    for tFile in .gitconfig .gitproj config .remote.proj; do
+        tResult=$(grep "$tExpectStr1" ../../test/root/$tFile)
+        assertTrue "$LINENO $tFile" "$?"
+        tResult=$(grep "$tExpectStr2" ../../test/root/$tFile)
+        assertTrue "$LINENO $tFile" "$?"
+    done
+
+    # ----------
+    tResult=$(fTestSavePath test-saved-path.tgz test-saved-path.inc $tExpectPath 2>&1)
+    gpDebug=10
+    tResult=$(fTestPatchPath test-saved-path.tgz test-saved-path.inc 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Nothing done"
+    for tFile in .gitconfig .gitproj config .remote.proj; do
+        tResult=$(grep "$tExpectStr1" ../../test/root/$tFile)
+        assertTrue "$LINENO $tFile" "$?"
+        tResult=$(grep "$tExpectStr2" ../../test/root/$tFile)
+        assertTrue "$LINENO $tFile" "$?"
+    done
+
+    return 0
+} # testPatchPath
 
 # ========================================
 # This should be the last defined function

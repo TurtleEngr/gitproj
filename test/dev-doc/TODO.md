@@ -187,6 +187,7 @@ structure, and some coding style quirks (e.g. [ $x -ne 0 ] vs
 	fix headings, not bullets - done
 	C<cmd> cannot be used in <pre> areas - done
 	fix POD error - done
+
 * Change "subsystem" to "subcommand" - done
 
 * Write the tutorial: create_a_git-proj_repo - done

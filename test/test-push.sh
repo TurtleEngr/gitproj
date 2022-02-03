@@ -67,7 +67,7 @@ EOF
 # ========================================
 
 # --------------------------------
-oneTimeSetUp()
+NAoneTimeSetUp()
 {
     local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
 

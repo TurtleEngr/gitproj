@@ -32,31 +32,31 @@ listed, then all of the test functions will be run.
 
 0 - if OK
 
-=head1 ERRORS
+=for comment =head1 ERRORS
 
-=head1 EXAMPLES
+=for comment =head1 EXAMPLES
 
-=head1 ENVIRONMENT
+=for comment =head1 ENVIRONMENT
 
-=head1 FILES
+=for comment =head1 FILES
 
 =head1 SEE ALSO
 
 shunit2.1
 
-=head1 NOTES
+=for comment =head1 NOTES
 
-=head1 CAVEATS
+=for comment =head1 CAVEATS
 
-=head1 DIAGNOSTICS
+=for comment =head1 DIAGNOSTICS
 
-=head1 BUGS
+=for comment =head1 BUGS
 
-=head1 RESTRICTIONS
+=for comment =head1 RESTRICTIONS
 
-=head1 AUTHOR
+=for comment =head1 AUTHOR
 
-=head1 HISTORY
+=for comment =head1 HISTORY
 
 =cut
 
@@ -66,7 +66,7 @@ EOF
 # ========================================
 
 # --------------------------------
-oneTimeSetUp()
+NAoneTimeSetUp()
 {
     local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
 
@@ -114,12 +114,14 @@ setUp()
     gpVer=$(cat $gpDoc/VERSION)
     fComSetConfig -L -k "gitproj.config.ver" -v "$gpVer"
     fComSetConfig -l -k "gitproj.config.ver" -v "$gpVer"
+    cd $gpTest >/dev/null 2>&1
 
     . $gpBin/gitproj-remote.inc
 
-    gpDebug=0
     gpVerbose=3
     gpMaxLoop=3
+    gpDebug=${gpDebug:-0}
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     fRemoteSetGlobals
     gpUnitDebug=0
     return 0
