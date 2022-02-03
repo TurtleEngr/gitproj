@@ -1,7 +1,6 @@
 language: bash
 
 env:
-  - gpVerbose=3
   - SHELL=/bin/bash
 
 script :
@@ -36,15 +35,18 @@ addons:
 #arch:
 #     - arm64
 
-matrix:
-  include:
-    # 20
+os: linux
+dist: bionic
+
+#matrix:
+#  include:
+#    # 20
 #    - os: linux
 #      dist: focal
-    # 18
-    - os: linux
-      dist: bionic
-    # 16
+#    # 18
+#    - os: linux
+#      dist: bionic
+#    # 16
 #    - os: linux
 #      dist: xenial
 
