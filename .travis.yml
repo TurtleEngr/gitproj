@@ -2,9 +2,11 @@ language: bash
 
 env:
   - gpVerbose=3
+  - SHELL=/bin/bash
 
 script :
   - cd test; make test-all
+#  - cd test; make .ran-test-clone.tmp .ran-test-status.tmp
 #  - cd test; make .ran-test-pre-commit.tmp .ran-test-com2.tmp
 #  - cd test; make .ran-test-pre-commit.tmp .ran-test-remote.tmp
 

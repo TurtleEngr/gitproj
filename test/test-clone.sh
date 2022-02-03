@@ -225,7 +225,7 @@ testCloneValidRemoteDir()
     rm $tRemoteRawOrigin/$cRemoteProjFile >/dev/null 2>&1
     tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Missing /home/bruce/ver/public/app/gitproj/test/root/mnt/usb-video/video-2020-04-02/george.raw/.remote.proj"
+    assertContains "$LINENO $tResult" "$tResult" "test/root/mnt/usb-video/video-2020-04-02/george.raw/.remote.proj"
 
     echo "bob.git" >$tRemoteRawOrigin/$cRemoteProjFile
     tResult=$(fCloneValidRemoteDir $tRemoteGitDir 2>&1)
