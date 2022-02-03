@@ -192,18 +192,17 @@ testPatchPath()
     assertContains "$LINENO $tResult" "$tResult" "Error: Missing: $gpTest/test-xxx.tgz"
 
     # ----------
-    tResult=$(fTestPatchPath test-saved-path.tgz test-xxx-path.inc 2>&1)
-    assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Error: Missing: test/test-xxx-path.inc"
-#ASSERT:197 Error: Missing: /home/travis/build/TurtleEngr/gitproj/test/test-saved-path.tgz [test.inc:232] not found:<Error: Missing: test/test-xxx-path.inc>
-
-    # ----------
     tResult=$(fTestSavePath test-saved-path.tgz test-saved-path.inc $tTestSavedPath 2>&1)
     assertTrue "$LINENO $tResult" "$?"
     assertTrue "$LINENO" "[ -f ../../test-saved-path.tgz ]"
     assertTrue "$LINENO" "[ -f ../../test/test-saved-path.inc ]"
     assertTrue "$LINENO" "grep $tTestSavedPath ../../test/test-saved-path.inc"
     ln -sf ../../test-saved-path.tgz .
+
+    # ----------
+    tResult=$(fTestPatchPath test-saved-path.tgz test-xxx-path.inc 2>&1)
+    assertFalse "$LINENO $tResult" "$?"
+    assertContains "$LINENO $tResult" "$tResult" "Error: Missing: test/test-xxx-path.inc"
 
     # ----------
     tResult=$(fTestPatchPath test-saved-path.tgz test-saved-path.inc 2>&1)
