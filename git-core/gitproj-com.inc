@@ -319,12 +319,21 @@ fComConfigCopy()
         fi
         if [ $pForce -ne 0 ]; then
             git config -f $pDest $tVar $tValue
+	    if [ $? -ne 0 ]; then
+	        fError -i -n "git config error" -l $tSrc:$LINENO
+	    fi
             continue
         fi
         if git config -f $pDest --get $tVar >/dev/null 2>&1; then
+	    if [ $? -ne 0 ]; then
+	        fError -i -n "git config error" -l $tSrc:$LINENO
+	    fi
             continue
         fi
         git config -f $pDest $tVar "$tValue"
+        if [ $? -ne 0 ]; then
+	    fError -i -n "git config error" -l $tSrc:$LINENO
+	fi
     done
     if diff -q $pDest $pDest.bak; then
         rm -f $pDest.bak
