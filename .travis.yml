@@ -28,15 +28,18 @@ addons:
 
 # https://docs.travis-ci.com/user/billing-overview/#partner-queue-solution
 # https://travis-ci.community/t/free-oss-credits-usage-calculation/10832/5?u=turtleengr
+
+os: linux
+dist: bionic
 arch:
      - arm64
 
-matrix:
-  include:
+#matrix:
+#  include:
 #    - os: linux
 #      dist: focal
-    - os: linux
-      dist: bionic
+#    - os: linux
+#      dist: bionic
 #    - os: linux
 #      dist: xenial
 

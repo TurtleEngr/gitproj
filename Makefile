@@ -21,6 +21,8 @@
 # --------------------
 # Config
 
+SHELL = /bin/bash
+
 mHtmlOpt = --cachedir=/tmp --index --backlink --podpath=.
 
 mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no

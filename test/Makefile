@@ -13,6 +13,8 @@
 # --------------------
 # Config
 
+SHELL = /bin/bash
+
 mHtmlOpt = --cachedir=/tmp --index --backlink
 mRsyncOpt = -rlptzLP
 

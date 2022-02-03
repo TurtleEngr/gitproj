@@ -40,6 +40,8 @@ include ver.mak
 # --------------------
 # Config
 
+SHELL = /bin/bash
+
 # --------------------
 # Main targets
 

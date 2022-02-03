@@ -102,37 +102,6 @@ tearDown()
 # ========================================
 
 # --------------------------------
-testSetup()
-{
-    assertTrue "$LINENO" "[ -x $gpBin/gitproj-com.inc ]"
-    assertTrue "$LINENO" "[ -x $gpBin/git-proj ]"
-    return 0
-
-    assertTrue "$LINENO" "[ -r $cTestFiles ]"
-    assertTrue "$LINENO" "[ -d $cTestSrcDir ]"
-    assertTrue "$LINENO" "[ -d $cTestDestDir ]"
-    assertNotEquals "$LINENO" "$cHome" "$HOME"
-    assertFalse "$LINENO" "[ -r $HOME/.gitconfig ]"
-
-    for i in $cDatMount1 $cDatMount2 $cDatMount3; do
-        fTestDebug "i=$i"
-        assertTrue "$LINENO ${i##*/}" "[ -d $i ]"
-    done
-    for i in $cDatProj1 $cDatProj2; do
-        fTestDebug "i=$i"
-        assertTrue "$LINENO ${i}" "[ -d $HOME/$i ]"
-    done
-    for i in $cDatProj1Big; do
-        fTestDebug "i=$i"
-        assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj1/$i ]"
-    done
-    for i in $cDatProj2Big $cDatProj2Big; do
-        fTestDebug "i=$i"
-        assertTrue "$LINENO ${i}" "[ -r $HOME/$cDatProj2/$i ]"
-    done
-} # testSetup
-
-# --------------------------------
 testComGitProjInternalDoc()
 {
     startSkipping
