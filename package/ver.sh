@@ -67,7 +67,7 @@ export ProdLicense="dist/usr/share/doc/git-proj/LICENSE"
 # Required
 # %license ProdLicense
 
-export ProdReadMe="dist/usr/share/doc/git-proj/README"
+export ProdReadMe="dist/usr/share/doc/git-proj/README.md"
 # Required
 # %readme ProdReadMe
 
