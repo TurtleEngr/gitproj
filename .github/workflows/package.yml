@@ -1,0 +1,27 @@
+name: package
+
+on:
+  workflow_run:
+    workflows: ["test"]
+    branches: [develop]
+    types:
+      - completed
+
+jobs:
+
+  Package:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: InstallDeps
+      run: cd test; make install-deps
+
+    - name: Build
+      run: cd package; make build
+
+    - name: Package
+      run: cd package; make package
