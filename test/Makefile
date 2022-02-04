@@ -126,7 +126,8 @@ clear-ran :
 stats :
 	./stats.sh
 
-gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html
+# ----------------------------------------
+gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html dev-doc/rush-config.html
 
 dev-doc/git-proj.md : $(mCore)/git-proj
 	-$? -H int-md >$@
@@ -143,6 +144,11 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 	-pod2html --title='Coding Convention' $(mHtmlOpt) <$? >$@
 	-$(mTidy) $@
 	-pod2markdown <dev-doc/coding-convention.pod >dev-doc/coding-convention.md
+
+dev-doc/rush-config.html : dev-doc/rush-config.pod
+	-pod2html --title='GNU Rush Configuration' $(mHtmlOpt) <$? >$@
+	-$(mTidy) $@
+	-pod2markdown <dev-doc/rush-config.pod >dev-doc/rush-config.md
 
 # rm-trailing-sp :
 ##rm-trailing-sp : ~/bin/rm-trailing-sp

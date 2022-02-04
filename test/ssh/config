@@ -1,0 +1,16 @@
+
+# Created by gitproj/test/Makefile
+# If you have a "Host *" at the end of your ~/.ssh/config file, "Host
+# moria.whyayh.com" settings will need to be moved before it.
+Host moria.whyayh.com
+	CheckHostIP no
+	Compression yes
+	ForwardAgent no
+	ForwardX11 no
+	IdentitiesOnly=yes
+	IdentityFile ~/.ssh/id.hamp
+	NoHostAuthenticationForLocalhost no
+	Protocol 2,1
+	ServerAliveInterval 60
+        StrictHostKeyChecking no
+	User hamp
