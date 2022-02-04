@@ -290,11 +290,11 @@ testPullGit()
 
     tResult=$(fPullGit 0 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertNotContains "$LINENO $tResult" "$tResult" "git pull origin develop"
+    assertNotContains "$LINENO $tResult" "$tResult" "git pull --ff-only origin develop"
 
     tResult=$(fPullGit 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertNotContains "$LINENO $tResult" "$tResult" "git pull origin develop"
+    assertNotContains "$LINENO $tResult" "$tResult" "git pull --ff-only origin develop"
 
     ##git status
     ##git diff
@@ -304,7 +304,7 @@ testPullGit()
     assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
     assertContains "$LINENO $tResult" "$tResult" "2 files changed"
-    assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
+    assertContains "$LINENO $tResult" "$tResult" "git pull --ff-only origin develop"
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
     # TODO: what if a current local branch has no remote branch?
@@ -328,7 +328,7 @@ testPullFromOrigin()
     # git
     assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
-    assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
+    assertContains "$LINENO $tResult" "$tResult" "git pull --ff-only origin develop"
     # debug
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
@@ -350,7 +350,7 @@ testGitProjPullCLI()
     # git
     assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
-    assertContains "$LINENO $tResult" "$tResult" "git pull origin develop"
+    assertContains "$LINENO $tResult" "$tResult" "git pull --ff-only origin develop"
     # debug
     ##assertContains "$LINENO $tResult" "$tResult" "xxxDisable-this-if-OK"
 
