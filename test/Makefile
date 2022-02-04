@@ -101,13 +101,13 @@ install-deps : epm epm-helper
 epm :
 	if ! dpkg -l $@; then \
 		wget $(mTestOpt) https://$(mReleaseUrl)/epm/ubuntu18/$(mEpmPkg); \
-		apt-get install ./$(mEpmPkg); \
+		sudo apt-get install ./$(mEpmPkg); \
 	fi
 
 epm-helper :
 	if ! dpkg -l $@; then \
 		wget $(mTestOpt) https://$(mReleaseUrl)/epm/$(mEpmHelper); \
-		apt-get install ./$(mEpmHelper); \
+		sudo apt-get install ./$(mEpmHelper); \
 	fi
 
 # --------------------
