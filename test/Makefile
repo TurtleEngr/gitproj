@@ -90,9 +90,7 @@ dist-clean : clear-ran
 # --------------------
 install-deps :
 	sudo apt-get update
-	for i in $(mDepPkg); do \
-	    sudo apt-get install -y $$i; \
-	done
+	sudo apt-get install -y $(mDepPkg)
 
 # --------------------
 # Test
