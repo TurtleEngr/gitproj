@@ -39,7 +39,7 @@ mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes y
 mCore = ../git-core
 
 mHost = moria.whyayh.com
-mReleaseUrl = $(mHost):/rel/release/software/ThirdParty
+mReleaseUrl = $(mHost):/rel/released/software/ThirdParty
 mTestUrl = $(mHost):/rel/development/software/own/git-proj/test
 mTestOpt = --user=guest --password=guest
 
