@@ -146,13 +146,13 @@ ssh-config :
 	   chmod u+rx,go= ~/.ssh
 	   echo "Host moria.whyayh.com" >~/.ssh/config
 	   chmod u+r,go= ~/.ssh/config
-	   echo "Hostname moria.whyayh.com >>~/.ssh/config
-	   echo "CheckHostIP no >>~/.ssh/config
-	   echo "Compression yes >>~/.ssh/config
-	   echo "ForwardAgent yes >>~/.ssh/config
-	   echo "StrictHostKeyChecking no >>~/.ssh/config
-	   echo "NoHostAuthenticationForLocalhost no >>~/.ssh/config
-	   echo "User bruce >>~/.ssh/config
+	   echo "Hostname moria.whyayh.com" >>~/.ssh/config
+	   echo "CheckHostIP no" >>~/.ssh/config
+	   echo "Compression yes" >>~/.ssh/config
+	   echo "ForwardAgent yes" >>~/.ssh/config
+	   echo "StrictHostKeyChecking no" >>~/.ssh/config
+	   echo "NoHostAuthenticationForLocalhost no" >>~/.ssh/config
+	   echo "User bruce" >>~/.ssh/config
 
 release : ver.mak ssh-config
 	-ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
