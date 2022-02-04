@@ -140,7 +140,21 @@ package : ver.epm epm.list $(ProdOSDist).require
 	# Has CHANGES.md been updated?
 	# If stable release, merge develop to main branch
 
-release : ver.mak
+ssh-config :
+	   -cat ~/.ssh/config
+	   -mkdir ~/.ssh
+	   chmod u+rx,go= ~/.ssh
+	   echo "Host moria.whyayh.com" >~/.ssh/config
+	   chmod u+r,go= ~/.ssh/config
+	   echo "Hostname moria.whyayh.com >>~/.ssh/config
+	   echo "CheckHostIP no >>~/.ssh/config
+	   echo "Compression yes >>~/.ssh/config
+	   echo "ForwardAgent yes >>~/.ssh/config
+	   echo "StrictHostKeyChecking no >>~/.ssh/config
+	   echo "NoHostAuthenticationForLocalhost no >>~/.ssh/config
+	   echo "User bruce >>~/.ssh/config
+
+release : ver.mak ssh-config
 	-ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
 	ssh $(ProdRelServer) test -d $(ProdRelDir)
 	'rsync' $(mRsyncOpt) pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
