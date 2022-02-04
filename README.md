@@ -8,6 +8,8 @@ require a git server.
 
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/makefile.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 
+[![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
+
 [![Travis](https://travis-ci.org/TurtleEngr/gitproj.svg?branch=develop)](https://app.travis-ci.com/github/TurtleEngr/gitproj)
 
 ## Why git-proj?
