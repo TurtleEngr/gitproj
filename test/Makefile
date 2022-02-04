@@ -15,6 +15,19 @@
 
 SHELL = /bin/bash
 
+mDepPkg = \
+	git \
+	bash \
+	coreutils \
+	gawk \
+	git-flow \
+	libpod-markdown-perl \
+	openssh-client \
+	perl \
+	rsync \
+	sed \
+	tidy
+
 mHtmlOpt = --cachedir=/tmp --index --backlink
 mRsyncOpt = -rlptzLP
 
@@ -73,6 +86,13 @@ clean :
 	-find * -name '*~' -exec rm -f {} \;
 
 dist-clean : clear-ran
+
+# --------------------
+install-deps :
+	sudo apt-get update
+	for i in $(mDepPkg); do \
+	    sudo apt-get install -y $$i; \
+	done
 
 # --------------------
 # Test
