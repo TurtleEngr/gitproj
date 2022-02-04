@@ -10,7 +10,7 @@ require a git server.
 
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
 
-[![Travis](https://travis-ci.org/TurtleEngr/gitproj.svg?branch=develop)](https://app.travis-ci.com/github/TurtleEngr/gitproj)
+N/A [![Travis](https://travis-ci.org/TurtleEngr/gitproj.svg?branch=develop)](https://app.travis-ci.com/github/TurtleEngr/gitproj)
 
 ## Why git-proj?
 

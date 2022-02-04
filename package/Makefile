@@ -42,6 +42,8 @@ include ver.mak
 
 SHELL = /bin/bash
 
+mRsyncOpt = -azP
+
 # --------------------
 # Main targets
 
@@ -68,7 +70,7 @@ build epm.list : clean ver.mak ver.epm ver.env
 	mkdir -p dist/usr/share/man/man1
 	echo $(ProdVer) >../doc/VERSION
 	cp ../git-core/* dist/usr/lib/git-core
-	rsync -a ../doc/* dist/usr/share/doc/git-proj
+	'rsync' -a ../doc/* dist/usr/share/doc/git-proj
 	-rm dist/usr/share/doc/git-proj/config/*.sav
 	-rm dist/usr/share/doc/git-proj/config/*.bak
 	cp ../LICENSE dist/usr/share/doc/git-proj
@@ -86,9 +88,9 @@ install :
 	if [ ! -f epm.list ]; then exit 1; fi
 	if [ "$(USER)" != "root" ]; then exit 1; fi
 	chown -R root:root dist/*
-	rsync -n -aP dist/usr/lib/git-core/* /usr/lib/git-core/
-	rsync -n -aP dist/usr/share/doc/git-proj /usr/share/doc
-	rsync -n -aP dist/usr/share/man/man1/* /usr/share/man/man1/
+	'rsync' -n $(mRsyncOpt) dist/usr/lib/git-core/* /usr/lib/git-core/
+	'rsync' -n $(mRsyncOpt) dist/usr/share/doc/git-proj /usr/share/doc
+	'rsync' -n $(mRsyncOpt) dist/usr/share/man/man1/* /usr/share/man/man1/
 	chown -R $(CurLogName):$(CurLogName) dist/*
 	# First: make build
 	# Only use this for testing.
@@ -141,7 +143,7 @@ package : ver.epm epm.list $(ProdOSDist).require
 release : ver.mak
 	-ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
 	ssh $(ProdRelServer) test -d $(ProdRelDir)
-	rsync -zP pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
+	'rsync' $(mRsyncOpt) pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
 
 clean-rc-release : TBD
 	# Remove all $(ProdName) Release Candidates from repo

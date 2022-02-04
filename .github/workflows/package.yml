@@ -27,3 +27,6 @@ jobs:
 
     - name: Package
       run: cd package; make package
+
+    - name: Release
+      run: cd package; make release
