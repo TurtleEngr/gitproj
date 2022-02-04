@@ -1,5 +1,7 @@
 name: package
 
+# https://github.community/t/github-actions-trigger-workflow-on-succes-failure-of-other-workflow/16100/10?u=turtleengr
+
 on:
   workflow_run:
     workflows: ["test"]
@@ -9,9 +11,9 @@ on:
 
 jobs:
 
-  Package:
-
+  on-success:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
 
