@@ -6,7 +6,7 @@ git-proj implements git sub-commands` for managing large binary files.
 Its setup and management is simpler than "git LFS", because it doesn't
 require a git server.
 
-[![test](https://github.com/TurtleEngr/gitproj/actions/workflows/makefile.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
+[![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
 
