@@ -19,10 +19,11 @@ your project's git repository (on purpose or accidentally)? I have
 seen this. That includes their .ssh/ dir with their ssh keys. They
 better have passwords on their private keys! Someone making this
 mistake will likely have password-less keys. Yikes, what a security
-mess--all their keys, and shared keys, will need to be changed.
+mess--all their keys, and shared keys, will need to be changed on
+all the systems they access.
 
 Sure you can "delete" the mistake, but if it was pushed to your main
-git server, it will be in the repo forever, unless to do the work
+git server, it will be in the repo forever, unless you do the work
 needed to rip it out. Yeah, there are tools that will do it, but they
 are not trivial, and your repo should be "locked" for a few hours
 until it is repaired. Maybe a faster solution: create a new repo, from
@@ -43,11 +44,11 @@ that path.
 
 The main inspiration for this git-proj tool came from my desire to use
 git to version video projects. But video files are HUGE, yet they
-don't change much. Since most video files are rendered from files that
-do not change, it is only important to version the video editor's
-file, so that you can recreate a particular video file version. Since
-rendering takes time you will want to save the rendered files. But
-there is usually no need to save every rendered version.
+don't change much. Since most video files are rendered from video
+editing tools, it is only important to version the video editor files,
+so that you can recreate a particular video file. Since rendering
+takes time you will want to save the rendered files. But there is
+usually no need to save every rendered version.
 
 Currently this tool only supports git and large files on a local
 system. The "remotes" can be setup on mounted drives, and they can be
