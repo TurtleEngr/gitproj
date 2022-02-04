@@ -83,7 +83,7 @@ fPullGit()
         fError -i -m "Problem getting current branch name." -l $tSrc:$LINENO
     fi
 
-    fComGit pull origin $tBranch
+    fComGit pull --ff-only origin $tBranch
     if [ $? -ne 0 ]; then
         fLog -f -p warning -m "There was a problem with git pull" -l $tSrc:$LINENO
         return 1

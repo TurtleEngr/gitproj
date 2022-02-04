@@ -6,6 +6,8 @@
         logAllRefUpdates = true
         quotePath = false
         trustctime = false
+[pull]
+        ff = only
 [user]
         name = YourName
         email = YourEmail@example.com
