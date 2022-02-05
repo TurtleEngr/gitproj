@@ -341,6 +341,7 @@ testGitProjPullCLI()
     local tResult
 
     tResult=$($gpBin/git-proj-pull -g -d -V 3 2>&1 < <(echo -e y))
+    sleep 1
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
