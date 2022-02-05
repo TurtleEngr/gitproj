@@ -44,8 +44,8 @@ the number of files to keep in the release directory.
 
 ## Configuration in the repo
 
-- Create a place for id.hamp key and ssh config at: test/ssh/
-- See: test/ssh/config file
+- Create a place for id.hamp key and ssh config: mkdir test/util/ssh
+- See: test/util/ssh/config file
 - Create a Makefile target "mk-ssh" (in test/Makefile) for
 creating the ~/.ssh dir
 
