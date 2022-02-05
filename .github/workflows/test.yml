@@ -20,4 +20,4 @@ jobs:
 
     - name: Test
 #      run: cd test; make test-all
-      run: cd test; ./test-pull.sh
+      run: cd test; make .ran-test-pull.tmp
