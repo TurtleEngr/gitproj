@@ -19,4 +19,5 @@ jobs:
       run: cd test; make install-deps
 
     - name: Test
-      run: cd test; make test-all
+#      run: cd test; make test-all
+      run: cd test; ./test-pull.sh

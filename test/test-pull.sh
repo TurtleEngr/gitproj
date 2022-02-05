@@ -326,7 +326,7 @@ testPullFromOrigin()
     assertTrue "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
     assertContains "$LINENO $tResult" "$tResult" "total size is"
     # git
-    assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
+    assertTrue "$LINENO $(echo $PWD; ls -la doc)" "[ -f doc/NewFileFromBob.txt ]"
     assertTrue "$LINENO" "grep 'Make a change' README.html"
     assertContains "$LINENO $tResult" "$tResult" "git pull --ff-only origin develop"
     # debug
