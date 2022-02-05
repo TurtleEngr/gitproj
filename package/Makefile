@@ -85,7 +85,7 @@ build epm.list : ver.mak ver.epm ver.env
 	-find dist -type f -name '*.bak*' -exec rm {} \;
 	cp ../LICENSE dist/usr/share/doc/git-proj
 	mkdir -p dist/usr/share/doc/git-proj/contrib
-	cp -p ../test/rm-trailing-sp ../test/bash-fmt ../test/bash-lint \
+	cp -p ../test/util/rm-trailing-sp ../test/util/bash-fmt ../test/util/bash-lint \
 		dist/usr/share/doc/git-proj/contrib
 	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
 	gzip dist/usr/share/man/man1/git-proj.1
