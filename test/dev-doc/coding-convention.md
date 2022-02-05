@@ -57,7 +57,7 @@ Prefix codes are used to show the **"scope"** of variables:
 All UPPERCASE variables are **only** used when they are required by
 other programs or scripts.
 
-If you have exported variables that are shared across scritps, then
+If you have exported variables that are shared across scripts, then
 this convention can be extended by using prefixes that are related to
 where the variables are set.
 
@@ -138,11 +138,11 @@ define defaults for the important globals used by the include file.
 - For the user callable scripts, do minimal setup--mainly
 collect the and validate the options. Include files with common
 functions and functions specific to the script. Put as much as
-possible into functions in the include file, so that the functions can
-be directly tested with unit test scripts found in doc/test.
-- Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test
-script. All other vars can be defined from include files or from git
-config vars.
+possible into functions in the include files, so that the functions can
+be directly tested with the unit test scripts found in test/.
+- Minimal vars are defined: gpBin, cCurDir, gpDoc, and gpTest if
+a test script. All other vars are defined from include files or from
+git config vars.
 - Define gpCmdName at the top of each each script that is called
 by a user.
 - Clean-Coding style (well I try).
@@ -175,17 +175,24 @@ are unique to the function.
     prompt is not "captured" with the test scripts. So use "echo -n" for
     the prompts before the read command.
 - fLog and fError messages
-- Put this at the beginning or end of each file
+    - Put this at the beginning or end of each file
 
-            export tSrc=${BASH_SOURCE##*/}
+                export tSrc=${BASH_SOURCE##*/}
 
-- Put this in each function that calls fError or fLog
+    - Put this in each function that calls fError or fLog
 
-            local tSrc=${BASH_SOURCE##*/}
+                local tSrc=${BASH_SOURCE##*/}
 
-- in Error and Log always pass this argument:
+    - in Error and Log always pass this argument:
 
-            -l $tSrc:$LINENO
+                -l $tSrc:$LINENO
+- The Makefile \`fmt\` target uses \`shfmt\` to normalize the
+indenting to 4 char.  \`rm-trailing-sp -t\` is used to remove any
+trailing spaces and tabs in text files. The pre-commit hook can be
+added (with the corresponding config hooks) to look for trailing
+spaces, invalid file names, and large binary files.
+- The \`then\` and \`do\` are on the same line as the opening
+statement (if they fit).
 
 # File Include Pattern - prod
 

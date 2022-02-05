@@ -10,8 +10,6 @@ require a git server.
 
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
 
-N/A [![Travis](https://travis-ci.org/TurtleEngr/gitproj.svg?branch=develop)](https://app.travis-ci.com/github/TurtleEngr/gitproj)
-
 ## Why git-proj?
 
 Have you ever had a developer commit their whole home directory into
@@ -27,11 +25,11 @@ git server, it will be in the repo forever, unless you do the work
 needed to rip it out. Yeah, there are tools that will do it, but they
 are not trivial, and your repo should be "locked" for a few hours
 until it is repaired. Maybe a faster solution: create a new repo, from
-a cleaned up HEAD on all active branches, and delete the compromized
+a cleaned up HEAD on all active branches, and delete the compromised
 repo. Yeah, faster, but you've lost all your change history.
 
 That is one scenario. This tool won't help with removing large binary
-files, but it can help with a more common sceanario. Beginning
+files, but it can help with a more common scenario. Beginning
 developers don't realize they shouldn't be committing object files,
 exe files, log files, video files, or generated PDFs to the
 repository. Your snappy repo will start to become huge and
@@ -95,7 +93,7 @@ tutorial shows how to get started with the git-proj commands.
   the apt-get package manager to install, all of these packages will
   be installed when git-proj is installed.)
 
-* The git subcommand directory /usr/lib/git-core exists.
+* The git sub-command directory /usr/lib/git-core exists.
 
 ## User requirements:
 
@@ -103,13 +101,17 @@ tutorial shows how to get started with the git-proj commands.
 
 * You have used the git CLI a lot (not just git in an IDE)
 
-## Download Location:
+## Download Locations:
 
-* [https://moria.whyayh.com/rel/released/software/own/git-proj/deb](https://moria.whyayh.com/rel/released/software/own/git-proj/deb) -
+* The stable versions can be found at:
+[https://moria.whyayh.com/rel/released/software/own/git-proj/deb](https://moria.whyayh.com/rel/released/software/own/git-proj/deb) -
 when prompted, use guest/guest for User/Password.
 
-Select the latest version (any OS). (the ones with 'RC' or 'test' in
-the names are not stable.
+* The test packages (ones that have at least passed all tests) can be found at:
+[https://moria.whyayh.com/rel/development/software/own/git-proj/deb](https://moria.whyayh.com/rel/development/software/own/git-proj/deb)
+
+Select the latest version (any OS). The ones with 'RC' or 'test' (and
+timestamps) in the names are not "stable".
 
 ### Download example:
 

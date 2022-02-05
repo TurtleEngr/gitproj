@@ -113,7 +113,7 @@
    f[Prefix]FunName - Prefix is usually an abbreviation of the file it is in</code></pre>
   <p>All UPPERCASE variables are <b>only</b> used when they are required by
   other programs or scripts.</p>
-  <p>If you have exported variables that are shared across scritps, then this
+  <p>If you have exported variables that are shared across scripts, then this
   convention can be extended by using prefixes that are related to where the
   variables are set.</p>
   <h2 id="Global-Variables">Global Variables</h2>
@@ -222,13 +222,13 @@
       <p>For the user callable scripts, do minimal setup--mainly collect the
       and validate the options. Include files with common functions and
       functions specific to the script. Put as much as possible into
-      functions in the include file, so that the functions can be directly
-      tested with unit test scripts found in doc/test.</p>
+      functions in the include files, so that the functions can be directly
+      tested with the unit test scripts found in test/.</p>
     </li>
     <li>
-      <p>Minimal vars: gpBin, cCurDir, gpDoc, gpTest if a test script. All
-      other vars can be defined from include files or from git config
-      vars.</p>
+      <p>Minimal vars are defined: gpBin, cCurDir, gpDoc, and gpTest if a
+      test script. All other vars are defined from include files or from git
+      config vars.</p>
     </li>
     <li>
       <p>Define gpCmdName at the top of each each script that is called by a
@@ -301,18 +301,31 @@
     </li>
     <li>
       <p>fLog and fError messages</p>
+      <ul>
+        <li>
+          <p>Put this at the beginning or end of each file</p>
+          <pre><code>        export tSrc=${BASH_SOURCE##*/}</code></pre>
+        </li>
+        <li>
+          <p>Put this in each function that calls fError or fLog</p>
+          <pre><code>        local tSrc=${BASH_SOURCE##*/}</code></pre>
+        </li>
+        <li>
+          <p>in Error and Log always pass this argument:</p>
+          <pre><code>        -l $tSrc:$LINENO</code></pre>
+        </li>
+      </ul>
     </li>
     <li>
-      <p>Put this at the beginning or end of each file</p>
-      <pre><code>        export tSrc=${BASH_SOURCE##*/}</code></pre>
+      <p>The Makefile `fmt` target uses `shfmt` to normalize the indenting to
+      4 char. `rm-trailing-sp -t` is used to remove any trailing spaces and
+      tabs in text files. The pre-commit hook can be added (with the
+      corresponding config hooks) to look for trailing spaces, invalid file
+      names, and large binary files.</p>
     </li>
     <li>
-      <p>Put this in each function that calls fError or fLog</p>
-      <pre><code>        local tSrc=${BASH_SOURCE##*/}</code></pre>
-    </li>
-    <li>
-      <p>in Error and Log always pass this argument:</p>
-      <pre><code>        -l $tSrc:$LINENO</code></pre>
+      <p>The `then` and `do` are on the same line as the opening statement
+      (if they fit).</p>
     </li>
   </ul>
   <h1 id="File-Include-Pattern---prod"><a href="#_podtop_">File Include

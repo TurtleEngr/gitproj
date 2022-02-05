@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>GNU Rush Configuration</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body id="_podtop_">
+  <ul id="index">
+    <li>
+      <a href="#Release-Server-Configuration">Release Server
+      Configuration</a>
+      <ul>
+        <li>
+          <a href="#GNU-Rush-Setup">GNU Rush Setup</a>
+          <ul>
+            <li><a href="#Create-User-on-Release-Server">Create User on
+            Release Server</a></li>
+            <li><a href="#Configure-rush">Configure rush</a></li>
+            <li><a href="#Cron-Job-Cleanup-Script">Cron Job Cleanup
+            Script</a></li>
+          </ul>
+        </li>
+        <li><a href="#Configuration-in-the-repo">Configuration in the
+        repo</a></li>
+        <li><a href="#Example-Tests-and-Use">Example Tests and Use</a></li>
+      </ul>
+    </li>
+    <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+  </ul>
+  <h1 id="Release-Server-Configuration"><a href="#_podtop_">Release Server
+  Configuration</a></h1>
+  <p>I want the package Action to save test packages to my server. Usually
+  I'll use ssh-agent to setup ssh keys for pushing files, then use scp or
+  rsync. But setting up ssh-agent on a github action server would be really
+  tricky, and require "secrets". So I chose to use a passwordless ssh key
+  that is is only in one user's authorized_keys file, and that user can only
+  use the scp command, and the command will only work with specific paths.
+  "GNU rush" satisfies these requirements.</p>
+  <h2 id="GNU-Rush-Setup">GNU Rush Setup</h2>
+  <p>Once setup, scp can also replace "wget" for getting the tgz tar files.
+  That will be more direct and probably faster.</p>
+  <h3 id="Create-User-on-Release-Server">Create User on Release Server</h3>
+  <ul>
+    <li>
+      <p>Create user "hamp"</p>
+      <pre><code>    adduser --shell=/usr/sbin/rush hamp</code></pre>
+    </li>
+    <li>
+      <p>Add hamp to "users" group in /etc/group</p>
+    </li>
+    <li>
+      <p>Add hamp to "AllowUsers" in /etc/ssh/sshd_config</p>
+    </li>
+    <li>
+      <p>Setup /home/hamp/.ssh with the passwordless ssh key.</p>
+      <pre><code>    sudo -s
+    mkdir /home/hamp/.ssh
+    cd /home/hamp/.ssh
+    ssh-keygen -t rsa -f id.hamp
+    cat id.hamp.pub &gt;authorized_keys
+    chmod -R go= .
+    chown -R hamp:hamp .</code></pre>
+    </li>
+  </ul>
+  <h3 id="Configure-rush">Configure rush</h3>
+  <ul>
+    <li>
+      <p>Install rush: apt-get install rush</p>
+    </li>
+    <li>
+      <p>Put test/util/rush.rc in /etc on the server</p>
+    </li>
+  </ul>
+  <h3 id="Cron-Job-Cleanup-Script">Cron Job Cleanup Script</h3>
+  <ul>
+    <li>
+      <p>Copy test/util/clean-git-proj-repo.sh to /usr/local/bin</p>
+    </li>
+    <li>
+      <p>Copy test/util/clean-git-proj-repo-cron /etc/cron.d/ setting the
+      number of files to keep in the release directory.</p>
+    </li>
+  </ul>
+  <h2 id="Configuration-in-the-repo">Configuration in the repo</h2>
+  <ul>
+    <li>
+      <p>Create a place for id.hamp key and ssh config at: test/ssh/</p>
+    </li>
+    <li>
+      <p>See: test/ssh/config file</p>
+    </li>
+    <li>
+      <p>Create a Makefile target "mk-ssh" (in test/Makefile) for creating
+      the ~/.ssh dir</p>
+      <pre><code>    mk-ssh : util/ssh/config util/ssh/id.hamp
+            -mkdir ~/.ssh
+            cp -f util/ssh/id.hamp  ~/.ssh
+            touch ~/.ssh/config; \
+            if ! grep 'Host moria.whyayh.com' ~/.ssh/config; then \
+                cat util/ssh/config &gt;&gt;~/.ssh/config; \
+            fi
+            chmod -R go= ~/.ssh</code></pre>
+    </li>
+    <li>
+      <p>Add commands like this to "release" targets in a Makefile</p>
+      <pre><code>    mServer = moria.whyayh.com
+    mRelPath = /software/own/git-proj/deb
+
+    release : ...
+            cd ../test; make mk-ssh
+            scp pkg/git-proj*.deb hamp@$(mServer):$(mPath)
+            scp pkg/git-proj*.tar.gz hamp@$(mServer):$(mPath)</code></pre>
+      <p>Note: the "git-proj/deb/" part of the path will need to be manually
+      created.</p>
+    </li>
+  </ul>
+  <h2 id="Example-Tests-and-Use">Example Tests and Use</h2>
+  <p>Put the id.hamp key in your ~/.ssh directory. Added the "test/ssh/config
+  file" text to your ~/.ssh/config file, before any last "Host *" rules.</p>
+  <p>over 4</p>
+  <ul>
+    <li>
+      <p>Manual tests that should work</p>
+      <pre><code>    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/own/foo.txt
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/own/git-proj/deb/foo.txt
+    scp -i ~/.ssh/id.hamp hamp@moria.whyayh.com:/software/own/foo.txt .
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/ThirdParty</code></pre>
+    </li>
+    <li>
+      <p>Manual tests that should fail</p>
+      <p>Paths must begin with "/software/" followed by "own" or
+      "ThirdParty".</p>
+      <pre><code>    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/rel/develop/software/own
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software</code></pre>
+      <p>Only two arguments can be after "scp"</p>
+      <pre><code>    scp -i ~/.ssh/id.hamp test.txt foo.txt hamp@moria.whyayh.com:/software/own</code></pre>
+      <p>Only scp can be run.</p>
+      <pre><code>    rsync test.txt hamp@moria.whyayh.com:/software/own
+
+    ssh -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com ls /software</code></pre>
+    </li>
+    <li>
+      <p>Makefile test</p>
+      <pre><code>    make build
+    make package
+    make release</code></pre>
+    </li>
+  </ul>
+  <h1 id="POD-ERRORS"><a href="#_podtop_">POD ERRORS</a></h1>
+  <p>Hey! <b>The above document had some coding errors, which are explained
+  below:</b></p>
+  <dl>
+    <dt id="Around-line-105">Around line 105:</dt>
+    <dd>
+      <p>'=item' outside of any '=over'</p>
+    </dd>
+  </dl>
+</body>
+</html>

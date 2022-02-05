@@ -44,7 +44,7 @@ Calls tcSaveEnv.
 #### tcCatch
 
 Save throw or cmd errors, and restore any env. var. changes in the subshell.
-If a commnd exits before a tcSaveEnv call, env. var. changes will be lost.
+If a command exits before a tcSaveEnv call, env. var. changes will be lost.
 Calls tcSaveEnv.
 
 #### tcThrowErrors
@@ -273,7 +273,7 @@ pLevel - emerg alert crit err warning notice info debug debug-N
     -xx - set gpDebug=2
     -X N - set gpDebug=N (0..100)
 
-    if gpDebug = 0, don't output andy debug msgs
+    if gpDebug = 0, don't output any debug msgs
     if gpDebug > 0, output any "debug" msgs, or
     if gpDebug = N1, output "debug-N2" msgs, if N1 >= N2
 
@@ -525,11 +525,11 @@ then the last one will be used.
 
     \* or if the value for pKey is equal to pDefault, fError will be called
     and the script will terminate. I.e. the config var is still set to
-    it's intitial "undefined" value.
+    it's initial "undefined" value.
 
     \* or if the value for pKey is equal to "TBD" or "not-defined", fError
     will be called and the script will terminate. I.e. the config var is
-    still set to it's intitial "undefined" value.
+    still set to it's initial "undefined" value.
 
     Note: -e will only exit the whole script if it is not in a subshell.
     I.e. don't use var=\\$(cmd) style.

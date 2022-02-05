@@ -1,0 +1,8 @@
+# clean-git-proj-repo.sh
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAIL=/var/mail/root
+
+# ----------------------------------------
+# m   h  D  M  W U       Cmd
+  12  4  *  *  * root    /usr/local/bin/clean-git-proj-repo.sh 10

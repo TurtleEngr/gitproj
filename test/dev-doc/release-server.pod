@@ -1,0 +1,137 @@
+=pod
+
+=head1 Release Server Configuration
+
+I want the package Action to save test packages to my server. Usually
+I'll use ssh-agent to setup ssh keys for pushing files, then use scp or
+rsync. But setting up ssh-agent on a github action server would be
+really tricky, and require "secrets". So I chose to use a passwordless
+ssh key that is is only in one user's authorized_keys file, and that
+user can only use the scp command, and the command will only work with
+specific paths. "GNU rush" satisfies these requirements.
+
+=head2 GNU Rush Setup
+
+Once setup, scp can also replace "wget" for getting the tgz tar files.
+That will be more direct and probably faster.
+
+=head3 Create User on Release Server
+
+=over 4
+
+=item * Create user "hamp"
+
+    adduser --shell=/usr/sbin/rush hamp
+
+=item * Add hamp to "users" group in /etc/group
+
+=item * Add hamp to "AllowUsers" in /etc/ssh/sshd_config
+
+=item * Setup /home/hamp/.ssh with the passwordless ssh key.
+
+    sudo -s
+    mkdir /home/hamp/.ssh
+    cd /home/hamp/.ssh
+    ssh-keygen -t rsa -f id.hamp
+    cat id.hamp.pub >authorized_keys
+    chmod -R go= .
+    chown -R hamp:hamp .
+
+=back
+
+=head3 Configure rush
+
+=over 4
+
+=item * Install rush: apt-get install rush
+
+=item * Put test/util/rush.rc in /etc on the server
+
+=back
+
+=head3 Cron Job Cleanup Script
+
+=over 4
+
+=item * Copy test/util/clean-git-proj-repo.sh to /usr/local/bin
+
+=item * Copy test/util/clean-git-proj-repo-cron /etc/cron.d/ setting
+the number of files to keep in the release directory.
+
+=back
+
+=head2 Configuration in the repo
+
+=over 4
+
+=item * Create a place for id.hamp key and ssh config at: test/ssh/
+
+=item * See: test/ssh/config file
+
+=item * Create a Makefile target "mk-ssh" (in test/Makefile) for
+creating the ~/.ssh dir
+
+    mk-ssh : util/ssh/config util/ssh/id.hamp
+            -mkdir ~/.ssh
+    	    cp -f util/ssh/id.hamp  ~/.ssh
+    	    touch ~/.ssh/config; \
+    	    if ! grep 'Host moria.whyayh.com' ~/.ssh/config; then \
+                cat util/ssh/config >>~/.ssh/config; \
+    	    fi
+    	    chmod -R go= ~/.ssh
+
+=item * Add commands like this to "release" targets in a Makefile
+
+    mServer = moria.whyayh.com
+    mRelPath = /software/own/git-proj/deb
+
+    release : ...
+    	    cd ../test; make mk-ssh
+            scp pkg/git-proj*.deb hamp@$(mServer):$(mPath)
+            scp pkg/git-proj*.tar.gz hamp@$(mServer):$(mPath)
+
+Note: the "git-proj/deb/" part of the path will need to be manually created.
+
+=back
+
+=head2 Example Tests and Use
+
+Put the id.hamp key in your ~/.ssh directory. Added the
+"test/ssh/config file" text to your ~/.ssh/config file, before any
+last "Host *" rules.
+
+over 4
+
+=item * Manual tests that should work
+
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/own/foo.txt
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/own/git-proj/deb/foo.txt
+    scp -i ~/.ssh/id.hamp hamp@moria.whyayh.com:/software/own/foo.txt .
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/ThirdParty
+
+=item * Manual tests that should fail
+
+Paths must begin with "/software/" followed by "own" or "ThirdParty".
+
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/rel/develop/software/own
+    scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software
+
+Only two arguments can be after "scp"
+
+    scp -i ~/.ssh/id.hamp test.txt foo.txt hamp@moria.whyayh.com:/software/own
+
+Only scp can be run.
+
+    rsync test.txt hamp@moria.whyayh.com:/software/own
+
+    ssh -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com ls /software
+
+=item * Makefile test
+
+    make build
+    make package
+    make release
+
+=back
+
+=cut

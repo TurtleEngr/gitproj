@@ -110,12 +110,12 @@ epm-helper :
 		sudo apt-get install -y ./$(mEpmHelperPkg); \
 	fi
 
-mk-ssh :
+mk-ssh : util/ssh/id.hamp util/ssh/config
 	-mkdir ~/.ssh
-	cp -f ssh/id.hamp  ~/.ssh
+	cp -f util/ssh/id.hamp  ~/.ssh
 	touch ~/.ssh/config; \
 	if ! grep 'Host moria.whyayh.com' ~/.ssh/config; then \
-		cat ssh/config >>~/.ssh/config; \
+		cat util/ssh/config >>~/.ssh/config; \
 	fi
 	chmod -R go= ~/.ssh
 
@@ -136,7 +136,7 @@ stats :
 	./stats.sh
 
 # ----------------------------------------
-gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html dev-doc/rush-config.html
+gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html dev-doc/release-server.html
 
 dev-doc/git-proj.md : $(mCore)/git-proj
 	-$? -H int-md >$@
@@ -154,10 +154,10 @@ dev-doc/coding-convention.html : dev-doc/coding-convention.pod
 	-$(mTidy) $@
 	-pod2markdown <dev-doc/coding-convention.pod >dev-doc/coding-convention.md
 
-dev-doc/rush-config.html : dev-doc/rush-config.pod
+dev-doc/release-server.html : dev-doc/release-server.pod
 	-pod2html --title='GNU Rush Configuration' $(mHtmlOpt) <$? >$@
 	-$(mTidy) $@
-	-pod2markdown <dev-doc/rush-config.pod >dev-doc/rush-config.md
+	-pod2markdown <dev-doc/release-server.pod >dev-doc/release-server.md
 
 # rm-trailing-sp :
 ##rm-trailing-sp : ~/bin/rm-trailing-sp

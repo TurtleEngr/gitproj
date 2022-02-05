@@ -1,0 +1,43 @@
+# /etc/rush.rc
+
+# Set verbosity level.
+debug 1
+
+# Default settings
+
+rule default
+  acct on
+  limits t5
+  umask 002
+  env - USER LOGNAME HOME PATH
+
+  # Uncomment this to activate the notification subsystem:
+  # (Also install 'rush-notifier' or a similar script.)
+  #
+  #post-socket inet://localhost
+  #
+  fall-through
+
+# --------------------
+# Scp requests: limited
+
+rule scp-to
+  command ^scp (-v )?-t( --)? /software/(own|ThirdParty)/?
+  uid = 1002
+  set[0] /usr/bin/scp
+  match[$] ! /\.\.
+  match[$] ! ^~/.*
+  transform[$] s,^/software/,/rel/development/software/,
+
+rule scp-from
+  command ^scp (-v )?-f( --)? /software/(own|ThirdParty)/?
+  uid = 1002
+  set[0] /usr/bin/scp
+  match[$] ! /\.\.
+  match[$] ! ^~/.*
+  transform[$] s,^/software/,/rel/development/software/,
+
+fall-through
+
+rule gen
+  exit You messed up!
