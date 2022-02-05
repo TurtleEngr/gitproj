@@ -173,8 +173,8 @@ test-release : ver.env
 	@echo '--------------------'
 	cat ver.env
 	@echo '--------------------'
-	. ./ver.env; scp -i ~/.ssh/id.hamp pkg/$(ProdName)-*.deb hamp@$(ProdRelServer):/$(ProdRelCategory)
-	. ./ver.env; scp -i ~/.ssh/id.hamp pkg/$(ProdName)-*.tar.gz hamp@$(ProdRelServer):/$(ProdRelCategory)
+	. ./ver.env; scp -v -i ~/.ssh/id.hamp pkg/$(ProdName)-*.deb hamp@$(ProdRelServer):/$(ProdRelCategory)
+	. ./ver.env; scp -v -i ~/.ssh/id.hamp pkg/$(ProdName)-*.tar.gz hamp@$(ProdRelServer):/$(ProdRelCategory)
 
 # --------------------
 # Use this to make release candidates or final builds
