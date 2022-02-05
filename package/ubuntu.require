@@ -1,15 +1,15 @@
 %requires git
 %requires bash
 %requires coreutils
-# includes: fmt, tr
+	# includes: fmt, tr
 %requires gawk
 %requires git-flow
 %requires libpod-markdown-perl
-# includes: pod2markdown
+	# includes: pod2markdown
 %requires openssh-client
 %requires openssh-server
 %requires perl
-# includes: pod2html, pod2man, pod2usage
+	# includes: pod2html, pod2man, pod2usage
 %requires rsync
 %requires sed
 %requires tidy
