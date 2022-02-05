@@ -110,6 +110,15 @@ epm-helper :
 		sudo apt-get install -y ./$(mEpmHelperPkg); \
 	fi
 
+mk-ssh :
+	-mkdir ~/.ssh
+	cp -f ssh/id.hamp  ~/.ssh
+	touch ~/.ssh/config; \
+	if ! grep 'Host moria.whyayh.com' ~/.ssh/config; then \
+		cat ssh/config >>~/.ssh/config; \
+	fi
+	chmod -R go= ~/.ssh
+
 # --------------------
 # Test
 

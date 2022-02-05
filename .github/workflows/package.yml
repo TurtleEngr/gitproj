@@ -20,13 +20,16 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: InstallDeps
-      run: cd test; make install-deps
+      run: cd test; make install-deps mk-ssh
+
+    - name: First
+      run: cd package; make first
 
     - name: Build
       run: cd package; make build
 
     - name: Package
-      run: cd package; make package
+      run: cd package; make test-package
 
-#    - name: Release
-#      run: cd package; make release
+    - name: Release
+      run: cd package; make test-release

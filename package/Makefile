@@ -44,9 +44,10 @@ SHELL = /bin/bash
 
 mRsyncOpt = -azP
 
-# --------------------
+# ----------------------------------------
 # Main targets
 
+# --------------------
 first : ver.mak ver.epm /usr/lib/git-core
 	touch ver.sh
 	make ver.mak
@@ -62,6 +63,7 @@ first : ver.mak ver.epm /usr/lib/git-core
 	@command -v tr
 	@command -v pod2markdown
 
+# --------------------
 build epm.list : clean ver.mak ver.epm ver.env
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	cd ..; make gen-doc
@@ -84,6 +86,7 @@ build epm.list : clean ver.mak ver.epm ver.env
 	find dist -executable -exec chmod a+rx {} \;
 	mkepmlist -u root -g root --prefix / dist | patch-epm-list -f ./epm.patch >epm.list
 
+# --------------------
 install :
 	if [ ! -f epm.list ]; then exit 1; fi
 	if [ "$(USER)" != "root" ]; then exit 1; fi
@@ -102,6 +105,7 @@ uninstall :
 	rm /usr/lib/git-core/gitproj-*.inc
 	rm -rf /usr/share/doc/git-proj
 
+# --------------------
 clean :
 	-rm epm.list ver.cs ver.env ver.epm ver.h ver.java ver.pl ver.xml >/dev/null 2>&1
 	-rm -rf dist tmp >/dev/null 2>&1
@@ -117,21 +121,26 @@ dist-clean : clean
 archive :
 	cd ../..; tar -czf gitproj-$$(cat gitproj/doc/VERSION).tgz --exclude=.git --exclude-vcs gitproj test-env*.tgz
 
+# --------------------
 test-package : epm.list $(ProdOSDist).require
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	-rm -rf pkg ver.epm >/dev/null 2>&1
 	mkdir pkg
 	export RELEASE=0; mkver.pl -e epm
 	epm -v -f native -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
+	epm -v -f portable -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
 
-test-release : TBD
+test-init :
+	-ssh $(ProdRelServer) mkdir -p $(ProdDevDir)
+	ssh $(ProdRelServer) test -d $(ProdDevDir)
 
-clean-test-release : TBD
-	# Remove all $(ProdName) packages from repo
+test-release :
+	scp -i ~/.ssh/id.hamp pkg/$(ProdName)-*.deb hamp@$(ProdRelServer):/$(ProdRelCategory)
 
-package : ver.epm epm.list $(ProdOSDist).require
+# --------------------
+package : epm.list $(ProdOSDist).require
 	if [ "$(USER)" = "root" ]; then exit 1; fi
-	-rm -rf pkg >/dev/null 2>&1
+	-rm -rf pkg ver.epm >/dev/null 2>&1
 	mkdir pkg
 	export RELEASE=1; mkver.pl -e epm
 	epm -v -f native -m $(ProdOSDist)-$(ProdArch) --output-dir pkg $(ProdName) ver.epm
@@ -140,21 +149,7 @@ package : ver.epm epm.list $(ProdOSDist).require
 	# Has CHANGES.md been updated?
 	# If stable release, merge develop to main branch
 
-ssh-config :
-	   -cat ~/.ssh/config
-	   -mkdir ~/.ssh
-	   chmod u+rx,go= ~/.ssh
-	   echo "Host moria.whyayh.com" >~/.ssh/config
-	   chmod u+r,go= ~/.ssh/config
-	   echo "Hostname moria.whyayh.com" >>~/.ssh/config
-	   echo "CheckHostIP no" >>~/.ssh/config
-	   echo "Compression yes" >>~/.ssh/config
-	   echo "ForwardAgent yes" >>~/.ssh/config
-	   echo "StrictHostKeyChecking no" >>~/.ssh/config
-	   echo "NoHostAuthenticationForLocalhost no" >>~/.ssh/config
-	   echo "User bruce" >>~/.ssh/config
-
-release : ver.mak ssh-config
+release : ver.mak
 	-ssh $(ProdRelServer) mkdir -p $(ProdRelDir)
 	ssh $(ProdRelServer) test -d $(ProdRelDir)
 	'rsync' $(mRsyncOpt) pkg/$(ProdName)-* $(ProdRelServer):$(ProdRelDir)
@@ -162,6 +157,7 @@ release : ver.mak ssh-config
 clean-rc-release : TBD
 	# Remove all $(ProdName) Release Candidates from repo
 
+# --------------------
 tag : ver.mak
 	-git commit -am Updated
 	git tag -f -a -m "Released to: $(ProdRelServer):$(ProdRelDir)" $(ProdTag)
@@ -178,14 +174,6 @@ tag : ver.mak
 # --------------------
 # Work Targets
 
-ver.epm ver.env : ver.sh
+ver.epm ver.env ver.mak : ver.sh
 	if [ "$(USER)" = "root" ]; then exit 1; fi
-	mkver.pl -e 'env epm'
-
-ver.mak : ver.sh
-	if [ "$(USER)" = "root" ]; then exit 1; fi
-	mkver.pl -e 'mak'
-	cat $@ | grep -E 'ProdName=|ProdAlias=|ProdVer=|ProdRC=|ProdBuild=|ProdSupport=|ProdVendor=|ProdPackager=|ProdCopyright=|MkVer=|ProdOS=|ProdOSDist=|ProdOSVer=|ProdArch=|ProdRelServer=|ProdRelDir=|ProdTag=|CurLogName' >ver.tmp
-	cp ver.tmp $@
-
-
+	mkver.pl -e 'env epm mak'
