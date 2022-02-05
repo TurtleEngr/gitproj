@@ -19,5 +19,4 @@ jobs:
       run: cd test; make install-deps
 
     - name: Test
-#      run: cd test; make test-all
-      run: cd test; make .ran-test-pull.tmp
+      run: cd test; make test-all

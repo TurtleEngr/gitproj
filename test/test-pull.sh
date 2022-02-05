@@ -319,6 +319,7 @@ testPullFromOrigin()
     local tResult
 
     tResult=$(fPullFromOrigin 1 1 2>&1 < <(echo -e y))
+    sleep 0.5
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
@@ -341,7 +342,7 @@ testGitProjPullCLI()
     local tResult
 
     tResult=$($gpBin/git-proj-pull -g -d -V 3 2>&1 < <(echo -e y))
-    sleep 1
+    sleep 0.5
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
