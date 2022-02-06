@@ -260,7 +260,7 @@ testCheckWhiteSpace()
 
     # ----------
     # Remove the trailing space, not add and check
-    $gpTest/rm-trailing-sp test-wsp.txt test2-wsp.txt
+    $gpTest/util/rm-trailing-sp test-wsp.txt test2-wsp.txt
     git add test-wsp.txt test2-wsp.txt
 
     tResult=$(git status -s 2>&1)

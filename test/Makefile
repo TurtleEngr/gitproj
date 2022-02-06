@@ -123,10 +123,10 @@ mk-ssh : util/ssh/id.hamp util/ssh/config
 # Test
 
 # Only run tests where the dependencies have changed
-test : rm-trailing-sp bash-fmt bash-lint $(mDepList) $(mBaseList) $(mCmdList)
+test : util/rm-trailing-sp util/bash-fmt utiil/bash-lint $(mDepList) $(mBaseList) $(mCmdList)
 
 # Use this for *force* all tests to be run
-test-all : rm-trailing-sp bash-fmt bash-lint clear-ran test
+test-all : util/rm-trailing-sp util/bash-fmt util/bash-lint clear-ran test
 
 clear-ran :
 	-rm .ran-test-*.tmp
@@ -160,15 +160,15 @@ dev-doc/release-server.html : dev-doc/release-server.pod
 	-pod2markdown <dev-doc/release-server.pod >dev-doc/release-server.md
 
 # rm-trailing-sp :
-##rm-trailing-sp : ~/bin/rm-trailing-sp
+##util/rm-trailing-sp : ~/bin/rm-trailing-sp
 ##	diff $@ $?
 
 # bash-fmt :
-##bash-fmt : ~/bin/bash-fmt
+##util/bash-fmt : ~/bin/bash-fmt
 ##	diff $@ $?
 
 # bash-lint :
-##bash-lint : ~/bin/bash-lint
+##util/bash-lint : ~/bin/bash-lint
 ##	diff $@ $?
 
 # ========================================
