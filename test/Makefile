@@ -123,7 +123,7 @@ mk-ssh : util/ssh/id.hamp util/ssh/config
 # Test
 
 # Only run tests where the dependencies have changed
-test : util/rm-trailing-sp util/bash-fmt utiil/bash-lint $(mDepList) $(mBaseList) $(mCmdList)
+test : util/rm-trailing-sp util/bash-fmt util/bash-lint $(mDepList) $(mBaseList) $(mCmdList)
 
 # Use this for *force* all tests to be run
 test-all : util/rm-trailing-sp util/bash-fmt util/bash-lint clear-ran test
