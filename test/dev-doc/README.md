@@ -4,7 +4,7 @@ An outline of the directory structure and files in git-proj can be
 found at: `test/dev-doc/outline.md`
 
 This MindMap also show how the pieces relate to each other. Right
-mouse click on the Mind Map image, and open itt in a new tab, get an
+mouse click on the Mind Map image, and open it in a new tab, get an
 interactive version of this document. Double click on collapsed icons
 to open/close sub-items.
 
