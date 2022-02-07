@@ -3,20 +3,21 @@
 An outline of the directory structure and files in git-proj can be
 found at: `test/dev-doc/outline.md`
 
-This MindMap also show how the pieces relate to each other. Click on
-the map to visit an interactive version.
+This MindMap also show how the pieces relate to each other. Right
+mouse click on the Mind Map image, and open itt in a new tab, get an
+interactive version of this document. Double click on collapsed icons
+to open/close sub-items.
 
 [![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
 
 Rather than have lots of loose scripts, Makefiles are used to collect
-together the major processes in the code's maintenance--not just the
-`build` process.
+together the major processes--not just the `build` process.
 
 # Library functions in git-core/
 
 * `gitproj-com.inc` - common functions used across many of the scripts
 
-* `gitproj-[CMD].inc` - the main function are put in these files, so
+* `gitproj-[CMD].inc` - the main functions are put in these files, so
 testing is easier
 
 * `git-proj-[CMD]` - these files only get the arguments and call the
@@ -33,11 +34,8 @@ Some "mocking" might be done, but most tests are written so that need
 for mocking is reduced.
 
 * `test-com.sh`
-
 * `test-com2.sh`
-
 * `test-gitproj.sh`
-
 * `test-[CMD].sh`
 
 * `test-[CMD].log` - these file are used by the Makefile to collect the
@@ -50,14 +48,12 @@ setup the test's files and env. vars.
 
 ## Test Environment files (test-env*.tgz)
 
-Currently these are symlinks to the directory above the git workspace.
-These will be moved to a public space when the tool is mostly done, or
-when automated testing is setup. An rsync or rclone step will be added when
-the space is setup.
+These are symlinks to the directory above the git workspace.
+The Makefile will copy any missing file from the release server.
 
 See the Makefile for how the tar-env*.tgz files are created and rebuilt.
 
-* test-env.tgz@ - is manually built
+* test-env.tgz@ - is created manually.
 
 # Documentation Files
 
