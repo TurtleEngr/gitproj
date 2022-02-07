@@ -3,6 +3,11 @@
 An outline of the directory structure and files in git-proj can be
 found at: `test/dev-doc/outline.md`
 
+This MindMap also show how the pieces relate to each other. Click on
+the map to visit an interactive version.
+
+[![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
+
 Rather than have lots of loose scripts, Makefiles are used to collect
 together the major processes in the code's maintenance--not just the
 `build` process.

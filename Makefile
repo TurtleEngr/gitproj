@@ -36,7 +36,7 @@ clean :
 	-find . -name '*~' -exec rm {} \;
 	-find . -name '*.tmp' -exec rm {} \;
 
-gen-doc : doc/CHANGES.md doc/README.md user-doc cmd-doc tutorial-doc
+gen-doc : user-doc cmd-doc tutorial-doc
 
 user-doc : doc/user-doc/git-proj.md doc/user-doc/git-proj.html doc/user-doc/config.html
 
@@ -60,18 +60,6 @@ doc/user-doc/tutorial/create_a_git-proj_repo.html : src-doc/create_a_git-proj_re
 	-pod2html --title='Create a git-proj Repo' $(mHtmlOpt) <$? >$@
 	-$(mTidy) doc/user-doc/config.html
 	-pod2markdown src-doc/create_a_git-proj_repo.pod >doc/user-doc/tutorial/create_a_git-proj_repo.md
-
-# Remove all "INT:" lines. uniq removes duplicate blank lines.
-doc/CHANGES.md : CHANGES.md
-	-grep -Ev 'INT:' <$? | uniq >$@
-
-# Remove all "INT:" lines. uniq removes duplicate blank lines.
-# Also remove all after "For Developers"
-doc/README.md : README.md
-	-grep -Ev 'INT:' <$? | uniq | awk ' \
-	    /^## For Developers/ { exit 0 } \
-	    { print $$0 } \
-	' >$@
 
 # git-proj will collect ALL usage help, and format as markdown
 doc/user-doc/git-proj.md : git-core/git-proj

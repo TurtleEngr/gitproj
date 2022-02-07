@@ -7,7 +7,6 @@ Its setup and management is simpler than "git LFS", because it doesn't
 require a git server.
 
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
-
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
 
 ## Why git-proj?
@@ -109,6 +108,9 @@ when prompted, use guest/guest for User/Password.
 
 * The test packages (ones that have at least passed all tests) can be found at:
 [https://moria.whyayh.com/rel/development/software/own/git-proj/deb](https://moria.whyayh.com/rel/development/software/own/git-proj/deb)
+
+[![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
+[![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
 
 Select the latest version (any OS). The ones with 'RC' or 'test' (and
 timestamps) in the names are not "stable".

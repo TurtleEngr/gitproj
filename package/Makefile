@@ -67,32 +67,59 @@ first ver.mak : /usr/lib/git-core
 # --------------------
 # Build pseudo root of all files at dist/
 
-build epm.list : ver.mak ver.epm ver.env
+build epm.list : build-prep build-core build-doc build-man build-contrib build-clean
 	@echo '--------------------'
-	@echo make build
+	@echo make epm.list
+	mkepmlist -u root -g root --prefix / dist | patch-epm-list -f ./epm.patch >epm.list
+
+build-prep : ver.mak ver.epm ver.env
+	@echo '--------------------'
+	@echo make build-prep
 	if [ "$(USER)" = "root" ]; then exit 1; fi
-	cd ..; make gen-doc
 	-rm -rf dist
-	mkdir -p dist/usr/lib/git-core
-	mkdir -p dist/usr/share/doc/git-proj
-	mkdir -p dist/usr/share/man/man1
 	echo $(ProdVer) >../doc/VERSION
+
+build-core :
+	@echo '--------------------'
+	@echo make build-core
+	mkdir -p dist/usr/lib/git-core
 	cp ../git-core/* dist/usr/lib/git-core
+
+build-doc :
+	@echo '--------------------'
+	@echo make build-doc
+	cd ..; make gen-doc
+	mkdir -p dist/usr/share/doc/git-proj
 	'rsync' -a ../doc/* dist/usr/share/doc/git-proj
+	cp ../LICENSE dist/usr/share/doc/git-proj
+	-grep -Ev 'INT:' <../CHANGES.md | uniq >dist/usr/share/doc/git-proj/CHANGES.md
+	-grep -Ev 'INT:' <../README.md | uniq | awk ' \
+	    /^## For Developers/ { exit 0 } \
+	    { print $$0 } \
+	' >dist/usr/share/doc/git-proj/README.md
+
+build-man :
+	@echo '--------------------'
+	@echo make build-man
+	mkdir -p dist/usr/share/man/man1
+	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
+	gzip dist/usr/share/man/man1/git-proj.1
+	ln dist/usr/share/man/man1/git-proj.1.gz dist/usr/share/man/man1/gitproj.1.gz
+
+build-contrib :
+	mkdir -p dist/usr/share/doc/git-proj/contrib
+	cp -p ../test/util/rm-trailing-sp ../test/util/bash-fmt ../test/util/bash-lint \
+		dist/usr/share/doc/git-proj/contrib
+
+build-clean :
+	@echo '--------------------'
+	@echo make build-clean
 	-find dist -type f -name '*~' -exec rm {} \;
 	-find dist -type f -name '*.tmp' -exec rm {} \;
 	-find dist -type f -name '*.sav' -exec rm {} \;
 	-find dist -type f -name '*.bak*' -exec rm {} \;
-	cp ../LICENSE dist/usr/share/doc/git-proj
-	mkdir -p dist/usr/share/doc/git-proj/contrib
-	cp -p ../test/util/rm-trailing-sp ../test/util/bash-fmt ../test/util/bash-lint \
-		dist/usr/share/doc/git-proj/contrib
-	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
-	gzip dist/usr/share/man/man1/git-proj.1
-	ln dist/usr/share/man/man1/git-proj.1.gz dist/usr/share/man/man1/gitproj.1.gz
 	chmod -R a+r dist
 	find dist -executable -exec chmod a+rx {} \;
-	mkepmlist -u root -g root --prefix / dist | patch-epm-list -f ./epm.patch >epm.list
 
 # --------------------
 # Non-package install - only for testing
