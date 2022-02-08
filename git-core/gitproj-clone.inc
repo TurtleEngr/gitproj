@@ -182,7 +182,7 @@ fCloneSetupGitProjConfig()
         tVerbose='-v'
     fi
 
-    cp $tVerbose --backup=t $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+    fComMkPreCommit
 
     if [ ! -f .gitignore ]; then
         fLog -f -p warning -m "Missing .gitignore file. Adding it now." -l $tSrc:$LINENO

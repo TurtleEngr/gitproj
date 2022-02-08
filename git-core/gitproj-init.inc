@@ -524,8 +524,7 @@ fInitMkGitDir()
     echo
     git status
 
-    echo
-    cp $tVerbose --backup=t $gpDoc/hooks/* $gpLocalTopDir/.git/hooks
+    fComMkPreCommit
 
     return 0
 } # fInitMkGitDir

@@ -628,6 +628,8 @@ testInitMkGitDir()
 
     cd $gpLocalTopDir >/dev/null 2>&1
 
+    # --------------------
+
     tResult=$(fInitMkGitDir 2>&1)
     tStatus=$?
     assertTrue $LINENO "$tStatus"
@@ -640,6 +642,10 @@ testInitMkGitDir()
 
     tTop=$($cGetTopDir)
     assertContains $LINENO "$tTop" "$gpLocalTopDir"
+
+    assertTrue "$LINENO $tResult" "[ -f $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO not exec" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
 
     tResult=$(git branch 2>&1)
     assertTrue $LINENO $?
@@ -654,11 +660,75 @@ testInitMkGitDir()
         tar -cvzf $tTarOut $gpProjName
     fi
 
-    assertTrue "$LINENO not exec" "[ -x $tTop/.git/hooks/pre-commit ]"
-    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
-
     return 0
 } # testInitMkGitDir
+
+# --------------------------------
+testComPreCommit()
+{
+    local tResult
+    local tStatus
+    local tTop
+    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTarOut=$gpTest/test-env_ProjAfterGInit.tgz
+
+    gpLocalTopDir=$HOME/$cDatProj1
+    cd $HOME >/dev/null 2>&1
+    if [ ! -r $tTarIn ]; then
+        fail "Missing: $tTarIn [$LINENO]"
+        return
+    fi
+    tar -xzf $tTarIn
+    fTestPatchPath
+
+    gpProjName=${cDatProj1##*/}
+    gpGitFlow="true"
+    gpMaxSize="1k"
+    gpAutoMove=true
+    gpAuto=0
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    tResult=$(fInitMkGitDir 2>&1)
+
+    # --------------------
+
+    tResult=$(fInitMkGitDir 2>&1)
+    tStatus=$?
+    assertTrue $LINENO "$tStatus"
+    tTop=$($cGetTopDir)
+    assertTrue "$LINENO" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO" "[ -x $tTop/.pre-commit ]"
+    assertTrue "$LINENO" "[ -x ~/.pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
+
+    # --------------------
+
+    rm $tTop/.git/hooks/pre-commit
+    tResult=$(fComMkPreCommit 2>&1)
+    assertTrue "$LINENO" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO" "[ -x $tTop/.pre-commit ]"
+    assertTrue "$LINENO" "[ -x ~/.pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
+
+    rm $tTop/.git/hooks/pre-commit
+    rm $tTop/.pre-commit
+    tResult=$(fComMkPreCommit 2>&1)
+    assertTrue "$LINENO" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO" "[ -x $tTop/.pre-commit ]"
+    assertTrue "$LINENO" "[ -x ~/.pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
+
+
+    rm $tTop/.git/hooks/pre-commit
+    rm $tTop/.pre-commit
+    rm ~/.pre-commit
+    tResult=$(fComMkPreCommit 2>&1)
+    assertTrue "$LINENO" "[ -x $tTop/.git/hooks/pre-commit ]"
+    assertTrue "$LINENO" "[ -x $tTop/.pre-commit ]"
+    assertTrue "$LINENO" "[ -x ~/.pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit $tTop/.git/hooks/pre-commit"
+
+} # testComPreCommit
 
 # --------------------------------
 testInitMkLocalConfig()

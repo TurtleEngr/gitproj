@@ -433,10 +433,14 @@ testCloneMkGitDirPass()
     assertTrue "$LINENO $HOME/project/$gpProjName" "[ -d $HOME/project/$gpProjName ]"
 
     cd $HOME/project/$gpProjName >/dev/null 2>&1
-    assertTrue $LINENO "[ -f .gitproj ]"
-    assertTrue $LINENO "[ -f $HOME/.gitconfig ]"
-    assertTrue $LINENO "[ -d .git ]"
-    assertTrue $LINENO "[ -x .git/hooks/pre-commit ]"
+    assertTrue "$LINENO" "[ -f .gitproj ]"
+    assertTrue "$LINENO" "[ -f $HOME/.gitconfig ]"
+    assertTrue "$LINENO" "[ -d .git ]"
+    assertTrue "$LINENO" "[ -x .git/hooks/pre-commit ]"
+    assertTrue "$LINENO" "[ -x .pre-commit ]"
+    assertTrue "$LINENO" "[ -x ~/.pre-commit ]"
+    assertTrue "$LINENO diff" "diff $gpDoc/hooks/pre-commit .git/hooks/pre-commit"
+
     assertEquals $LINENO testserver2 $HOSTNAME
     assertTrue $LINENO "grep local-host.=.$HOSTNAME .git/config"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to check"

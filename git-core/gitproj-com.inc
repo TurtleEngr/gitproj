@@ -1970,6 +1970,43 @@ fComGetProjGlobals()
     return 0
 } # fComGetProjGlobals
 
+# --------------------
+fComMkPreCommit()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    local tVerbose=""
+
+    if ! fComMustBeInGitRepo $PWD; then
+        return 1
+    fi
+
+    cd $gpLocalTopDir >/dev/null 2>&1
+    if [ $gpVerbose -ge 2 ]; then
+        tVerbose='-v'
+    fi
+
+    if [ ! -f ~/.pre-commit ]; then
+        fLog -f -p notice -m "Update ~/.pre-commit from $gpDoc/hooks/pre-commit" -l $tSrc:$LINENO
+        cp -p $tVerbose $gpDoc/hooks/pre-commit ~/.pre-commit
+    fi
+
+    if [ ! -f .pre-commit ]; then
+        fLog -f -p notice -m "Update $gpProjName/.pre-commit from ~/.pre-commit and add to git" -l $tSrc:$LINENO
+        cp -p $tVerbose ~/.pre-commit .
+	git add .pre-commit
+    fi
+
+    if [ ! -f .git/hooks/pre-commit ]; then
+        fLog -f -p notice -m "Update .git/hooks/pre-commit from $gpProjName/.pre-commit" -l $tSrc:$LINENO
+        cp -p $tVerbose .pre-commit .git/hooks/pre-commit
+    fi
+    if [ ! -x ./.git/hooks/pre-commit ]; then
+        chmod a+rx ./.git/hooks/pre-commit
+    fi
+
+    return 0
+} # fComMkPreCommit
+
 fComGetVer()
 {
     local tSrc=${BASH_SOURCE##*/}

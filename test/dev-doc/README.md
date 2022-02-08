@@ -5,8 +5,8 @@ found at: `test/dev-doc/outline.md`
 
 This MindMap also show how the pieces relate to each other. Right
 mouse click on the Mind Map image, and open it in a new tab, get an
-interactive version of this document. Double click on collapsed icons
-to open/close sub-items.
+interactive outline. Double click on collapsed icons to open/close
+sub-items.
 
 [![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
 
@@ -29,16 +29,22 @@ are the main entry point for git sub-commands. For example:
 
 Every function should have unit-tests that check the inputs and
 outputs of functions. Valid inputs and error states should be checked.
+If a function can only be tested "in production", then refactor the
+code so that it can be tested! (In a QA/Release/Operations roles, I
+have had developers say some of the code can only be tested in
+production. That is B.S. What they are announcing? They don't want to
+do the work to be a professional engineer.)
 
 Some "mocking" might be done, but most tests are written so that need
-for mocking is reduced.
+for mocking is reduced. Without mocking, the tests will be more
+fragile.  So? It is better to have fragile tests than fragile code.
 
 * `test-com.sh`
 * `test-com2.sh`
 * `test-gitproj.sh`
 * `test-[CMD].sh`
 
-* `test-[CMD].log` - these file are used by the Makefile to collect the
+* `test-[CMD].log` - these files are used by the Makefile to collect the
 output from a `test-[CMD].sh` script. If the log file is older than any
 of its dependencies, then the corresponding `test-[CMD].sh` script will
 be run.
