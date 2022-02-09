@@ -34,6 +34,7 @@ fi
 pTab=0
 if [ "x$1" = "x-t" ]; then
     pTab=1
+    shift
 fi
 
 for tFile in $*; do
@@ -58,20 +59,15 @@ for tFile in $*; do
         continue
     fi
 
-    if [ ! -w $tFile ]; then
-        echo "Skipping read-only $tFile"
-        continue
-    fi
-
     tExec=0
     if [ -x $tFile ]; then
         tExec=1
     fi
 
-    if [ ${pTab:-0} -eq 1 ]; then
-        expand <$tFile | sed -E 's/[[:space:]]*$//' >$tFile.tmp
+    if [ ${pTab:-0} -eq 0 ]; then
+        sed -E 's/[[:space:]]*$//' <$tFile >$tFile.tmp
     else
-        cat <$tFile | sed -E 's/[[:space:]]*$//' >$tFile.tmp
+        expand <$tFile | sed -E 's/[[:space:]]*$//' >$tFile.tmp
     fi
 
     mv $tFile.tmp $tFile
