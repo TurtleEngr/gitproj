@@ -17,42 +17,45 @@ export LC_ALL=C
 export gErr=0
 export gSrc=${BASH_SOURCE##*/}
 
+# --------------------
 fIsBinary()
 {
     local pFile="$1"
     grep -Hm1 '^' <"$pFile" | grep -q '^Binary'
     # Copied from: https://unix.stackexchange.com/questions/275516/is-there-a-convenient-way-to-classify-files-as-binary-or-text
-}
+} # fIsBinary
 
+# --------------------
 fReport()
 {
-    local pZero=$1
+    local pExpect=$1
     local pResult=$2
     local pFile=$3
     local pMsg="$4"
     local pLine=$5
     local tErr=0
 
-    if [ $pZero -eq 0 ] && [ $pResult -ne 0 ]; then
+    if [ $pExpect -eq 0 ] && [ $pResult -ne 0 ]; then
         tErr=1
     fi
-    if [ $pZero -eq 1 ] && [ $pResult -eq 0 ]; then
+    if [ $pExpect -eq 1 ] && [ $pResult -eq 0 ]; then
         tErr=1
     fi
-    if [ $tErr -ne 0 ]; then
-        let ++gErr
-        if [ "$gVerbose" = "true" ]; then
-            echo "$pFile $pMsg [$gSrc:$pLine]"
-        fi
-        gFileList="$gFileList $pFile"
-        git reset HEAD $pFile
-        if [ "${pFile%!*}" != "$pFile" ]; then
-            pFile=$(echo $pFile | tr '!' ' ')
-            git reset HEAD "$pFile"
-        fi
-        return 1
+    if [ $tErr -eq 0 ]; then
+        return 0
     fi
-    return 0
+
+    let ++gErr
+    if [ "$gVerbose" = "true" ]; then
+        echo "$pFile $pMsg [$gSrc:$pLine]"
+    fi
+    gFileList="$gFileList $pFile"
+    git reset HEAD $pFile >/dev/null 2>&1
+    if [ "${pFile%!*}" != "$pFile" ]; then
+        pFile=$(echo $pFile | tr '!' ' ')
+        git reset HEAD "$pFile" >/dev/null 2>&1
+    fi
+    return 1
 } # fReport
 
 # --------------------
@@ -120,6 +123,7 @@ EOF
 fCheckWhiteSpace()
 {
     local tFile
+    local tResult
     # Note: DOS EOL files will give a false report.
 
     tResult=$(git config --get --bool gitproj.hook.check-whitespace)
@@ -141,6 +145,59 @@ fCheckWhiteSpace()
     fi
     return 0
 } # fCheckWhiteSpace
+
+# --------------------
+fCheckForTabs()
+{
+    local tFile
+    local tResult
+    local tIncList
+    local tExcList
+
+    tResult=$(git config --get --bool gitproj.hook.check-for-tabs)
+    if [ "$tResult" != "true" ]; then
+        return 0
+    fi
+
+    tIncList=$(git config --get gitproj.hook.tab-include-list)
+    tExcList=$(git config --get gitproj.hook.tab-exclude-list)
+    if [ -z "$tIncList" ]; then
+        tIncList='*'
+    fi
+
+    # If there are tab, in tIncList, but not tExcList, print file
+    # Also skip binary files
+    for tFile in $(git diff --cached --name-only --diff-filter=ACR $gAgainst | tr ' ' '!'); do
+        if [ ! -f "$tFile" ]; then
+            continue
+        fi
+        if fIsBinary $tFile; then
+            continue
+        fi
+        if $(echo $tFile | grep -qvE "$tIncList"); then
+            continue
+        fi
+        if [ -n "$tExcList" ]; then
+            if $(echo $tFile | grep -qE "$tExcList"); then
+                continue
+            fi
+        fi
+        # -P, perl, is needed, because \t is not tab in POSIX for grep
+        if grep -qP '\t' $tFile; then
+            tFile=${tFile%%:*}
+            fReport 0 1 $tFile "tabs found" $LINENO
+        fi
+    done
+
+    if [ -n "$gFileList" ]; then
+        let ++gErr
+        echo
+        echo "These files had tabs in them:"
+        echo "$gFileList" | fmt -w 10
+        echo
+    fi
+    return 0
+} # fCheckForTabs
 
 # --------------------
 fCheckNotRaw()
@@ -246,6 +303,7 @@ fi
 fEnabled
 fCheckFileNames
 fCheckWhiteSpace
+fCheckForTabs
 fCheckNotRaw
 fCheckBigFiles
 

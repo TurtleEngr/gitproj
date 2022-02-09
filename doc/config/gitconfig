@@ -60,5 +60,7 @@
         check-in-raw = true
         check-whitespace = true
         check-for-tabs = false
+	tab-include-list = *.sh|*.inc
+	tab-exclude-list = Makefile
         check-for-big-files = true
         binary-file-size = 10k

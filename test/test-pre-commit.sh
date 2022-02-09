@@ -284,6 +284,84 @@ testCheckWhiteSpace()
 } # testCheckWhiteSpace
 
 # --------------------------------
+testCheckForTabs()
+{
+    local tResult
+
+    # Make some files with tabs
+    cd $HOME/project/george >/dev/null 2>&1
+    # Note: Changed "cat EOF" to echo, because this test file cannot be
+    # committed with trailing whitespaces.
+    echo "Testing for tabs" >test1-tab.txt
+    echo "	  leading tab" >>test1-tab.txt
+    echo "lots	  tab in middle" >>test1-tab.txt
+    cp test1-tab.txt test2-tab.txt
+    cp test1-tab.txt test3-tab.sh
+    cp test1-tab.txt test4-tab.mak
+    cp test1-tab.txt test5-tab.mak
+    cp $gpTest/small-binary.gif .
+    git add test1-tab.txt test2-tab.txt test3-tab.sh test4-tab.mak test5-tab.mak small-binary.gif
+
+    # Enable and set
+    git config --bool gitproj.hook.check-for-tabs true
+    git config gitproj.hook.tab-include-list '*.txt|*.mak|*.sh|*.gif'
+    git config gitproj.hook.tab-exclude-list 'test4-tab.mak|*.sh'
+    cp -fp $gpDoc/hooks/pre-commit .git/hooks
+
+    # ----------
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "A  test1-tab.txt"
+    assertContains "$LINENO" "$tResult" "A  test2-tab.txt"
+    assertContains "$LINENO" "$tResult" "A  test3-tab.sh"
+    assertContains "$LINENO" "$tResult" "A  test4-tab.mak"
+    assertContains "$LINENO" "$tResult" "A  test5-tab.mak"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git commit -m "Testing" 2>&1)
+    assertFalse $LINENO $?
+    assertContains "$LINENO" "$tResult" "test1-tab.txt tabs found"
+    assertContains "$LINENO" "$tResult" "test2-tab.txt tabs found"
+    assertContains "$LINENO" "$tResult" "test5-tab.mak tabs found"
+    assertNotContains "$LINENO" "$tResult" "test4-tab.mak"
+    assertNotContains "$LINENO" "$tResult" ".sh"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "?? test1-tab.txt"
+    assertContains "$LINENO" "$tResult" "?? test2-tab.txt"
+    assertContains "$LINENO" "$tResult" "?? test5-tab.mak"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    # ----------
+    # Remove the tabs, add and check again
+    $gpTest/util/rm-trailing-sp -t test1-tab.txt test2-tab.txt test5-tab.mak
+    git add test1-tab.txt test2-tab.txt test5-tab.mak
+
+    tResult=$(git status -s 2>&1)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "A  test1-tab.txt"
+    assertContains "$LINENO" "$tResult" "A  test2-tab.txt"
+    assertContains "$LINENO" "$tResult" "A  test5-tab.mak"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git commit -m "Testing OK" 2>&1)
+    assertTrue $LINENO $?
+    assertNotContains "$LINENO" "$tResult" "test1-tab.txt tabs found"
+    assertNotContains "$LINENO" "$tResult" "test2-tab.txt tabs found"
+    assertNotContains "$LINENO" "$tResult" "test5-tab.mak tabs found"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    tResult=$(git log test1-tab.txt 2>&1 | head -n 10)
+    assertTrue $LINENO $?
+    assertContains "$LINENO" "$tResult" "Testing OK"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to view result"
+
+    return 0
+} # testCheckForTabs
+
+# --------------------------------
 testCheckNotRaw()
 {
     local tResult
