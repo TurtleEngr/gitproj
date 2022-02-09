@@ -400,24 +400,27 @@ testInitGetMoveFiles()
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "No large binary files were found"
 
+    gpAuto=0
     gpMaxSize="18k"
     tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "n"))
     tStatus=$?
     assertTrue "$LINENO" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "The files, shown above, can be moved"
     assertContains "$LINENO $tResult" "$tResult" "Move the files"
-    assertContains "$LINENO $tResult" "$tResult" "Binary files will NOT be moved"
+    assertContains "$LINENO $tResult" "$tResult" 'Binary files will NOT be moved'
+    ##assertContains "$LINENO $tResult" "$tResult" "show result"
 
+    gpAuto=0
     gpMaxSize="18k"
     tResult=$(fInitGetMoveFiles 2>&1 < <(echo -e "y"))
     tStatus=$?
     assertTrue "$LINENO" $tStatus
     assertContains "$LINENO $tResult" "$tResult" "The files, shown above, can be moved"
     assertContains "$LINENO $tResult" "$tResult" "Move the files"
-    assertContains "$LINENO $tResult" "$tResult" "Binary files will be moved"
+    assertContains "$LINENO $tResult" "$tResult" 'Binary files will be moved'
 
     gpMaxSize="18k"
-    fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "x\nn")
+    fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "n")
     assertTrue "$LINENO" $?
     assertEquals "$LINENO" "0" "$gpAutoMove"
 

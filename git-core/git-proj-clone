@@ -149,7 +149,7 @@ gpRemoteGitDir=""
 gpRemoteRawOrigin=""
 gpProjName=""
 gpAuto=0
-gpYesNo="No"
+gpYesNo="n"
 pRemoteGitDir=""
 while getopts :ad:nyhH:qvV:xX: tArg; do
     case $tArg in
@@ -164,8 +164,8 @@ while getopts :ad:nyhH:qvV:xX: tArg; do
         V) gpVerbose=$OPTARG ;;
         x) let ++gpDebug ;;
         X) gpDebug=$OPTARG ;;
-        n) gpYesNo=No ;;
-        y) gpYesNo=Yes ;;
+        n) gpYesNo=n ;;
+        y) gpYesNo=y ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

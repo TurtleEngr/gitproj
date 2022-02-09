@@ -897,24 +897,24 @@ fComYesNo()
     declare -l tResult
 
     if [ ${gpAuto:-0} -ne 0 ]; then
-        if [ "$gpYesNo" = "Yes" ]; then
-            gResponse="Yes"
+        if [ "$gpYesNo" = "y" ]; then
+            gResponse="y"
             return 0
         fi
-        if [ "$gpYesNo" = "No" ]; then
-            gResponse="No"
+        if [ "$gpYesNo" = "n" ]; then
+            gResponse="n"
             return 1
         fi
+        gResponse="n"
         return 1
     fi
-
     echo -n "$pPrompt [y/n]? "
     read -r tResult
     if [ "${tResult::1}" = "y" ]; then
-        gResponse="Yes"
+        gResponse="y"
         return 0
     fi
-    gResponse="No"
+    gResponse="n"
     return 1
 
     cat <<EOF >/dev/null
@@ -924,15 +924,15 @@ fComYesNo()
 
 =internal-head3 fComYesNo pPrompt
 
-If gpYesNo = "Yes", set gResponse to "y", and return 0.
+If gpYesNo = "y", set gResponse to "y", and return 0.
 
-If gpYesNo = "No", set gResponse to "n", and return 1.
+If gpYesNo = "n", set gResponse to "n", and return 1.
 
-If gpYesNo is not set, output the pPrompt, then "read" the response.
+If gpAuto is 0, output the pPrompt, then "read" the response.
 
-If the response begins with a "y", then that is the same as gpYesNo = "Yes"
+If the response begins with a "y", then that is the same as gpYesNo = "y"
 
-If the response is not a "y", then that is the same as gpYesNo = "No"
+If the response is not a "y", then that is the same as gpYesNo = "n"
 
 =internal-cut
 EOF

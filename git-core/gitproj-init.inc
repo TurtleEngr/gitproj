@@ -203,14 +203,13 @@ fInitGetBinaryFiles()
 fInitGetMoveFiles()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tMaxLoop=5
     declare -l tResult
 
     echo
-    fLog -p notice -m "Looking for binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
+    fLog -f -p notice -m "Looking for binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
 
     if ! fInitGetBinaryFiles; then
-        fLog -p notice -m 'No large binary files were found.' -l $tSrc:$LINENO
+        fLog -f -p notice -m 'No large binary files were found.' -l $tSrc:$LINENO
         return 0
     fi
 
@@ -218,10 +217,7 @@ fInitGetMoveFiles()
         return 0
     fi
 
-    while [ $tMaxLoop -gt 0 ]; do
-        let --tMaxLoop
-
-        cat <<EOF | fComFmt
+    cat <<EOF | fComFmt
 
 The files, shown above, can be moved to the project's raw
 directory. Paths will be created in the top raw directory A symlink
@@ -229,28 +225,14 @@ will replace the moved file. The symlink will point to
 [raw/path]. ^c if you want to change the MaxSize.
 
 EOF
-        # TBD convert this logic to use fComSelect()
-        echo -n "Move the files (-m) [y/n]? "
-        read -r tResult
-        case $tResult in
-            y*)
-                gpAutoMove=1
-                echo "Binary files will be moved."
-                echo
-                break
-                ;;
-            n*)
-                gpAutoMove=0
-                echo "Binary files will NOT be moved."
-                echo
-                break
-                ;;
-        esac
-    done
-    if [ $tMaxLoop -eq 0 ]; then
-        fError -i -m "Possible infinite loop." -l $tSrc:$LINENO
-    fi
 
+    gpAutoMove=0
+    if fComYesNo "Move the files (-m)?"; then
+        fLog -f -p notice -m 'Binary files will be moved' -l $tSrc:$LINENO
+        gpAutoMove=1
+        return 0
+    fi
+    fLog -f -p notice -m 'Binary files will NOT be moved' -l $tSrc:$LINENO
     return 0
 } # fInitGetMoveFiles
 
@@ -616,7 +598,7 @@ fInitCreateLocalGit()
     fInitGetSize $gpMaxSize
 
     # -m (if -a default is true)
-    fInitGetMoveFiles $gpAutoMove
+    fInitGetMoveFiles
 
     # -f
     fInitGetGitFlow $gpGitFlow

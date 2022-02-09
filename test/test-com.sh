@@ -663,22 +663,22 @@ testComYesNo()
     local tResult
 
     gpAuto=1
-    gpYesNo="Yes"
+    gpYesNo="y"
     fComYesNo "Continue" 2>&1
     assertTrue $LINENO $?
-    assertEquals $LINENO "Yes" "$gResponse"
+    assertEquals $LINENO "y" "$gResponse"
 
     gpAuto=1
-    gpYesNo="No"
+    gpYesNo="n"
     fComYesNo "Continue" 2>&1
     assertFalse $LINENO $?
-    assertEquals $LINENO "No" "$gResponse"
+    assertEquals $LINENO "n" "$gResponse"
 
     gpAuto=0
     gpYesNo=""
     fComYesNo "Continue" >/dev/null 2>&1 < <(echo yes)
     assertTrue $LINENO $?
-    assertEquals $LINENO "Yes" $gResponse
+    assertEquals $LINENO "y" $gResponse
 
     tResult=$(fComYesNo "Continue" 2>&1 < <(echo Yes))
     assertTrue $LINENO $?
@@ -686,11 +686,11 @@ testComYesNo()
 
     fComYesNo "Continue" >/dev/null 2>&1 < <(echo no)
     assertFalse $LINENO $?
-    assertEquals $LINENO "No" $gResponse
+    assertEquals $LINENO "n" $gResponse
 
     fComYesNo "Continue" >/dev/null 2>&1 < <(echo xx)
     assertFalse $LINENO $?
-    assertEquals $LINENO "No" $gResponse
+    assertEquals $LINENO "n" $gResponse
 
     return 0
 } # testComYesNo

@@ -149,7 +149,7 @@ fRemoteSetGlobals
 
 tSrc=${BASH_SOURCE##*/}
 export pMountDir=""
-gpYesNo=No
+gpYesNo=n
 while getopts :ad:hH:vxyn tArg; do
     case $tArg in
         # Script arguments
@@ -160,8 +160,8 @@ while getopts :ad:hH:vxyn tArg; do
         H) fUsage "$OPTARG" ;;
         v) let ++gpVerbose ;;
         x) let ++gpDebug ;;
-        y) gpYesNo=Yes ;;
-        n) gpYesNo=No ;;
+        y) gpYesNo=y ;;
+        n) gpYesNo=n ;;
         # Problem arguments
         :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
         \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;

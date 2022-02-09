@@ -259,8 +259,7 @@ EOF
         if ! fRemoteCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
             continue
         fi
-        fComYesNo "Use: $tMountDir"
-        if [ $? -ne 0 ]; then
+        if ! fComYesNo "Use: $tMountDir"; then
             continue
         fi
         break
@@ -456,8 +455,7 @@ EOF
         fi
 
         # Prompt
-        fComYesNo "Replace this with another remote origin"
-        if [ $? -ne 0 ]; then
+        if ! fComYesNo "Replace this with another remote origin"; then
             fLog -p warning -m "Quitting" -l $tSrc:$LINENO
             exit 1
         fi

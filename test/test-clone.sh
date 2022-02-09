@@ -306,14 +306,14 @@ testCloneGettingStarted()
     gpDebug=2
     cd $HOME/project >/dev/null 2>&1
     gpAuto=1
-    gpYesNo=No
+    gpYesNo=n
     tResult=$(fCloneGettingStarted 2>&1)
     assertFalse "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
     assertContains "$LINENO $tResult" "$tResult" "Not continuing"
 
     gpAuto=1
-    gpYesNo=Yes
+    gpYesNo=y
     tResult=$(fCloneGettingStarted 2>&1)
     assertTrue "$LINENO" "$?"
     assertContains "$LINENO $tResult" "$tResult" "Be sure you are"
@@ -582,7 +582,7 @@ testCloneSummary()
     gpLocalRawDir=$HOME/project/george/raw
     gpVerbose=3
     gpAuto=1
-    gpYesNo=Yes
+    gpYesNo=y
 
     cd $gpLocalTopDir >/dev/null 2>&1
     tResult=$(fCloneMkRawDir 2>&1)
@@ -590,12 +590,12 @@ testCloneSummary()
 
     # Tests
 
-    gpYesNo=No
+    gpYesNo=n
     tResult=$(fCloneSummary 2>&1)
     assertFalse "$LINENO $tResult" $?
     assertContains "$LINENO $tResult" "$tResult" "Not continuing"
 
-    gpYesNo=Yes
+    gpYesNo=y
     tResult=$(fCloneSummary 2>&1)
     tStatus=$?
     assertTrue "$LINENO $tResult" $tStatus
@@ -630,7 +630,7 @@ testCloneFromRemoteDir()
     gpRemoteRawOrigin=""
     gpProjName=""
     gpAuto=1
-    gpYesNo=Yes
+    gpYesNo=y
     gpVerbose=3
     cd $HOME/project >/dev/null 2>&1
 
