@@ -48,7 +48,7 @@ include ver.mak
 # Main targets
 
 # --------------------
-first ver.mak : /usr/lib/git-core
+first ver.mak : /usr/lib/git-core ver.sh
 	@echo '--------------------'
 	@echo make first
 	mkver.pl -e 'mak'
