@@ -11,7 +11,9 @@ tProjDuration=$(dateutils.ddiff $tProjStart $tProjEnd)
 tNumTests=$(grep '^test' test/test-*.sh | grep '()' | wc -l)
 tNumAsserts=$(grep assert test/*.sh | wc -l)
 
-tTotalLines=$(cat $(find * -type f | grep -Ev 'dist|subcommands') | wc -l)
+# Includes all files, even most generated files.
+# Excludes: binary files, package built files, and files I didn't write.
+tTotalLines=$(cat $(find * -type f | grep -Ev 'package/dist|package/pkg|test/.ran-*|*.tgz|*.gif|shunit2*') | wc -l)
 
 tLinesInTest=$(cat $(find test -type f) | wc -l)
 
@@ -24,7 +26,6 @@ tDoc=$(cat $(find * -prune -type f) | wc -w)
 let tWordsInDoc+=tDoc
 
 tLinesInCode=$(cat $(find git-core -type f) | wc -l)
-
 tDoc=$(
     awk '
         /=pod/,/=cut/ {
@@ -33,9 +34,9 @@ tDoc=$(
         /=internal-pod/,/=internal-cut/ {
             print $0
         }
-    ' $(find test/* git-core/* -type f) | wc -l
+    ' $(find git-core/* -type f) | wc -l
 )
-let tLinesInDoc+=tDoc
+#let tLinesInDoc+=tDoc
 let tLinesInCode-=tDoc
 
 tDoc=$(
@@ -49,7 +50,6 @@ tDoc=$(
     ' $(find test/* git-core/* -type f) | wc -w
 )
 let tWordsInDoc+=tDoc
-
 
 tNumFun=$(grep '()' git-core/* | grep -Ev '#' | wc -l)
 tNumCmds=$('ls' git-core/git-proj-* | wc -l)
