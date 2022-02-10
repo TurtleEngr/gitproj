@@ -1,5 +1,11 @@
 # Directions
 
+# All the "meta-data" related to the gitproj product is put in the
+# ver.sh file. The mkver.pl script will generate all the other ver.*
+# files.  Notice the ../doc/VERSION file is updated from a variable
+# that is in the ver.env file, which was generated from ver.sh. So the
+# version number should ONLY be changed in ver.sh
+
 # Run this first to check for dependencies and to setup meta-data for
 # packaging (see ver.sh and mkver.sh)
 # make first
@@ -51,18 +57,19 @@ include ver.mak
 first ver.mak : /usr/lib/git-core ver.sh
 	@echo '--------------------'
 	@echo make first
-	mkver.pl -e 'mak'
-	@command -v git
-	@command -v epm
-	@command -v mkver.pl
-	@command -v mkepmlist
-	@command -v patch-epm-list
-	@command -v perl
-	@command -v gawk
-	@command -v fmt
-	@command -v sed
-	@command -v tr
-	@command -v pod2markdown
+	-mkver.pl -e 'mak env' 2>&1 | grep -v Warning:
+	command -v git
+	command -v epm
+	command -v mkver.pl
+	command -v mkepmlist
+	command -v patch-epm-list
+	command -v perl
+	command -v gawk
+	command -v fmt
+	command -v sed
+	command -v tr
+	command -v pod2markdown
+	. ./ver.env; echo $$ProdVer >../doc/VERSION
 
 # --------------------
 # Build pseudo root of all files at dist/
@@ -72,12 +79,14 @@ build epm.list : build-prep build-core build-doc build-man build-contrib build-c
 	@echo make epm.list
 	mkepmlist -u root -g root --prefix / dist | patch-epm-list -f ./epm.patch >epm.list
 
-build-prep : ver.mak ver.epm ver.env
+build-prep : ver.mak ver.epm ver.env ../doc/VERSION
 	@echo '--------------------'
 	@echo make build-prep
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	-rm -rf dist
-	echo $(ProdVer) >../doc/VERSION
+
+../doc/VERSION : ver.env
+	. ./ver.env; echo $$ProdVer >../doc/VERSION
 
 build-core :
 	@echo '--------------------'

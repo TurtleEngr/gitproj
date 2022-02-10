@@ -1,5 +1,13 @@
 # git-proj CHANGES
 
+## tag-...
+
+* Updated docs, fixed typos
+
+* INT: Add update of doc/VERSION to "first" target for package/Makefile
+
+* INT: documented the "epm" dependency for development.
+
 ## tag-0-5-7-1
 
 Wed 09 Feb 2022 07:37:27 PM PST

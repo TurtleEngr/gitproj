@@ -13,12 +13,41 @@ sub-items.
 Rather than have lots of loose scripts, Makefiles are used to collect
 together the major processes--not just the `build` process.
 
+# Dependencies for Development
+
+The "first" target in
+[package/Makefile](https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile)
+lists the required commands.
+
+The main
+[README.md](https://github.com/TurtleEngr/gitproj/blob/develop/README.md)
+file for this repo lists the required packages for the gitproj script
+(see section: Installing, System requirements, Packages).
+
+## EPM
+
+In addition the package process requires the `epm` and `epm-helper`
+packages.  These have the commands: epm, mkepmlist, patch-epm-list,
+and mkver.pl.  The packages can be found at:
+
+    [/rel/released/software/ThirdParty/epm/](https://moria.whyayh.com/rel/released/software/ThirdParty/epm/)
+
+* Download and install epm version 5.0.2 or larger from the mx19/ or
+ubuntu18/ directories.
+
+* Download and install epm-helper version 1.5.1 or larger.
+
+The GitHub code for the epm packages can be found at:
+
+    [github.com/TurtleEngr/epm-deb-pkg](https://github.com/TurtleEngr/epm-deb-pkg)
+    [github.com/TurtleEngr/epm-helper](https://github.com/TurtleEngr/epm-helper)
+
 # Library functions in git-core/
 
-* `gitproj-com.inc` - common functions used across many of the scripts
+* `gitproj-com.inc` - common functions used across many of the scripts.
 
-* `gitproj-[CMD].inc` - the main functions are put in these files, so
-testing is easier
+* `gitproj-[CMD].inc` - the main functions the commands are put in
+these files, so testing is easier.
 
 * `git-proj-[CMD]` - these files only get the arguments and call the
 functions in the corresponding `gitproj-[CMD].inc` file. These files
@@ -55,7 +84,7 @@ setup the test's files and env. vars.
 ## Test Environment files (test-env*.tgz)
 
 These are symlinks to the directory above the git workspace.
-The Makefile will copy any missing file from the release server.
+The Makefile will copy any missing files from the release server.
 
 See the Makefile for how the tar-env*.tgz files are created and rebuilt.
 

@@ -131,10 +131,10 @@ timestamps) in the names are not "stable".
 The user docs can be browsed online at:
 [user-doc](https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc)
 
-After installation, html and markdown help files can also be found at:
-/usr/share/doc/git-proj/user-doc/
+After installation, html and markdown help files and tutorials can
+also be found at: /usr/share/doc/git-proj/user-doc/
 
-Also you can get with these commands:
+Also you can get help with these commands:
 
 `man git-proj` - this will give you an overview of git-proj
 
@@ -144,9 +144,9 @@ git-proj sub-commands.
 `git proj [CMD] -h` - output the help for "git proj CMD".
 For example: "git proj init -h"
 
-`git proj [CMD] -H usage` - output the short usage help for "git proj CMD".
-For example: "git proj init -H usage". If a command requires options,
-you can just type the command for the usage help.
+`git proj [CMD] -H usage` - this outputs just the short usage help for
+"git proj CMD".  For example: "git proj init -H usage". If a command
+requires options, you can just type the command for the usage help.
 
 # Source
 
