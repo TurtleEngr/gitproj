@@ -164,7 +164,7 @@ These are the main configuration files you will need to know about.
     PROJ/.gitproj
     PROJ/.git/config
 
-See LINK{gitproj Configuration Documentation|config.html} for
+See [gitproj Configuration Documentation](config.md) for
 details about these files and all the important gitproj variables.
 The pre-commit hook and its config vars are also described.
 
@@ -185,12 +185,12 @@ See  the tutorial document for some examples.
 
 HOME, USER, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
 
-See the LINK{gitproj Configuration Documentation|config.html} for a
+See the [gitproj Configuration Documentation](config.md) for a
 complete list of env. vars.
 
 # FILES
 
-See the LINK{gitproj Configuration Documentation|config.html} for a
+See the [gitproj Configuration Documentation](config.md) for a
 complete list of important files.
 
 All the User Documentation can also be found online in github at:

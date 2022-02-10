@@ -16,20 +16,20 @@
     <li>
       <a href="#Precedence">Precedence</a>
       <ul>
-        <li><a href="#System-etc-gitconfg">System, /etc/gitconfg</a></li>
+        <li><a href="#etc-gitconfg-System">/etc/gitconfg (System)</a></li>
         <li><a href=
-        "#gitproj-global-usr-share-doc-git-proj-config-gitconfig">gitproj,
-        global, /usr/share/doc/git-proj/config/gitconfig</a></li>
-        <li><a href="#Global-user---global-.gitconfig">Global, user,
-        --global, ~/.gitconfig</a></li>
-        <li><a href="#gitproj-local-PROJ-.gitproj">gitproj, local,
-        PROJ/.gitproj</a></li>
-        <li><a href="#Local-proj---local-PROJ-.git-config">Local, proj,
-        --local, PROJ/.git/config</a></li>
+        "#usr-share-doc-git-proj-config-gitconfig-gitproj-global">/usr/share/doc/git-proj/config/gitconfig
+        (gitproj global)</a></li>
+        <li><a href="#gitconfig---global-user">~/.gitconfig (--global
+        user)</a></li>
+        <li><a href="#PROJ-.gitproj-gitproj-local">PROJ/.gitproj (gitproj
+        local)</a></li>
+        <li><a href="#PROJ-.git-config---local-proj">PROJ/.git/config
+        (--local proj)</a></li>
         <li><a href=
-        "#usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit">
+        "#usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit-PROJ-.git-hooks-pre-commit">
         /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit,
-        PROJ/.pre-commit</a></li>
+        PROJ/.pre-commit, PROJ/.git/hooks/pre-commit</a></li>
       </ul>
     </li>
     <li>
@@ -130,19 +130,20 @@
   location "git config" will use.</p>
   <p>git-proj doesn't do anything with "/etc/config" or
   ".git/config.worktree".</p>
-  <h2 id="System-etc-gitconfg">System, /etc/gitconfg</h2>
+  <h2 id="etc-gitconfg-System">/etc/gitconfg (System)</h2>
   <pre><code>    /etc/gitconfg</code></pre>
   <p>Currently gitproj does not do anything with this file. Variables that
   should be set for all users on a system can be put in this file. Since
   gitproj defines all of the gitproj variables in a user's ~/.gitconfig, the
   /etc/gitconfig changes will not have any impact on the gitproj
   variables.</p>
-  <h2 id="gitproj-global-usr-share-doc-git-proj-config-gitconfig">gitproj,
-  global, /usr/share/doc/git-proj/config/gitconfig</h2>
-  <pre><code>    LINK{/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig}</code></pre>
+  <h2 id="usr-share-doc-git-proj-config-gitconfig-gitproj-global">
+  /usr/share/doc/git-proj/config/gitconfig (gitproj global)</h2>
+  <pre><code>    <a href=
+  "..html">/usr/share/doc/git-proj/config/gitconfig</a></code></pre>
   <p>gitproj default variable values for all users and projects are defined
   in this file. The values are only copied at selected times and unless
-  specified, they will only add missing vars, not changing user or project
+  specified, they will only add missing vars, not change user or project
   vars.</p>
   <p>This file is mainly used when creating an initial project with
   <span style="white-space: nowrap;">"git proj init"</span> or <span style=
@@ -223,8 +224,7 @@
         tab-ext-list = c sh md html pod
         check-for-big-files = true      # don't allow files &gt; binary-file-size
         binary-file-size = 10k</code></pre>
-  <h2 id="Global-user---global-.gitconfig">Global, user, --global,
-  ~/.gitconfig</h2>
+  <h2 id="gitconfig---global-user">~/.gitconfig (--global user)</h2>
   <pre><code>    ~/.gitconfig
     ~/.gitignore</code></pre>
   <p>If the ~/.gitconfig is not defined, it will be copied from
@@ -232,9 +232,10 @@
   will be copied from /usr/share/doc/config/gitignore.</p>
   <p><span style="white-space: nowrap;">"git proj init"</span> and
   <span style="white-space: nowrap;">"git proj clone"</span> will update
-  ~/.gitconfig from /usr/share/doc/config/gitconfig, for any vars that are
-  not defined in ~/.gitconfig. Existing variables will not be changed.</p>
-  <h2 id="gitproj-local-PROJ-.gitproj">gitproj, local, PROJ/.gitproj</h2>
+  ~/.gitconfig from /usr/share/doc/config/gitconfig, for any gitproj section
+  vars that are not defined in ~/.gitconfig. Existing values will not be
+  changed.</p>
+  <h2 id="PROJ-.gitproj-gitproj-local">PROJ/.gitproj (gitproj local)</h2>
   <pre><code>    PROJ/.gitproj
     PROJ/.gitignore</code></pre>
   <p>The PROJ/.gitproj file is not used directly by "git config". It is only
@@ -244,23 +245,23 @@
   "missing" vars from /usr/share/doc/config/gitconfig). PROJ/.gitproj should
   be versioned, for use by <span style="white-space: nowrap;">git proj
   clone</span></p>
-  <p><span style="white-space: nowrap;">"git proj clone"</span> will add vars
-  from PROJ/.gitproj to PROJ/.git/config after the files are created. If
+  <p><span style="white-space: nowrap;">"git proj clone"</span> will add all
+  vars from PROJ/.gitproj to PROJ/.git/config after the files are created. If
   PROJ/.gitproj is missing, it will create it with the "init" process.</p>
   <p>git-proj commands that change gitproj section vars in PROJ/.git/config
   will also change the vars in PROD/.gitproj, so that later clones can update
   PROJ/.git/config.</p>
-  <h2 id="Local-proj---local-PROJ-.git-config">Local, proj, --local,
-  PROJ/.git/config</h2>
+  <h2 id="PROJ-.git-config---local-proj">PROJ/.git/config (--local proj)</h2>
   <pre><code>    PROJ/.git/config</code></pre>
   <p><span style="white-space: nowrap;">"git proj init"</span> and
   <span style="white-space: nowrap;">"git proj clone"</span> will copy all of
   the vars in PROJ/.gitproj to PROJ/.git/config.</p>
   <h2 id=
-  "usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit">
-  /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit,
-  PROJ/.pre-commit</h2>
-  <pre><code>    LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
+  "usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit-PROJ-.git-hooks-pre-commit">
+  /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit,
+  PROJ/.git/hooks/pre-commit</h2>
+  <pre><code>    <a href=
+  "..html">/usr/share/doc/git-proj/hooks/pre-commit</a>
     ~/.pre-commit (optimal)
     PROJ/.pre-commit (optimal)
     PROJ/.git/hooks/pre-commit</code></pre>
@@ -271,6 +272,11 @@
   PROJ/.git/hooks/pre-commit file. If PROJ/.pre-commit exists, that file will
   be used. If ~/.pre-commit exits, that file will be used. And finally the
   /usr/share/doc/git-proj/hooks/pre-commit file will be used.</p>
+  <p>The first time <span style="white-space: nowrap;">"git proj init"</span>
+  is used to create a project, all the pre-commit files (~/.pre-commit,
+  PROJ/.pre-commit, PROJ/.git/hooks/pre-commit) will be cloned from
+  /usr/share/doc/git-proj/hooks/pre-commit This allows the user to add their
+  own pre-commit functions.</p>
   <h1 id="Config-Variables-and-Environment-Variables"><a href=
   "#_podtop_">Config Variables and Environment Variables</a></h1>
   <p>These are globals and vars that effect how the script runs. Just about
@@ -346,8 +352,8 @@
   <p>If not found, then set to: $gpBin/../doc If still not found: error.</p>
   <h2 id="gpDebug--x--xx...--X-N-NA-0">gpDebug; -x, -xx..., -X N; NA;
   (0)</h2>
-  <p>See the "common-options" section in LINK{git-proj|git-proj.html} for
-  details.</p>
+  <p>See the "common-options" section in <a href="git-proj.html">git-proj</a>
+  for details.</p>
   <p>There is no config variable for gpDebug.</p>
   <h2 id="NA--NA-gitproj.config.git-flow-pkg-git-flow">NA; -NA,
   gitproj.config.git-flow-pkg, (git-flow)</h2>
@@ -393,8 +399,8 @@
   should be at least twice the size of the space used by ProjName.raw.</p>
   <h2 id="gpVerbose--q--v--V-N-gitproj.config.verbose-2">gpVerbose; -q, -v,
   -V N; gitproj.config.verbose; (2)</h2>
-  <p>See the "common-options" section in LINK{git-proj|git-proj.html} for
-  details.</p>
+  <p>See the "common-options" section in <a href="git-proj.html">git-proj</a>
+  for details.</p>
   <h2 id="gpVer--NA-gitproj.config.ver">gpVer, -NA; gitproj.config.ver,
   ()</h2>
   <p>This is set by <span style="white-space: nowrap;">git proj init</span>

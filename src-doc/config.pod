@@ -24,7 +24,7 @@ location "git config" will use.
 git-proj doesn't do anything with "/etc/config" or
 ".git/config.worktree".
 
-=head2 System, /etc/gitconfg
+=head2 /etc/gitconfg (System)
 
     /etc/gitconfg
 
@@ -34,18 +34,18 @@ gitproj defines all of the gitproj variables in a user's ~/.gitconfig,
 the /etc/gitconfig changes will not have any impact on the gitproj
 variables.
 
-=head2 gitproj, global, /usr/share/doc/git-proj/config/gitconfig
+=head2 /usr/share/doc/git-proj/config/gitconfig (gitproj global)
 
     LINK{/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig}
 
 gitproj default variable values for all users and projects are defined
 in this file. The values are only copied at selected times and unless
-specified, they will only add missing vars, not changing user or
-project vars.
+specified, they will only add missing vars, not change user or project
+vars.
 
-This file is mainly used when creating an initial project with S<"git
-proj init"> or S<"git proj clone">. It is also used by S<"git proj
-config">.
+This file is mainly used when creating an initial project with
+S<"git proj init"> or S<"git proj clone">. It is also used by
+S<"git proj config">.
 
 The /usr/share/doc/git-proj/config/gitconfig file is not used directly
 by "git config".  It is only used to setup the ~/.gitconfig file.
@@ -105,27 +105,27 @@ keep the existing config file (see man dpkg --force-confdef,
         bin = /usr/lib/git-core
         doc = /usr/share/doc/git-proj
         git-flow-pkg = git-flow
-        git-flow = true		# set by init in PROJ/.gitroj
-	# The TBDs are changed when in PROJ/.gitroj and PROJ/.git/config
+        git-flow = true         # set by init in PROJ/.gitroj
+        # The TBDs are changed when in PROJ/.gitroj and PROJ/.git/config
         local-status=TBD        # set by init and clone
         local-host=TBD          # set by init and clone
         proj-name = TBD         # set by init and clone
         remote-status=TBD       # set by remote and clone
-        remote-raw-origin=TBD	# set by remote and clone
+        remote-raw-origin=TBD   # set by remote and clone
         remote-min-space = 2g   # set by remote and clone
         verbose = 2
     [gitproj "hook"]
         verbose = true
         pre-commit-enabled = true
-        check-file-names = true		# only these ch in names: [-_.a-zA-z0-9]
-        check-in-raw = true		# don't allow ci to PROJ/raw/?
-        check-whitespace = true		# don't allow trailing spaces
-        check-for-tabs = false 		# don't allow tabs for tab-ext-list
-	tab-ext-list = c sh md html pod
-        check-for-big-files = true	# don't allow files > binary-file-size
+        check-file-names = true         # only these ch in names: [-_.a-zA-z0-9]
+        check-in-raw = true             # don't allow ci to PROJ/raw/?
+        check-whitespace = true         # don't allow trailing spaces
+        check-for-tabs = false          # don't allow tabs for tab-ext-list
+        tab-ext-list = c sh md html pod
+        check-for-big-files = true      # don't allow files > binary-file-size
         binary-file-size = 10k
 
-=head2 Global, user, --global, ~/.gitconfig
+=head2 ~/.gitconfig (--global user)
 
     ~/.gitconfig
     ~/.gitignore
@@ -135,10 +135,11 @@ If the ~/.gitconfig is not defined, it will be copied from
 it will be copied from /usr/share/doc/config/gitignore.
 
 S<"git proj init"> and S<"git proj clone"> will update ~/.gitconfig
-from /usr/share/doc/config/gitconfig, for any vars that are not
-defined in ~/.gitconfig. Existing variables will not be changed.
+from /usr/share/doc/config/gitconfig, for any gitproj section vars
+that are not defined in ~/.gitconfig. Existing values will not be
+changed.
 
-=head2 gitproj, local, PROJ/.gitproj
+=head2 PROJ/.gitproj (gitproj local)
 
     PROJ/.gitproj
     PROJ/.gitignore
@@ -151,22 +152,22 @@ S<"git proj init"> will create PROJ/.gitproj from the gitproj sections in
 /usr/share/doc/config/gitconfig). PROJ/.gitproj should be versioned,
 for use by S<git proj clone>
 
-S<"git proj clone"> will add vars from PROJ/.gitproj to PROJ/.git/config
-after the files are created. If PROJ/.gitproj is missing, it will
-create it with the "init" process.
+S<"git proj clone"> will add all vars from PROJ/.gitproj to
+PROJ/.git/config after the files are created. If PROJ/.gitproj is
+missing, it will create it with the "init" process.
 
 git-proj commands that change gitproj section vars in PROJ/.git/config
 will also change the vars in PROD/.gitproj, so that later clones can
 update PROJ/.git/config.
 
-=head2 Local, proj, --local, PROJ/.git/config
+=head2 PROJ/.git/config (--local proj)
 
     PROJ/.git/config
 
-S<"git proj init"> and S<"git proj clone"> will copy all of the
-vars in PROJ/.gitproj to PROJ/.git/config.
+S<"git proj init"> and S<"git proj clone"> will copy all of the vars
+in PROJ/.gitproj to PROJ/.git/config.
 
-=head2 /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit
+=head2 /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit, PROJ/.git/hooks/pre-commit
 
     LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
     ~/.pre-commit (optimal)
@@ -181,6 +182,12 @@ PROJ/.git/hooks/pre-commit file. If PROJ/.pre-commit exists, that file
 will be used. If ~/.pre-commit exits, that file will be used. And
 finally the /usr/share/doc/git-proj/hooks/pre-commit file will be
 used.
+
+The first time S<"git proj init"> is used to create a project, all the
+pre-commit files (~/.pre-commit, PROJ/.pre-commit,
+PROJ/.git/hooks/pre-commit) will be cloned from
+/usr/share/doc/git-proj/hooks/pre-commit This allows the user to add
+their own pre-commit functions.
 
 =head1 Config Variables and Environment Variables
 
@@ -204,7 +211,7 @@ is the logical result.)
     gp[Var];          - a global env. var. name (NA means there is none)
     -[A];             - a CLI option (-NA means there is none)
     git.config.[var]; - git config var name (NA means there is none)
-    (default) 	      - its default value, if not defined anywhere
+    (default)         - its default value, if not defined anywhere
 
 =head2 gpAuto; -a; NA; (false)
 
@@ -382,7 +389,7 @@ gitproj.hook.tabs-ext-list
 To fix, use "rm-trailing-sp -f FILE"
 
 =head2 gpTabExtList; -NA; gitproj.hook.tabs-ext-list; (c sh md html pod)
-	tab-ext-list = c sh md html pod
+        tab-ext-list = c sh md html pod
 
 List the file extensions for files that will be checked for tabs.
 

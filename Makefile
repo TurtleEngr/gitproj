@@ -42,8 +42,10 @@ user-doc : doc/user-doc/git-proj.md doc/user-doc/git-proj.html doc/user-doc/conf
 
 doc/user-doc/config.html : src-doc/config.pod
 	-pod2html --title='Configuration Documentation' $(mHtmlOpt) <$? >$@
+	-test/util/fix-rel-links.sh doc/user-doc/config.html
 	-$(mTidy) doc/user-doc/config.html
 	-pod2markdown <src-doc/config.pod >doc/user-doc/config.md
+	-test/util/fix-rel-links.sh doc/user-doc/config.md
 
 cmd-doc :
 	-mkdir -p doc/user-doc/subcommands
@@ -65,11 +67,13 @@ doc/user-doc/tutorial/create_a_git-proj_repo.html : src-doc/create_a_git-proj_re
 doc/user-doc/git-proj.md : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
 	-$? -H md >$@
+	-test/util/fix-rel-links.sh doc/user-doc/git-proj.md
 
 # git-proj will collect ALL usage help, and format as html, with a TOC
 doc/user-doc/git-proj.html : git-core/git-proj
 	-mkdir doc/user-doc 2>/dev/null
 	-$? -H html >$@
+	-test/util/fix-rel-links.sh doc/user-doc/git-proj.html
 
 # Remove trailing whitespace, convert tabs to spaces, and normalized
 # indents in bash fiies.

@@ -15,7 +15,7 @@ export ProdName="git-proj"
 export ProdAlias="git-proj"
 # One word [-a-z0-9]
 
-export ProdVer="0.5.6"
+export ProdVer="0.5.7"
 # [0-9]*.[0-9]*{.[0-9]*}
 # Requires 2 numbers, 3'rd number is optional
 # First, Major changes, older projects will need to be upgraded
@@ -28,7 +28,7 @@ export ProdRC=""
 # If set and RELEASE=1
   # %release rc.ProdRC
 
-export ProdBuild="2"
+export ProdBuild="1"
 # [0-9.]*
 # Required
 # If RELEASE=1, and ProdRC=""

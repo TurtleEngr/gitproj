@@ -22,7 +22,7 @@ location "git config" will use.
 git-proj doesn't do anything with "/etc/config" or
 ".git/config.worktree".
 
-## System, /etc/gitconfg
+## /etc/gitconfg (System)
 
     /etc/gitconfg
 
@@ -32,16 +32,18 @@ gitproj defines all of the gitproj variables in a user's ~/.gitconfig,
 the /etc/gitconfig changes will not have any impact on the gitproj
 variables.
 
-## gitproj, global, /usr/share/doc/git-proj/config/gitconfig
+## /usr/share/doc/git-proj/config/gitconfig (gitproj global)
 
-    LINK{/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig}
+    [/usr/share/doc/git-proj/config/gitconfig](..md)
 
 gitproj default variable values for all users and projects are defined
 in this file. The values are only copied at selected times and unless
-specified, they will only add missing vars, not changing user or
-project vars.
+specified, they will only add missing vars, not change user or project
+vars.
 
-This file is mainly used when creating an initial project with "git proj init" or "git proj clone". It is also used by "git proj config".
+This file is mainly used when creating an initial project with
+"git proj init" or "git proj clone". It is also used by
+"git proj config".
 
 The /usr/share/doc/git-proj/config/gitconfig file is not used directly
 by "git config".  It is only used to setup the ~/.gitconfig file.
@@ -121,7 +123,7 @@ keep the existing config file (see man dpkg --force-confdef,
         check-for-big-files = true      # don't allow files > binary-file-size
         binary-file-size = 10k
 
-## Global, user, --global, ~/.gitconfig
+## ~/.gitconfig (--global user)
 
     ~/.gitconfig
     ~/.gitignore
@@ -131,10 +133,11 @@ If the ~/.gitconfig is not defined, it will be copied from
 it will be copied from /usr/share/doc/config/gitignore.
 
 "git proj init" and "git proj clone" will update ~/.gitconfig
-from /usr/share/doc/config/gitconfig, for any vars that are not
-defined in ~/.gitconfig. Existing variables will not be changed.
+from /usr/share/doc/config/gitconfig, for any gitproj section vars
+that are not defined in ~/.gitconfig. Existing values will not be
+changed.
 
-## gitproj, local, PROJ/.gitproj
+## PROJ/.gitproj (gitproj local)
 
     PROJ/.gitproj
     PROJ/.gitignore
@@ -147,24 +150,24 @@ only used to setup the initial PROJ/.git/config file.
 /usr/share/doc/config/gitconfig). PROJ/.gitproj should be versioned,
 for use by git proj clone
 
-"git proj clone" will add vars from PROJ/.gitproj to PROJ/.git/config
-after the files are created. If PROJ/.gitproj is missing, it will
-create it with the "init" process.
+"git proj clone" will add all vars from PROJ/.gitproj to
+PROJ/.git/config after the files are created. If PROJ/.gitproj is
+missing, it will create it with the "init" process.
 
 git-proj commands that change gitproj section vars in PROJ/.git/config
 will also change the vars in PROD/.gitproj, so that later clones can
 update PROJ/.git/config.
 
-## Local, proj, --local, PROJ/.git/config
+## PROJ/.git/config (--local proj)
 
     PROJ/.git/config
 
-"git proj init" and "git proj clone" will copy all of the
-vars in PROJ/.gitproj to PROJ/.git/config.
+"git proj init" and "git proj clone" will copy all of the vars
+in PROJ/.gitproj to PROJ/.git/config.
 
-## /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit
+## /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit, PROJ/.git/hooks/pre-commit
 
-    LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
+    [/usr/share/doc/git-proj/hooks/pre-commit](..md)
     ~/.pre-commit (optimal)
     PROJ/.pre-commit (optimal)
     PROJ/.git/hooks/pre-commit
@@ -177,6 +180,12 @@ PROJ/.git/hooks/pre-commit file. If PROJ/.pre-commit exists, that file
 will be used. If ~/.pre-commit exits, that file will be used. And
 finally the /usr/share/doc/git-proj/hooks/pre-commit file will be
 used.
+
+The first time "git proj init" is used to create a project, all the
+pre-commit files (~/.pre-commit, PROJ/.pre-commit,
+PROJ/.git/hooks/pre-commit) will be cloned from
+/usr/share/doc/git-proj/hooks/pre-commit This allows the user to add
+their own pre-commit functions.
 
 # Config Variables and Environment Variables
 
@@ -274,7 +283,7 @@ If not found, then set to: $gpBin/../doc  If still not found: error.
 
 ## gpDebug; -x, -xx..., -X N; NA; (0)
 
-See the "common-options" section in LINK{git-proj|git-proj.html} for details.
+See the "common-options" section in [git-proj](git-proj.md) for details.
 
 There is no config variable for gpDebug.
 
@@ -324,7 +333,7 @@ size of the space used by ProjName.raw.
 
 ## gpVerbose; -q, -v, -V N; gitproj.config.verbose; (2)
 
-See the "common-options" section in LINK{git-proj|git-proj.html} for details.
+See the "common-options" section in [git-proj](git-proj.md) for details.
 
 ## gpVer, -NA; gitproj.config.ver, ()
 
@@ -378,7 +387,7 @@ gitproj.hook.tabs-ext-list
 To fix, use "rm-trailing-sp -f FILE"
 
 ## gpTabExtList; -NA; gitproj.hook.tabs-ext-list; (c sh md html pod)
-	tab-ext-list = c sh md html pod
+        tab-ext-list = c sh md html pod
 
 List the file extensions for files that will be checked for tabs.
 

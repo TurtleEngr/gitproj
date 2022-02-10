@@ -48,7 +48,7 @@ for tFile in $*; do
         continue
     fi
 
-    file $tFile | grep -q 'text'
+    file $tFile | grep -q ' text'
     if [ $? -ne 0 ]; then
         echo "Skipping binary $tFile"
         continue
