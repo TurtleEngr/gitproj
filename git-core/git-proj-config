@@ -3,6 +3,11 @@
 #--------------------
 fUsage()
 {
+    # Quick help, run this:
+    # git-proj-config -h | less
+    local pStyle="${1:-usage}"
+
+    fComUsage -s $pStyle -f $gpBin/$gpCmdName
     exit 1
     cat <<\EOF >/dev/null
 =pod
@@ -11,40 +16,129 @@ fUsage()
 
 =for html <hr/>
 
- git proj config [-e pExternalPath] [-r pRawPath]
+=head1 NAME git proj config
 
-    Define or redefine the gitproj options.
+=head1 SYNOPSIS
 
-    -e pExternalPath
+    git proj config [common-options]
 
-       If the external repo is mounted at a different path than the
-       original "origin", then use this command to set the origin to
-       the new mount point.
+=head1 DESCRIPTION
 
-    -r pRawPath
+=head2 Global Checks
 
-       Redefine the location of the local raw file dir. The "raw"
-       symlink will be updated.
+These are done even if not in a git-proj managed workspace.
 
-    -c on/off
+Compare ~/.gitconfig with $gpDoc/config/gitconfig
+Compare ~/.gitignore with $gpDoc/config/gitignore
+Compare ~/.pre-commit with $gpDoc/hooks/pre-commit
 
-       Set a commit hook to not allow commits for "large" binary files.
+if git-flow=true
+   is git-flow installed?
+   are git-flow section vars defined?
 
-    -s pMaxSize
+Validate "facility" name
+Validate "bin" and "doc" locations
+Validate all bool vars are only true/false
+Validate all int vars only have numbers
 
-       Set the max size for commits of binary files.
+=head3 Global Actions
 
-Usage:
-        proj-set-remote pPath
+Update missing vars in ~/.gitconfig from $gpDoc/config/gitconfig?
+Force update of all gitproj sections from $gpDoc/config/gitconfig?
+Force update of "gitproj config" section from $gpDoc/config/gitconfig?
+Force update of "gitproj hooks" section from $gpDoc/config/gitconfig?
+Update ~/.gitignore from $gpDoc/config/gitignore? (note this will result in a sorted list)
+Replace ~/.pre-commit from $gpDoc/hooks/pre-commit?
+Install/update git-flow and corresponding configs?
 
-Description
-        Use this script if the mount path is different from the origin
-        remote. pPath is the path pointing the current repo's remote
-        repo on an external drive.
+=head2 Local Checks
 
-        Setup a different host.
+These are done if you are in a git-proj managed workspace.
 
-        Review and change the current settings interactively.
+Compare PROJ/.gitproj with ~/.gitconfig (only list the diffs from all
+gitproj sections and the diffs that are in .gitproj and also in
+~/.gitconfig
+
+Compare PROJ/.gitproj with PROJ/.git/config (only list the diffs from all
+gitproj sections and the diffs that are in .gitproj and also in
+~/.gitconfig
+
+Compare PROJ/.gitignore with ~/.gitignore
+
+Compare PROJ/.pre-commit with ~/.pre-commit
+
+Compare PROJ/.git/hooks/pre-commit with PROJ/.pre-commit
+Notes disabled checks
+
+prog-name != top dir name
+
+gitproj.config.local-status - is TBD
+remote.origin.url - not defined
+     git-proj-init needs to be run
+
+gitproj.config.remote-status - is TBD
+gitproj.config.remote-raw-origin - is TBD
+warn if gitproj.config.remote.min-space is < 2x existing space
+
+if gitproj.config.remote-raw-origin, report if not found.
+   suggest mounting it or runing git-proj-remote
+
+=head2 Local Actions
+
+gitproj.config.local-status
+remote.origin.url
+gitproj.config.remote-status
+
+Change: gitproj.config.remote-raw-origin? (Best way: run git-proj-remote)
+
+------------
+
+This is an interactive program to help with the common confguration
+options for the git-proj sub-comands.
+
+If the external repo is mounted at a different path than the original
+"origin", then use this command to set the origin to the new mount
+point.
+
+Redefine the location of the local raw file dir. The "raw"
+symlink will be updated.
+
+Set a commit hook to not allow commits for "large" binary files.
+
+Set the max size for commits of binary files.
+
+Use this script if the mount path is different from the origin
+remote. pPath is the path pointing the current repo's remote repo on
+an external drive.
+
+Setup a different host.
+
+Review and change the current settings interactively.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<[common-options]>
+
+ -h
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)
+
+Run "git proj -h" for details. Or "man git-proj" for help with all the
+sub-commands.
+
+=back
+
+=head1 RETURN VALUE
+
+ 0 - if OK
+ !0 - if errors
+
+=for comment =head1 ERRORS
+
+=head1 EXAMPLES
 
 Example
         The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git
@@ -54,6 +148,41 @@ Example
 
         will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
         if trip.git is found at the specified path.
+
+=for comment=head1 ENVIRONMENT
+
+=for comment=head1 FILES
+
+=head1 SEE ALSO
+
+ git proj
+ git proj remote
+ git proj clone
+ git proj push
+ git proj pull
+ git proj set
+ git proj status
+ git proj add   TODO
+ git proj config
+ git flow
+
+=for comment =head1 NOTES
+
+=for comment =head1 CAVEATS
+
+=for comment =head1 DIAGNOSTICS
+
+=for comment =head1 BUGS
+
+=for comment =head1 RESTRICTIONS
+
+=head1 AUTHOR
+
+TurtleEngr
+
+=head1 HISTORY
+
+GPLv3 Copyright 2021 by TurtleEngr
 
 =cut
 
