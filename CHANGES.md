@@ -1,5 +1,39 @@
 # git-proj CHANGES
 
+## tag-0-5-7-1
+
+Wed 09 Feb 2022 07:37:27 PM PST
+
+* INT: Created fix-rel-links.sh and fixed LINK{} tags. Issue: #5
+
+* Implement the pre-commit gitproj.hook.check-for-tabs. See issue #4
+
+* INT: The code has been converted to use the fComYesNo function. Issue #9
+
+* Get pre-commit from more than one place. See "config" document, and issue #16
+
+* INT: Added fComMkPreCommit to init and clone. Implements issue #16
+
+* INT: Updated docs. Reorganized build steps in package.
+
+* INT: Moved scripts to test/utils. Uses clean-git-proj-repo.sh and clean-git-proj-repo-cron on release server.
+
+* Push test packages to moria. See: [/rel/development/software/own/git-proj/deb/](https://moria.whyayh.com/rel/development/software/own/git-proj/deb/)
+
+* INT: Document the release-server setup. Added rush documentation.
+
+* Added "ff-only" to "git proj pull"
+
+* INT: Implemented GitHub Actions: test, package. See Issue #27
+
+    * INT: Get epm package that does not include mkver.pl. Issue #27
+    * INT: Fixed released path. Issue #27
+    * INT: Changed package.yml so it only runs if test succeeds. Issue #27
+    * INT: Added sudo to apt-get. Issue #27
+    * INT: Added epm and epm-helper requirements. Issue #27
+    * INT: Simplified install-deps
+    * INT: Added github actions badge
+
 ----------
 
 ## tag-0-5-5-2
