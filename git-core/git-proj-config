@@ -24,98 +24,197 @@ fUsage()
 
 =head1 DESCRIPTION
 
+=head2 Main Menu Options
+
+=over 4
+
+=item * Run all health checks, only report problems. [error]
+
+=item * Run all health checks, only report differences [diff, warnings]
+
+=item * Run all health checks, report status [info]
+
+=item * Select Global Actions
+
+=item * Select Local Actions (offered only if in a PROJ)
+
+=item * Select Other Actions
+
+=back
+
 =head2 Global Checks
 
 These are done even if not in a git-proj managed workspace.
 
-Compare ~/.gitconfig with $gpDoc/config/gitconfig
-Compare ~/.gitignore with $gpDoc/config/gitignore
-Compare ~/.pre-commit with $gpDoc/hooks/pre-commit
+The Validate Checks, check $gpDoc/gitconfig and ~/.gitconfig. If there
+is a problem they can be fixed by: 1) manually setting, 2) select
+default, or 3) if ~/.gpconfig select from $gpDoc/gitconfig.
 
-if git-flow=true
-   is git-flow installed?
-   are git-flow section vars defined?
+=over 4
 
-Validate "facility" name
-Validate "bin" and "doc" locations
-Validate all bool vars are only true/false
-Validate all int vars only have numbers
+=item * Validate "facility" name [error]
 
-=head3 Global Actions
+=item * Validate "bin" and "doc" locations [error]
 
-Update missing vars in ~/.gitconfig from $gpDoc/config/gitconfig?
-Force update of all gitproj sections from $gpDoc/config/gitconfig?
-Force update of "gitproj config" section from $gpDoc/config/gitconfig?
-Force update of "gitproj hooks" section from $gpDoc/config/gitconfig?
-Update ~/.gitignore from $gpDoc/config/gitignore? (note this will result in a sorted list)
-Replace ~/.pre-commit from $gpDoc/hooks/pre-commit?
-Install/update git-flow and corresponding configs?
+=item * Validate all bool vars are only true/false [error]
+
+=item * Validate all int vars only have numbers [error]
+
+=item * Compare ~/.gitconfig with $gpDoc/config/gitconfig [diff]
+
+=item * Compare ~/.gitignore with $gpDoc/config/gitignore [diff]
+
+=item * Compare ~/.pre-commit with $gpDoc/hooks/pre-commit [diff]
+
+=item * if git-flow=true
+
+=over 4
+
+=item * is git-flow installed? [warning]
+
+=item * are git-flow section vars defined? [warning]
+
+=back
+
+=back
 
 =head2 Local Checks
 
 These are done if you are in a git-proj managed workspace.
 
-Compare PROJ/.gitproj with ~/.gitconfig (only list the diffs from all
-gitproj sections and the diffs that are in .gitproj and also in
-~/.gitconfig
+The Validate Checks, check PROJ/gitproj and --local. If
+there is a problem they can be fixed by: 1) manfully setting, 2) select
+from ~/.gitconfig, 3) select default
 
-Compare PROJ/.gitproj with PROJ/.git/config (only list the diffs from all
-gitproj sections and the diffs that are in .gitproj and also in
-~/.gitconfig
+=over 4
 
-Compare PROJ/.gitignore with ~/.gitignore
+=item * If defined, validate "facility" name [error]
 
-Compare PROJ/.pre-commit with ~/.pre-commit
+=item * If defined, validate "bin" and "doc" locations [error]
 
-Compare PROJ/.git/hooks/pre-commit with PROJ/.pre-commit
-Notes disabled checks
+=item * Validate all gitproj bool vars are only true/false [error]
 
-prog-name != top dir name
+=item * Validate all gitproj int vars only have numbers [error]
 
-gitproj.config.local-status - is TBD
-remote.origin.url - not defined
-     git-proj-init needs to be run
+=item * Compare PROJ/.gitproj with ~/.gitconfig (only list the diffs
+from all gitproj sections and the diffs that are in .gitproj and also
+in ~/.gitconfig [diff]
 
-gitproj.config.remote-status - is TBD
-gitproj.config.remote-raw-origin - is TBD
-warn if gitproj.config.remote.min-space is < 2x existing space
+=item * Compare PROJ/.gitproj with PROJ/.git/config (only list the
+diffs from all gitproj sections and the diffs that are in .gitproj and
+also in ~/.gitconfig [diff]
 
-if gitproj.config.remote-raw-origin, report if not found.
-   suggest mounting it or runing git-proj-remote
+=item * Compare PROJ/.gitignore with ~/.gitignore [diff]
 
-=head2 Local Actions
+=item * Compare PROJ/.pre-commit with ~/.pre-commit [diff]
 
-gitproj.config.local-status
-remote.origin.url
-gitproj.config.remote-status
+=item * Compare PROJ/.git/hooks/pre-commit with PROJ/.pre-commit [diff]
 
-Change: gitproj.config.remote-raw-origin? (Best way: run git-proj-remote)
+=item * Note disabled pre-commit checks [info]
 
-TBD
+=item * prog-name != top dir name [warning]
 
-------------
+=item * gitproj.config.local-status - is TBD [error]
 
-This is an interactive program to help with the common confguration
-options for the git-proj sub-comands.
+=item * remote.origin.url - not defined
+(git-proj-init needs to be run) [error]
 
-If the external repo is mounted at a different path than the original
-"origin", then use this command to set the origin to the new mount
-point.
+=item * gitproj.config.remote-status - is TBD
+(git-proj-remote needs to be run) [error]
 
-Redefine the location of the local raw file dir. The "raw"
-symlink will be updated.
+=item * gitproj.config.remote-raw-origin - is TBD
+(git-proj-remote needs to be run) [warning]
 
-Set a commit hook to not allow commits for "large" binary files.
+=item * warn if gitproj.config.remote.min-space is < 2x existing space [warning]
 
-Set the max size for commits of binary files.
+=item * if gitproj.config.remote-raw-origin, report if not found.
+(suggest mounting it or running git-proj-remote) [warning]
 
-Use this script if the mount path is different from the origin
-remote. pPath is the path pointing the current repo's remote repo on
-an external drive.
+=back
 
-Setup a different host.
+=head2 Additional Checks
 
-Review and change the current settings interactively.
+=over 4
+
+=item * List symlinks with problems [error]
+
+=item * Check for big binary files, not in raw/ [warning]
+
+=item * Report on all symlinks in PROJ [info]
+
+=back
+
+=head3 Global Action Menus
+
+=over 4
+
+=item * Update missing vars in ~/.gitconfig from $gpDoc/config/gitconfig?
+
+=item * Force update of ALL gitproj sections from $gpDoc/config/gitconfig?
+
+=item * Force update of "gitproj config" section from $gpDoc/config/gitconfig?
+
+=item * Force update of "gitproj hooks" section from $gpDoc/config/gitconfig?
+
+=item * Update ~/.gitignore from $gpDoc/config/gitignore?  (note this
+will result in a sorted list, with duplicates removed) (only adds
+missing from $gpDoc/config/.gitignore)
+
+=item * Replace ~/.pre-commit from $gpDoc/hooks/pre-commit?
+
+=item * Install/update git-flow and corresponding configs?
+
+=back
+
+=head2 Local Action Menus
+
+=over 4
+
+=item * Fix remote.origin.url
+
+=item * Change: gitproj.config.remote-raw-origin? (Best way: run
+git-proj-remote)
+
+=item * Force update of PROJ/.gitproj from --local
+(core, git-flow, and gitproj sections only)
+
+=item * Force update of --local from PROJ/.gitproj
+(core, git-flow, and gitproj sections only)
+
+=item * Update missing vars in PROJ/.gitproj and --local from
+~/.gitconfig (gitproj sections only)
+
+=item * Force update of ALL vars in PROJ/.gitproj and --local from
+~/.gitconfig (remotes are not changed) (gitproj sections only) (and
+vars in-common)
+
+=item * Force update of ALL gitproj sections in PROJ/.gitproj and
+--local from ~/.gitconfig (remotes are not changed)
+
+=item * Force update of "gitproj config" section in PROJ/.gitproj and
+--local from ~/.gitconfig (remotes are not changed)
+
+=item * Force update of "gitproj hooks" section in PROJ/.gitproj and
+--local from ~/.gitconfig
+
+=item * Update ~/.gitignore from ~/.gitignore? (note this will result
+in a sorted list, with duplicates removed) (only adds missing from
+~/.gitignore)
+
+=item * Replace PROJ/.pre-commit and PROJ/.git/hooks/pre-commit from
+~/.pre-commit
+
+=head2 Additional Action Menus
+
+=over 4
+
+=item * Set remote-min-space (1) set manually, 2) set from
+~/.gitconfig, 3) default)
+
+=item * Set the max size for commits of binary files.  (1) set
+manually, 2) set from ~/.gitconfig, 3) default)
+
+=back
 
 =head1 OPTIONS
 
@@ -140,16 +239,7 @@ sub-commands.
 
 =for comment =head1 ERRORS
 
-=head1 EXAMPLES
-
-Example
-        The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git
-        But the drive is now mounted at /mnt/usb-drive, use:
-
-            proj-set-remote /mnt/usb-drive/video-2019-04-01
-
-        will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
-        if trip.git is found at the specified path.
+=for comment =head1 EXAMPLES
 
 =for comment=head1 ENVIRONMENT
 
@@ -192,42 +282,57 @@ EOF
     exit 1
 }
 
-# --------------------
-fCheckForGit()
-{
-    if [ ! -d .git ]; then
-        echo 'Error: .git not found in current directory.'
-        exit 1
-    fi
-}
-
-fFindRemote()
-{
-    local pPath=$1
-
-    local tOrigin=$($cGetOrigin)
-    local tRemoteGit=${tOrigin##*/}
-    local tNewPath=$pPath/$tRemoteGit
-
-    if [ ! -d $tNewPath ]; then
-        echo "Error: Could not find: $tNewPath"
-        exit 1
-    fi
-    echo $tNewPath
-}
-
 # ====================
 # Main
 
-if [ $# -ne 1 ]; then
-    fUsage
+export gpBin gpCmdName tSrc
+
+gpCmdName=${BASH_SOURCE##*/}
+tSrc=${BASH_SOURCE##*/}
+
+# -------------------
+# Set current directory location in PWD
+if [ -z "$PWD" ]; then
+    PWD=$(pwd)
 fi
 
-gpPath=$1
+# -------------------
+# Define the location of this script
+gpBin=${0%/*}
+if [ "$gpBin" = "." ]; then
+    gpBin=$PWD
+fi
+cd $gpBin >/dev/null 2>&1
+gpBin=$PWD
+cd - >/dev/null 2>&1
 
-fCheckForGit
-tNewPath=$(fFindRemote $gpPath)
+# -------------------
+. $gpBin/gitproj-com.inc
+# Calls: fComSetGlobals
+. $gpBin/gitproj-config.inc
 
-git remote set-url origin $tNewPath
+# -------------------
+while getopts :hH:qvV:xX: tArg; do
+    case $tArg in
+        # Script arguments
+        # Common arguments
+        h) fUsage long ;;
+        H) fUsage "$OPTARG" ;;
+        q) gpVerbose=0 ;;
+        v) gpVerbose=2 ;;
+        V) gpVerbose=$OPTARG" ;;
+        x) let ++gpDebug ;;
+        X) gpDebug=$OPTARG" ;;
+        # Problem arguments
+        :) fError -m "Value required for option: -$OPTARG" -l $tSrc:$LINENO ;;
+        \?) fError -m "Unknown option: $OPTARG" -l $tSrc:$LINENO ;;
+    esac
+done
+shift $((OPTIND - 1))
+if [ $# -ne 0 ]; then
+    fError -m "Unknown option: $*" -l $tSrc:$LINENO
+fi
 
+# ----------
+fConfigMenu
 exit 0
