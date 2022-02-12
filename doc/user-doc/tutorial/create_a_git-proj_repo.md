@@ -2,8 +2,11 @@
 
 # Download and install git-proj.
 
+    # Find the latest version here
     tUrl=https://moria.whyayh.com/rel/released/software/own/git-proj/deb
-    tPkg=git-proj-0.4.1-1-mx-x86_64.deb
+
+    # Replace the N's with the latest version
+    tPkg=git-proj-N.N.N-N-mx-x86_64.deb
     tOpt="--user=guest --password=guest"
     wget $tOpt $tUrl/$tPkg
 
@@ -193,7 +196,7 @@ Now try out some git command in the project directory:
 `git proj status` will give you information about differences between
 your local raw/ directory and the remote raw/ directory.
 
-    git proj stats
+    git proj status
 
 This outputs an error and the short usage help.
 

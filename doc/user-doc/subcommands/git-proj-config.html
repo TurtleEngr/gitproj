@@ -11,45 +11,320 @@
 
 
 
+<ul id="index">
+  <li><a href="#NAME-git-proj-config">NAME git proj config</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Main-Menu-Options">Main Menu Options</a></li>
+      <li><a href="#Global-Checks">Global Checks</a></li>
+      <li><a href="#Local-Checks">Local Checks</a></li>
+      <li><a href="#Additional-Checks">Additional Checks</a>
+        <ul>
+          <li><a href="#Global-Action-Menus">Global Action Menus</a></li>
+        </ul>
+      </li>
+      <li><a href="#Local-Action-Menus">Local Action Menus</a></li>
+      <li><a href="#Additional-Action-Menus">Additional Action Menus</a></li>
+    </ul>
+  </li>
+  <li><a href="#OPTIONS">OPTIONS</a></li>
+  <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#HISTORY">HISTORY</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
 <hr/>
 
-<pre><code> git proj config [-e pExternalPath] [-r pRawPath]
+<a href="#_podtop_"><h1 id="NAME-git-proj-config">NAME git proj config</h1></a>
 
-    Define or redefine the gitproj options.
+<a href="#_podtop_"><h1 id="SYNOPSIS">SYNOPSIS</h1></a>
 
-    -e pExternalPath
+<pre><code>    NOT IMPLEMENTED YET
+    git proj config [common-options]</code></pre>
 
-       If the external repo is mounted at a different path than the
-       original &quot;origin&quot;, then use this command to set the origin to
-       the new mount point.
+<a href="#_podtop_"><h1 id="DESCRIPTION">DESCRIPTION</h1></a>
 
-    -r pRawPath
+<h2 id="Main-Menu-Options">Main Menu Options</h2>
 
-       Redefine the location of the local raw file dir. The &quot;raw&quot;
-       symlink will be updated.
+<ul>
 
-    -c on/off
+<li><p>Run all health checks, only report problems. [error]</p>
 
-       Set a commit hook to not allow commits for &quot;large&quot; binary files.
+</li>
+<li><p>Run all health checks, only report differences [diff, warnings]</p>
 
-    -s pMaxSize
+</li>
+<li><p>Run all health checks, report status [info]</p>
 
-       Set the max size for commits of binary files.</code></pre>
+</li>
+<li><p>Select Global Actions</p>
 
-<p>Usage: proj-set-remote pPath</p>
+</li>
+<li><p>Select Local Actions (offered only if in a PROJ)</p>
 
-<p>Description Use this script if the mount path is different from the origin remote. pPath is the path pointing the current repo&#39;s remote repo on an external drive.</p>
+</li>
+<li><p>Select Other Actions</p>
 
-<pre><code>        Setup a different host.
+</li>
+</ul>
 
-        Review and change the current settings interactively.</code></pre>
+<h2 id="Global-Checks">Global Checks</h2>
 
-<p>Example The origin is currently set to: /mnt/usb-video/video-2019-04-01/trip.git But the drive is now mounted at /mnt/usb-drive, use:</p>
+<p>These are done even if not in a git-proj managed workspace.</p>
 
-<pre><code>            proj-set-remote /mnt/usb-drive/video-2019-04-01
+<p>The Validate Checks, check $gpDoc/gitconfig and ~/.gitconfig. If there is a problem they can be fixed by: 1) manually setting, 2) select default, or 3) if ~/.gpconfig select from $gpDoc/gitconfig.</p>
 
-        will set the origin to: /mnt/usb-drive/video-2019-04-01/trip.git
-        if trip.git is found at the specified path.</code></pre>
+<ul>
+
+<li><p>Validate &quot;facility&quot; name [error]</p>
+
+</li>
+<li><p>Validate &quot;bin&quot; and &quot;doc&quot; locations [error]</p>
+
+</li>
+<li><p>Validate all bool vars are only true/false [error]</p>
+
+</li>
+<li><p>Validate all int vars only have numbers [error]</p>
+
+</li>
+<li><p>Compare ~/.gitconfig with $gpDoc/config/gitconfig [diff]</p>
+
+</li>
+<li><p>Compare ~/.gitignore with $gpDoc/config/gitignore [diff]</p>
+
+</li>
+<li><p>Compare ~/.pre-commit with $gpDoc/hooks/pre-commit [diff]</p>
+
+</li>
+<li><p>if git-flow=true</p>
+
+<ul>
+
+<li><p>is git-flow installed? [warning]</p>
+
+</li>
+<li><p>are git-flow section vars defined? [warning]</p>
+
+</li>
+</ul>
+
+</li>
+</ul>
+
+<h2 id="Local-Checks">Local Checks</h2>
+
+<p>These are done if you are in a git-proj managed workspace.</p>
+
+<p>The Validate Checks, check PROJ/gitproj and --local. If there is a problem they can be fixed by: 1) manfully setting, 2) select from ~/.gitconfig, 3) select default</p>
+
+<ul>
+
+<li><p>If defined, validate &quot;facility&quot; name [error]</p>
+
+</li>
+<li><p>If defined, validate &quot;bin&quot; and &quot;doc&quot; locations [error]</p>
+
+</li>
+<li><p>Validate all gitproj bool vars are only true/false [error]</p>
+
+</li>
+<li><p>Validate all gitproj int vars only have numbers [error]</p>
+
+</li>
+<li><p>Compare PROJ/.gitproj with ~/.gitconfig (only list the diffs from all gitproj sections and the diffs that are in .gitproj and also in ~/.gitconfig [diff]</p>
+
+</li>
+<li><p>Compare PROJ/.gitproj with PROJ/.git/config (only list the diffs from all gitproj sections and the diffs that are in .gitproj and also in ~/.gitconfig [diff]</p>
+
+</li>
+<li><p>Compare PROJ/.gitignore with ~/.gitignore [diff]</p>
+
+</li>
+<li><p>Compare PROJ/.pre-commit with ~/.pre-commit [diff]</p>
+
+</li>
+<li><p>Compare PROJ/.git/hooks/pre-commit with PROJ/.pre-commit [diff]</p>
+
+</li>
+<li><p>Note disabled pre-commit checks [info]</p>
+
+</li>
+<li><p>prog-name != top dir name [warning]</p>
+
+</li>
+<li><p>gitproj.config.local-status - is TBD [error]</p>
+
+</li>
+<li><p>remote.origin.url - not defined (git-proj-init needs to be run) [error]</p>
+
+</li>
+<li><p>gitproj.config.remote-status - is TBD (git-proj-remote needs to be run) [error]</p>
+
+</li>
+<li><p>gitproj.config.remote-raw-origin - is TBD (git-proj-remote needs to be run) [warning]</p>
+
+</li>
+<li><p>warn if gitproj.config.remote.min-space is &lt; 2x existing space [warning]</p>
+
+</li>
+<li><p>if gitproj.config.remote-raw-origin, report if not found. (suggest mounting it or running git-proj-remote) [warning]</p>
+
+</li>
+</ul>
+
+<h2 id="Additional-Checks">Additional Checks</h2>
+
+<ul>
+
+<li><p>List symlinks with problems [error]</p>
+
+</li>
+<li><p>Check for big binary files, not in raw/ [warning]</p>
+
+</li>
+<li><p>Report on all symlinks in PROJ [info]</p>
+
+</li>
+</ul>
+
+<h3 id="Global-Action-Menus">Global Action Menus</h3>
+
+<ul>
+
+<li><p>Update missing vars in ~/.gitconfig from $gpDoc/config/gitconfig?</p>
+
+</li>
+<li><p>Force update of ALL gitproj sections from $gpDoc/config/gitconfig?</p>
+
+</li>
+<li><p>Force update of &quot;gitproj config&quot; section from $gpDoc/config/gitconfig?</p>
+
+</li>
+<li><p>Force update of &quot;gitproj hooks&quot; section from $gpDoc/config/gitconfig?</p>
+
+</li>
+<li><p>Update ~/.gitignore from $gpDoc/config/gitignore? (note this will result in a sorted list, with duplicates removed) (only adds missing from $gpDoc/config/.gitignore)</p>
+
+</li>
+<li><p>Replace ~/.pre-commit from $gpDoc/hooks/pre-commit?</p>
+
+</li>
+<li><p>Install/update git-flow and corresponding configs?</p>
+
+</li>
+</ul>
+
+<h2 id="Local-Action-Menus">Local Action Menus</h2>
+
+<ul>
+
+<li><p>Fix remote.origin.url</p>
+
+</li>
+<li><p>Change: gitproj.config.remote-raw-origin? (Best way: run git-proj-remote)</p>
+
+</li>
+<li><p>Force update of PROJ/.gitproj from --local (core, git-flow, and gitproj sections only)</p>
+
+</li>
+<li><p>Force update of --local from PROJ/.gitproj (core, git-flow, and gitproj sections only)</p>
+
+</li>
+<li><p>Update missing vars in PROJ/.gitproj and --local from ~/.gitconfig (gitproj sections only)</p>
+
+</li>
+<li><p>Force update of ALL vars in PROJ/.gitproj and --local from ~/.gitconfig (remotes are not changed) (gitproj sections only) (and vars in-common)</p>
+
+</li>
+<li><p>Force update of ALL gitproj sections in PROJ/.gitproj and --local from ~/.gitconfig (remotes are not changed)</p>
+
+</li>
+<li><p>Force update of &quot;gitproj config&quot; section in PROJ/.gitproj and --local from ~/.gitconfig (remotes are not changed)</p>
+
+</li>
+<li><p>Force update of &quot;gitproj hooks&quot; section in PROJ/.gitproj and --local from ~/.gitconfig</p>
+
+</li>
+<li><p>Update ~/.gitignore from ~/.gitignore? (note this will result in a sorted list, with duplicates removed) (only adds missing from ~/.gitignore)</p>
+
+</li>
+<li><p>Replace PROJ/.pre-commit and PROJ/.git/hooks/pre-commit from ~/.pre-commit</p>
+
+</li>
+</ul>
+
+<h2 id="Additional-Action-Menus">Additional Action Menus</h2>
+
+<ul>
+
+<li><p>Set remote-min-space (1) set manually, 2) set from ~/.gitconfig, 3) default)</p>
+
+</li>
+<li><p>Set the max size for commits of binary files. (1) set manually, 2) set from ~/.gitconfig, 3) default)</p>
+
+</li>
+</ul>
+
+<a href="#_podtop_"><h1 id="OPTIONS">OPTIONS</h1></a>
+
+<dl>
+
+<dt id="common-options"><b>[common-options]</b></dt>
+<dd>
+
+<pre><code> -h
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
+
+<p>Run &quot;git proj -h&quot; for details. Or &quot;man git-proj&quot; for help with all the sub-commands.</p>
+
+</dd>
+</dl>
+
+<a href="#_podtop_"><h1 id="RETURN-VALUE">RETURN VALUE</h1></a>
+
+<pre><code> 0 - if OK
+ !0 - if errors</code></pre>
+
+<a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
+
+<pre><code> git proj
+ git proj remote
+ git proj clone
+ git proj push
+ git proj pull
+ git proj set
+ git proj status
+ git proj add   TODO
+ git proj config
+ git flow</code></pre>
+
+<a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
+
+<p>TurtleEngr</p>
+
+<a href="#_podtop_"><h1 id="HISTORY">HISTORY</h1></a>
+
+<p>GPLv3 Copyright 2021 by TurtleEngr</p>
+
+<a href="#_podtop_"><h1 id="POD-ERRORS">POD ERRORS</h1></a>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-208">Around line 208:</dt>
+<dd>
+
+<p>You forgot a &#39;=back&#39; before &#39;=head2&#39;</p>
+
+</dd>
+</dl>
 
 
 </body>
