@@ -20,6 +20,7 @@ fUsage()
 
 =head1 SYNOPSIS
 
+    NOT IMPLEMENTED YET
     git proj config [common-options]
 
 =head1 DESCRIPTION
