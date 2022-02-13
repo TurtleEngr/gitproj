@@ -76,7 +76,8 @@ mCmdList = \
 	.ran-test-push.tmp \
 	.ran-test-pull.tmp \
 	.ran-test-clone.tmp \
-	.ran-test-status.tmp
+	.ran-test-status.tmp \
+	.ran-test-config.tmp
 
 # The might be implemented later
 mCmdToDo = \
@@ -224,6 +225,8 @@ test-push.sh : test-env_TestDestDirAfterRemoteReport.tgz test-env_ProjLocalDefin
 test-remore.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
 
 test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
+
+test-config.sh : test-env_ProjLocalDefined.tgz test-env_Home2AfterPush.tgz
 
 # --------------------
 test-env.tgz :

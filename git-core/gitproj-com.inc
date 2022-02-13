@@ -845,7 +845,7 @@ fComStackTrace()
 fComSelect()
 {
     PS3="$1"
-    local pDirList="$2"
+    local pList="$2"
     local pHelp="$3"
     local tSrc=${BASH_SOURCE##*/}
     local tResponse
@@ -854,7 +854,7 @@ fComSelect()
     export gResponse
 
     # Loop until a valid selection, or QUIT or OTHER
-    select tResponse in QUIT HELP $pDirList; do
+    select tResponse in QUIT HELP $pList; do
         let --tMaxLoop
         if [ $tMaxLoop -le 0 ]; then
             fLog -f -p warning -m "Too many responses." -l $tSrc:$LINENO
