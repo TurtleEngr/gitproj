@@ -939,6 +939,90 @@ EOF
 } # fComYesNo
 
 # ------------------
+fComStub()
+{
+    echo "Running fStub $*"
+} # fComStub
+
+# ------------------
+fComMenu()
+{
+    local pTitle=$1
+    local pMenu=$2
+    local pActn=$3
+    local tSrc=${BASH_SOURCE##*/}
+    local tSize
+    local tPrompt
+    local tItem
+    local tSelect
+    declare -a tMenu
+
+    tSize=$(eval echo "\${#${pMenu}[@]}")
+    let --tSize
+    tPrompt="$(eval echo $(echo \${${pMenu}[0]}))"
+    while true; do
+        echo
+        echo "Menu: $pTitle"
+        for ((tItem = 1 ; tItem <= tSize ; tItem++)); do
+            echo -e "  $tItem)\n      $(eval echo $(echo \${${pMenu}[$tItem]}))" | fmt -t
+            tMenu[$tItem]="$(eval echo $(echo \${${pMenu}[$tItem]}))"
+        done
+        echo -n "$tPrompt "
+        read tSelect
+        if [ -z "$tSelect" ]; then
+            continue
+        fi
+	echo "$tSelect" | grep -q '[0-9]'
+	if [ $? -ne 0 ]; then
+	    continue
+	fi
+	if [[ $tSelect -lt 1 || $tSelect -gt $tSize ]]; then
+	    continue
+	fi
+        tActn="$(eval echo $(echo \${${pActn}[$tSelect]}))"
+        if [ -z "$tActn" ]; then
+ 	    fError -i -n -m "Problem with action" -l $tSrc:$LINENO
+            continue
+        fi
+        tA=${tActn%% *}
+        tF=${tActn#* }
+        case $tA in
+            help)
+                fComMenuHelp $pActn
+                ;;
+            func)
+                eval $tF
+                ;;
+            menu)
+                fComMenu "${tMenu[$tSelect]}" $tF
+                ;;
+            back)
+                return
+                ;;
+            *)
+                echo
+ 	        fError -i -n -m "Problem with action" -l $tSrc:$LINENO
+                ;;
+        esac
+        continue
+    done
+}
+
+# ------------------
+fComMenuHelp()
+{
+    local pHelp=$1
+    local tSrc=${BASH_SOURCE##*/}
+    local tHelp
+
+    tHelp="$(eval echo $(echo \${${pHelp}[0]}))"
+    echo
+    echo '--------------------'
+    echo -e "$tHelp" | fmt
+    echo '--------------------'
+} # fComHelp
+
+# ------------------
 fComFmtLog()
 {
     local pLevel=$1
