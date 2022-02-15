@@ -939,28 +939,31 @@ EOF
 } # fComYesNo
 
 # ------------------
-fComStub()
-{
-    echo "Running fStub $*"
-} # fComStub
-
-# ------------------
 fComMenu()
 {
     local pTitle=$1
     local pMenu=$2
     local pActn=$3
     local tSrc=${BASH_SOURCE##*/}
-    local tSize
-    local tPrompt
-    local tItem
-    local tSelect
     declare -a tMenu
+    local tMaxLoop=$gpMaxLoop
+    local tActn
+    local tSize
+    local tItem
+    local tPrompt
+    local tSelect
+    local tCmd
+    local tFun
 
     tSize=$(eval echo "\${#${pMenu}[@]}")
     let --tSize
     tPrompt="$(eval echo $(echo \${${pMenu}[0]}))"
     while true; do
+        let --tMaxLoop
+        if [ $tMaxLoop -le 0 ]; then
+            fLog -f -p warning -m "Too many responses." -l $tSrc:$LINENO
+            break
+        fi
         echo
         echo "Menu: $pTitle"
         for ((tItem = 1 ; tItem <= tSize ; tItem++)); do
@@ -969,6 +972,7 @@ fComMenu()
         done
         echo -n "$tPrompt "
         read tSelect
+	echo "$tSelect"
         if [ -z "$tSelect" ]; then
             continue
         fi
@@ -984,20 +988,23 @@ fComMenu()
  	    fError -i -n -m "Problem with action" -l $tSrc:$LINENO
             continue
         fi
-        tA=${tActn%% *}
-        tF=${tActn#* }
-        case $tA in
+        tCmd=${tActn%% *}
+        tFun=${tActn#* }
+        case $tCmd in
             help)
                 fComMenuHelp $pActn
+		tMaxLoop=$gpMaxLoop
                 ;;
             func)
-                eval $tF
+                eval $tFun
+		tMaxLoop=$gpMaxLoop
                 ;;
             menu)
-                fComMenu "${tMenu[$tSelect]}" $tF
-                ;;
+                fComMenu "${tMenu[$tSelect]}" $tFun
+		tMaxLoop=$gpMaxLoop
+		;;
             back)
-                return
+                return 0
                 ;;
             *)
                 echo
@@ -1006,7 +1013,42 @@ fComMenu()
         esac
         continue
     done
-}
+    return 1
+    cat <<EOF >/dev/null
+=internal-pod
+
+=internal-for html <hr/>
+
+=internal-head3 fComMenu pTitle pMenu pActn
+
+pTitle - string
+
+pMenu - the name of an array of menu items
+
+    pMenu[0] - prompt for the menu
+    pMenu[1..Size] - text is piped through "fmt -t" (after prepending "N) ")
+
+pActn - the name of an array of actions for a menu item with the same index.
+
+    pActn[0] - help text for the menu
+    pActn[1..Size]  - first word is a command, followed by options
+
+pActn Commands
+
+    help - send the pActn array name to fComMenuHelp, it will output pActn[0].
+    func pFuncName [pArgs...]- call pFuncName passing pArgs.
+    menu pMenu pActn - call fComMenu passing the specified array names
+                       The pTitle will be the text from the calling menu item.
+    back - return to the calling menu (or the first calling program).
+
+Examples
+
+    See testComMenu() in test/test-com.sh
+    See fConfigMenu() in git-core/gitproj-config.inc
+
+=internal-cut
+EOF
+} # fComMenu
 
 # ------------------
 fComMenuHelp()
@@ -1020,7 +1062,7 @@ fComMenuHelp()
     echo '--------------------'
     echo -e "$tHelp" | fmt
     echo '--------------------'
-} # fComHelp
+} # fComMenuHelp
 
 # ------------------
 fComFmtLog()

@@ -696,6 +696,130 @@ testComYesNo()
 } # testComYesNo
 
 # --------------------------------
+testComMenu()
+{
+    local tResult
+    declare -ag gMainMenu
+    declare -ag gMainActn
+    declare -ag gSub1Menu
+    declare -ag gSub1Actn
+    declare -ag gSub2Menu
+    declare -ag gSub2Actn
+    declare -ag gSub3Menu
+    declare -ag gSub3Actn
+
+    # --------------------
+    # Setup
+
+    # ----------
+    gMainMenu[0]="Select a MainMenu Item: "
+    gMainActn[0]="Main help text"
+    gMainMenu[1]="Quit"
+    gMainActn[1]="func exit 0"
+    gMainMenu[2]="Help"
+    gMainActn[2]="help"
+    gMainMenu[3]="Main Item m1"
+    gMainActn[3]="func echo hello world"
+    gMainMenu[4]="Main Item m2"
+    gMainActn[4]="func echo another world"
+    gMainMenu[5]="Sub Menu1"
+    gMainActn[5]="menu gSub1Menu gSub1Actn"
+    gMainMenu[6]="Sub Menu2"
+    gMainActn[6]="menu gSub2Menu gSub2Actn"
+
+    # ----------
+    gSub1Menu[0]="Select a Sub1Menu Item: "
+    gSub1Actn[0]="Sub1 help text"
+    gSub1Menu[1]="Back1"
+    gSub1Actn[1]="back"
+    gSub1Menu[2]="Help1"
+    gSub1Actn[2]="help"
+    gSub1Menu[3]="Quit1"
+    gSub1Actn[3]="func exit 1"
+    gSub1Menu[4]="Sub1 Item1-4"
+    gSub1Actn[4]="func echo item1-4 selected"
+    gSub1Menu[5]="Sub1 Menu2-5"
+    gSub1Actn[5]="menu gSub2Menu gSub2Actn"
+    gSub1Menu[6]="Sub1 Menu3-6"
+    gSub1Actn[6]="menu gSub3Menu gSub3Actn"
+
+    # ----------
+    gSub2Menu[0]="Select a Sub2Menu Item: "
+    gSub2Actn[0]="Sub2 help text"
+    gSub2Menu[1]="Back"
+    gSub2Actn[1]="back"
+    gSub2Menu[2]="Help"
+    gSub2Actn[2]="help"
+    gSub2Menu[3]="Quit"
+    gSub2Actn[3]="func exit 2"
+    gSub2Menu[4]="Sub2 Menu3-4"
+    gSub2Actn[4]="menu gSub3Menu gSub3Actn"
+    gSub2Menu[5]="Sub2 Item1-5"
+    gSub2Actn[5]="func echo item1-5 selected"
+
+    # ----------
+    gSub3Menu[0]="Select a Sub3Menu Item: "
+    gSub3Actn[0]="Sub3 help"
+    gSub3Menu[1]="Back3"
+    gSub3Actn[1]="back"
+    gSub3Menu[2]="Help3"
+    gSub3Actn[2]="help"
+    gSub3Menu[3]="Quit3"
+    gSub3Actn[3]="func exit 3"
+    gSub3Menu[4]="Sub3 Item1-4"
+    gSub3Actn[4]="func echo item1-4 selected"
+    gSub3Menu[5]="Sub3 Menu1-5"
+    gSub3Actn[5]="menu gSub1Menu gSub1Actn"
+    gSub3Menu[6]="Sub3 Main Menu"
+    gSub3Actn[6]="menu gMainMenu gMainActn"
+
+    # --------------------
+    gpMaxLoop=4
+
+    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n1'))
+    assertTrue "$LINENO $?" $?
+    assertContains "$LINENO" "$tResult" "Select a MainMenu Item"
+    assertContains "$LINENO" "$tResult" "Main Item m1"
+    assertContains "$LINENO" "$tResult" "Main Item m2"
+    assertContains "$LINENO" "$tResult" "Sub Menu2"
+    assertContains "$LINENO" "$tResult" "hello world"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
+
+    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n5\n3'))
+    assertTrue "$LINENO $?" "[ $? -eq 1 ]"
+    assertContains "$LINENO" "$tResult" "hello world"
+    assertContains "$LINENO" "$tResult" "Select a Sub1Menu Item: "
+    assertContains "$LINENO" "$tResult" "Sub Menu1"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
+
+    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n5\n2\n1\n4\n1'))
+    assertContains "$LINENO" "$tResult" "hello world"
+    assertContains "$LINENO" "$tResult" "Select a Sub1Menu Item: "
+    assertContains "$LINENO" "$tResult" "Sub Menu1"
+    assertContains "$LINENO" "$tResult" "Sub1 help text"
+    assertContains "$LINENO" "$tResult" "another world"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
+
+    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n6\n5\n4\n5\n2\n3'))
+    assertTrue "$LINENO $?" "[ $? -eq 1 ]"
+    assertContains "$LINENO" "$tResult" "Menu: Sub Menu2"
+    assertContains "$LINENO" "$tResult" "Sub2 Item1-5"
+    assertContains "$LINENO" "$tResult" "Menu: Sub2 Menu3-4"
+    assertContains "$LINENO" "$tResult" "Select a Sub3Menu Item: "
+    assertContains "$LINENO" "$tResult" "Menu: Sub3 Menu1-5"
+    assertContains "$LINENO" "$tResult" "Sub1 help text"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
+
+    return 0
+} # testComMenu
+
+# --------------------------------
+testComMenuHelp()
+{
+    return 0
+} # testComMenuHelp
+
+# --------------------------------
 testComSetConfigGlobal()
 {
     local tResult
