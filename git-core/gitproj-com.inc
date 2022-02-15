@@ -319,9 +319,9 @@ fComConfigCopy()
         fi
         if [ $pForce -ne 0 ]; then
             git config -f $pDest $tVar $tValue
-	    if [ $? -ne 0 ]; then
-	        fError -i -n "git config error" -l $tSrc:$LINENO
-	    fi
+            if [ $? -ne 0 ]; then
+                fError -i -n "git config error" -l $tSrc:$LINENO
+            fi
             continue
         fi
         if git config -f $pDest --get $tVar >/dev/null 2>&1; then
@@ -329,8 +329,8 @@ fComConfigCopy()
         fi
         git config -f $pDest $tVar "$tValue"
         if [ $? -ne 0 ]; then
-	    fError -i -n "git config error" -l $tSrc:$LINENO
-	fi
+            fError -i -n "git config error" -l $tSrc:$LINENO
+        fi
     done
     if diff -q $pDest $pDest.bak; then
         rm -f $pDest.bak
@@ -972,20 +972,20 @@ fComMenu()
         done
         echo -n "$tPrompt "
         read tSelect
-	echo "$tSelect"
+        echo "$tSelect"
         if [ -z "$tSelect" ]; then
             continue
         fi
-	echo "$tSelect" | grep -q '[0-9]'
-	if [ $? -ne 0 ]; then
-	    continue
-	fi
-	if [[ $tSelect -lt 1 || $tSelect -gt $tSize ]]; then
-	    continue
-	fi
+        echo "$tSelect" | grep -q '[0-9]'
+        if [ $? -ne 0 ]; then
+            continue
+        fi
+        if [[ $tSelect -lt 1 || $tSelect -gt $tSize ]]; then
+            continue
+        fi
         tActn="$(eval echo $(echo \${${pActn}[$tSelect]}))"
         if [ -z "$tActn" ]; then
- 	    fError -i -n -m "Problem with action" -l $tSrc:$LINENO
+            fError -i -n -m "Problem with action" -l $tSrc:$LINENO
             continue
         fi
         tCmd=${tActn%% *}
@@ -993,22 +993,22 @@ fComMenu()
         case $tCmd in
             help)
                 fComMenuHelp $pActn
-		tMaxLoop=$gpMaxLoop
+                tMaxLoop=$gpMaxLoop
                 ;;
             func)
                 eval $tFun
-		tMaxLoop=$gpMaxLoop
+                tMaxLoop=$gpMaxLoop
                 ;;
             menu)
                 fComMenu "${tMenu[$tSelect]}" $tFun
-		tMaxLoop=$gpMaxLoop
-		;;
+                tMaxLoop=$gpMaxLoop
+                ;;
             back)
                 return 0
                 ;;
             *)
                 echo
- 	        fError -i -n -m "Problem with action" -l $tSrc:$LINENO
+                fError -i -n -m "Problem with action" -l $tSrc:$LINENO
                 ;;
         esac
         continue
@@ -1057,10 +1057,10 @@ fComMenuHelp()
     local tSrc=${BASH_SOURCE##*/}
     local tHelp
 
-    tHelp="$(eval echo $(echo \${${pHelp}[0]}))"
+    tHelp="$(eval echo -e "$(echo -e "\${${pHelp}[0]}")")"
     echo
     echo '--------------------'
-    echo -e "$tHelp" | fmt
+    echo -e "$tHelp" | fmt -t | grep .
     echo '--------------------'
 } # fComMenuHelp
 
@@ -2119,7 +2119,7 @@ fComMkPreCommit()
     if [ ! -f .pre-commit ]; then
         fLog -f -p notice -m "Update $gpProjName/.pre-commit from ~/.pre-commit and add to git" -l $tSrc:$LINENO
         cp -p $tVerbose ~/.pre-commit .
-	git add .pre-commit
+        git add .pre-commit
     fi
 
     if [ ! -f .git/hooks/pre-commit ]; then
