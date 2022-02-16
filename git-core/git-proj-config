@@ -200,8 +200,6 @@ Note: this will result in a sorted list, with duplicates removed.
 
 =item (7) Install/update git-flow and corresponding configs
 
-=item * TBD? Install/update git-flow and corresponding configs
-
 =back
 
 =head2 Local and Project Level Action Menus
@@ -216,7 +214,11 @@ Note: this will result in a sorted list, with duplicates removed.
 
 =item (7) UserIgnore -> ProjectIgnore (only adds missing items)
 
+=back
+
 =head2 pre-commit Hook Action Menus
+
+=over 4
 
 =item (4) ProductPreCommit -> UserPreCommit
 
@@ -231,6 +233,8 @@ Note: this will result in a sorted list, with duplicates removed.
 =item (9) --local -> --global (Force update of 'gitproj.hooks' section)
 
 =item (10) LocalPreCommit -> UserPreCommit
+
+=back
 
 =head2 Other Action Menus
 

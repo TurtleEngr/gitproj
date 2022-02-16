@@ -118,42 +118,41 @@ in --global \[diff\]
 
 ### Global User Level Action Menus
 
-- 1) Back
-- 2) Help
-- 3) Quit
-- 4) ProductConfig -> --global Only update missing vars
-- 5) ProductConfig -> --global Force update of all gitproj vars
-- 6) ProductIgnore -> UserIgnore (only add missing)
+- (1) Back
+- (2) Help
+- (3) Quit
+- (4) ProductConfig -> --global Only update missing vars
+- (5) ProductConfig -> --global Force update of all gitproj vars
+- (6) ProductIgnore -> UserIgnore (only add missing)
 
     Note: this will result in a sorted list, with duplicates removed.
 
-- 7) Install/update git-flow and corresponding configs
-- \* TBD? Install/update git-flow and corresponding configs
+- (7) Install/update git-flow and corresponding configs
 
 ## Local and Project Level Action Menus
 
-- 4) --local -> ProjectConfig (Force core, git-flow, and gitproj.config sections only)
-- 5) --global -> ProjectConfig and --local (Update missing vars in gitproj.config sections only)
-- 6) --global -> ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)
-- 7) UserIgnore -> ProjectIgnore (only adds missing items)
+- (4) --local -> ProjectConfig (Force core, git-flow, and gitproj.config sections only)
+- (5) --global -> ProjectConfig and --local (Update missing vars in gitproj.config sections only)
+- (6) --global -> ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)
+- (7) UserIgnore -> ProjectIgnore (only adds missing items)
 
 ## pre-commit Hook Action Menus
 
-- 4) ProductPreCommit -> UserPreCommit
-- 5) --global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)
-- 6) UserPreCommit -> ProjectPreCommit and LocalPreCommit
-- 7) --local -> ProjectConfig (Force update of 'gitproj.hooks' section)
-- 8) LocalPreCommit -> ProjectPreCommit
-- 9) --local -> --global (Force update of 'gitproj.hooks' section)
-- 10) LocalPreCommit -> UserPreCommit
+- (4) ProductPreCommit -> UserPreCommit
+- (5) --global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)
+- (6) UserPreCommit -> ProjectPreCommit and LocalPreCommit
+- (7) --local -> ProjectConfig (Force update of 'gitproj.hooks' section)
+- (8) LocalPreCommit -> ProjectPreCommit
+- (9) --local -> --global (Force update of 'gitproj.hooks' section)
+- (10) LocalPreCommit -> UserPreCommit
 
 ## Other Action Menus
 
-- 4) Set remote-min-space
+- (4) Set remote-min-space
 
     Fix options: 1) set manually, 2) set from --global, 3) default
 
-- 5) Set the max size for commits of binary files.
+- (5) Set the max size for commits of binary files.
 
     Fix options: 1) set manually, 2) set from ~/.gitconfig, 3) default
 
@@ -233,23 +232,3 @@ TurtleEngr
 # HISTORY
 
 GPLv3 Copyright 2021 by TurtleEngr
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 203:
-
-    Expected text after =item, not a bullet
-
-- Around line 219:
-
-    You forgot a '=back' before '=head2'
-
-- Around line 221:
-
-    '=item' outside of any '=over'
-
-- Around line 235:
-
-    You forgot a '=back' before '=head2'
