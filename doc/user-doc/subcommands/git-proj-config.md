@@ -34,21 +34,21 @@ missing, while other actions can "force" changes.
 
 ## Main Menu Options
 
-- 1) Quit
+- (1) Quit
 
     In lower levels #1 will change to "Back" and Quit will move to #3.
 
-- 2) Help
+- (2) Help
 
     This will be available in all menus.
 
-- 3) Run all health checks, only report problems. \[errors\]
-- 4) Run all health checks, only report differences \[diff, warnings\]
-- 5) Run all health checks, report status \[info\]
-- 6) Select Global User Level Actions
-- 7) Select Local Project Level Actions (offered only if in a PROJ)
-- 8) Select pre-commit Hook Actions (offered only if in a PROJ)
-- 9) Select Other Actions
+- (3) Run all health checks, only report problems. \[errors\]
+- (4) Run all health checks, only report differences \[diff, warnings\]
+- (5) Run all health checks, report status \[info\]
+- (6) Select Global User Level Actions
+- (7) Select Local Project Level Actions (offered only if in a PROJ)
+- (8) Select pre-commit Hook Actions (offered only if in a PROJ)
+- (9) Select Other Actions
 
 ## Global User Level Checks
 

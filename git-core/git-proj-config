@@ -50,27 +50,27 @@ missing, while other actions can "force" changes.
 
 =over 4
 
-=item 1) Quit
+=item (1) Quit
 
 In lower levels #1 will change to "Back" and Quit will move to #3.
 
-=item 2) Help
+=item (2) Help
 
 This will be available in all menus.
 
-=item 3) Run all health checks, only report problems. [errors]
+=item (3) Run all health checks, only report problems. [errors]
 
-=item 4) Run all health checks, only report differences [diff, warnings]
+=item (4) Run all health checks, only report differences [diff, warnings]
 
-=item 5) Run all health checks, report status [info]
+=item (5) Run all health checks, report status [info]
 
-=item 6) Select Global User Level Actions
+=item (6) Select Global User Level Actions
 
-=item 7) Select Local Project Level Actions (offered only if in a PROJ)
+=item (7) Select Local Project Level Actions (offered only if in a PROJ)
 
-=item 8) Select pre-commit Hook Actions (offered only if in a PROJ)
+=item (8) Select pre-commit Hook Actions (offered only if in a PROJ)
 
-=item 9) Select Other Actions
+=item (9) Select Other Actions
 
 =back
 
