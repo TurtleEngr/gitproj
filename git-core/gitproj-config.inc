@@ -129,11 +129,11 @@ fConfigMenu()
   o ProductConfig is short for $gpDoc/config/gitconfig\n\n
   o ProductPreCommit is short for $gpDoc/hooks/pre-commit\n\n
   o --global is short for ~/.gitconfig\n\n
-  o UserPreCommit is short for ~/.git/hooks/pre-commit\n\n
+  o UserPreCommit is short for ~/.pre-commit\n\n
   o --local is short for $gpProjName/.git/config\n\n
   o ProjectConfig is short for $gpProjName/.gitproj\n\n
   o ProjectPreCommit is short for $gpProjName/.pre-commit\n\n
-  o GitPreCommit is short for $gpProjName/.git/hooks/pre-commit\n\n
+  o LocalPreCommit is short for $gpProjName/.git/hooks/pre-commit\n\n
 "
     gHookMenu[1]="Back"
     gHookActn[1]="back"
@@ -148,19 +148,19 @@ fConfigMenu()
     gHookMenu[5]="--global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)"
     gHookActn[5]="func echo fGlobal2Proj hooks"
 
-    gHookMenu[6]="UserPreCommit -> ProjectPreCommit and GitPreCommit"
+    gHookMenu[6]="UserPreCommit -> ProjectPreCommit and LocalPreCommit"
     gHookActn[6]="func echo fUser2Proj pre-commit"
 
     gHookMenu[7]="--local -> ProjectConfig (Force update of 'gitproj.hooks' section)"
     gHookActn[7]="func echo fLocal2Proj hooks force"
 
-    gHookMenu[8]="GitPreCommit -> ProjectPreCommit"
+    gHookMenu[8]="LocalPreCommit -> ProjectPreCommit"
     gHookActn[8]="func echo fGit2Project pre-commit"
 
     gHookMenu[9]="--local -> --global (Force update of 'gitproj.hooks' section) "
     gHookActn[9]="func echo fLocal2Global force"
 
-    gHookMenu[10]="GitPreCommit -> UserPreCommit"
+    gHookMenu[10]="LocalPreCommit -> UserPreCommit"
     gHookActn[10]="func echo fGit2UserHook"
 
     # ----------
