@@ -309,11 +309,11 @@ sub-commands.
 
 =over 4
 
-=item * ProjectConfig is short for $gpProjName/.gitproj
+=item * ProjectConfig is short for ProjName/.gitproj
 
-=item * ProjectIgnore is short for $gpProjName/.gitignore
+=item * ProjectIgnore is short for ProjName/.gitignore
 
-=item * ProjectPreCommit is short for $gpProjName/.pre-commit
+=item * ProjectPreCommit is short for ProjName/.pre-commit
 
 =back
 
@@ -321,9 +321,9 @@ sub-commands.
 
 =over 4
 
-=item * --local is short for $gpProjName/.git/config
+=item * --local is short for ProjName/.git/config
 
-=item * LocalPreCommit is short for $gpProjName/.git/hooks/pre-commit
+=item * LocalPreCommit is short for ProjName/.git/hooks/pre-commit
 
 =back
 

@@ -191,14 +191,14 @@ in --global \[diff\]
 
 ## Project Level
 
-- ProjectConfig is short for $gpProjName/.gitproj
-- ProjectIgnore is short for $gpProjName/.gitignore
-- ProjectPreCommit is short for $gpProjName/.pre-commit
+- ProjectConfig is short for ProjName/.gitproj
+- ProjectIgnore is short for ProjName/.gitignore
+- ProjectPreCommit is short for ProjName/.pre-commit
 
 ## Local Level
 
-- --local is short for $gpProjName/.git/config
-- LocalPreCommit is short for $gpProjName/.git/hooks/pre-commit
+- --local is short for ProjName/.git/config
+- LocalPreCommit is short for ProjName/.git/hooks/pre-commit
 
 # SEE ALSO
 
