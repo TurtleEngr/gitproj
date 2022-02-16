@@ -50,27 +50,27 @@ missing, while other actions can "force" changes.
 
 =over 4
 
-=item * 1) Quit
+=item 1) Quit
 
 In lower levels #1 will change to "Back" and Quit will move to #3.
 
-=item * 2) Help
+=item 2) Help
 
 This will be available in all menus.
 
-=item * 3) Run all health checks, only report problems. [errors]
+=item 3) Run all health checks, only report problems. [errors]
 
-=item * 4) Run all health checks, only report differences [diff, warnings]
+=item 4) Run all health checks, only report differences [diff, warnings]
 
-=item * 5) Run all health checks, report status [info]
+=item 5) Run all health checks, report status [info]
 
-=item * 6) Select Global User Level Actions
+=item 6) Select Global User Level Actions
 
-=item * 7) Select Local Project Level Actions (offered only if in a PROJ)
+=item 7) Select Local Project Level Actions (offered only if in a PROJ)
 
-=item * 8) Select pre-commit Hook Actions (offered only if in a PROJ)
+=item 8) Select pre-commit Hook Actions (offered only if in a PROJ)
 
-=item * 9) Select Other Actions
+=item 9) Select Other Actions
 
 =back
 
@@ -184,21 +184,21 @@ Suggest mounting it or running "git proj remote".
 
 =over 4
 
-=item * 1) Back
+=item 1) Back
 
-=item * 2) Help
+=item 2) Help
 
-=item * 3) Quit
+=item 3) Quit
 
-=item * 4) ProductConfig -> --global Only update missing vars
+=item 4) ProductConfig -> --global Only update missing vars
 
-=item * 5) ProductConfig -> --global Force update of all gitproj vars
+=item 5) ProductConfig -> --global Force update of all gitproj vars
 
-=item * 6) ProductIgnore -> UserIgnore (only add missing)
+=item 6) ProductIgnore -> UserIgnore (only add missing)
 
 Note: this will result in a sorted list, with duplicates removed.
 
-=item * 7) Install/update git-flow and corresponding configs
+=item 7) Install/update git-flow and corresponding configs
 
 =item * TBD? Install/update git-flow and corresponding configs
 
@@ -208,39 +208,39 @@ Note: this will result in a sorted list, with duplicates removed.
 
 =over 4
 
-=item * 4) --local -> ProjectConfig (Force core, git-flow, and gitproj.config sections only)
+=item 4) --local -> ProjectConfig (Force core, git-flow, and gitproj.config sections only)
 
-=item * 5) --global -> ProjectConfig and --local (Update missing vars in gitproj.config sections only)
+=item 5) --global -> ProjectConfig and --local (Update missing vars in gitproj.config sections only)
 
-=item * 6) --global -> ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)
+=item 6) --global -> ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)
 
-=item * 7) UserIgnore -> ProjectIgnore (only adds missing items)
+=item 7) UserIgnore -> ProjectIgnore (only adds missing items)
 
 =head2 pre-commit Hook Action Menus
 
-=item * 4) ProductPreCommit -> UserPreCommit
+=item 4) ProductPreCommit -> UserPreCommit
 
-=item * 5) --global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)
+=item 5) --global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)
 
-=item * 6) UserPreCommit -> ProjectPreCommit and LocalPreCommit
+=item 6) UserPreCommit -> ProjectPreCommit and LocalPreCommit
 
-=item * 7) --local -> ProjectConfig (Force update of 'gitproj.hooks' section)
+=item 7) --local -> ProjectConfig (Force update of 'gitproj.hooks' section)
 
-=item * 8) LocalPreCommit -> ProjectPreCommit
+=item 8) LocalPreCommit -> ProjectPreCommit
 
-=item * 9) --local -> --global (Force update of 'gitproj.hooks' section)
+=item 9) --local -> --global (Force update of 'gitproj.hooks' section)
 
-=item * 10) LocalPreCommit -> UserPreCommit
+=item 10) LocalPreCommit -> UserPreCommit
 
 =head2 Other Action Menus
 
 =over 4
 
-=item * 4) Set remote-min-space
+=item 4) Set remote-min-space
 
 Fix options: 1) set manually, 2) set from --global, 3) default
 
-=item * 5) Set the max size for commits of binary files.
+=item 5) Set the max size for commits of binary files.
 
 Fix options: 1) set manually, 2) set from ~/.gitconfig, 3) default
 

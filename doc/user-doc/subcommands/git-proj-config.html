@@ -67,40 +67,49 @@
 
 <h2 id="Main-Menu-Options">Main Menu Options</h2>
 
-<ul>
+<dl>
 
-<li><p>1) Quit</p>
+<dt id="Quit">1) Quit</dt>
+<dd>
 
 <p>In lower levels #1 will change to &quot;Back&quot; and Quit will move to #3.</p>
 
-</li>
-<li><p>2) Help</p>
+</dd>
+<dt id="Help">2) Help</dt>
+<dd>
 
 <p>This will be available in all menus.</p>
 
-</li>
-<li><p>3) Run all health checks, only report problems. [errors]</p>
+</dd>
+<dt id="Run-all-health-checks-only-report-problems.-errors">3) Run all health checks, only report problems. [errors]</dt>
+<dd>
 
-</li>
-<li><p>4) Run all health checks, only report differences [diff, warnings]</p>
+</dd>
+<dt id="Run-all-health-checks-only-report-differences-diff-warnings">4) Run all health checks, only report differences [diff, warnings]</dt>
+<dd>
 
-</li>
-<li><p>5) Run all health checks, report status [info]</p>
+</dd>
+<dt id="Run-all-health-checks-report-status-info">5) Run all health checks, report status [info]</dt>
+<dd>
 
-</li>
-<li><p>6) Select Global User Level Actions</p>
+</dd>
+<dt id="Select-Global-User-Level-Actions">6) Select Global User Level Actions</dt>
+<dd>
 
-</li>
-<li><p>7) Select Local Project Level Actions (offered only if in a PROJ)</p>
+</dd>
+<dt id="Select-Local-Project-Level-Actions-offered-only-if-in-a-PROJ">7) Select Local Project Level Actions (offered only if in a PROJ)</dt>
+<dd>
 
-</li>
-<li><p>8) Select pre-commit Hook Actions (offered only if in a PROJ)</p>
+</dd>
+<dt id="Select-pre-commit-Hook-Actions-offered-only-if-in-a-PROJ">8) Select pre-commit Hook Actions (offered only if in a PROJ)</dt>
+<dd>
 
-</li>
-<li><p>9) Select Other Actions</p>
+</dd>
+<dt id="Select-Other-Actions">9) Select Other Actions</dt>
+<dd>
 
-</li>
-</ul>
+</dd>
+</dl>
 
 <h2 id="Global-User-Level-Checks">Global User Level Checks</h2>
 
@@ -232,96 +241,117 @@
 
 <h3 id="Global-User-Level-Action-Menus">Global User Level Action Menus</h3>
 
-<ul>
+<dl>
 
-<li><p>1) Back</p>
+<dt id="Back">1) Back</dt>
+<dd>
 
-</li>
-<li><p>2) Help</p>
+</dd>
+<dt id="Help1">2) Help</dt>
+<dd>
 
-</li>
-<li><p>3) Quit</p>
+</dd>
+<dt id="Quit1">3) Quit</dt>
+<dd>
 
-</li>
-<li><p>4) ProductConfig -&gt; --global Only update missing vars</p>
+</dd>
+<dt id="ProductConfig-----global-Only-update-missing-vars">4) ProductConfig -&gt; --global Only update missing vars</dt>
+<dd>
 
-</li>
-<li><p>5) ProductConfig -&gt; --global Force update of all gitproj vars</p>
+</dd>
+<dt id="ProductConfig-----global-Force-update-of-all-gitproj-vars">5) ProductConfig -&gt; --global Force update of all gitproj vars</dt>
+<dd>
 
-</li>
-<li><p>6) ProductIgnore -&gt; UserIgnore (only add missing)</p>
+</dd>
+<dt id="ProductIgnore---UserIgnore-only-add-missing">6) ProductIgnore -&gt; UserIgnore (only add missing)</dt>
+<dd>
 
 <p>Note: this will result in a sorted list, with duplicates removed.</p>
 
-</li>
-<li><p>7) Install/update git-flow and corresponding configs</p>
+</dd>
+<dt id="Install-update-git-flow-and-corresponding-configs">7) Install/update git-flow and corresponding configs</dt>
+<dd>
 
-</li>
-<li><p>TBD? Install/update git-flow and corresponding configs</p>
+</dd>
+<dt id="TBD-Install-update-git-flow-and-corresponding-configs">* TBD? Install/update git-flow and corresponding configs</dt>
+<dd>
 
-</li>
-</ul>
+</dd>
+</dl>
 
 <h2 id="Local-and-Project-Level-Action-Menus">Local and Project Level Action Menus</h2>
 
-<ul>
+<dl>
 
-<li><p>4) --local -&gt; ProjectConfig (Force core, git-flow, and gitproj.config sections only)</p>
+<dt id="local---ProjectConfig-Force-core-git-flow-and-gitproj.config-sections-only">4) --local -&gt; ProjectConfig (Force core, git-flow, and gitproj.config sections only)</dt>
+<dd>
 
-</li>
-<li><p>5) --global -&gt; ProjectConfig and --local (Update missing vars in gitproj.config sections only)</p>
+</dd>
+<dt id="global---ProjectConfig-and---local-Update-missing-vars-in-gitproj.config-sections-only">5) --global -&gt; ProjectConfig and --local (Update missing vars in gitproj.config sections only)</dt>
+<dd>
 
-</li>
-<li><p>6) --global -&gt; ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)</p>
+</dd>
+<dt id="global---ProjectConfig-and---local-Force-update-of-all-gitproj.config-section-vars-in-common-remotes-are-not-changed">6) --global -&gt; ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)</dt>
+<dd>
 
-</li>
-<li><p>7) UserIgnore -&gt; ProjectIgnore (only adds missing items)</p>
+</dd>
+<dt id="UserIgnore---ProjectIgnore-only-adds-missing-items">7) UserIgnore -&gt; ProjectIgnore (only adds missing items)</dt>
+<dd>
 
-</li>
-</ul>
+</dd>
+</dl>
 
 <h2 id="pre-commit-Hook-Action-Menus">pre-commit Hook Action Menus</h2>
 
-<ul>
+<dl>
 
-<li><p>4) ProductPreCommit -&gt; UserPreCommit</p>
+<dt id="ProductPreCommit---UserPreCommit">4) ProductPreCommit -&gt; UserPreCommit</dt>
+<dd>
 
-</li>
-<li><p>5) --global -&gt; ProjectConfig and --local (Force update of &#39;gitproj hooks&#39; section)</p>
+</dd>
+<dt id="global---ProjectConfig-and---local-Force-update-of-gitproj-hooks-section">5) --global -&gt; ProjectConfig and --local (Force update of &#39;gitproj hooks&#39; section)</dt>
+<dd>
 
-</li>
-<li><p>6) UserPreCommit -&gt; ProjectPreCommit and LocalPreCommit</p>
+</dd>
+<dt id="UserPreCommit---ProjectPreCommit-and-LocalPreCommit">6) UserPreCommit -&gt; ProjectPreCommit and LocalPreCommit</dt>
+<dd>
 
-</li>
-<li><p>7) --local -&gt; ProjectConfig (Force update of &#39;gitproj.hooks&#39; section)</p>
+</dd>
+<dt id="local---ProjectConfig-Force-update-of-gitproj.hooks-section">7) --local -&gt; ProjectConfig (Force update of &#39;gitproj.hooks&#39; section)</dt>
+<dd>
 
-</li>
-<li><p>8) LocalPreCommit -&gt; ProjectPreCommit</p>
+</dd>
+<dt id="LocalPreCommit---ProjectPreCommit">8) LocalPreCommit -&gt; ProjectPreCommit</dt>
+<dd>
 
-</li>
-<li><p>9) --local -&gt; --global (Force update of &#39;gitproj.hooks&#39; section)</p>
+</dd>
+<dt id="local-----global-Force-update-of-gitproj.hooks-section">9) --local -&gt; --global (Force update of &#39;gitproj.hooks&#39; section)</dt>
+<dd>
 
-</li>
-<li><p>10) LocalPreCommit -&gt; UserPreCommit</p>
+</dd>
+<dt id="LocalPreCommit---UserPreCommit">10) LocalPreCommit -&gt; UserPreCommit</dt>
+<dd>
 
-</li>
-</ul>
+</dd>
+</dl>
 
 <h2 id="Other-Action-Menus">Other Action Menus</h2>
 
-<ul>
+<dl>
 
-<li><p>4) Set remote-min-space</p>
+<dt id="Set-remote-min-space">4) Set remote-min-space</dt>
+<dd>
 
 <p>Fix options: 1) set manually, 2) set from --global, 3) default</p>
 
-</li>
-<li><p>5) Set the max size for commits of binary files.</p>
+</dd>
+<dt id="Set-the-max-size-for-commits-of-binary-files">5) Set the max size for commits of binary files.</dt>
+<dd>
 
 <p>Fix options: 1) set manually, 2) set from ~/.gitconfig, 3) default</p>
 
-</li>
-</ul>
+</dd>
+</dl>
 
 <a href="#_podtop_"><h1 id="OPTIONS">OPTIONS</h1></a>
 
@@ -439,6 +469,12 @@
 
 <dl>
 
+<dt id="Around-line-203">Around line 203:</dt>
+<dd>
+
+<p>Expected text after =item, not a bullet</p>
+
+</dd>
 <dt id="Around-line-219">Around line 219:</dt>
 <dd>
 

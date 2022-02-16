@@ -128,7 +128,7 @@ in --global \[diff\]
     Note: this will result in a sorted list, with duplicates removed.
 
 - 7) Install/update git-flow and corresponding configs
-- TBD? Install/update git-flow and corresponding configs
+- \* TBD? Install/update git-flow and corresponding configs
 
 ## Local and Project Level Action Menus
 
@@ -237,6 +237,10 @@ GPLv3 Copyright 2021 by TurtleEngr
 # POD ERRORS
 
 Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 203:
+
+    Expected text after =item, not a bullet
 
 - Around line 219:
 
