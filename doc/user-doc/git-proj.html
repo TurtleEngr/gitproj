@@ -83,6 +83,45 @@
     <li><a href="#SEE-ALSO6">SEE ALSO</a></li>
     <li><a href="#AUTHOR6">AUTHOR</a></li>
     <li><a href="#HISTORY6">HISTORY</a></li>
+    <li><a href="#NAME-git-proj-config">NAME git proj config</a></li>
+    <li><a href="#SYNOPSIS7">SYNOPSIS</a></li>
+    <li>
+      <a href="#DESCRIPTION7">DESCRIPTION</a>
+      <ul>
+        <li><a href="#Main-Menu-Options">Main Menu Options</a></li>
+        <li><a href="#Global-User-Level-Checks">Global User Level
+        Checks</a></li>
+        <li><a href="#Local-and-Project-Level-Checks">Local and Project Level
+        Checks</a></li>
+        <li>
+          <a href="#Additional-Checks">Additional Checks</a>
+          <ul>
+            <li><a href="#Global-User-Level-Action-Menus">Global User Level
+            Action Menus</a></li>
+          </ul>
+        </li>
+        <li><a href="#Local-and-Project-Level-Action-Menus">Local and Project
+        Level Action Menus</a></li>
+        <li><a href="#pre-commit-Hook-Action-Menus">pre-commit Hook Action
+        Menus</a></li>
+        <li><a href="#Other-Action-Menus">Other Action Menus</a></li>
+      </ul>
+    </li>
+    <li><a href="#OPTIONS7">OPTIONS</a></li>
+    <li><a href="#RETURN-VALUE7">RETURN VALUE</a></li>
+    <li>
+      <a href="#FILES1">FILES</a>
+      <ul>
+        <li><a href="#Product-Level">Product Level</a></li>
+        <li><a href="#User-Level">User Level</a></li>
+        <li><a href="#Project-Level">Project Level</a></li>
+        <li><a href="#Local-Level">Local Level</a></li>
+      </ul>
+    </li>
+    <li><a href="#SEE-ALSO7">SEE ALSO</a></li>
+    <li><a href="#NOTES">NOTES</a></li>
+    <li><a href="#AUTHOR7">AUTHOR</a></li>
+    <li><a href="#HISTORY7">HISTORY</a></li>
   </ul>
   <h1 id="NAME-git-proj">NAME git proj</h1>
   <p>This implements the "git proj" sub-command, for managing large binary
@@ -679,6 +718,355 @@
   <h1 id="AUTHOR6">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY6">HISTORY</h1>
+  <p>GPLv3 Copyright 2021 by TurtleEngr</p>
+  <hr />
+  <h1 id="NAME-git-proj-config">NAME git proj config</h1>
+  <h1 id="SYNOPSIS7">SYNOPSIS</h1>
+  <pre><code>    NOT IMPLEMENTED YET
+    git proj config [common-options]</code></pre>
+  <h1 id="DESCRIPTION7">DESCRIPTION</h1>
+  <p>This is text menu driven tool for checking and tuning up your git-proj
+  configurations. There are are 4 configuration"levels" to consider: Product,
+  User, Project, and Local. The standard git support configs at the User and
+  Local levels, and the usual --global and --local options can be used with
+  "git config" to get and set variables. Or you can edit the files directly.
+  See the FILES section for files listed by their levels.</p>
+  <p>The "git proj config" tool has two major sections: "Health Checks" and
+  "Actions".</p>
+  <p>The "problem" health check will report serious problems that should be
+  fixed (some fix-up help will be offered). The other health checks are
+  useful for finding areas that you might want to update. For example, in
+  your user level configs may have changed and you might notice some project
+  level configs are different. You can then run and "action" to make them
+  consistent.</p>
+  <p>The "actions" are used to copy config variables and files between the
+  different "levels". Some actions will only copy things that are missing,
+  while other actions can "force" changes.</p>
+  <h2 id="Main-Menu-Options">Main Menu Options</h2>
+  <dl>
+    <dt id="Quit">(1) Quit</dt>
+    <dd>
+      <p>In lower levels #1 will change to "Back" and Quit will move to
+      #3.</p>
+    </dd>
+    <dt id="Help">(2) Help</dt>
+    <dd>
+      <p>This will be available in all menus.</p>
+    </dd>
+    <dt id="Run-all-health-checks-only-report-problems.-errors">(3) Run all
+    health checks, only report problems. [errors]</dt>
+    <dd></dd>
+    <dt id="Run-all-health-checks-only-report-differences-diff-warnings">(4)
+    Run all health checks, only report differences [diff, warnings]</dt>
+    <dd></dd>
+    <dt id="Run-all-health-checks-report-status-info">(5) Run all health
+    checks, report status [info]</dt>
+    <dd></dd>
+    <dt id="Select-Global-User-Level-Actions">(6) Select Global User Level
+    Actions</dt>
+    <dd></dd>
+    <dt id="Select-Local-Project-Level-Actions-offered-only-if-in-a-PROJ">(7)
+    Select Local Project Level Actions (offered only if in a PROJ)</dt>
+    <dd></dd>
+    <dt id="Select-pre-commit-Hook-Actions-offered-only-if-in-a-PROJ">(8)
+    Select pre-commit Hook Actions (offered only if in a PROJ)</dt>
+    <dd></dd>
+    <dt id="Select-Other-Actions">(9) Select Other Actions</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Global-User-Level-Checks">Global User Level Checks</h2>
+  <p>These are done even if not in a git-proj managed workspace.</p>
+  <p>The Validate Checks, check ProductConfig and --global. If there is a
+  problem they can be fixed by: 1) manually setting, 2) select default, or 3)
+  if --global select from ProductConfig.</p>
+  <ul>
+    <li>
+      <p>Validate "facility" name [error]</p>
+    </li>
+    <li>
+      <p>Validate "bin" and "doc" locations [error]</p>
+    </li>
+    <li>
+      <p>Validate all bool vars are only true/false [error]</p>
+    </li>
+    <li>
+      <p>Validate all int vars only have numbers [error]</p>
+    </li>
+    <li>
+      <p>Compare --global with ProductConfig [diff]</p>
+    </li>
+    <li>
+      <p>Compare UserIgnore with ProductIgnore [diff]</p>
+    </li>
+    <li>
+      <p>Compare UserPreCommit with ProductPreCommit [diff]</p>
+    </li>
+    <li>
+      <p>if git-flow=true</p>
+      <ul>
+        <li>
+          <p>is git-flow installed? [warning]</p>
+        </li>
+        <li>
+          <p>are git-flow section vars defined in --global? [warning]</p>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <h2 id="Local-and-Project-Level-Checks">Local and Project Level Checks</h2>
+  <p>These are done if you are in a git-proj managed workspace.</p>
+  <p>The Validate Checks, check ProjectConfig and --local. If there is a
+  problem they can be fixed by: 1) manfully setting, 2) select from --global,
+  3) select default</p>
+  <ul>
+    <li>
+      <p>If defined, validate "facility" name [error]</p>
+    </li>
+    <li>
+      <p>If defined, validate "bin" and "doc" locations [error]</p>
+    </li>
+    <li>
+      <p>Validate all gitproj bool vars are only true/false [error]</p>
+    </li>
+    <li>
+      <p>Validate all gitproj int vars only have numbers [error]</p>
+    </li>
+    <li>
+      <p>Compare ProjectConfig with --global (only list the diffs from all
+      gitproj sections and the diffs that are in .gitproj and also in
+      --global [diff]</p>
+    </li>
+    <li>
+      <p>Compare ProjectConfig with --local (only list the diffs from all
+      gitproj sections and the diffs that are in ProjectConfig and also in
+      --global [diff]</p>
+    </li>
+    <li>
+      <p>Compare ProjectIgnore with UserIgnore [diff]</p>
+    </li>
+    <li>
+      <p>Compare ProjectPreCommit with UserPreCommit [diff]</p>
+    </li>
+    <li>
+      <p>Compare LocalPreCommit with ProjectPreCommit [diff]</p>
+    </li>
+    <li>
+      <p>Note the disabled pre-commit checks [info]</p>
+    </li>
+    <li>
+      <p>gitproj.config.proj-name != the git top dir name [warning]</p>
+    </li>
+    <li>
+      <p>gitproj.config.local-status - is TBD [error]</p>
+    </li>
+    <li>
+      <p>remote.origin.url - is not defined [warning]</p>
+      <p>"git proj init" needs to be run.</p>
+    </li>
+    <li>
+      <p>gitproj.config.remote-status - is TBD [error]</p>
+      <p>"git proj remote" needs to be run.</p>
+    </li>
+    <li>
+      <p>gitproj.config.remote-raw-origin - is TBD [warning]</p>
+      <p>"git proj remote" needs to be run.</p>
+    </li>
+    <li>
+      <p>warn if gitproj.config.remote.min-space is &lt; 2x existing space
+      [warning]</p>
+    </li>
+    <li>
+      <p>if gitproj.config.remote-raw-origin, report if not found.
+      [warning]</p>
+      <p>Suggest mounting it or running "git proj remote".</p>
+    </li>
+  </ul>
+  <h2 id="Additional-Checks">Additional Checks</h2>
+  <ul>
+    <li>
+      <p>List symlinks with problems [error]</p>
+    </li>
+    <li>
+      <p>Check for big binary files, not in raw/ [warning]</p>
+    </li>
+    <li>
+      <p>Report on all symlinks in PROJ [info]</p>
+    </li>
+  </ul>
+  <h3 id="Global-User-Level-Action-Menus">Global User Level Action Menus</h3>
+  <dl>
+    <dt id="Back">(1) Back</dt>
+    <dd></dd>
+    <dt id="Help1">(2) Help</dt>
+    <dd></dd>
+    <dt id="Quit1">(3) Quit</dt>
+    <dd></dd>
+    <dt id="ProductConfig-----global-Only-update-missing-vars">(4)
+    ProductConfig -&gt; --global Only update missing vars</dt>
+    <dd></dd>
+    <dt id="ProductConfig-----global-Force-update-of-all-gitproj-vars">(5)
+    ProductConfig -&gt; --global Force update of all gitproj vars</dt>
+    <dd></dd>
+    <dt id="ProductIgnore---UserIgnore-only-add-missing">(6) ProductIgnore
+    -&gt; UserIgnore (only add missing)</dt>
+    <dd>
+      <p>Note: this will result in a sorted list, with duplicates
+      removed.</p>
+    </dd>
+    <dt id="Install-update-git-flow-and-corresponding-configs">(7)
+    Install/update git-flow and corresponding configs</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Local-and-Project-Level-Action-Menus">Local and Project Level
+  Action Menus</h2>
+  <dl>
+    <dt id=
+    "local---ProjectConfig-Force-core-git-flow-and-gitproj.config-sections-only">
+    (4) --local -&gt; ProjectConfig (Force core, git-flow, and gitproj.config
+    sections only)</dt>
+    <dd></dd>
+    <dt id=
+    "global---ProjectConfig-and---local-Update-missing-vars-in-gitproj.config-sections-only">
+    (5) --global -&gt; ProjectConfig and --local (Update missing vars in
+    gitproj.config sections only)</dt>
+    <dd></dd>
+    <dt id=
+    "global---ProjectConfig-and---local-Force-update-of-all-gitproj.config-section-vars-in-common-remotes-are-not-changed">
+    (6) --global -&gt; ProjectConfig and --local (Force update of all
+    gitproj.config section, vars in-common) (remotes are not changed)</dt>
+    <dd></dd>
+    <dt id="UserIgnore---ProjectIgnore-only-adds-missing-items">(7)
+    UserIgnore -&gt; ProjectIgnore (only adds missing items)</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="pre-commit-Hook-Action-Menus">pre-commit Hook Action Menus</h2>
+  <dl>
+    <dt id="ProductPreCommit---UserPreCommit">(4) ProductPreCommit -&gt;
+    UserPreCommit</dt>
+    <dd></dd>
+    <dt id=
+    "global---ProjectConfig-and---local-Force-update-of-gitproj-hooks-section">
+    (5) --global -&gt; ProjectConfig and --local (Force update of 'gitproj
+    hooks' section)</dt>
+    <dd></dd>
+    <dt id="UserPreCommit---ProjectPreCommit-and-LocalPreCommit">(6)
+    UserPreCommit -&gt; ProjectPreCommit and LocalPreCommit</dt>
+    <dd></dd>
+    <dt id="local---ProjectConfig-Force-update-of-gitproj.hooks-section">(7)
+    --local -&gt; ProjectConfig (Force update of 'gitproj.hooks'
+    section)</dt>
+    <dd></dd>
+    <dt id="LocalPreCommit---ProjectPreCommit">(8) LocalPreCommit -&gt;
+    ProjectPreCommit</dt>
+    <dd></dd>
+    <dt id="local-----global-Force-update-of-gitproj.hooks-section">(9)
+    --local -&gt; --global (Force update of 'gitproj.hooks' section)</dt>
+    <dd></dd>
+    <dt id="LocalPreCommit---UserPreCommit">(10) LocalPreCommit -&gt;
+    UserPreCommit</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Other-Action-Menus">Other Action Menus</h2>
+  <dl>
+    <dt id="Set-remote-min-space">(4) Set remote-min-space</dt>
+    <dd>
+      <p>Fix options: 1) set manually, 2) set from --global, 3) default</p>
+    </dd>
+    <dt id="Set-the-max-size-for-commits-of-binary-files">(5) Set the max
+    size for commits of binary files.</dt>
+    <dd>
+      <p>Fix options: 1) set manually, 2) set from ~/.gitconfig, 3)
+      default</p>
+    </dd>
+  </dl>
+  <h1 id="OPTIONS7">OPTIONS</h1>
+  <dl>
+    <dt id="common-options7"><b>[common-options]</b></dt>
+    <dd>
+      <pre><code> -h
+ -H usage|text|html|md|man|int|int-html|int-md
+ -q, -v, -V N     (gpVerbose)
+ -x, -xx..., -X N (gpDebug)</code></pre>
+      <p>Run "git proj -h" for details. Or "man git-proj" for help with all
+      the sub-commands.</p>
+    </dd>
+  </dl>
+  <h1 id="RETURN-VALUE7">RETURN VALUE</h1>
+  <pre><code> 0 - if OK
+ !0 - if errors</code></pre>
+  <h1 id="FILES1">FILES</h1>
+  <h2 id="Product-Level">Product Level</h2>
+  <ul>
+    <li>
+      <p>ProductConfig is short for
+      /usr/share/doc/git-proj/config/gitconfig</p>
+    </li>
+    <li>
+      <p>ProductIgnore is short for
+      /usr/share/doc/git-proj/config/gitignore</p>
+    </li>
+    <li>
+      <p>ProductPreCommit is short for
+      /usr/share/doc/git-proj/hooks/pre-commit</p>
+    </li>
+  </ul>
+  <h2 id="User-Level">User Level</h2>
+  <ul>
+    <li>
+      <p>--global is short for ~/.gitconfig</p>
+    </li>
+    <li>
+      <p>UserIgnore is short for ~/.gitignore</p>
+    </li>
+    <li>
+      <p>UserPreCommit is short for ~/.pre-commit</p>
+      <p>(Note: this may change to: ~/.git/hooks/pre-commit)</p>
+    </li>
+  </ul>
+  <h2 id="Project-Level">Project Level</h2>
+  <ul>
+    <li>
+      <p>ProjectConfig is short for ProjName/.gitproj</p>
+    </li>
+    <li>
+      <p>ProjectIgnore is short for ProjName/.gitignore</p>
+    </li>
+    <li>
+      <p>ProjectPreCommit is short for ProjName/.pre-commit</p>
+    </li>
+  </ul>
+  <h2 id="Local-Level">Local Level</h2>
+  <ul>
+    <li>
+      <p>--local is short for ProjName/.git/config</p>
+    </li>
+    <li>
+      <p>LocalPreCommit is short for ProjName/.git/hooks/pre-commit</p>
+    </li>
+  </ul>
+  <h1 id="SEE-ALSO7">SEE ALSO</h1>
+  <pre><code> git proj
+ git proj remote
+ git proj clone
+ git proj push
+ git proj pull
+ git proj set
+ git proj status
+ git proj add   TODO
+ git proj config
+ git flow</code></pre>
+  <h1 id="NOTES">NOTES</h1>
+  <p>The checks and actions do not cover "all" of the configuration changes
+  that you might like. "git proj config" is just a helper tool to point out
+  problems and differences that might matter.</p>
+  <p>You are free to edit the files directly. Just make sure the bool and int
+  vars are syntactically OK. Also the Product level configs should probably
+  be left unchanged, so that git-proj updates will not overwrite your
+  changes. Put the changes you want to keep at the --global or Project
+  Levels.</p>
+  <h1 id="AUTHOR7">AUTHOR</h1>
+  <p>TurtleEngr</p>
+  <h1 id="HISTORY7">HISTORY</h1>
   <p>GPLv3 Copyright 2021 by TurtleEngr</p>
 </body>
 </html>

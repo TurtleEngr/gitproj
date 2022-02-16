@@ -222,15 +222,46 @@ stdin and it outputs to stdout.
 
 ### fComYesNo pPrompt
 
-If gpYesNo = "Yes", set gResponse to "y", and return 0.
+If gpYesNo = "y", set gResponse to "y", and return 0.
 
-If gpYesNo = "No", set gResponse to "n", and return 1.
+If gpYesNo = "n", set gResponse to "n", and return 1.
 
-If gpYesNo is not set, output the pPrompt, then "read" the response.
+If gpAuto is 0, output the pPrompt, then "read" the response.
 
-If the response begins with a "y", then that is the same as gpYesNo = "Yes"
+If the response begins with a "y", then that is the same as gpYesNo = "y"
 
-If the response is not a "y", then that is the same as gpYesNo = "No"
+If the response is not a "y", then that is the same as gpYesNo = "n"
+
+<div>
+    <hr/>
+</div>
+
+### fComMenu pTitle pMenu pActn
+
+pTitle - string
+
+pMenu - the name of an array of menu items
+
+    pMenu[0] - prompt for the menu
+    pMenu[1..Size] - text is piped through "fmt -t" (after prepending "N) ")
+
+pActn - the name of an array of actions for a menu item with the same index.
+
+    pActn[0] - help text for the menu
+    pActn[1..Size]  - first word is a command, followed by options
+
+pActn Commands
+
+    help - send the pActn array name to fComMenuHelp, it will output pActn[0].
+    func pFuncName [pArgs...]- call pFuncName passing pArgs.
+    menu pMenu pActn - call fComMenu passing the specified array names
+                       The pTitle will be the text from the calling menu item.
+    back - return to the calling menu (or the first calling program).
+
+Examples
+
+    See testComMenu() in test/test-com.sh
+    See fConfigMenu() in git-core/gitproj-config.inc
 
 <div>
     <hr/>

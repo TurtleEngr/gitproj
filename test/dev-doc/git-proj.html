@@ -47,6 +47,8 @@
             "#fComUsage--f-pFileList--s-pStyle--t-pTitle--i--a">fComUsage -f
             pFileList -s pStyle [-t pTitle] [-i] [-a]</a></li>
             <li><a href="#fComYesNo-pPrompt">fComYesNo pPrompt</a></li>
+            <li><a href="#fComMenu-pTitle-pMenu-pActn">fComMenu pTitle pMenu
+            pActn</a></li>
             <li><a href="#fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog
             pLevel "pMsg" pLine pErr</a></li>
             <li>
@@ -249,13 +251,31 @@
   </dl>
   <hr />
   <h3 id="fComYesNo-pPrompt">fComYesNo pPrompt</h3>
-  <p>If gpYesNo = "Yes", set gResponse to "y", and return 0.</p>
-  <p>If gpYesNo = "No", set gResponse to "n", and return 1.</p>
-  <p>If gpYesNo is not set, output the pPrompt, then "read" the response.</p>
+  <p>If gpYesNo = "y", set gResponse to "y", and return 0.</p>
+  <p>If gpYesNo = "n", set gResponse to "n", and return 1.</p>
+  <p>If gpAuto is 0, output the pPrompt, then "read" the response.</p>
   <p>If the response begins with a "y", then that is the same as gpYesNo =
-  "Yes"</p>
-  <p>If the response is not a "y", then that is the same as gpYesNo =
-  "No"</p>
+  "y"</p>
+  <p>If the response is not a "y", then that is the same as gpYesNo = "n"</p>
+  <hr />
+  <h3 id="fComMenu-pTitle-pMenu-pActn">fComMenu pTitle pMenu pActn</h3>
+  <p>pTitle - string</p>
+  <p>pMenu - the name of an array of menu items</p>
+  <pre><code>    pMenu[0] - prompt for the menu
+    pMenu[1..Size] - text is piped through "fmt -t" (after prepending "N) ")</code></pre>
+  <p>pActn - the name of an array of actions for a menu item with the same
+  index.</p>
+  <pre><code>    pActn[0] - help text for the menu
+    pActn[1..Size]  - first word is a command, followed by options</code></pre>
+  <p>pActn Commands</p>
+  <pre><code>    help - send the pActn array name to fComMenuHelp, it will output pActn[0].
+    func pFuncName [pArgs...]- call pFuncName passing pArgs.
+    menu pMenu pActn - call fComMenu passing the specified array names
+                       The pTitle will be the text from the calling menu item.
+    back - return to the calling menu (or the first calling program).</code></pre>
+  <p>Examples</p>
+  <pre><code>    See testComMenu() in test/test-com.sh
+    See fConfigMenu() in git-core/gitproj-config.inc</code></pre>
   <hr />
   <h3 id="fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog pLevel "pMsg" pLine
   pErr</h3>

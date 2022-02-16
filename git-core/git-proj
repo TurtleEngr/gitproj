@@ -17,10 +17,10 @@ fUsage()
         -f $gpBin/git-proj-push \
         -f $gpBin/git-proj-pull \
         -f $gpBin/git-proj-status \
+        -f $gpBin/git-proj-config \
         "
     tFileList="$(echo $tFileList)"
 
-    #-f $gpBin/git-proj-config \
     #-f $gpBin/git-proj-add \
     #-f $gpBin/git-proj-rm \
     #-f $gpBin/git-proj-check \
@@ -34,6 +34,7 @@ fUsage()
         -f $gpBin/gitproj-pull.inc \
         -f $gpBin/gitproj-push.inc \
         -f $gpBin/gitproj-status.inc \
+        -f $gpBin/gitproj-config.inc \
     "
     tIntFileList="$(echo $tIntFileList)"
 
