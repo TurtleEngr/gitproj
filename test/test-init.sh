@@ -579,7 +579,7 @@ testInitMoveBinaryFiles()
 } # testInitMoveBinaryFiles
 
 # --------------------------------
-testInitMkGitFlow()
+testComMkGitFlow()
 {
     local tResult
 
@@ -592,7 +592,7 @@ testInitMkGitFlow()
     gpAutoMove=true
     gpAuto=0
 
-    tResult=$(fInitMkGitFlow 2>&1)
+    tResult=$(fComMkGitFlow 2>&1)
     assertTrue $LINENO $?
     assertEquals $LINENO "main" "$(git config --get --global gitflow.branch.main)"
     assertEquals $LINENO "develop" "$(git config --get --global gitflow.branch.develop)"
@@ -603,7 +603,7 @@ testInitMkGitFlow()
     assertEquals $LINENO "support/" "$(git config --get --global gitflow.prefix.support)"
 
     return 0
-} # testInitMkGitFlow
+} # testComMkGitFlow
 
 # --------------------------------
 testInitMkGitDir()

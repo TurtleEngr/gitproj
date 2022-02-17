@@ -52,17 +52,18 @@ missing, while other actions can "force" changes.
 
 =item (1) Quit
 
-In lower levels #1 will change to "Back" and Quit will move to #3.
+In the lower level menus #1 will change to "Back" and "Quit" will move
+to #3.
 
 =item (2) Help
 
 This will be available in all menus.
 
-=item (3) Run all health checks, only report problems. [errors]
+=item (3) Run health checks that look for problems [errors]
 
-=item (4) Run all health checks, only report differences [diff, warnings]
+=item (4) Run health checks that look for differences [diff, warnings]
 
-=item (5) Run all health checks, report status [info]
+=item (5) Run all health checks and report their status [info]
 
 =item (6) Select Global User Level Actions
 

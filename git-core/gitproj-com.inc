@@ -1884,6 +1884,7 @@ fComSaveVar2Config()
     fi
 } # fComSaveVar2Config
 
+# --------------------
 fComCheckPkg()
 {
     local pPkg=$1
@@ -1895,6 +1896,39 @@ fComCheckPkg()
     fLog -p debug-2 -m "fComCheckPkg $pPkg $tStatus" -l $tSrc:$LINENO
     return $tStatus
 } # fComCheckPkg
+
+# --------------------
+fComMkGitFlow()
+{
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ "$gpGitFlow" = "false" ]; then
+        return 0
+    fi
+    if ! fComCheckPkg git-flow; then
+        echo
+        fLog -p warning -m "git-flow is not installed" -l $tSrc:$LINENO
+        gpGitFlow=false
+        fComSetConfig -g -k gitproj.config.git-flow -v false
+        return 1
+    fi
+    echo
+    fLog -p notice -m "git flow init" -l $tSrc:$LINENO
+    git flow init -d
+
+    # Define the default prefixes
+    fComSetConfig -g -k gitflow.branch.main -v main
+    fComSetConfig -g -k gitflow.branch.master -v main
+    fComSetConfig -g -k gitflow.branch.develop -v develop
+
+    fComSetConfig -g -k gitflow.prefix.feature -v feature/
+    fComSetConfig -g -k gitflow.prefix.bugfix -v bug/
+    fComSetConfig -g -k gitflow.prefix.release -v release/
+    fComSetConfig -g -k gitflow.prefix.hotfix -v hotfix/
+    fComSetConfig -g -k gitflow.prefix.support -v support/
+
+    return 0
+} # fComMkGitFlow
 
 # --------------------
 fComMustBeInGitRepo()

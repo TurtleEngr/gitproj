@@ -9,10 +9,205 @@ export gpBin gpCheckFileNames gpCheckForBigFiles \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
+
+# --------------------
+fCheckForErrors()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    echo "TBD fCheckForErrors()"
+} # fCheckForErrors()
+
+fCheckForWarnings()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    echo "TBD fCheckForWarnings()"
+} # fCheckForWarnings
+
+fCheckStatus()
+{
+    local tSrc=${BASH_SOURCE##*/}
+    echo "TBD fCheckStatus()"
+} # fCheckStatus
+
+# --------------------
+fConfigHealth()
+{
+    local pStatus=$1
+    local tSrc=${BASH_SOURCE##*/}
+
+    case $pStatus in
+        error)
+	    fCheckForErrors
+	    ;;
+	warning)
+	    fCheckForErrors
+	    fCheckForWarnings
+	    ;;
+	info)
+	    fCheckForErrors
+	    fCheckForWarnings
+	    fCheckStatus
+	    ;;
+	*)
+	    fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+	    ;;
+    esac
+
+    return 0
+} # fConfigHealth
+
+fConfigMergeIgnore()
+{
+    local pFrom=$1
+    local pTo=$2
+    local tSrc=${BASH_SOURCE##*/}
+
+    if [ ! -f $pFrom ]; then
+        fError -i -n -m "" -l $tSrc:$LINENO
+    fi
+    $gpDoc/config/gitignore ~/.gitignore
+    if [ ! -f $tTo ]; then
+        cp -v $pFrom $tTo
+	return 0
+    fi
+
+    cp -v --backup=t  $tTo $tTo.bak
+    cat $pFrom $pTo | grep -v '^#' | sort -u >t.tmp
+    mv t.tmp $pTo
+
+    return 0
+} # fConfigMergeIgnore
+
+fConfigProduct2User()
+{
+    local pStatus=$1
+    local tSrc=${BASH_SOURCE##*/}
+
+    case $pStatus in
+        missing)
+	    echo TBD fConfigProduct2User missing
+	    ;;
+        missing-hook)
+	    echo TBD fConfigProduct2User missing-hook
+	    ;;
+ 	force)
+	    echo TBD fConfigProduct2User force
+	    ;;
+ 	force-hook)
+	    echo TBD fConfigProduct2User force-hook
+	    ;;
+ 	ignore)
+	    fConfigMergeIgnore $gpDoc/config/gitignore ~/.gitignore
+	    ;;
+ 	pre-commit)
+	    cp -v --backup=t $gpDoc/hooks/pre-commit ~/.pre-commit
+	    ;;
+	*)
+	    fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+	    ;;
+    esac
+
+    return 0
+} # fConfigProduct2User
+
+fConfigUser2Project()
+{
+    local pStatus="$1"
+    local pDir="$2"
+    local tSrc=${BASH_SOURCE##*/}
+    local tTopDir="$($cGetTopDir 2>&1)"
+
+    case "${pDir:-error}" in
+        up)   : ;;
+	down) : ;;
+	*)
+	    fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
+	    ;;
+    esac
+
+    case $pStatus in
+        missing)
+	    echo TBD fConfigUser2Project missing $pDir
+	    ;;
+        missing-hook)
+	    echo TBD fConfigUser2Project missing-hook $pDir
+	    ;;
+ 	force)
+	    echo TBD fConfigUser2Project force $pDir
+	    ;;
+ 	force-hook)
+	    echo TBD fConfigUser2Project force-hook $pDir
+	    ;;
+ 	ignore)
+	    if [ "$pDir" = "down" ]; then
+	        fConfigMergeIgnore ~/.gitignore $tTopDir/.gitignore
+		return 0
+	    fi
+	    fConfigMergeIgnore $tTopDir/.gitignore ~/.gitignore
+	    ;;
+ 	pre-commit)
+	    if [ "$pDir" = "down" ]; then
+	        cp -v --backup=t ~/.pre-commit $tTopDir/.pre-commit
+		return 0
+	    fi
+	    cp -v --backup=t $tTopDir/.pre-commit ~/.pre-commit
+	    ;;
+	*)
+	    fError -i -n -m "Invalid option: pStatus=$pStatus" -l $tSrc$LINENO
+	    ;;
+    esac
+
+    return 0
+} # fConfigUser2Project
+
+fConfigProject2Local()
+{
+    local pStatus="$1"
+    local pDir="$2"
+    local tSrc=${BASH_SOURCE##*/}
+    local tTopDir="$($cGetTopDir 2>&1)"
+
+    case "${pDir:-error}" in
+        up)   : ;;
+	down) : ;;
+	*)
+	    fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
+	    ;;
+    esac
+
+    case $pStatus in
+        missing)
+	    echo TBD fConfigProject2Local missing $pDir
+	    ;;
+        missing-hook)
+	    echo TBD fConfigProject2Local missing-hook $pDir
+	    ;;
+ 	force)
+	    echo TBD fConfigProject2Local force $pDir
+	    ;;
+ 	force-hook)
+	    echo TBD fConfigProject2Local force-hook $pDir
+	    ;;
+ 	pre-commit)
+	    if [ "$pDir" = "down" ]; then
+	        cp -v --backup=t $tTopDir/.pre-commit $tTopDir/.git/hooks/pre-commit
+	        return 0
+	    fi
+	    cp -v --backup=t $tTopDir/.git/hooks/pre-commit $tTopDir/.pre-commit
+	    ;;
+	*)
+	    fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+	    ;;
+    esac
+
+    return 0
+} # fConfigProject2Local
+
 # --------------------
 fConfigMenu()
 {
     local tNext
+    local tSrc=${BASH_SOURCE##*/}
     declare -ag gMainMenu
     declare -ag gMainActn
     declare -ag gGlobalMenu
@@ -34,14 +229,14 @@ fConfigMenu()
     gMainMenu[2]="Help"
     gMainActn[2]="help"
 
-    gMainMenu[3]="Run all health checks, only report problems." #  [error]
-    gMainActn[3]="func echo fConfigHealth error"
+    gMainMenu[3]="Run health checks that look for problems." #  [error]
+    gMainActn[3]="func fConfigHealth error"
 
-    gMainMenu[4]="Run all health checks, only report differences" # [diff, warnings]
-    gMainActn[4]="func echo fConfigHealth warning"
+    gMainMenu[4]="Run health checks that look for differences." # [diff, warnings]
+    gMainActn[4]="func fConfigHealth warning"
 
-    gMainMenu[5]="Run all health checks, report status" # [info]
-    gMainActn[5]="func echo fConfigHealth info"
+    gMainMenu[5]="Run all health checks and report their status" # [info]
+    gMainActn[5]="func fConfigHealth info"
 
     gMainMenu[6]="Select Global User Level Actions"
     gMainActn[6]="menu gGlobalMenu gGlobalActn"
@@ -79,22 +274,20 @@ fConfigMenu()
     gGlobalActn[3]="func exit 0"
 
     gGlobalMenu[4]="ProductConfig -> --global Only update missing vars"
-    gGlobalActn[4]="func echo fProd2User missing"
+    gGlobalActn[4]="func fConfigProduct2User missing"
 
     gGlobalMenu[5]="ProductConfig -> --global Force update of all gitproj vars"
-    gGlobalActn[5]="func echo fProd2User all"
+    gGlobalActn[5]="func fConfigProduct2User force"
 
     gGlobalMenu[6]="ProductIgnore -> UserIgnore (only add missing)"
-    gGlobalActn[6]="func echo fProd2User ignore"
+    gGlobalActn[6]="func fConfigProduct2User ignore"
     # Note this will result in a sorted list, with duplicates removed.
     # cat $gpDoc/config/gitignore ~/.gitignore grep -v '#' | sort -fu
 
     gGlobalMenu[7]="Install/update git-flow and corresponding configs"
-    gGlobalActn[7]="func echo git-flow"
+    gGlobalActn[7]="func fComMkGitFlow"
 
     # ----------
-    #
-
     gLocalMenu[0]="Select an action by number: "
     gLocalActn[0]="\n These options help with adjustments between User and Project configs.\n\n
   o --global is short for ~/.gitconfig\n\n
@@ -143,7 +336,7 @@ fConfigMenu()
     gHookActn[3]="func exit 0"
 
     gHookMenu[4]="ProductPreCommit -> UserPreCommit"
-    gHookActn[4]="func echo fProd2User replace"
+    gHookActn[4]="func fConfigProduct2User pre-commit"
 
     gHookMenu[5]="--global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)"
     gHookActn[5]="func echo fGlobal2Proj hooks"
@@ -186,3 +379,6 @@ fConfigMenu()
 
     return 0
 } # fConfigMenu
+
+# ========================================
+fComPreProjSetGlobals
