@@ -15,18 +15,48 @@ fCheckForErrors()
 {
     local tSrc=${BASH_SOURCE##*/}
     echo "TBD fCheckForErrors()"
+
+    # Product
+
+    # User
+
+    # Project
+
+    # Local
+
+    return 0
 } # fCheckForErrors()
 
 fCheckForWarnings()
 {
     local tSrc=${BASH_SOURCE##*/}
     echo "TBD fCheckForWarnings()"
+
+    # Product
+
+    # User
+
+    # Project
+
+    # Local
+
+    return 0
 } # fCheckForWarnings
 
 fCheckStatus()
 {
     local tSrc=${BASH_SOURCE##*/}
     echo "TBD fCheckStatus()"
+
+    # Product
+
+    # User
+
+    # Project
+
+    # Local
+
+    return 0
 } # fCheckStatus
 
 # --------------------
@@ -37,20 +67,20 @@ fConfigHealth()
 
     case $pStatus in
         error)
-	    fCheckForErrors
-	    ;;
-	warning)
-	    fCheckForErrors
-	    fCheckForWarnings
-	    ;;
-	info)
-	    fCheckForErrors
-	    fCheckForWarnings
-	    fCheckStatus
-	    ;;
-	*)
-	    fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
-	    ;;
+            fCheckForErrors
+            ;;
+        warning)
+            fCheckForErrors
+            fCheckForWarnings
+            ;;
+        info)
+            fCheckForErrors
+            fCheckForWarnings
+            fCheckStatus
+            ;;
+        *)
+            fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+            ;;
     esac
 
     return 0
@@ -63,12 +93,11 @@ fConfigMergeIgnore()
     local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -f $pFrom ]; then
-        fError -i -n -m "" -l $tSrc:$LINENO
+        fError -i -n -m "Missing: $pFrom" -l $tSrc:$LINENO
     fi
-    $gpDoc/config/gitignore ~/.gitignore
     if [ ! -f $tTo ]; then
         cp -v $pFrom $tTo
-	return 0
+        return 0
     fi
 
     cp -v --backup=t  $tTo $tTo.bak
@@ -83,28 +112,41 @@ fConfigProduct2User()
     local pStatus=$1
     local tSrc=${BASH_SOURCE##*/}
 
+    local tAll='core\.|alias\.|gitflow\.|gitproj\.config\.'
+    local tGitProj='|gitproj\.config\.'
+    local tHook=='|gitproj\.hooks\.'
     case $pStatus in
+        missing-all)
+            # All core, alias, gitflow, gitproj.config
+            fComConfigCopy -s $gpDoc/config/gitconfig -d ~/.gitconfig \
+                           -i 'core\.|alias\.|gitflow\.|gitproj\.'
+            ;;
         missing)
-	    echo TBD fConfigProduct2User missing
-	    ;;
+            # All gitflow, gitproj.config
+            fComConfigCopy -s $gpDoc/config/gitconfig -f ~/.gitconfig \
+                           -i 'core\.|alias\.|gitflow\.|gitproj\.'
+            ;;
         missing-hook)
-	    echo TBD fConfigProduct2User missing-hook
-	    ;;
- 	force)
-	    echo TBD fConfigProduct2User force
-	    ;;
- 	force-hook)
-	    echo TBD fConfigProduct2User force-hook
-	    ;;
- 	ignore)
-	    fConfigMergeIgnore $gpDoc/config/gitignore ~/.gitignore
-	    ;;
- 	pre-commit)
-	    cp -v --backup=t $gpDoc/hooks/pre-commit ~/.pre-commit
-	    ;;
-	*)
-	    fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
-	    ;;
+            fComConfigCopy -s $gpDoc/config/gitconfig -f ~/.gitconfig \
+                           -i 'gitproj\.hooks'
+            ;;
+        force-all)
+            echo TBD fConfigProduct2User force
+            ;;
+        force-all)
+            ;;
+        force-hook)
+            echo TBD fConfigProduct2User force-hook
+            ;;
+        ignore)
+            fConfigMergeIgnore $gpDoc/config/gitignore ~/.gitignore
+            ;;
+        pre-commit)
+            cp -v --backup=t $gpDoc/hooks/pre-commit ~/.pre-commit
+            ;;
+        *)
+            fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+            ;;
     esac
 
     return 0
@@ -119,42 +161,42 @@ fConfigUser2Project()
 
     case "${pDir:-error}" in
         up)   : ;;
-	down) : ;;
-	*)
-	    fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
-	    ;;
+        down) : ;;
+        *)
+            fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
+            ;;
     esac
 
     case $pStatus in
         missing)
-	    echo TBD fConfigUser2Project missing $pDir
-	    ;;
+            echo TBD fConfigUser2Project missing $pDir
+            ;;
         missing-hook)
-	    echo TBD fConfigUser2Project missing-hook $pDir
-	    ;;
- 	force)
-	    echo TBD fConfigUser2Project force $pDir
-	    ;;
- 	force-hook)
-	    echo TBD fConfigUser2Project force-hook $pDir
-	    ;;
- 	ignore)
-	    if [ "$pDir" = "down" ]; then
-	        fConfigMergeIgnore ~/.gitignore $tTopDir/.gitignore
-		return 0
-	    fi
-	    fConfigMergeIgnore $tTopDir/.gitignore ~/.gitignore
-	    ;;
- 	pre-commit)
-	    if [ "$pDir" = "down" ]; then
-	        cp -v --backup=t ~/.pre-commit $tTopDir/.pre-commit
-		return 0
-	    fi
-	    cp -v --backup=t $tTopDir/.pre-commit ~/.pre-commit
-	    ;;
-	*)
-	    fError -i -n -m "Invalid option: pStatus=$pStatus" -l $tSrc$LINENO
-	    ;;
+            echo TBD fConfigUser2Project missing-hook $pDir
+            ;;
+        force)
+            echo TBD fConfigUser2Project force $pDir
+            ;;
+        force-hook)
+            echo TBD fConfigUser2Project force-hook $pDir
+            ;;
+        ignore)
+            if [ "$pDir" = "down" ]; then
+                fConfigMergeIgnore ~/.gitignore $tTopDir/.gitignore
+                return 0
+            fi
+            fConfigMergeIgnore $tTopDir/.gitignore ~/.gitignore
+            ;;
+        pre-commit)
+            if [ "$pDir" = "down" ]; then
+                cp -v --backup=t ~/.pre-commit $tTopDir/.pre-commit
+                return 0
+            fi
+            cp -v --backup=t $tTopDir/.pre-commit ~/.pre-commit
+            ;;
+        *)
+            fError -i -n -m "Invalid option: pStatus=$pStatus" -l $tSrc$LINENO
+            ;;
     esac
 
     return 0
@@ -169,35 +211,35 @@ fConfigProject2Local()
 
     case "${pDir:-error}" in
         up)   : ;;
-	down) : ;;
-	*)
-	    fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
-	    ;;
+        down) : ;;
+        *)
+            fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
+            ;;
     esac
 
     case $pStatus in
         missing)
-	    echo TBD fConfigProject2Local missing $pDir
-	    ;;
+            echo TBD fConfigProject2Local missing $pDir
+            ;;
         missing-hook)
-	    echo TBD fConfigProject2Local missing-hook $pDir
-	    ;;
- 	force)
-	    echo TBD fConfigProject2Local force $pDir
-	    ;;
- 	force-hook)
-	    echo TBD fConfigProject2Local force-hook $pDir
-	    ;;
- 	pre-commit)
-	    if [ "$pDir" = "down" ]; then
-	        cp -v --backup=t $tTopDir/.pre-commit $tTopDir/.git/hooks/pre-commit
-	        return 0
-	    fi
-	    cp -v --backup=t $tTopDir/.git/hooks/pre-commit $tTopDir/.pre-commit
-	    ;;
-	*)
-	    fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
-	    ;;
+            echo TBD fConfigProject2Local missing-hook $pDir
+            ;;
+        force)
+            echo TBD fConfigProject2Local force $pDir
+            ;;
+        force-hook)
+            echo TBD fConfigProject2Local force-hook $pDir
+            ;;
+        pre-commit)
+            if [ "$pDir" = "down" ]; then
+                cp -v --backup=t $tTopDir/.pre-commit $tTopDir/.git/hooks/pre-commit
+                return 0
+            fi
+            cp -v --backup=t $tTopDir/.git/hooks/pre-commit $tTopDir/.pre-commit
+            ;;
+        *)
+            fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+            ;;
     esac
 
     return 0
@@ -382,3 +424,73 @@ fConfigMenu()
 
 # ========================================
 fComPreProjSetGlobals
+return
+
+# Notes for refactor:
+cat <<EOF
+gTypeMenu
+Update configs or files
+1) Back
+2) Help
+3) Quit
+4) Copy all config: core, alias, git-flow, gitproj.config
+        menu 'Copy all' gConfMenu gConfActn
+5) Copy some config: git-flow, gitproj.config
+        menu 'Copy some' gConfMenu gConfActn
+6) Only copy: gitproj.config
+        menu 'Only copy gitproj' gConfMenu gConfActn
+7) Only copy: gitproj.hooks
+        menu 'Only copy hooks' gConfMenu gConfActn
+8) Copy gitignore
+        menu 'Copy gitignore' gIgnoreMenu gIgnorActn
+9) Copy pre-commit
+        menu 'Copy pre-commit' gConfMenu gConfActn
+Select the configs or file to be moved:
+
+gConfigMenu
+3, 4, 5, 6, 8
+1) Back
+2) Help
+3) Quit
+4) Product -> User
+        menu "$pTitle; Product -> User" gForceMenu gForceActn
+5) User -> Project
+6) Project -> Local
+7) Local -> Project
+8) Project -> User
+Select the from/to:
+
+gIgnoreMenu
+7
+1) Back
+2) Help
+3) Quit
+4) Product -> User
+        menu "$pTitle; Product -> User" gYesNoMenu gYesNoActn
+5) User -> Project
+6) Project -> User
+Select the from -> to direction:
+
+gForceMenu
+3, 4, 5, 6
+1) Back
+2) Help
+3) Quit
+4) Only copy missing
+        "menu $pTitle; Only Missing" gYesNoMenu gYesNoActn
+5) Force copy
+        menu "$pTitle; Force" gYesNoMenu gYesNoActn
+Select the "force" option:
+
+gYesNo
+$pTitle
+1) Back (use this to go back and select other options)
+        return
+2) Help
+        help
+3) Quit
+        exit
+4) Yes, continue
+        "func fConfigExecAction $pTitle"
+Is the above action correct?
+EOF
