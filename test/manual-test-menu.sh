@@ -160,6 +160,25 @@ configuration settings that you have defined at the global level."
     return 0
 } # fConfigMenu
 
+fConfigExecAction()
+{
+    echo "In fConfigExecAction: $*"
+
+#  Example 1:
+#    Update configs or files;
+#    Copy all config:
+#    core, alias, git-flow, gitproj.config;
+#    Product -> User;
+#    Only copy missing
+
+#  Example 2:
+#    Update configs or files;
+#    Copy gitignore;
+#    User -> Project
+
+    exit 0
+} # fConfigExecAction
+
 fConfigMenu2()
 {
     declare -ag gTypeMenu
@@ -274,12 +293,11 @@ fConfigMenu2()
     gYesNoMenu[3]="Quit"
     gYesNoActn[3]="func exit 1"
     gYesNoMenu[4]="Yes, continue"
-    gYesNoActn[4]="func echo fConfigExecAction \$gMenuTitle"
+    gYesNoActn[4]="func fConfigExecAction \$gMenuTitle"
 
-    fComMenu "$gMenuTitle" gTypeMenu gTypeActn
+    (fComMenu "$gMenuTitle" gTypeMenu gTypeActn)
     return $?
 } # fConfigMenu2
-
 
 export gpProjName=george
 export gpDoc=/usr/share/doc/git-proj/

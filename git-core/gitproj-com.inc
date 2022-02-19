@@ -967,7 +967,10 @@ fComMenu()
         fi
     	gMenuTitle=$pTitle
         echo
-        echo "Current selections: $pTitle" | fmt -t
+        echo "Current selections:"
+	IFS=';'
+	printf '\t%s\n' $pTitle
+	IFS=' '
         for ((tItem = 1 ; tItem <= tSize ; tItem++)); do
             echo -e "  $tItem)\n      $(eval echo $(echo \${${pMenu}[$tItem]}))" | fmt -t
             tMenu[$tItem]="$(eval echo $(echo \${${pMenu}[$tItem]}))"
@@ -1002,7 +1005,7 @@ fComMenu()
                 tMaxLoop=$gpMaxLoop
                 ;;
             menu)
-                fComMenu "${pTitle}; ${tMenu[$tSelect]}" ${tFun}
+                fComMenu "${pTitle};${tMenu[$tSelect]}" ${tFun}
                 tMaxLoop=$gpMaxLoop
                 ;;
             back)
