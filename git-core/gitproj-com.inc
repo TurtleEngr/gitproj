@@ -945,6 +945,7 @@ fComMenu()
     local pMenu=$2
     local pActn=$3
     local tSrc=${BASH_SOURCE##*/}
+    declare -g gMenuTitle
     declare -a tMenu
     local tMaxLoop=$gpMaxLoop
     local tActn
@@ -964,8 +965,9 @@ fComMenu()
             fLog -f -p warning -m "Too many responses." -l $tSrc:$LINENO
             break
         fi
+    	gMenuTitle=$pTitle
         echo
-        echo "Menu: $pTitle"
+        echo "Current selections: $pTitle" | fmt -t
         for ((tItem = 1 ; tItem <= tSize ; tItem++)); do
             echo -e "  $tItem)\n      $(eval echo $(echo \${${pMenu}[$tItem]}))" | fmt -t
             tMenu[$tItem]="$(eval echo $(echo \${${pMenu}[$tItem]}))"
@@ -1000,7 +1002,7 @@ fComMenu()
                 tMaxLoop=$gpMaxLoop
                 ;;
             menu)
-                fComMenu "${tMenu[$tSelect]}" $tFun
+                fComMenu "${pTitle}; ${tMenu[$tSelect]}" ${tFun}
                 tMaxLoop=$gpMaxLoop
                 ;;
             back)
