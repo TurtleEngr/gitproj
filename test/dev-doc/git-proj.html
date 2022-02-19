@@ -19,19 +19,6 @@
           <a href="#Common-Script-Functions">Common Script Functions</a>
           <ul>
             <li>
-              <a href="#try-catch-functions">try/catch functions</a>
-              <ul>
-                <li><a href="#tcTry">tcTry</a></li>
-                <li><a href="#tcSaveEnv">tcSaveEnv</a></li>
-                <li><a href="#tcReturn">tcReturn</a></li>
-                <li><a href="#tcThrow">tcThrow</a></li>
-                <li><a href="#tcCatch">tcCatch</a></li>
-                <li><a href="#tcThrowErrors">tcThrowErrors</a></li>
-                <li><a href="#tcIgnoreErrors">tcIgnoreErrors</a></li>
-                <li><a href="#Sample-Use">Sample Use</a></li>
-              </ul>
-            </li>
-            <li>
               <a href="#fComConfigCopy">fComConfigCopy</a>
               <ul>
                 <li><a href="#Synopsis">Synopsis</a></li>
@@ -87,114 +74,6 @@
   Documentation</h1>
   <hr />
   <h2 id="Common-Script-Functions">Common Script Functions</h2>
-  <h3 id="try-catch-functions">try/catch functions</h3>
-  <p><b>NOTE the env. var. part does not reliably work. So don't use the "tc"
-  functions until they are fixed.</b></p>
-  <p>These functions were inspired by:
-  https://gist.github.com/e7d/e43e6586c1c2ecb67ae2</p>
-  <p>Changes: This version doesn't save the previous state of "set -e".
-  Exported env. var. changes in the subshell are saved, so they can be
-  restored when the subshell is done.</p>
-  <h4 id="tcTry">tcTry</h4>
-  <p>Call this just before the required subshell section.</p>
-  <h4 id="tcSaveEnv">tcSaveEnv</h4>
-  <p>Call this when env changes must not be lost. This is called by the other
-  related commands.</p>
-  <h4 id="tcReturn">tcReturn</h4>
-  <p>Call this at end of the tcTry subshell. Calls tcSaveEnv.</p>
-  <h4 id="tcThrow">tcThrow</h4>
-  <p>Call this to throw error (1..255) to tcCatch Calls tcSaveEnv.</p>
-  <h4 id="tcCatch">tcCatch</h4>
-  <p>Save throw or cmd errors, and restore any env. var. changes in the
-  subshell. If a command exits before a tcSaveEnv call, env. var. changes
-  will be lost. Calls tcSaveEnv.</p>
-  <h4 id="tcThrowErrors">tcThrowErrors</h4>
-  <p>Now, if a cmd returns non-zero, exit the try subshell. Calls
-  tcSaveEnv.</p>
-  <h4 id="tcIgnoreErrors">tcIgnoreErrors</h4>
-  <p>Now, if a cmd returns non-zero, execution will continue. Calls
-  tcSaveEnv.</p>
-  <h4 id="Sample-Use">Sample Use</h4>
-  <pre><code>    #!/bin/bash
-    . try_catch.sh
-
-    export cFatal=100
-    export cWarn=101
-    export cmd1 cmd2 foo1 foo2 foo3
-
-    fCmd1()
-    {
-        tcMsg="fCmd1 error"
-        if [ $((RANDOM % 3)) = 1 ]; then
-            rm /x/y/zz/y
-        fi
-        echo cmd1="fCmd1 ran OK"
-    }
-
-    fCmd2()
-    {
-        tcMsg="fCmd2 error"
-        if [ $((RANDOM % 4)) = 1 ]; then
-            rm /x/y/zz/y
-        fi
-        if [ $((RANDOM % 4)) = 1 ]; then
-          tcThrow 42 "fCmd2 threw this"
-        fi
-        echo cmd2="fCmd2 ran OK"
-    }
-
-    fTestIt()
-    {
-        tcMessage="Default message for exits"
-        tcTry
-        (
-            # This is an error, but execution will continue
-            rm /x/y/zz/y
-
-            tcThrowErrors
-            # Commands will now go to tcCatch if non-zero return
-
-            if [ $((RANDOM % 3)) = 1 ]; then
-                tcThrow $cFatal "Throw message. Line=$LINENO"
-            fi
-            export foo1="this will not be set if tcThrow is run"
-            tcSaveEnv
-
-            if [ $((RANDOM % 3)) = 1 ]; then
-                rm /x/y/zz/y
-            fi
-            export foo2="this is set because 'rm' was not run", and tcSaveEnv ran
-            tcSaveEnv
-
-            fCmd1
-            fCmd2
-
-            # This will fail after it is created, second run, if no throws
-            mkdir foo-bar
-            export foo3="This not be set on second run"
-
-            tcReturn
-        )
-        tcCatch || {
-            case $tcErr in
-                $cFatal)
-                    echo "Caught: Throw happened. $tcMsg"
-                    ;;
-                $cWarn)
-                    echo "Caught: Warning. $tcMsg"
-                    ;;
-                *)  echo "Caught: Unknown exit: $tcErr. $tcMsg" ;;
-            esac
-        }
-        echo
-        echo foo1=$foo1
-        echo foo2=$foo2
-        echo foo3=$foo3
-        echo cmd1=$cmd1
-        echo cmd2=$cmd1
-    } # fTestIt
-
-    fTestIt</code></pre>
   <hr />
   <h3 id="fComConfigCopy">fComConfigCopy</h3>
   <h4 id="Synopsis">Synopsis</h4>
