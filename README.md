@@ -80,6 +80,10 @@ Then the
 [Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/tutorial/create_a_git-proj_repo.md)
 tutorial shows how to get started with the git-proj commands.
 
+For a full understanding of all the configuration variable and their
+"levels", see
+[gitproj Configuration Documentation](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/config.md).
+
 # Installing
 
 ## System requirements:

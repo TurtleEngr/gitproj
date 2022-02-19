@@ -36,15 +36,16 @@ missing, while other actions can "force" changes.
 
 - (1) Quit
 
-    In lower levels #1 will change to "Back" and Quit will move to #3.
+    In the lower level menus #1 will change to "Back" and "Quit" will move
+    to #3.
 
 - (2) Help
 
     This will be available in all menus.
 
-- (3) Run all health checks, only report problems. \[errors\]
-- (4) Run all health checks, only report differences \[diff, warnings\]
-- (5) Run all health checks, report status \[info\]
+- (3) Run health checks that look for problems \[errors\]
+- (4) Run health checks that look for differences \[diff, warnings\]
+- (5) Run all health checks and report their status \[info\]
 - (6) Select Global User Level Actions
 - (7) Select Local Project Level Actions (offered only if in a PROJ)
 - (8) Select pre-commit Hook Actions (offered only if in a PROJ)

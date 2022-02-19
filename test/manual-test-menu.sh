@@ -27,7 +27,7 @@ validation errors, you will be prompted with repair options.\n\n The
 configuration settings that you have defined at the global level."
 
     gMainMenu[1]="Quit"
-    gMainActn[1]="func exit"
+    gMainActn[1]="func exit 1"
     gMainMenu[2]="Help"
     gMainActn[2]="help"
 
@@ -63,7 +63,7 @@ configuration settings that you have defined at the global level."
     gGlobalMenu[2]="Help"
     gGlobalActn[2]="help"
     gGlobalMenu[3]="Quit"
-    gGlobalActn[3]="func exit"
+    gGlobalActn[3]="func exit 2"
 
     gGlobalMenu[4]="$gpDoc/config/gitconfig -> ~/.gitconfig Only update missing vars"
     gGlobalActn[4]="func echo fComStub update missing"
@@ -90,7 +90,7 @@ configuration settings that you have defined at the global level."
     gLocalMenu[2]="Help"
     gLocalActn[2]="help"
     gLocalMenu[3]="Quit"
-    gLocalActn[3]="func exit"
+    gLocalActn[3]="func exit 3"
 
     gLocalMenu[4]="Select pre-commiit Hook Actions"
     gLocalActn[4]="menu gHookMenu gHookActn"
@@ -116,7 +116,7 @@ configuration settings that you have defined at the global level."
     gHookMenu[2]="Help"
     gHookActn[2]="help"
     gHookMenu[3]="Quit"
-    gHookActn[3]="func exit"
+    gHookActn[3]="func exit 4"
 
     gHookMenu[4]="~/.gitconfig -> $gpProjName/.gitproj and --local (Force update of 'gitproj hooks' section)"
     gHookActn[4]="func echo fComStub arg1"
@@ -144,7 +144,7 @@ configuration settings that you have defined at the global level."
     gOtherMenu[2]="Help"
     gOtherActn[2]="help"
     gOtherMenu[3]="Quit"
-    gOtherActn[3]="func exit"
+    gOtherActn[3]="func exit 5"
 
     gOtherMenu[4]="Set remote-min-space"
     gOtherActn[4]="func echo fComStub arg1"
@@ -162,20 +162,11 @@ configuration settings that you have defined at the global level."
 
 fConfigExecAction()
 {
-    echo "In fConfigExecAction: $*"
-
-#  Example 1:
-#    Update configs or files;
-#    Copy all config:
-#    core, alias, git-flow, gitproj.config;
-#    Product -> User;
-#    Only copy missing
-
-#  Example 2:
-#    Update configs or files;
-#    Copy gitignore;
-#    User -> Project
-
+    local pArg="$*"
+    local tCode
+    echo "In fConfigExecAction: $pArg"
+    tCode=$(echo "} $pArg {" | sed 's/}[^{]*{/ /g')
+    echo "tCode=$tCode"
     exit 0
 } # fConfigExecAction
 
@@ -196,102 +187,140 @@ fConfigMenu2()
     declare -g gMenuTitle="Update configs or files"
 
     gTypeMenu[0]="Select the configs or file to be moved:"
-    gTypeActn[0]="Help for type..."
+    gTypeActn[0]="\n Define the config sections or files that you want to update or copy."
     gTypeMenu[1]="Quit"
     gTypeActn[1]="func exit 1"
     gTypeMenu[2]="Help"
     gTypeActn[2]="help"
-    gTypeMenu[3]="Copy all config: core, alias, git-flow, gitproj.config"
+    gTypeMenu[3]="{copy-all} Copy all config section: core, alias, git-flow, gitproj.config"
     gTypeActn[3]="menu gConfMenu gConfActn"
-    gTypeMenu[4]="Copy some config: git-flow, gitproj.config"
+    gTypeMenu[4]="{copy-some} Copy some config section: git-flow, gitproj.config"
     gTypeActn[4]="menu gConfMenu gConfActn"
-    gTypeMenu[5]="Only copy: gitproj.config"
+    gTypeMenu[5]="{copy-gitproj} Only copy gitproj.config section"
     gTypeActn[5]="menu gConfMenu gConfActn"
-    gTypeMenu[6]="Only copy: gitproj.hooks"
+    gTypeMenu[6]="{copy-hooks} Only copy gitproj.hooks section"
     gTypeActn[6]="menu gConfMenu gConfActn"
-    gTypeMenu[7]="Copy gitignore"
+    gTypeMenu[7]="{gitignore} Copy gitignore file"
     gTypeActn[7]="menu gIgnoreMenu gIgnoreActn"
-    gTypeMenu[8]="Copy pre-commit"
+    gTypeMenu[8]="{pre-commit} Copy pre-commit file"
     gTypeActn[8]="menu gPreCommitMenu gPreCommitActn"
 
     # 3, 4, 5, 6
     gConfMenu[0]="Select the from/to:"
-    gConfActn[0]="Help for config..."
+    
+    gConfActn[0]="\n Define what level to copy from and what level to
+copy to.\n\n For example, if you select 'Product -> User', then that
+means sections from /usr/share/doc/git-proj/config/gitconfig will be
+copied to ~/.gitconfig\n\n The config 'levels' are more completely
+described in the user-doc 'gitproj Configuration Documentation'
+(config.md)"
+
     gConfMenu[1]="Back"
-    gConfActn[1]="func return"
+    gConfActn[1]="back"
     gConfMenu[2]="Help"
     gConfActn[2]="help"
     gConfMenu[3]="Quit"
-    gConfActn[3]="func exit 1"
-    gConfMenu[4]="Product -> User"
+    gConfActn[3]="func exit 2"
+    gConfMenu[4]="{ProdUser} Product -> User"
     gConfActn[4]="menu gForceMenu gForceActn"
-    gConfMenu[5]="User -> Project"
+    
+    gConfMenu[5]="{UserProj} User -> Project"
     gConfActn[5]="menu gForceMenu gForceActn"
-    gConfMenu[6]="Project -> Local"
+    gConfMenu[6]="{ProjLocal} Project -> Local"
     gConfActn[6]="menu gForceMenu gForceActn"
-    gConfMenu[7]="Local -> Project"
+    gConfMenu[7]="{LocalProj} Local -> Project"
     gConfActn[7]="menu gForceMenu gForceActn"
-    gConfMenu[8]="Project -> User"
+    gConfMenu[8]="{ProjUser} Project -> User"
     gConfActn[8]="menu gForceMenu gForceActn"
 
     # 7
     gIgnoreMenu[0]="Select the from -> to direction:"
-    gIgnoreActn[0]="Help for ignore direction..."
+    
+    gIgnoreActn[0]="\n Define what level to copy from and what level
+to copy to.\n\n For example, if you select 'Product -> User', then
+that means /usr/share/doc/git-proj/config/gitignore will be merged to
+~/.gitignore\n\n An existing ~/.gitignore will be copied to
+~/.gitignore.bak\n\n The updated ~/.gitignore will be sorted with
+duplicates and comments removed.\n\n The config 'levels' are more
+completely described in the user-doc 'gitproj Configuration
+Documentation' (config.md)"
+
     gIgnoreMenu[1]="Back"
-    gIgnoreActn[1]="func return"
+    gIgnoreActn[1]="back"
     gIgnoreMenu[2]="Help"
     gIgnoreActn[2]="help"
     gIgnoreMenu[3]="Quit"
-    gIgnoreActn[3]="func exit 1"
-    gIgnoreMenu[4]="Product -> User"
+    gIgnoreActn[3]="func exit 3"
+    gIgnoreMenu[4]="ProdUser} Product -> User"
     gIgnoreActn[4]="menu gYesNoMenu gYesNoActn"
-    gIgnoreMenu[5]="User -> Project"
+    
+    gIgnoreMenu[5]="{UserProj} User -> Project"
     gIgnoreActn[5]="menu gYesNoMenu gYesNoActn"
-    gIgnoreMenu[6]="Project -> User"
+    gIgnoreMenu[6]="{ProjUser} Project -> User"
     gIgnoreActn[6]="menu gYesNoMenu gYesNoActn"
 
     # 8
     gPreCommitMenu[0]="Select the from -> to direction:"
-    gPreCommitActn[0]="Help for ignore direction..."
+    
+    gPreCommitActn[0]="\n Define what level to copy from and what
+level to copy to.\n\n For example, if you select 'Product -> User',
+then that means /usr/share/doc/git-proj/hooks/pre-commit will be
+copied to ~/.pre-commit\n\n An existing ~/.pre-commit will be copied
+to ~/.pre-commit.~1~\n\n The config 'levels' are more completely
+described in the user-doc 'gitproj Configuration Documentation'
+(config.md)"
+
     gPreCommitMenu[1]="Back"
-    gPreCommitActn[1]="func return"
+    gPreCommitActn[1]="back"
     gPreCommitMenu[2]="Help"
     gPreCommitActn[2]="help"
     gPreCommitMenu[3]="Quit"
-    gPreCommitActn[3]="func exit 1"
-    gPreCommitMenu[4]="Product -> User"
+    gPreCommitActn[3]="func exit 4"
+    gPreCommitMenu[4]="{ProdUser} Product -> User"
     gPreCommitActn[4]="menu gYesNoMenu gYesNoActn"
-    gPreCommitMenu[5]="User -> Project"
+    
+    gPreCommitMenu[5]="{UserProj} User -> Project"
     gPreCommitActn[5]="menu gYesNoMenu gYesNoActn"
-    gPreCommitMenu[6]="Project -> Local"
+    gPreCommitMenu[6]="{ProjLocal} Project -> Local"
     gPreCommitActn[6]="menu gYesNoMenu gYesNoActn"
-    gPreCommitMenu[7]="Local -> Project"
+    gPreCommitMenu[7]="{LocalProj} Local -> Project"
     gPreCommitActn[7]="menu gYesNoMenu gYesNoActn"
-    gPreCommitMenu[8]="Project -> User"
+    gPreCommitMenu[8]="{ProjUser} Project -> User"
     gPreCommitActn[8]="menu gYesNoMenu gYesNoActn"
 
     # 3, 4, 5, 6
     gForceMenu[0]="Select the "force" option:"
-    gForceActn[0]="Help for force..."
+    
+    gForceActn[0]="\nIf you select 'Force copy', then the variables in
+the 'from' file will replace the variables in the 'to' file.\n\n If
+you select 'Only copy missing', then existing variables, in the 'to'
+file, will not be replaced with variables in the 'from' file. But
+missing variables will be copied from the 'from' file."
+    
     gForceMenu[1]="Back"
-    gForceActn[1]="func return"
+    gForceActn[1]="back"
     gForceMenu[2]="Help"
     gForceActn[2]="help"
     gForceMenu[3]="Quit"
-    gForceActn[3]="func exit 1"
-    gForceMenu[4]="Only copy missing"
+    gForceActn[3]="func exit 5"
+    gForceMenu[4]="{force} Force copy"
     gForceActn[4]="menu gYesNoMenu gYesNoActn"
-    gForceMenu[5]="Force copy"
+    gForceMenu[5]="{missing} Only copy missing"
     gForceActn[5]="menu gYesNoMenu gYesNoActn"
 
     gYesNoMenu[0]="Is the above action correct?"
-    gYesNoActn[0]="Help for yes/no..."
+
+    gYesNoActn[0]="\n Selecting 'Yes' will make the changes you have
+selected. If you do not want to continue, then you can Quit, to return
+to the main menu, or select the Back options to update your
+selections."
+    
     gYesNoMenu[1]="Back if no"
-    gYesNoActn[1]="func return"
+    gYesNoActn[1]="back"
     gYesNoMenu[2]="Help"
     gYesNoActn[2]="help"
     gYesNoMenu[3]="Quit"
-    gYesNoActn[3]="func exit 1"
+    gYesNoActn[3]="func exit 6"
     gYesNoMenu[4]="Yes, continue"
     gYesNoActn[4]="func fConfigExecAction \$gMenuTitle"
 
@@ -299,6 +328,7 @@ fConfigMenu2()
     return $?
 } # fConfigMenu2
 
+export gpDebug=1
 export gpProjName=george
 export gpDoc=/usr/share/doc/git-proj/
 # fConfigMenu

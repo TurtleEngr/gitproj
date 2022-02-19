@@ -107,162 +107,45 @@ fConfigMergeIgnore()
     return 0
 } # fConfigMergeIgnore
 
-fConfigProduct2User()
+fConfigExecAction()
 {
-    local pStatus=$1
-    local tSrc=${BASH_SOURCE##*/}
-
-    local tAll='core\.|alias\.|gitflow\.|gitproj\.config\.'
-    local tGitProj='|gitproj\.config\.'
-    local tHook=='|gitproj\.hooks\.'
-    case $pStatus in
-        missing-all)
-            # All core, alias, gitflow, gitproj.config
-            fComConfigCopy -s $gpDoc/config/gitconfig -d ~/.gitconfig \
-                           -i 'core\.|alias\.|gitflow\.|gitproj\.'
-            ;;
-        missing)
-            # All gitflow, gitproj.config
-            fComConfigCopy -s $gpDoc/config/gitconfig -f ~/.gitconfig \
-                           -i 'core\.|alias\.|gitflow\.|gitproj\.'
-            ;;
-        missing-hook)
-            fComConfigCopy -s $gpDoc/config/gitconfig -f ~/.gitconfig \
-                           -i 'gitproj\.hooks'
-            ;;
-        force-all)
-            echo TBD fConfigProduct2User force
-            ;;
-        force-all)
-            ;;
-        force-hook)
-            echo TBD fConfigProduct2User force-hook
-            ;;
-        ignore)
-            fConfigMergeIgnore $gpDoc/config/gitignore ~/.gitignore
-            ;;
-        pre-commit)
-            cp -v --backup=t $gpDoc/hooks/pre-commit ~/.pre-commit
-            ;;
-        *)
-            fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
-            ;;
-    esac
-
-    return 0
-} # fConfigProduct2User
-
-fConfigUser2Project()
-{
-    local pStatus="$1"
-    local pDir="$2"
-    local tSrc=${BASH_SOURCE##*/}
-    local tTopDir="$($cGetTopDir 2>&1)"
-
-    case "${pDir:-error}" in
-        up)   : ;;
-        down) : ;;
-        *)
-            fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
-            ;;
-    esac
-
-    case $pStatus in
-        missing)
-            echo TBD fConfigUser2Project missing $pDir
-            ;;
-        missing-hook)
-            echo TBD fConfigUser2Project missing-hook $pDir
-            ;;
-        force)
-            echo TBD fConfigUser2Project force $pDir
-            ;;
-        force-hook)
-            echo TBD fConfigUser2Project force-hook $pDir
-            ;;
-        ignore)
-            if [ "$pDir" = "down" ]; then
-                fConfigMergeIgnore ~/.gitignore $tTopDir/.gitignore
-                return 0
-            fi
-            fConfigMergeIgnore $tTopDir/.gitignore ~/.gitignore
-            ;;
-        pre-commit)
-            if [ "$pDir" = "down" ]; then
-                cp -v --backup=t ~/.pre-commit $tTopDir/.pre-commit
-                return 0
-            fi
-            cp -v --backup=t $tTopDir/.pre-commit ~/.pre-commit
-            ;;
-        *)
-            fError -i -n -m "Invalid option: pStatus=$pStatus" -l $tSrc$LINENO
-            ;;
-    esac
-
-    return 0
-} # fConfigUser2Project
-
-fConfigProject2Local()
-{
-    local pStatus="$1"
-    local pDir="$2"
-    local tSrc=${BASH_SOURCE##*/}
-    local tTopDir="$($cGetTopDir 2>&1)"
-
-    case "${pDir:-error}" in
-        up)   : ;;
-        down) : ;;
-        *)
-            fError -i -n -m "Invalid option: pDir=$pDir" -l $tSrc$LINENO
-            ;;
-    esac
-
-    case $pStatus in
-        missing)
-            echo TBD fConfigProject2Local missing $pDir
-            ;;
-        missing-hook)
-            echo TBD fConfigProject2Local missing-hook $pDir
-            ;;
-        force)
-            echo TBD fConfigProject2Local force $pDir
-            ;;
-        force-hook)
-            echo TBD fConfigProject2Local force-hook $pDir
-            ;;
-        pre-commit)
-            if [ "$pDir" = "down" ]; then
-                cp -v --backup=t $tTopDir/.pre-commit $tTopDir/.git/hooks/pre-commit
-                return 0
-            fi
-            cp -v --backup=t $tTopDir/.git/hooks/pre-commit $tTopDir/.pre-commit
-            ;;
-        *)
-            fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
-            ;;
-    esac
-
-    return 0
-} # fConfigProject2Local
+    local pArg="$*"
+    local tCode
+    echo "In fConfigExecAction: $pArg"
+    tCode=$(echo "} $pArg {" | sed 's/}[^{]*{/ /g')
+    echo "tCode=$tCode"
+    exit 0
+} # fConfigExecAction
 
 # --------------------
 fConfigMenu()
 {
-    local tNext
     local tSrc=${BASH_SOURCE##*/}
+    local tInProj
     declare -ag gMainMenu
     declare -ag gMainActn
-    declare -ag gGlobalMenu
-    declare -ag gGlobalActn
-    declare -ag gLocalMenu
-    declare -ag gLocalActn
-    declare -ag gHookMenu
-    declare -ag gHookActn
+    declare -ag gTypeMenu
+    declare -ag gTypeActn
+    declare -ag gConfMenu
+    declare -ag gConfActn
+    declare -ag gIgnoreMenu
+    declare -ag gIgnoreActn
+    declare -ag gPreCommitMenu
+    declare -ag gPreCommitActn
+    declare -ag gForceMenu
+    declare -ag gForceActn
+    declare -ag gYesNoMenu
+    declare -ag gYesNoActn
+    declare -g gMenuTitle="Main"
 
-    # --------------------
+    tInProj=false
+    if fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
+        tInProj=true
+    fi
+
+    # ------------------------------
     # Setup Menu Structure
 
-    # ----------
     gMainMenu[0]="Select by number: "
 
     gMainActn[0]="\n  The 'health checks' will look for errors, differences, or just give a configuration status report. If there are validation errors, you will be prompted with repair options.\n\n  The 'actions' are most useful for updating an old project to use newer configuration settings that you have defined at the global level.\n"
@@ -280,146 +163,153 @@ fConfigMenu()
     gMainMenu[5]="Run all health checks and report their status" # [info]
     gMainActn[5]="func fConfigHealth info"
 
-    gMainMenu[6]="Select Global User Level Actions"
-    gMainActn[6]="menu gGlobalMenu gGlobalActn"
+    gMainMenu[6]="Select actions to update configs or files"
+    gMainActn[6]="menu gTypeMenu gTypeActn"
 
-    tNext=7
-#    if fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
-    if true; then
-        gpProjName=${gpProjName:-ProjName}
-        # Offered only if in a PROJ
-        tNext=9
+    # ----------
+    gTypeMenu[0]="Select the configs or file to be moved:"
+    gTypeActn[0]="\n Define the config sections or files that you want to update or copy."
+    gTypeMenu[1]="Quit"
+    gTypeActn[1]="func exit 1"
+    gTypeMenu[2]="Help"
+    gTypeActn[2]="help"
+    gTypeMenu[3]="{copy-all} Copy all config section: core, alias, git-flow, gitproj.config"
+    gTypeActn[3]="menu gConfMenu gConfActn"
+    gTypeMenu[4]="{copy-some} Copy some config section: git-flow, gitproj.config"
+    gTypeActn[4]="menu gConfMenu gConfActn"
+    gTypeMenu[5]="{copy-gitproj} Only copy gitproj.config section"
+    gTypeActn[5]="menu gConfMenu gConfActn"
+    gTypeMenu[6]="{copy-hooks} Only copy gitproj.hooks section"
+    gTypeActn[6]="menu gConfMenu gConfActn"
+    gTypeMenu[7]="{gitignore} Copy gitignore file"
+    gTypeActn[7]="menu gIgnoreMenu gIgnoreActn"
+    gTypeMenu[8]="{pre-commit} Copy pre-commit file"
+    gTypeActn[8]="menu gPreCommitMenu gPreCommitActn"
 
-        gMainMenu[7]="Select Local Project Level Actions"
-        gMainActn[7]="menu gLocalMenu gLocalActn"
+    # 3, 4, 5, 6
+    gConfMenu[0]="Select the from/to:"
+    
+    gConfActn[0]="\n Define what level to copy from and what level to
+copy to.\n\n For example, if you select 'Product -> User', then that
+means sections from /usr/share/doc/git-proj/config/gitconfig will be
+copied to ~/.gitconfig\n\n The config 'levels' are more completely
+described in the user-doc 'gitproj Configuration Documentation'
+(config.md)"
 
-        gMainMenu[8]="Select pre-commit Hook Actions"
-        gMainActn[8]="menu gHookMenu gHookActn"
+    gConfMenu[1]="Back"
+    gConfActn[1]="back"
+    gConfMenu[2]="Help"
+    gConfActn[2]="help"
+    gConfMenu[3]="Quit"
+    gConfActn[3]="func exit 2"
+    gConfMenu[4]="{ProdUser} Product -> User"
+    gConfActn[4]="menu gForceMenu gForceActn"
+    if $tInProj; then
+        gConfMenu[5]="{UserProj} User -> Project"
+    	gConfActn[5]="menu gForceMenu gForceActn"
+    	gConfMenu[6]="{ProjLocal} Project -> Local"
+    	gConfActn[6]="menu gForceMenu gForceActn"
+    	gConfMenu[7]="{LocalProj} Local -> Project"
+	gConfActn[7]="menu gForceMenu gForceActn"
+    	gConfMenu[8]="{ProjUser} Project -> User"
+    	gConfActn[8]="menu gForceMenu gForceActn"
     fi
+    
+    # 7
+    gIgnoreMenu[0]="Select the from -> to direction:"
+    
+    gIgnoreActn[0]="\n Define what level to copy from and what level
+to copy to.\n\n For example, if you select 'Product -> User', then
+that means /usr/share/doc/git-proj/config/gitignore will be merged to
+~/.gitignore\n\n An existing ~/.gitignore will be copied to
+~/.gitignore.bak\n\n The updated ~/.gitignore will be sorted with
+duplicates and comments removed.\n\n The config 'levels' are more
+completely described in the user-doc 'gitproj Configuration
+Documentation' (config.md)"
 
-    gMainMenu[$tNext]="Select Other Actions"
-    gMainActn[$tNext]="menu gOtherMenu gOtherActn"
+    gIgnoreMenu[1]="Back"
+    gIgnoreActn[1]="back"
+    gIgnoreMenu[2]="Help"
+    gIgnoreActn[2]="help"
+    gIgnoreMenu[3]="Quit"
+    gIgnoreActn[3]="func exit 3"
+    gIgnoreMenu[4]="{ProdUser} Product -> User"
+    gIgnoreActn[4]="menu gYesNoMenu gYesNoActn"
+    if $tInProj; then
+        gIgnoreMenu[5]="{UserProj} User -> Project"
+     	gIgnoreActn[5]="menu gYesNoMenu gYesNoActn"
+    	gIgnoreMenu[6]="{ProjUser} Project -> User"
+    	gIgnoreActn[6]="menu gYesNoMenu gYesNoActn"
+    fi
+    
+    # 8
+    gPreCommitMenu[0]="Select the from -> to direction:"
+    
+    gPreCommitActn[0]="\n Define what level to copy from and what
+level to copy to.\n\n For example, if you select 'Product -> User',
+then that means /usr/share/doc/git-proj/hooks/pre-commit will be
+copied to ~/.pre-commit\n\n An existing ~/.pre-commit will be copied
+to ~/.pre-commit.~1~\n\n The config 'levels' are more completely
+described in the user-doc 'gitproj Configuration Documentation'
+(config.md)"
 
-    # ----------
-    gGlobalMenu[0]="Select an action by number: "
-    gGlobalActn[0]="\n These options help with adjustments between Product and User configs.\n\n
-  o ProductConfig is short for $gpDoc/config/gitconfig\n\n
-  o ProductIgnore is short for $gpDoc/config/gitignore\n\n
-  o --global is short for ~/.gitconfig\n\n
-  o UserIgnore is short for ~/.gitignore\n\n
-"
-    gGlobalMenu[1]="Back"
-    gGlobalActn[1]="back"
-    gGlobalMenu[2]="Help"
-    gGlobalActn[2]="help"
-    gGlobalMenu[3]="Quit"
-    gGlobalActn[3]="func exit 0"
+    gPreCommitMenu[1]="Back"
+    gPreCommitActn[1]="back"
+    gPreCommitMenu[2]="Help"
+    gPreCommitActn[2]="help"
+    gPreCommitMenu[3]="Quit"
+    gPreCommitActn[3]="func exit 4"
+    gPreCommitMenu[4]="{ProdUser} Product -> User"
+    gPreCommitActn[4]="menu gYesNoMenu gYesNoActn"
+    if $tInProj; then
+        gPreCommitMenu[5]="{UserProj} User -> Project"
+    	gPreCommitActn[5]="menu gYesNoMenu gYesNoActn"
+    	gPreCommitMenu[6]="{ProjLocal} Project -> Local"
+    	gPreCommitActn[6]="menu gYesNoMenu gYesNoActn"
+    	gPreCommitMenu[7]="{LocalProj} Local -> Project"
+    	gPreCommitActn[7]="menu gYesNoMenu gYesNoActn"
+    	gPreCommitMenu[8]="{ProjUser} Project -> User"
+   	gPreCommitActn[8]="menu gYesNoMenu gYesNoActn"
+    fi
+    
+    # 3, 4, 5, 6
+    gForceMenu[0]="Select the "force" option:"
+    
+    gForceActn[0]="\nIf you select 'Force copy', then the variables in
+the 'from' file will replace the variables in the 'to' file.\n\n If
+you select 'Only copy missing', then existing variables, in the 'to'
+file, will not be replaced with variables in the 'from' file. But
+missing variables will be copied from the 'from' file."
+    
+    gForceMenu[1]="Back"
+    gForceActn[1]="back"
+    gForceMenu[2]="Help"
+    gForceActn[2]="help"
+    gForceMenu[3]="Quit"
+    gForceActn[3]="func exit 5"
+    gForceMenu[4]="{force} Force copy"
+    gForceActn[4]="menu gYesNoMenu gYesNoActn"
+    gForceMenu[5]="{missing} Only copy missing"
+    gForceActn[5]="menu gYesNoMenu gYesNoActn"
 
-    gGlobalMenu[4]="ProductConfig -> --global Only update missing vars"
-    gGlobalActn[4]="func fConfigProduct2User missing"
+    gYesNoMenu[0]="Is the above action correct?"
 
-    gGlobalMenu[5]="ProductConfig -> --global Force update of all gitproj vars"
-    gGlobalActn[5]="func fConfigProduct2User force"
+    gYesNoActn[0]="\n Selecting 'Yes' will make the changes you have
+selected. If you do not want to continue, then you can Quit, to return
+to the main menu, or select the Back options to update your
+selections."
+    
+    gYesNoMenu[1]="Back if no"
+    gYesNoActn[1]="back"
+    gYesNoMenu[2]="Help"
+    gYesNoActn[2]="help"
+    gYesNoMenu[3]="Quit"
+    gYesNoActn[3]="func exit 6"
+    gYesNoMenu[4]="Yes, continue"
+    gYesNoActn[4]="func fConfigExecAction \$gMenuTitle"
 
-    gGlobalMenu[6]="ProductIgnore -> UserIgnore (only add missing)"
-    gGlobalActn[6]="func fConfigProduct2User ignore"
-    # Note this will result in a sorted list, with duplicates removed.
-    # cat $gpDoc/config/gitignore ~/.gitignore grep -v '#' | sort -fu
-
-    gGlobalMenu[7]="Install/update git-flow and corresponding configs"
-    gGlobalActn[7]="func fComMkGitFlow"
-
-    # ----------
-    gLocalMenu[0]="Select an action by number: "
-    gLocalActn[0]="\n These options help with adjustments between User and Project configs.\n\n
-  o --global is short for ~/.gitconfig\n\n
-  o UserIgnore is short for ~/.gitignore\n\n
-  o --local is short for $gpProjName/.git/config\n\n
-  o ProjectConfig is short for $gpProjName/.gitproj\n\n
-  o ProjectIgnore is short for $gpProjName/.gitignore\n\n
-"
-    gLocalMenu[1]="Back"
-    gLocalActn[1]="back"
-    gLocalMenu[2]="Help"
-    gLocalActn[2]="help"
-    gLocalMenu[3]="Quit"
-    gLocalActn[3]="func exit 0"
-
-    gLocalMenu[4]="--local -> ProjectConfig (Force core, git-flow, and gitproj.config sections only)"
-    gLocalActn[4]="func echo fLocal2Proj"
-
-    gLocalMenu[5]="--global -> ProjectConfig and --local (Update missing vars in gitproj.config sections only)"
-    gLocalActn[5]="func echo fGlobal2Proj missing"
-
-    gLocalMenu[6]="--global -> ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)"
-    gLocalActn[6]="func echo fGlobal2Proj force all"
-
-    gLocalMenu[7]="UserIgnore -> ProjectIgnore (only adds missing items)"
-    # Note this will result in a sorted list, with duplicates removed)
-    gLocalActn[7]="func echo fUser2ProjIgnore"
-
-    # ----------
-    gHookMenu[0]="Select an action by number: "
-    gHookActn[0]="\n These options help with Hook adjustments between Product, User, and Project.\n\n
-  o ProductConfig is short for $gpDoc/config/gitconfig\n\n
-  o ProductPreCommit is short for $gpDoc/hooks/pre-commit\n\n
-  o --global is short for ~/.gitconfig\n\n
-  o UserPreCommit is short for ~/.pre-commit\n\n
-  o --local is short for $gpProjName/.git/config\n\n
-  o ProjectConfig is short for $gpProjName/.gitproj\n\n
-  o ProjectPreCommit is short for $gpProjName/.pre-commit\n\n
-  o LocalPreCommit is short for $gpProjName/.git/hooks/pre-commit\n\n
-"
-    gHookMenu[1]="Back"
-    gHookActn[1]="back"
-    gHookMenu[2]="Help"
-    gHookActn[2]="help"
-    gHookMenu[3]="Quit"
-    gHookActn[3]="func exit 0"
-
-    gHookMenu[4]="ProductPreCommit -> UserPreCommit"
-    gHookActn[4]="func fConfigProduct2User pre-commit"
-
-    gHookMenu[5]="--global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)"
-    gHookActn[5]="func echo fGlobal2Proj hooks"
-
-    gHookMenu[6]="UserPreCommit -> ProjectPreCommit and LocalPreCommit"
-    gHookActn[6]="func echo fUser2Proj pre-commit"
-
-    gHookMenu[7]="--local -> ProjectConfig (Force update of 'gitproj.hooks' section)"
-    gHookActn[7]="func echo fLocal2Proj hooks force"
-
-    gHookMenu[8]="LocalPreCommit -> ProjectPreCommit"
-    gHookActn[8]="func echo fGit2Project pre-commit"
-
-    gHookMenu[9]="--local -> --global (Force update of 'gitproj.hooks' section) "
-    gHookActn[9]="func echo fLocal2Global force"
-
-    gHookMenu[10]="LocalPreCommit -> UserPreCommit"
-    gHookActn[10]="func echo fGit2UserHook"
-
-    # ----------
-    gOtherMenu[0]="Select an action by number: "
-    gOtherActn[0]="\n Other help, TBD\n"
-    gOtherMenu[1]="Back"
-    gOtherActn[1]="back"
-    gOtherMenu[2]="Help"
-    gOtherActn[2]="help"
-    gOtherMenu[3]="Quit"
-    gOtherActn[3]="func exit 0"
-
-    gOtherMenu[4]="Set remote-min-space"
-    gOtherActn[4]="func echo fSetMinRemoteSpace"
-    # (1) set manually, 2) set from --global, 3) default)"
-
-    gOtherMenu[5]="Set the max size for commits of binary files."
-    # (1) set manually, 2) set from --global, 3) default)"
-    gOtherActn[5]="func echo fSetMaxSize"
-
-    # ----------
-    fComMenu "Main" gMainMenu gMainActn
-
-    return 0
+    (fComMenu "$gMenuTitle" gMainMenu gMainActn)
+    return $?
 } # fConfigMenu
 
 # ========================================

@@ -966,18 +966,22 @@ fComMenu()
             break
         fi
     	gMenuTitle=$pTitle
+	tSelected=$(echo $pTitle | sed 's/{[^}]*} //g')
         echo
         echo "Current selections:"
 	IFS=';'
-	printf '\t%s\n' $pTitle
+	printf '\t%s\n' $tSelected
 	IFS=' '
         for ((tItem = 1 ; tItem <= tSize ; tItem++)); do
-            echo -e "  $tItem)\n      $(eval echo $(echo \${${pMenu}[$tItem]}))" | fmt -t
             tMenu[$tItem]="$(eval echo $(echo \${${pMenu}[$tItem]}))"
+            echo -e "  $tItem)\n      ${tMenu[$tItem]}" | \
+	        sed 's/{[^}]*} //g' | fmt -t
         done
         echo -n "$tPrompt "
         read tSelect
-        echo "$tSelect"
+	if [ $gpDebug -ne 0 ]; then
+            echo "$tSelect"
+	fi
         if [ -z "$tSelect" ]; then
             continue
         fi
@@ -1028,10 +1032,87 @@ fComMenu()
 
 pTitle - string
 
+    If the Actn is a "menu", the selected menu's text will be append
+    to the current pTitle, separated with ';'. And gMenuTitle will be
+    set to that combined title.
+
+    When the pTitle is displayed, the ';' is replaced with a newline.
+    Also all text that matches '{.*} ' will be removed. This is done
+    so that the text between '{}' can be used internally, to parse
+    what was selected.
+
+    Examples:
+
+    pTitle="First title"
+    gMenu1[0]="Select the text style:"
+    gMenu1[1]="{code} Select text for Code1"
+    gActn1[1]="menu gMenu2 gActn2"
+    gMenu1[2]="{code2} Select alternate text"
+    gActn1[2]="menu gMenu2 gActn2"
+    gMenu1[3]="Quit"
+    gActn1[3]="func exit 1"
+    This will be displayed as:
+    
+    Current selections:
+            First title
+    1) Select text for Code1
+    2) Select alternate text
+    3) Quit
+    Select the text style:
+    
+    User selects menu item 1, and the next menu will be
+    pTitle="First title;code1: Select text for Code1"
+    gMenu2[0]="Select the type:"
+    gMenu2[1]="{file} Change file"
+    gActn2[1]="menu gYesNoMenu gYesNoActn
+    gMenu2[2]="{section} Change section"
+    gActn2[2]="menu gYesNoMenu gYesNoActn
+    gMenu2[3]="Back"
+    gActn2[3]="back"
+    This will be desplayed as:
+
+    Current selections:
+            First title
+	    Select text for Code1
+    1) Change file
+    2) Change section
+    3) Back
+    Select the type:
+
+    User selects menu item 2, and the next menu will be
+    pTitle="First title;code1: Select text for Code1;section: Change section"
+    gYesNoMenu[0]="Are the above selections OK?"
+    gYesNoMenu[1]="Yes, continue"
+    gYesNoActn[1]="func fProcess \$gMenuTitle"
+    gYesNoMenu[2]="No, exit"
+    gYesNoActn[2]="func exit 1"
+    gYesNoMenu[3]="Back"
+    gYesNoActn[3]="back"
+    
+    This will be desplayed as:
+
+    Current selections:
+            First title
+	    Select text for Code1
+	    Change section
+    1) Yes, continue
+    2) No, exit
+    3) Back
+    Are the above selections OK?
+
+    If the user selects 2, then then fProcess will be called:
+    
+    fProcess First title;{code1} Select text for Code1;{section} Change section
+
 pMenu - the name of an array of menu items
 
     pMenu[0] - prompt for the menu
     pMenu[1..Size] - text is piped through "fmt -t" (after prepending "N) ")
+
+    Also text that matches '{.*}' will be removed.
+
+    Example:
+    pMenu[1]="code1: Select text for Code1"
 
 pActn - the name of an array of actions for a menu item with the same index.
 
@@ -1040,14 +1121,22 @@ pActn - the name of an array of actions for a menu item with the same index.
 
 pActn Commands
 
-    help - send the pActn array name to fComMenuHelp, it will output pActn[0].
-    func pFuncName [pArgs...]- call pFuncName passing pArgs.
+    help - send the pActn array name to fComMenuHelp, it will output
+        pActn[0].
+    
+    func pFuncName [pArgs...]- call pFuncName passing pArgs. The
+        \$gMenuTitle can be passed to the function, so that the list of
+        what was selected can be parsed. Look for ';text: ' for the
+        selection codes.
+    
     menu pMenu pActn - call fComMenu passing the specified array names
-                       The pTitle will be the text from the calling menu item.
+        The pTitle will be the text from the calling menu item.
+
     back - return to the calling menu (or the first calling program).
 
 Examples
 
+    See test/manual-test-menu.sh
     See testComMenu() in test/test-com.sh
     See fConfigMenu() in git-core/gitproj-config.inc
 
