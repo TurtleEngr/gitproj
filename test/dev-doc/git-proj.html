@@ -1,0 +1,621 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>git-proj Internal Doc</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body>
+  <ul id="index">
+    <li>
+      <a href="#gitproj-com.inc-Internal-Documentation">gitproj-com.inc
+      Internal Documentation</a>
+      <ul>
+        <li>
+          <a href="#Common-Script-Functions">Common Script Functions</a>
+          <ul>
+            <li>
+              <a href="#try-catch-functions">try/catch functions</a>
+              <ul>
+                <li><a href="#tcTry">tcTry</a></li>
+                <li><a href="#tcSaveEnv">tcSaveEnv</a></li>
+                <li><a href="#tcReturn">tcReturn</a></li>
+                <li><a href="#tcThrow">tcThrow</a></li>
+                <li><a href="#tcCatch">tcCatch</a></li>
+                <li><a href="#tcThrowErrors">tcThrowErrors</a></li>
+                <li><a href="#tcIgnoreErrors">tcIgnoreErrors</a></li>
+                <li><a href="#Sample-Use">Sample Use</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#fComConfigCopy">fComConfigCopy</a>
+              <ul>
+                <li><a href="#Synopsis">Synopsis</a></li>
+                <li><a href="#Description">Description</a></li>
+              </ul>
+            </li>
+            <li><a href="#fComSetGlobals">fComSetGlobals</a></li>
+            <li><a href=
+            "#fComCheckDeps-pRequired-List-pOptional-List">fComCheckDeps
+            "pRequired List" "pOptional List"</a></li>
+            <li><a href="#fComInternalDoc">fComInternalDoc</a></li>
+            <li><a href=
+            "#fComUsage--f-pFileList--s-pStyle--t-pTitle--i--a">fComUsage -f
+            pFileList -s pStyle [-t pTitle] [-i] [-a]</a></li>
+            <li><a href="#fComYesNo-pPrompt">fComYesNo pPrompt</a></li>
+            <li><a href="#fComMenu-pTitle-pMenu-pActn">fComMenu pTitle pMenu
+            pActn</a></li>
+            <li><a href="#fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog
+            pLevel "pMsg" pLine pErr</a></li>
+            <li>
+              <a href="#fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr--f">fLog -m
+              pMsg [-p pLevel] [-l $LINENO] [-e pErr] [-f]</a>
+              <ul>
+                <li><a href="#fLog-Examples">fLog Examples:</a></li>
+              </ul>
+            </li>
+            <li><a href="#fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg
+            [-l $LINENO] [-e pErr] [-i]</a></li>
+            <li><a href="#fComGit-pArgs">fComGit [pArgs...]</a></li>
+            <li>
+              <a href="#fComGetConfig">fComGetConfig</a>
+              <ul>
+                <li><a href="#Synopsis1">Synopsis</a></li>
+                <li><a href="#Description1">Description</a></li>
+                <li><a href="#Options">Options</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#fComGetConfig1">fComGetConfig</a>
+              <ul>
+                <li><a href="#Synopsis2">Synopsis</a></li>
+                <li><a href="#Description2">Description</a></li>
+                <li><a href="#Options1">Options</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+  <hr />
+  <h1 id="gitproj-com.inc-Internal-Documentation">gitproj-com.inc Internal
+  Documentation</h1>
+  <hr />
+  <h2 id="Common-Script-Functions">Common Script Functions</h2>
+  <h3 id="try-catch-functions">try/catch functions</h3>
+  <p><b>NOTE the env. var. part does not reliably work. So don't use the "tc"
+  functions until they are fixed.</b></p>
+  <p>These functions were inspired by:
+  https://gist.github.com/e7d/e43e6586c1c2ecb67ae2</p>
+  <p>Changes: This version doesn't save the previous state of "set -e".
+  Exported env. var. changes in the subshell are saved, so they can be
+  restored when the subshell is done.</p>
+  <h4 id="tcTry">tcTry</h4>
+  <p>Call this just before the required subshell section.</p>
+  <h4 id="tcSaveEnv">tcSaveEnv</h4>
+  <p>Call this when env changes must not be lost. This is called by the other
+  related commands.</p>
+  <h4 id="tcReturn">tcReturn</h4>
+  <p>Call this at end of the tcTry subshell. Calls tcSaveEnv.</p>
+  <h4 id="tcThrow">tcThrow</h4>
+  <p>Call this to throw error (1..255) to tcCatch Calls tcSaveEnv.</p>
+  <h4 id="tcCatch">tcCatch</h4>
+  <p>Save throw or cmd errors, and restore any env. var. changes in the
+  subshell. If a command exits before a tcSaveEnv call, env. var. changes
+  will be lost. Calls tcSaveEnv.</p>
+  <h4 id="tcThrowErrors">tcThrowErrors</h4>
+  <p>Now, if a cmd returns non-zero, exit the try subshell. Calls
+  tcSaveEnv.</p>
+  <h4 id="tcIgnoreErrors">tcIgnoreErrors</h4>
+  <p>Now, if a cmd returns non-zero, execution will continue. Calls
+  tcSaveEnv.</p>
+  <h4 id="Sample-Use">Sample Use</h4>
+  <pre><code>    #!/bin/bash
+    . try_catch.sh
+
+    export cFatal=100
+    export cWarn=101
+    export cmd1 cmd2 foo1 foo2 foo3
+
+    fCmd1()
+    {
+        tcMsg="fCmd1 error"
+        if [ $((RANDOM % 3)) = 1 ]; then
+            rm /x/y/zz/y
+        fi
+        echo cmd1="fCmd1 ran OK"
+    }
+
+    fCmd2()
+    {
+        tcMsg="fCmd2 error"
+        if [ $((RANDOM % 4)) = 1 ]; then
+            rm /x/y/zz/y
+        fi
+        if [ $((RANDOM % 4)) = 1 ]; then
+          tcThrow 42 "fCmd2 threw this"
+        fi
+        echo cmd2="fCmd2 ran OK"
+    }
+
+    fTestIt()
+    {
+        tcMessage="Default message for exits"
+        tcTry
+        (
+            # This is an error, but execution will continue
+            rm /x/y/zz/y
+
+            tcThrowErrors
+            # Commands will now go to tcCatch if non-zero return
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                tcThrow $cFatal "Throw message. Line=$LINENO"
+            fi
+            export foo1="this will not be set if tcThrow is run"
+            tcSaveEnv
+
+            if [ $((RANDOM % 3)) = 1 ]; then
+                rm /x/y/zz/y
+            fi
+            export foo2="this is set because 'rm' was not run", and tcSaveEnv ran
+            tcSaveEnv
+
+            fCmd1
+            fCmd2
+
+            # This will fail after it is created, second run, if no throws
+            mkdir foo-bar
+            export foo3="This not be set on second run"
+
+            tcReturn
+        )
+        tcCatch || {
+            case $tcErr in
+                $cFatal)
+                    echo "Caught: Throw happened. $tcMsg"
+                    ;;
+                $cWarn)
+                    echo "Caught: Warning. $tcMsg"
+                    ;;
+                *)  echo "Caught: Unknown exit: $tcErr. $tcMsg" ;;
+            esac
+        }
+        echo
+        echo foo1=$foo1
+        echo foo2=$foo2
+        echo foo3=$foo3
+        echo cmd1=$cmd1
+        echo cmd2=$cmd1
+    } # fTestIt
+
+    fTestIt</code></pre>
+  <hr />
+  <h3 id="fComConfigCopy">fComConfigCopy</h3>
+  <h4 id="Synopsis">Synopsis</h4>
+  <pre>
+  <code>    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]</code></pre>
+  <h4 id="Description">Description</h4>
+  <p>Copy values from git config file pSource to pDest. If -f (force), the
+  pSource values will override the pDest values, otherwise the pSource value
+  will only be copied to pDest if it does not exist there.</p>
+  <p>The -i pIncPat is a "grep" pattern that only selects the variable names
+  that match the pattern. For example: <span style="white-space: nowrap;">-i
+  'gitproj\.config\.|gitflow\.'</span></p>
+  <p>The -e pExcPat is a "grep" pattern that removes variable names that
+  match the pattern. For example: <span style="white-space: nowrap;">-e
+  'gitproj.config.remote-raw-origin'</span> pExcPat is applied after
+  pIncPat.</p>
+  <p>pSource and pDest files must exist. pSource must be readable, and pDest
+  must be writable.</p>
+  <p>A backup copy of pDest is made with this command: <span style=
+  "white-space: nowrap;">cp -backup=t $pDest $pDest.bak</span></p>
+  <hr />
+  <h3 id="fComSetGlobals">fComSetGlobals</h3>
+  <p>Set initial values for all of the globals use by this script. The ones
+  that begin with "gp" can usually be overridden by setting them before the
+  script is run.</p>
+  <hr />
+  <h3 id="fComCheckDeps-pRequired-List-pOptional-List">fComCheckDeps
+  "pRequired List" "pOptional List"</h3>
+  <p>Check for required and optional programs or scripts used by this script.
+  If any required programs are missing, exit the script.</p>
+  <hr />
+  <h3 id="fComInternalDoc">fComInternalDoc</h3>
+  <p>This function collects all of the "internal-pod" documentation from
+  stdin and it outputs to stdout.</p>
+  <hr />
+  <h3 id="fComUsage--f-pFileList--s-pStyle--t-pTitle--i--a">fComUsage -f
+  pFileList -s pStyle [-t pTitle] [-i] [-a]</h3>
+  <dl>
+    <dt id="f-pFileList---list-of-file-names"><b>-f pFileList</b> - list of
+    file names</dt>
+    <dd></dd>
+    <dt id="s-pStyle---output-style"><b>-s pStyle</b> - output style</dt>
+    <dd>
+      <pre><code> short|usage - usage only (does not work with -i or -a)
+ man         - all, man format (does not work with -i or -a)
+ long|text   - all text format
+ html        - all, html format (see -t)
+ md          - all, markdown format</code></pre>
+    </dd>
+    <dt id="t---title-for-HTML-style"><b>-t</b> - title for HTML style</dt>
+    <dd></dd>
+    <dt id="i---internal-doc-only-see-fComInternalDoc"><b>-i</b> - internal
+    doc only (see fComInternalDoc)</dt>
+    <dd></dd>
+  </dl>
+  <hr />
+  <h3 id="fComYesNo-pPrompt">fComYesNo pPrompt</h3>
+  <p>If gpYesNo = "y", set gResponse to "y", and return 0.</p>
+  <p>If gpYesNo = "n", set gResponse to "n", and return 1.</p>
+  <p>If gpAuto is 0, output the pPrompt, then "read" the response.</p>
+  <p>If the response begins with a "y", then that is the same as gpYesNo =
+  "y"</p>
+  <p>If the response is not a "y", then that is the same as gpYesNo = "n"</p>
+  <hr />
+  <h3 id="fComMenu-pTitle-pMenu-pActn">fComMenu pTitle pMenu pActn</h3>
+  <p>pTitle - string</p>
+  <pre>
+  <code>    If the Actn is a "menu", the selected menu's text will be append
+    to the current pTitle, separated with ';'. And gMenuTitle will be
+    set to that combined title.
+
+    When the pTitle is displayed, the ';' is replaced with a newline.
+    Also all text that matches '{.*} ' will be removed. This is done
+    so that the text between '{}' can be used internally, to parse
+    what was selected.
+
+    Examples:
+
+    pTitle="First title"
+    gMenu1[0]="Select the text style:"
+    gMenu1[1]="{code} Select text for Code1"
+    gActn1[1]="menu gMenu2 gActn2"
+    gMenu1[2]="{code2} Select alternate text"
+    gActn1[2]="menu gMenu2 gActn2"
+    gMenu1[3]="Quit"
+    gActn1[3]="func exit 1"
+    This will be displayed as:
+    
+    Current selections:
+            First title
+    1) Select text for Code1
+    2) Select alternate text
+    3) Quit
+    Select the text style:
+    
+    User selects menu item 1, and the next menu will be
+    pTitle="First title;code1: Select text for Code1"
+    gMenu2[0]="Select the type:"
+    gMenu2[1]="{file} Change file"
+    gActn2[1]="menu gYesNoMenu gYesNoActn
+    gMenu2[2]="{section} Change section"
+    gActn2[2]="menu gYesNoMenu gYesNoActn
+    gMenu2[3]="Back"
+    gActn2[3]="back"
+    This will be desplayed as:
+
+    Current selections:
+            First title
+            Select text for Code1
+    1) Change file
+    2) Change section
+    3) Back
+    Select the type:
+
+    User selects menu item 2, and the next menu will be
+    pTitle="First title;code1: Select text for Code1;section: Change section"
+    gYesNoMenu[0]="Are the above selections OK?"
+    gYesNoMenu[1]="Yes, continue"
+    gYesNoActn[1]="func fProcess \$gMenuTitle"
+    gYesNoMenu[2]="No, exit"
+    gYesNoActn[2]="func exit 1"
+    gYesNoMenu[3]="Back"
+    gYesNoActn[3]="back"
+    
+    This will be desplayed as:
+
+    Current selections:
+            First title
+            Select text for Code1
+            Change section
+    1) Yes, continue
+    2) No, exit
+    3) Back
+    Are the above selections OK?
+
+    If the user selects 2, then then fProcess will be called:
+    
+    fProcess First title;{code1} Select text for Code1;{section} Change section</code></pre>
+  <p>pMenu - the name of an array of menu items</p>
+  <pre><code>    pMenu[0] - prompt for the menu
+    pMenu[1..Size] - text is piped through "fmt -t" (after prepending "N) ")
+
+    Also text that matches '{.*}' will be removed.
+
+    Example:
+    pMenu[1]="code1: Select text for Code1"</code></pre>
+  <p>pActn - the name of an array of actions for a menu item with the same
+  index.</p>
+  <pre><code>    pActn[0] - help text for the menu
+    pActn[1..Size]  - first word is a command, followed by options</code></pre>
+  <p>pActn Commands</p>
+  <pre>
+  <code>    help - send the pActn array name to fComMenuHelp, it will output
+        pActn[0].
+    
+    func pFuncName [pArgs...]- call pFuncName passing pArgs. The
+        \$gMenuTitle can be passed to the function, so that the list of
+        what was selected can be parsed. Look for ';text: ' for the
+        selection codes.
+    
+    menu pMenu pActn - call fComMenu passing the specified array names
+        The pTitle will be the text from the calling menu item.
+
+    back - return to the calling menu (or the first calling program).</code></pre>
+  <p>Examples</p>
+  <pre><code>    See test/manual-test-menu.sh
+    See testComMenu() in test/test-com.sh
+    See fConfigMenu() in git-core/gitproj-config.inc</code></pre>
+  <hr />
+  <h3 id="fComFmtLog-pLevel-pMsg-pLine-pErr">fComFmtLog pLevel "pMsg" pLine
+  pErr</h3>
+  <p>This function formats and outputs a consistent log message output. See:
+  fLog and fError.</p>
+  <hr />
+  <h3 id="fLog--m-pMsg--p-pLevel--l-LINENO--e-pErr--f">fLog -m pMsg [-p
+  pLevel] [-l $LINENO] [-e pErr] [-f]</h3>
+  <p>pLevel - emerg alert crit err warning notice info debug debug-N</p>
+  <pre><code> emerg, alert, crit, and err levels will always be output.
+
+ emerg, alert, crit - exit gErr (or 1 if gErr=0, or not -e)
+ err - return gErr (or 1 if gErr=0, or not -e)
+ all other levels - return 0
+
+ (fError defaults to "crit". -n changes it too "err")
+ (-i adds "Internal: to message, an it calls fComStackTrace)
+
+ -q   set gpVerbose=0
+ -v   set gpVerbose=2 (default)
+ -V N set gpVerbose=N (0..4)
+ gitproj.config.verbose=N set gpVerbose=N
+
+ if gpVerbose = 0, don't output warning, notice or info
+ if gpVerbose = 1, don't output notice, info
+ if gpVerbose = 2, don't output info (default verbose level)
+ if gpVerbose &gt;= 3, output all non-debug levels
+ if -f, ignore the gpVerbose setting
+
+ -x - set gpDebug=1
+ -xx - set gpDebug=2
+ -X N - set gpDebug=N (0..100)
+
+ if gpDebug = 0, don't output any debug msgs
+ if gpDebug &gt; 0, output any "debug" msgs, or
+ if gpDebug = N1, output "debug-N2" msgs, if N1 &gt;= N2</code></pre>
+  <p>See Globals: gpSysLog, gpFacility, gpVerbose, gpDebug</p>
+  <h4 id="fLog-Examples">fLog Examples:</h4>
+  <pre><code> local tFile=${BASH_SOURCE##*/}
+ local tFile=file.inc
+ gpCmdName=program.sh
+
+ fError -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh crit: Error: Message [file.inc:234](8)
+    gErr=8
+    exit 8
+
+ fError -n -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Error: Message [file.inc:234](8)
+    gErr=8
+    return 8
+
+ fError -i [-n] -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Internal: Error: Message [file.inc:234](8)
+    gErr=8
+    call: fComStackTrace
+    return 8, if -n
+    exit 8, if ! -n
+
+ fLog -p err -m "Message" -l $tFile:$LINENO -e 8
+
+    Output: program.sh err: Message [file.inc:234](8)
+    gErr=8
+    return 8
+
+ fLog -p warning -m "Output if gpVerbose" -e 8
+
+    if gpVerbose &gt;= 1
+    Output: program.sh warning: Message (8)
+    gErr=8
+    return 0
+
+ fLog -p notice -m "Notice msg"  -e 8 -l $LINENO
+
+    if gpVerbose &gt;= 2
+    Output: program.sh notice: Notice msg [234]
+    gErr=0
+    return 0
+
+ fLog -p info -m "Info message"
+
+    if gpVerbose &gt;= 3
+    Output: program.sh info: Info message
+    gErr=0
+    return 0
+
+ fLog -p debug -m "Output only if $gpDebug &gt; 0" -l $LINENO
+
+    Output: program.sh debug: Output only if $gpDebug &gt; 0 [234]
+    return 0
+
+ fLog -p debug-3 -m "Output only if $gpDebug &gt;= 3" -l $LINENO
+
+    Output: program.sh debug-3: Output only if $gpDebug &gt;= 3 [234]
+    return 0</code></pre>
+  <hr />
+  <h3 id="fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg [-l $LINENO]
+  [-e pErr] [-i]</h3>
+  <p>This will call: fLog -p crit -m "pMsg" -l pLine -e pErr</p>
+  <p>If no -i, then "fUsage short", will be called.</p>
+  <hr />
+  <h3 id="fComGit-pArgs">fComGit [pArgs...]</h3>
+  <p>TODO: replace this with set/try/catch</p>
+  <p>This is a wrapper for "git". If gpVerbose is &gt;= 2, the git call will
+  will be echoed. If the git call exits with a non-0, then an error message
+  is output and the script exits (if not called in a sub-shell).</p>
+  <p>This is used to make the code look "clean". You don't need to clutter
+  the code with if statements with every git command. I.e. this supports the
+  "design pattern" where, if a command exits, it is assumed all is OK,
+  because if it failed, the script would exit.</p>
+  <hr />
+  <h3 id="fComGetConfig">fComGetConfig</h3>
+  <h4 id="Synopsis1">Synopsis</h4>
+  <pre>
+  <code>    fComSetConfig -k pKey -v pValue [-g|-l|-L|-f pFile] [-b|-i] [-a]</code></pre>
+  <h4 id="Description1">Description</h4>
+  <h4 id="Options">Options</h4>
+  <p>Only one of these will be used: -g, -l, -L, -f. The last one in the list
+  of options will be used if there is more than one. If none, then -l is the
+  default.</p>
+  <p>Only one or none of these can be specified: -b, -i. If more than one,
+  then the last one will be used.</p>
+  <dl>
+    <dt id="k-pKey"><b>-k pKey</b></dt>
+    <dd>
+      <p>This option is required.</p>
+    </dd>
+    <dt id="v-pValue"><b>-v pValue</b></dt>
+    <dd>
+      <p>This option is required.</p>
+    </dd>
+    <dt id="g"><b>-g</b></dt>
+    <dd>
+      <p>Write to ~/.gitconfig (--global)</p>
+    </dd>
+    <dt id="l"><b>-l</b></dt>
+    <dd>
+      <p>You must be in a git workspace for this option to work.
+      (--local)</p>
+      <p>Write to GIT_DIR/.git/config</p>
+    </dd>
+    <dt id="L"><b>-L</b></dt>
+    <dd>
+      <p>Write to GIT_DIR/.gitproj</p>
+    </dd>
+    <dt id="f-pFile"><b>-f pFile</b></dt>
+    <dd>
+      <p>Write to pFile.</p>
+    </dd>
+    <dt id="b"><b>-b</b></dt>
+    <dd>
+      <p>The value will be normalized to "true" or "false".</p>
+    </dd>
+    <dt id="i"><b>-i</b></dt>
+    <dd>
+      <p>The value will be converted to a single "byte" value, based on its
+      suffix.</p>
+      <p>Valid suffixes: k, K, m, M, g, G</p>
+      <p>These will be converted to lowercase before being sent to "git
+      config".</p>
+    </dd>
+    <dt id="a"><b>-a</b></dt>
+    <dd>
+      <p>Use this option if you need to specify a key with multiple values.
+      If not specified, then any matching key in the file, being written to,
+      will replace the value.</p>
+    </dd>
+  </dl>
+  <hr />
+  <h3 id="fComGetConfig1">fComGetConfig</h3>
+  <h4 id="Synopsis2">Synopsis</h4>
+  <pre><code>    fComGetConfig -k pKey [-g|-l|-L|-f pFile] [-b|-i]
+                  [-d pDefault] [-e] [-v pFilter]</code></pre>
+  <h4 id="Description2">Description</h4>
+  <p>If pKey is found, the last defined value is echoed. And the value is
+  saved in global gGetConfigValue. And the file location of the value is
+  saved in gGetConfigOrigin.</p>
+  <p>If the key is not found, and -d pDefault is set then gGetConfigValue is
+  set to pDefault, and gGetConfigOrigin is set to "default".</p>
+  <p>If the key is not found, and there is no -d option, then gGetConfigValue
+  is set to "", and gGetConfigOrigin is set to "not-found", and "" is
+  returned.</p>
+  <p>Command Returns</p>
+  <pre><code>    0 - OK (even for no value found)
+    1 - Errors</code></pre>
+  <h4 id="Options1">Options</h4>
+  <p>Only one of these will be used: -g, -l, -L, -f. The last one in the list
+  of options will be if there is more than one. If none, then all the config
+  files will be used.</p>
+  <p>Only one or none of these can be specified: -b, -i. If more than one,
+  then the last one will be used.</p>
+  <dl>
+    <dt id="k-pKey1"><b>-k pKey</b></dt>
+    <dd>
+      <p>This option is required. The last file were this key is found will
+      be used to set the value returned.</p>
+    </dd>
+    <dt id="g1"><b>-g</b></dt>
+    <dd>
+      <p>Look in ~/.gitconfig Includes are followed so
+      ~/gitproj.config.global will be included.</p>
+    </dd>
+    <dt id="l1"><b>-l</b></dt>
+    <dd>
+      <p>You must be in a git workspace for this option to work.</p>
+      <p>Look in GIT_DIR/.git/config Includes are followed so these files
+      will be included: GIT_DIR/.gitproj and GIT_DIR/.git/config</p>
+    </dd>
+    <dt id="f-pFile1"><b>-f pFile</b></dt>
+    <dd>
+      <p>This will look in pFile for pKey. Includes will be followed.</p>
+    </dd>
+    <dt id="b1"><b>-b</b></dt>
+    <dd>
+      <p>The value will be normalized to "true" or "false".</p>
+      <p>Valid values in the files:</p>
+    </dd>
+    <dt id="i1"><b>-i</b></dt>
+    <dd>
+      <p>The value will be converted to a single "byte" value, based on its
+      suffix.</p>
+      <p>Valid suffixes: k, m, g</p>
+      <p>Note: fComSetConf with -i will allow: [kKmMgG]. It will convert the
+      values to lower-case, when saving them in the config files.</p>
+    </dd>
+    <dt id="d-pDefault"><b>-d pDefault</b></dt>
+    <dd>
+      <p>If pKey is not found, then pDefault will be returned, and
+      gGetConfigOrigin will be set to "default".</p>
+    </dd>
+    <dt id="e"><b>-e</b></dt>
+    <dd>
+      <p>If -e, then do some simple validation checks:</p>
+      <p>* if the pKey is not found, then fError will be called and the
+      script will terminate. I.e. the config var is required.</p>
+      <p>* or if the value for pKey is equal to pDefault, fError will be
+      called and the script will terminate. I.e. the config var is still set
+      to it's initial "undefined" value.</p>
+      <p>* or if the value for pKey is equal to "TBD" or "not-defined",
+      fError will be called and the script will terminate. I.e. the config
+      var is still set to it's initial "undefined" value.</p>
+      <p>Note: -e will only exit the whole script if it is not in a subshell.
+      I.e. don't use var=\$(cmd) style.</p>
+    </dd>
+    <dt id="v-pFilter"><b>-v pFilter</b></dt>
+    <dd>
+      <p>pFilter is used as a pattern match for the value found. This is
+      useful for times when there could be duplicate pKeys with different
+      values. For example there could be multiple "include.path" keys.</p>
+    </dd>
+  </dl>
+</body>
+</html>

@@ -140,10 +140,10 @@ stats :
 gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html dev-doc/release-server.html
 
 dev-doc/git-proj.md : $(mCore)/git-proj $(mCore)/gitproj-com.inc
-	-$? -H int-md >$@
+	-$(mCore)/git-proj -H int-md >$@
 
 dev-doc/git-proj.html : $(mCore)/git-proj $(mCore)/gitproj-com.inc
-	-$? -H int-html >$@
+	-$(mCore)/git-proj -H int-html >$@
 
 dev-doc/outline.html : dev-doc/outline.pod
 	-pod2html --title='Outline of Files' $(mHtmlOpt) <$? >$@
