@@ -146,6 +146,7 @@ fComConfigCopy()
         tVerbose='-v'
     fi
 
+    # Get args and validate
     while getopts :fs:d:i:e: tArg; do
         # shellcheck disable=SC2213,SC2220
         case $tArg in
@@ -165,18 +166,22 @@ fComConfigCopy()
         esac
     done
 
-    if [ -z "$pSource" ] || [ ! -r $pSource ]; then
+    if [[ -z "$pSource" || ! -r $pSource ]]; then
         fError -n -i -m "fComConfigCopy: -s $pSource is missing or not readable" -l $tSrc:$LINENO
         return 1
     fi
-    if [ -z "$pDest" ] || [ ! -w $pDest ]; then
+    if [ -z "$pDest" ]; then
         fError -n -i -m "fComConfigCopy: -d $pDest is missing or not writable" -l $tSrc:$LINENO
         return 1
     fi
 
-    cp $tVerbose --backup=t $pDest $pDest.bak
-    if [ $? -ne 0 ]; then
-        fError -n -i -m "fComConfigCopy: " -l $tSrc:$LINENO
+    touch $pDest
+    if [ ! -w $pDest ]; then
+        fError -n -i -m "-d $pDest file is not writable" -l $tSrc:$LINENO
+        return 1
+    fi
+    if ! cp $tVerbose --backup=t $pDest $pDest.bak; then
+        fError -n -i -m "Problem backing up -d $pDest file" -l $tSrc:$LINENO
         return 1
     fi
 
@@ -233,8 +238,9 @@ The -e pExcPat is a "grep" pattern that removes variable names that
 match the pattern. For example: S<-e 'gitproj.config.remote-raw-origin'>
 pExcPat is applied after pIncPat.
 
-pSource and pDest files must exist. pSource must be readable, and
-pDest must be writable.
+pSource must exist and be readable. If pDest exists, must be writable.
+If pDest does not exist then it will be created with the specified
+include and exclude patterns.
 
 A backup copy of pDest is made with this command:
 S<cp -backup=t $pDest $pDest.bak>
