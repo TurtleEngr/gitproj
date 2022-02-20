@@ -86,6 +86,51 @@ fConfigHealth()
     return 0
 } # fConfigHealth
 
+fConfigUpdate()
+{
+    local pInc
+    local pFiles
+    local pForce
+    local tSrc=${BASH_SOURCE##*/}
+    local tFrom
+    local tTo
+    local tForce
+    local tTopDir=$($cGetTopDir)
+
+    if [ "$pForce" = "force" ]; then
+        tForce='-f'
+    fi
+
+    case $pFiles in
+        ProdUser)
+	    tFrom=/usr/share/doc/git-proj/config/gitconfig
+	    tTo=~/.gitconfig
+	    ;;
+        UserProj)
+	    tFrom=~/.gitconfig
+	    tTo=$tTopDir/.gitproj
+	    ;;
+    	ProjLocal)
+	    tFrom=$tTopDir/.gitproj
+	    tTo=$tTopDir/.git/config
+	    ;;
+    	LocalProj)
+	    tFrom=$tTopDir/.git/config
+	    tTo=$tTopDir/.gitproj
+	    ;;
+    	ProjUser)
+	    tFrom=$tTopDir/.gitproj
+	    tTo=~/.gitconfig
+	    ;;
+	*)
+	    fError -i -n -m "Unknown option: $pFiles" -l $tSrc:$LINENO
+	    ;;
+    esac
+
+    fComConfigCopy $tForce -s $tFrom -d $tTo -i "$pInc"
+    return $?
+} # fConfigUpdate
+
 fConfigMergeIgnore()
 {
     local pFrom=$1
@@ -107,13 +152,132 @@ fConfigMergeIgnore()
     return 0
 } # fConfigMergeIgnore
 
+fConfigIgnore()
+{
+    local pFiles=$1
+    local tSrc=${BASH_SOURCE##*/}
+    local tFrom
+    local tTo
+    local tTopDir=$($cGetTopDir)
+    
+    case $pFiles in
+        ProdUser)
+	    tFrom=/usr/share/doc/git-proj/config/gitignore
+	    tTo=~/.gitignore
+	    ;;
+        UserProj)
+	    tFrom=~/.gitignore
+	    tTo=$tTopDir/.gitignore
+	    ;;
+    	ProjUser)
+	    tFrom=$tTopDir/.gitignore
+	    tTo=~/.gitignore
+	    ;;
+	*)
+	    fError -i -n -m "Unknown option: $pFiles" -l $tSrc:$LINENO
+	    ;;
+    esac
+
+    fConfigMergeIgnore $tFrom $tTo
+    return $?
+} # fConfigIgnore
+
+fConfigCopyPreCommit()
+{
+    local pFrom
+    local pTo
+    local tSrc=${BASH_SOURCE##*/}
+
+    cp --backup=t $pFrom $pTo
+    return $?
+} # fConfigCopyPreCommit
+
+fConfigPreCommit()
+{
+    local pFiles=$1
+    local tSrc=${BASH_SOURCE##*/}
+    local tFrom
+    local tTo
+    local tTopDir=$($cGetTopDir)
+    
+    case $pFiles in
+        ProdUser)
+	    tFrom=/usr/share/doc/git-proj/hooks/pre-commit
+	    tTo=~/.pre-commit
+	    ;;
+        UserProj)
+	    tFrom=~/.pre-commit
+	    tTo=$tTopDir/.pre-commit
+	    ;;
+    	ProjLocal)
+	    tFrom=$tTopDir/.pre-commit
+	    tTo=$tTopDir/.git/hooks/pre-commit
+	    ;;
+    	LocalProj)
+	    tFrom=$tTopDir/.git/hooks/pre-commit
+	    tTo=$tTopDir/.git/hooks/pre-commit
+	    ;;
+    	ProjUser)
+	    tFrom=$tTopDir/.git/hooks/pre-commit
+	    tTo=~/.pre-commit
+	    ;;
+	*)
+	    fError -i -n -m "Unknown option: $pFiles" -l $tSrc:$LINENO
+	    ;;
+    esac
+
+    fConfigCopyPreCommit $tFrom $tTo
+    return $?
+} # fConfigPreCommit
+
 fConfigExecAction()
 {
-    local pArg="$*"
+    local pArgStr="$*"
+    local tSrc=${BASH_SOURCE##*/}
     local tCode
-    echo "In fConfigExecAction: $pArg"
-    tCode=$(echo "} $pArg {" | sed 's/}[^{]*{/ /g')
-    echo "tCode=$tCode"
+    declare -a tArgList
+    local tArg
+    local i
+
+    # Extract the codes from pArgStr and assign them to tArgList
+    tCode=$(echo "} $pArgStr {" | sed 's/}[^{]*{/ /g')
+    if [ $gpDebug -ne 0 ]; then
+        echo "In fConfigExecAction: $pArgStr"
+        echo "tCode=$tCode"
+    fi
+
+    i=0
+    for tArg in $tCode; do
+        let ++i
+        tArgList[$i]=$tArg
+    done
+
+    # Select on the type
+    case ${tArgList[1]} in
+        copy-all)
+	    fConfigUpdate 'core\.|alias\.|git-flow\.|gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
+	    ;;
+	copy-some)
+	    fConfigUpdate 'git-flow\.|gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
+	    ;;
+	copy-gitproj)
+	    fConfigUpdate 'gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
+	    ;;
+	copy-hooks)
+	    fConfigUpdate 'gitproj\.hooks\.' ${tArgList[2]} ${tArgList[3]}
+	    ;;
+	gitignore)
+	    fConfigIgnore ${tArgList[2]}
+	    ;;
+	pre-commit)
+	    fConfigPreCommit ${tArgList[2]}
+	    ;;
+	*)
+	    fError -i -n -m "${tArgList[1]} is unknown type" -l $tSrc:$LINENO
+	    ;;
+    esac
+
+    # s/b in a subshell, so this will return to main main
     exit 0
 } # fConfigExecAction
 
