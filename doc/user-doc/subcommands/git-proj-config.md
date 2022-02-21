@@ -11,12 +11,13 @@
 
 # DESCRIPTION
 
-This is text menu driven tool for checking and tuning up your git-proj
-configurations. There are are 4 configuration"levels" to consider:
-Product, User, Project, and Local. The standard git support configs
-at the User and Local levels, and the usual --global and --local options
-can be used with "git config" to get and set variables. Or you can edit
-the files directly. See the FILES section for files listed by their levels.
+This is a text menu driven tool for checking and tuning up your
+git-proj configurations. There are 4 configuration "levels" to
+consider: Product, User, Project, and Local. The standard git support
+configs at the User and Local levels, and the usual --global and
+\--local options can be used with "git config" to get and set
+variables. Or you can edit the files directly. See the FILES section
+for files listed by their levels.
 
 The "git proj config" tool has two major sections: "Health Checks" and
 "Actions".
@@ -34,9 +35,9 @@ missing, while other actions can "force" changes.
 
 ## Main Menu Options
 
-- (1) Quit
+- (1) Quit, exit git-proj-config
 
-    In the lower level menus #1 will change to "Back" and "Quit" will move
+    In the lower level menus, #1 will change to "Back" and "Quit" will move
     to #3.
 
 - (2) Help
@@ -46,12 +47,9 @@ missing, while other actions can "force" changes.
 - (3) Run health checks that look for problems \[errors\]
 - (4) Run health checks that look for differences \[diff, warnings\]
 - (5) Run all health checks and report their status \[info\]
-- (6) Select Global User Level Actions
-- (7) Select Local Project Level Actions (offered only if in a PROJ)
-- (8) Select pre-commit Hook Actions (offered only if in a PROJ)
-- (9) Select Other Actions
+- (6) Select actions to update configs or files
 
-## Global User Level Checks
+## Global User Level Health Checks
 
 These are done even if not in a git-proj managed workspace.
 
@@ -70,9 +68,9 @@ default, or 3) if --global select from ProductConfig.
     - is git-flow installed? \[warning\]
     - are git-flow section vars defined in --global? \[warning\]
 
-## Local and Project Level Checks
+## Local and Project Level Health Checks
 
-These are done if you are in a git-proj managed workspace.
+These are only done if you are in a git-proj managed workspace.
 
 The Validate Checks, check ProjectConfig and --local. If there is a
 problem they can be fixed by: 1) manfully setting, 2) select from
@@ -117,45 +115,106 @@ in --global \[diff\]
 - Check for big binary files, not in raw/ \[warning\]
 - Report on all symlinks in PROJ \[info\]
 
-### Global User Level Action Menus
+### Select actions to update configs or files
+
+Define the config sections or files that you want to update or copy."
 
 - (1) Back
 - (2) Help
-- (3) Quit
-- (4) ProductConfig -> --global Only update missing vars
-- (5) ProductConfig -> --global Force update of all gitproj vars
-- (6) ProductIgnore -> UserIgnore (only add missing)
+- (3) Quit, back to main
+- (4) Copy all config section: core, alias, git-flow, gitproj.config
+- (5) Copy some config section: git-flow, gitproj.config
+- (6) Only copy gitproj.config section
+- (7) Only copy gitproj.hooks section
+- (8) Copy gitignore file
+- (9) Copy pre-commit file
+- Select the configs or file to be moved:
 
-    Note: this will result in a sorted list, with duplicates removed.
+## Config File Level Direction
 
-- (7) Install/update git-flow and corresponding configs
+These options are for all of the config files actions.
 
-## Local and Project Level Action Menus
+Define what level to copy from and what level to copy to.
 
-- (4) --local -> ProjectConfig (Force core, git-flow, and gitproj.config sections only)
-- (5) --global -> ProjectConfig and --local (Update missing vars in gitproj.config sections only)
-- (6) --global -> ProjectConfig and --local (Force update of all gitproj.config section, vars in-common) (remotes are not changed)
-- (7) UserIgnore -> ProjectIgnore (only adds missing items)
+For example, if you select 'Product -> User', then that means sections
+from /usr/share/doc/git-proj/config/gitconfig will be copied to
+~/.gitconfig
 
-## pre-commit Hook Action Menus
+The config 'levels' and files are more completely described in the
+user-doc 'gitproj Configuration Documentation' (config.md
 
-- (4) ProductPreCommit -> UserPreCommit
-- (5) --global -> ProjectConfig and --local (Force update of 'gitproj hooks' section)
-- (6) UserPreCommit -> ProjectPreCommit and LocalPreCommit
-- (7) --local -> ProjectConfig (Force update of 'gitproj.hooks' section)
-- (8) LocalPreCommit -> ProjectPreCommit
-- (9) --local -> --global (Force update of 'gitproj.hooks' section)
-- (10) LocalPreCommit -> UserPreCommit
+- (4) Product -> Use
+- (5) User -> Project
+- (6) Project -> Local
+- (7) Local -> Project
+- (8) Project -> User
+- Select the from/to:
 
-## Other Action Menus
+## Only copy missing or Force
 
-- (4) Set remote-min-space
+If you select 'Force copy', then the variables in the 'from' file will
+replace the variables in the 'to' file.
 
-    Fix options: 1) set manually, 2) set from --global, 3) default
+If you select 'Only copy missing', then existing variables, in the
+'to' file, will not be replaced with variables in the 'from' file. But
+missing variables will be copied from the 'from' file.
 
-- (5) Set the max size for commits of binary files.
+- (4) Force copy
+- (5) Only copy missing
+- Select the "force" option:
 
-    Fix options: 1) set manually, 2) set from ~/.gitconfig, 3) default
+## Copy gitignore file
+
+Define what level to copy from and what level to copy to.
+
+For example, if you select 'Product -> User', then that means
+/usr/share/doc/git-proj/config/gitignore will be merged to
+~/.gitignore
+
+An existing ~/.gitignore will be copied to ~/.gitignore.bak The
+updated ~/.gitignore will be sorted with duplicates and comments
+removed.
+
+The config 'levels' and files are more completely described in the
+user-doc 'gitproj Configuration Documentation' (config.md)
+
+- (4) Product -> User
+- (5) User -> Project
+- (6) Project -> User
+- Select the from/to:
+
+## Copy pre-commit file
+
+Define what level to copy from and what level to copy to.
+
+For example, if you select 'Product -> User', then that means
+/usr/share/doc/git-proj/hooks/pre-commit will be copied to
+~/.pre-commit
+
+An existing ~/.pre-commit will be copied to ~/.pre-commit.~1~
+
+The config 'levels' and files are more completely described in the user-doc
+'gitproj Configuration Documentation' (config.md)
+
+- (4) Product -> Use
+- (5) User -> Project
+- (6) Project -> Local
+- (7) Local -> Project
+- (8) Project -> User
+- Select the from/to:
+
+## Continue?
+
+Selecting 'Yes' will make the changes you have selected. If you do not
+want to continue, then you can Quit, to return to the main menu, or
+select the Back options to update your selections.
+
+- (1) Back
+- (2) Help
+- (3) Quit, back to main
+- (4) Yes, continue
+
+    Are the above actions correct?
 
 # OPTIONS
 

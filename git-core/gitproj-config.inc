@@ -9,7 +9,6 @@ export gpBin gpCheckFileNames gpCheckForBigFiles \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
-
 # --------------------
 fCheckForErrors()
 {
@@ -79,7 +78,7 @@ fConfigHealth()
             fCheckStatus
             ;;
         *)
-            fError -i -n -m "Invalid option: $pStatus" -l $tSrc$LINENO
+            fError -i -m "Invalid option: $pStatus" -l $tSrc$LINENO -e 20
             ;;
     esac
 
@@ -123,7 +122,7 @@ fConfigUpdate()
 	    tTo=~/.gitconfig
 	    ;;
 	*)
-	    fError -i -n -m "Unknown option: $pFiles" -l $tSrc:$LINENO
+	    fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
 	    ;;
     esac
 
@@ -138,16 +137,16 @@ fConfigMergeIgnore()
     local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -f $pFrom ]; then
-        fError -i -n -m "Missing: $pFrom" -l $tSrc:$LINENO
+        fError -i -m "Missing: $pFrom" -l $tSrc:$LINENO -e 20
     fi
     if [ ! -f $tTo ]; then
         cp -v $pFrom $tTo
-        return 0
+        return $?
     fi
 
     cp -v --backup=t  $tTo $tTo.bak
     cat $pFrom $pTo | grep -v '^#' | sort -u >t.tmp
-    mv t.tmp $pTo
+    mv -f t.tmp $pTo
 
     return 0
 } # fConfigMergeIgnore
@@ -174,7 +173,7 @@ fConfigIgnore()
 	    tTo=~/.gitignore
 	    ;;
 	*)
-	    fError -i -n -m "Unknown option: $pFiles" -l $tSrc:$LINENO
+	    fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
 	    ;;
     esac
 
@@ -222,7 +221,7 @@ fConfigPreCommit()
 	    tTo=~/.pre-commit
 	    ;;
 	*)
-	    fError -i -n -m "Unknown option: $pFiles" -l $tSrc:$LINENO
+	    fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
 	    ;;
     esac
 
@@ -273,7 +272,7 @@ fConfigExecAction()
 	    fConfigPreCommit ${tArgList[2]}
 	    ;;
 	*)
-	    fError -i -n -m "${tArgList[1]} is unknown type" -l $tSrc:$LINENO
+	    fError -i -m "${tArgList[1]} is unknown type" -l $tSrc:$LINENO -e 20
 	    ;;
     esac
 
@@ -300,7 +299,8 @@ fConfigMenu()
     declare -ag gForceActn
     declare -ag gYesNoMenu
     declare -ag gYesNoActn
-    declare -g gMenuTitle="Main"
+    declare -g gMenuTitle='Main'
+    declare -g gExitMenu=0
 
     tInProj=false
     if fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
@@ -313,8 +313,8 @@ fConfigMenu()
     gMainMenu[0]="Select by number: "
 
     gMainActn[0]="\n  The 'health checks' will look for errors, differences, or just give a configuration status report. If there are validation errors, you will be prompted with repair options.\n\n  The 'actions' are most useful for updating an old project to use newer configuration settings that you have defined at the global level.\n"
-    gMainMenu[1]="Quit"
-    gMainActn[1]="func exit 0"
+    gMainMenu[1]="Quit, exit git-proj-config"
+    gMainActn[1]="func exit 222"
     gMainMenu[2]="Help"
     gMainActn[2]="help"
 
@@ -333,38 +333,40 @@ fConfigMenu()
     # ----------
     gTypeMenu[0]="Select the configs or file to be moved:"
     gTypeActn[0]="\n Define the config sections or files that you want to update or copy."
-    gTypeMenu[1]="Quit"
-    gTypeActn[1]="func exit 1"
+    gTypeMenu[1]="Back"
+    gTypeActn[1]="back"
     gTypeMenu[2]="Help"
     gTypeActn[2]="help"
-    gTypeMenu[3]="{copy-all} Copy all config section: core, alias, git-flow, gitproj.config"
-    gTypeActn[3]="menu gConfMenu gConfActn"
-    gTypeMenu[4]="{copy-some} Copy some config section: git-flow, gitproj.config"
+    gTypeMenu[3]="Quit, back to main"
+    gTypeActn[3]="func exit 2"
+    gTypeMenu[4]="{copy-all} Copy all config section: core, alias, git-flow, gitproj.config"
     gTypeActn[4]="menu gConfMenu gConfActn"
-    gTypeMenu[5]="{copy-gitproj} Only copy gitproj.config section"
+    gTypeMenu[5]="{copy-some} Copy some config section: git-flow, gitproj.config"
     gTypeActn[5]="menu gConfMenu gConfActn"
-    gTypeMenu[6]="{copy-hooks} Only copy gitproj.hooks section"
+    gTypeMenu[6]="{copy-gitproj} Only copy gitproj.config section"
     gTypeActn[6]="menu gConfMenu gConfActn"
-    gTypeMenu[7]="{gitignore} Copy gitignore file"
-    gTypeActn[7]="menu gIgnoreMenu gIgnoreActn"
-    gTypeMenu[8]="{pre-commit} Copy pre-commit file"
-    gTypeActn[8]="menu gPreCommitMenu gPreCommitActn"
+    gTypeMenu[7]="{copy-hooks} Only copy gitproj.hooks section"
+    gTypeActn[7]="menu gConfMenu gConfActn"
+    gTypeMenu[8]="{gitignore} Copy gitignore file"
+    gTypeActn[8]="menu gIgnoreMenu gIgnoreActn"
+    gTypeMenu[9]="{pre-commit} Copy pre-commit file"
+    gTypeActn[9]="menu gPreCommitMenu gPreCommitActn"
 
-    # 3, 4, 5, 6
+    # 4, 5, 6, 7
     gConfMenu[0]="Select the from/to:"
     
     gConfActn[0]="\n Define what level to copy from and what level to
 copy to.\n\n For example, if you select 'Product -> User', then that
-means sections from /usr/share/doc/git-proj/config/gitconfig will be
-copied to ~/.gitconfig\n\n The config 'levels' are more completely
-described in the user-doc 'gitproj Configuration Documentation'
-(config.md)"
+means sections from /usr/share/doc/git-proj/config/gitignore will be
+copied to ~/.gitconfig\n\n The config 'levels' and files are more
+completely described in the user-doc 'gitproj Configuration
+Documentation' (config.md)"
 
     gConfMenu[1]="Back"
     gConfActn[1]="back"
     gConfMenu[2]="Help"
     gConfActn[2]="help"
-    gConfMenu[3]="Quit"
+    gConfMenu[3]="Quit, back to main"
     gConfActn[3]="func exit 2"
     gConfMenu[4]="{ProdUser} Product -> User"
     gConfActn[4]="menu gForceMenu gForceActn"
@@ -387,15 +389,15 @@ to copy to.\n\n For example, if you select 'Product -> User', then
 that means /usr/share/doc/git-proj/config/gitignore will be merged to
 ~/.gitignore\n\n An existing ~/.gitignore will be copied to
 ~/.gitignore.bak\n\n The updated ~/.gitignore will be sorted with
-duplicates and comments removed.\n\n The config 'levels' are more
-completely described in the user-doc 'gitproj Configuration
+duplicates and comments removed.\n\n The config 'levels' and files are
+more completely described in the user-doc 'gitproj Configuration
 Documentation' (config.md)"
 
     gIgnoreMenu[1]="Back"
     gIgnoreActn[1]="back"
     gIgnoreMenu[2]="Help"
     gIgnoreActn[2]="help"
-    gIgnoreMenu[3]="Quit"
+    gIgnoreMenu[3]="Quit, back to main"
     gIgnoreActn[3]="func exit 3"
     gIgnoreMenu[4]="{ProdUser} Product -> User"
     gIgnoreActn[4]="menu gYesNoMenu gYesNoActn"
@@ -413,15 +415,15 @@ Documentation' (config.md)"
 level to copy to.\n\n For example, if you select 'Product -> User',
 then that means /usr/share/doc/git-proj/hooks/pre-commit will be
 copied to ~/.pre-commit\n\n An existing ~/.pre-commit will be copied
-to ~/.pre-commit.~1~\n\n The config 'levels' are more completely
-described in the user-doc 'gitproj Configuration Documentation'
-(config.md)"
+to ~/.pre-commit.~1~\n\n The config 'levels' and files are more
+completely described in the user-doc 'gitproj Configuration
+Documentation' (config.md)"
 
     gPreCommitMenu[1]="Back"
     gPreCommitActn[1]="back"
     gPreCommitMenu[2]="Help"
     gPreCommitActn[2]="help"
-    gPreCommitMenu[3]="Quit"
+    gPreCommitMenu[3]="Quit, back to main"
     gPreCommitActn[3]="func exit 4"
     gPreCommitMenu[4]="{ProdUser} Product -> User"
     gPreCommitActn[4]="menu gYesNoMenu gYesNoActn"
@@ -449,102 +451,37 @@ missing variables will be copied from the 'from' file."
     gForceActn[1]="back"
     gForceMenu[2]="Help"
     gForceActn[2]="help"
-    gForceMenu[3]="Quit"
+    gForceMenu[3]="Quit, back to main"
     gForceActn[3]="func exit 5"
     gForceMenu[4]="{force} Force copy"
     gForceActn[4]="menu gYesNoMenu gYesNoActn"
     gForceMenu[5]="{missing} Only copy missing"
     gForceActn[5]="menu gYesNoMenu gYesNoActn"
 
-    gYesNoMenu[0]="Is the above action correct?"
+    gYesNoMenu[0]="Are the above actions correct?"
 
     gYesNoActn[0]="\n Selecting 'Yes' will make the changes you have
 selected. If you do not want to continue, then you can Quit, to return
 to the main menu, or select the Back options to update your
 selections."
     
-    gYesNoMenu[1]="Back if no"
+    gYesNoMenu[1]="Back"
     gYesNoActn[1]="back"
     gYesNoMenu[2]="Help"
     gYesNoActn[2]="help"
-    gYesNoMenu[3]="Quit"
+    gYesNoMenu[3]="Quit, back to main"
     gYesNoActn[3]="func exit 6"
     gYesNoMenu[4]="Yes, continue"
     gYesNoActn[4]="func fConfigExecAction \$gMenuTitle"
 
-    (fComMenu "$gMenuTitle" gMainMenu gMainActn)
+    while true; do
+        (fComMenu "$gMenuTitle" gMainMenu gMainActn)
+	if [ $? -eq 222 ]; then
+	    break
+	fi
+    done
     return $?
 } # fConfigMenu
 
 # ========================================
 fComPreProjSetGlobals
-return
-
-# Notes for refactor:
-cat <<EOF
-gTypeMenu
-Update configs or files
-1) Back
-2) Help
-3) Quit
-4) Copy all config: core, alias, git-flow, gitproj.config
-        menu 'Copy all' gConfMenu gConfActn
-5) Copy some config: git-flow, gitproj.config
-        menu 'Copy some' gConfMenu gConfActn
-6) Only copy: gitproj.config
-        menu 'Only copy gitproj' gConfMenu gConfActn
-7) Only copy: gitproj.hooks
-        menu 'Only copy hooks' gConfMenu gConfActn
-8) Copy gitignore
-        menu 'Copy gitignore' gIgnoreMenu gIgnorActn
-9) Copy pre-commit
-        menu 'Copy pre-commit' gConfMenu gConfActn
-Select the configs or file to be moved:
-
-gConfigMenu
-3, 4, 5, 6, 8
-1) Back
-2) Help
-3) Quit
-4) Product -> User
-        menu "$pTitle; Product -> User" gForceMenu gForceActn
-5) User -> Project
-6) Project -> Local
-7) Local -> Project
-8) Project -> User
-Select the from/to:
-
-gIgnoreMenu
-7
-1) Back
-2) Help
-3) Quit
-4) Product -> User
-        menu "$pTitle; Product -> User" gYesNoMenu gYesNoActn
-5) User -> Project
-6) Project -> User
-Select the from -> to direction:
-
-gForceMenu
-3, 4, 5, 6
-1) Back
-2) Help
-3) Quit
-4) Only copy missing
-        "menu $pTitle; Only Missing" gYesNoMenu gYesNoActn
-5) Force copy
-        menu "$pTitle; Force" gYesNoMenu gYesNoActn
-Select the "force" option:
-
-gYesNo
-$pTitle
-1) Back (use this to go back and select other options)
-        return
-2) Help
-        help
-3) Quit
-        exit
-4) Yes, continue
-        "func fConfigExecAction $pTitle"
-Is the above action correct?
-EOF
