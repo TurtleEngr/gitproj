@@ -323,8 +323,9 @@ testComConfigUpdateLocal()
     # Change
     fComSetConfig -l -k "gitproj.config.verbose" -v 3
     # Check
-    tValue=$(fComGetConfig -L -k "gitproj.config.verbose")
+    tValue=$(fComGetConfig -L -k "gitproj.config.verbose" -d null)
     assertEquals "$LINENO" "2" "$tValue"
+
     # Test
     tResult=$(fComConfigUpdateLocal 2>&1)
     assertTrue "$LINENO $tResult" "$?"

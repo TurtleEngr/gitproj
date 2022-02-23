@@ -141,6 +141,7 @@ fComConfigCopy()
     local OPTIND=1
     local OPTARG
     local tArg
+    local tDestDir
 
     if [ $gpVerbose -ge 2 ]; then
         tVerbose='-v'
@@ -175,9 +176,12 @@ fComConfigCopy()
         return 1
     fi
 
-    if [ ! -d ${pDest%/*} ]; then
-        fError -n -i -m "${pDest%/*} directory does not exist" -l $tSrc:$LINENO
-        return 1
+    tDestDir=${pDest%/*}
+    if [ "$tDestDir" != "$pDest" ]; then
+        if [ ! -d $tDestDir ]; then
+            fError -n -i -m "$tDestDir directory does not exist" -l $tSrc:$LINENO
+            return 1
+	fi
     fi
 
     touch $pDest
@@ -2096,7 +2100,7 @@ fComCheckDirSpace()
     let pMinSpace=pMinSpace/1024/1024
 
     if [ $tAvail -lt $tDesiredSize ] || [ $tAvail -lt $pMinSpace ]; then
-        fLog -f -p warning -m "There is may not be enough space at $pMountDir, which has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB (or ${pMinSpace}MB)" -l $tSrc:$LINENO
+        fLog -f -p warning -m "There may not be enough space at $pMountDir, which has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB (or ${pMinSpace}MB)" -l $tSrc:$LINENO
         return 1
     fi
 

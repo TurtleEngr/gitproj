@@ -460,7 +460,7 @@ testRemoteGetAnotherMountDir()
     gpRemoteMinSpace=1073741824000000
     tResult=$(fRemoteGetAnotherMountDir "/tmp/foo" "$gpRemoteMinSpace" 2>&1 < <(echo -e "$cDatMount3/video-2020-04-02\n\n"))
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "There is not enough space"
+    assertContains "$LINENO $tResult" "$tResult" "warning: There may not be enough space at"
 
     return 0
 } # testRemoteGetAnotherMountDir
