@@ -21,7 +21,7 @@ export gSrc=${BASH_SOURCE##*/}
 fIsBinary()
 {
     local pFile="$1"
-    grep -Hm1 '^' <"$pFile" | grep -q '^Binary'
+    grep -Hm1 '^' <"$pFile" 2>&1 | grep -qi 'binary'
     # Copied from: https://unix.stackexchange.com/questions/275516/is-there-a-convenient-way-to-classify-files-as-binary-or-text
 } # fIsBinary
 

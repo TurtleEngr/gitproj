@@ -311,7 +311,6 @@ test-env_TestDestDirAfterCreateRemoteGit.tgz :
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
 	else \
-		./test-init.sh $@; \
 		./test-remote.sh testRemoteCreateRemoteGit; \
 	fi
 
@@ -320,7 +319,6 @@ test-env_Home2AfterPush.tgz :
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
 	else \
-		./test-init.sh $@; \
 		./test-push.sh testGitProjPushCLI; \
 	fi
 
@@ -329,7 +327,6 @@ test-env_Home3AfterCloneMkGit.tgz :
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
 	else \
-		./test-init.sh $@; \
 		./test-clone.sh testCloneMkGitDirPass; \
 	fi
 
@@ -338,7 +335,6 @@ test-env_Home3AfterCloneSummary.tgz :
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
 	else \
-		./test-init.sh $@; \
 		./test-clone.sh testCloneSummary; \
 	fi
 
@@ -351,5 +347,8 @@ update-tgz-files :
 		if [ -z $$? ]; then \
 			exit 1; \
 		fi; \
+		sleep 7; \
 	done
 
+	# sleep required because there is a rate limit that only allows
+        # 6 ssh connections allowed every 30 sec (from the same IP).
