@@ -91,37 +91,6 @@ fRemoteCheckDir()
 } # fRemoteCheckDir
 
 # --------------------
-fRemoteCheckDirSpace()
-{
-    local pMountDir=$1
-    local pMinSpace=$2
-    local tSrc=${BASH_SOURCE##*/}
-    local tAvail
-    local tGitSize
-    local tRawSize
-    local tDesiredSize
-
-    tAvail=$(df -BM $pMountDir --output=avail | tail -n1)
-    tAvail=${tAvail%M}
-
-    tGitSize=$(du -sm $gpLocalTopDir/.git | awk '{print $1}')
-    let tGitSize*=2
-
-    tRawSize=$(du -sm $gpLocalTopDir/raw | awk '{print $1}')
-    let tRawSize*=2
-
-    let tDesiredSize=tGitSize+tRawSize
-    let pMinSpace=pMinSpace/1024/1024
-
-    if [ $tAvail -lt $tDesiredSize ] || [ $tAvail -lt $pMinSpace ]; then
-        fError -n -m "There is not enough space at $pMountDir, which has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB (or ${pMinSpace}MB)" -l $tSrc:$LINENO
-        return 1
-    fi
-
-    return 0
-} # fRemoteCheckDirSpace
-
-# --------------------
 fRemoteGetDirList()
 {
     local pMountDir="$1"
@@ -175,7 +144,7 @@ fRemoteGetAnotherMountDir()
         if ! fRemoteCheckDir $tReply; then
             continue
         fi
-        if ! fRemoteCheckDirSpace "$tReply" "$gpRemoteMinSpace"; then
+        if ! fComCheckDirSpace "$tReply" "$gpRemoteMinSpace"; then
             continue
         fi
         break
@@ -207,7 +176,7 @@ fRemoteGetMountDir()
         if ! fRemoteCheckDir $pMountDir; then
             fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
         fi
-        if ! fRemoteCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
+        if ! fComCheckDirSpace "$pMountDir" "$gpRemoteMinSpace"; then
             fError -m "Cannot continue with -a mode." -l $tSrc:$LINENO
         fi
 	cd $pMountDir >/dev/null 2>&1
@@ -256,7 +225,7 @@ EOF
         if ! fRemoteCheckDir $tMountDir; then
             continue
         fi
-        if ! fRemoteCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
+        if ! fComCheckDirSpace "$tMountDir" "$gpRemoteMinSpace"; then
             continue
         fi
         if ! fComYesNo "Use: $tMountDir"; then

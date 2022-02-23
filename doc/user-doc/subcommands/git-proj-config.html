@@ -16,10 +16,12 @@
   <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a>
     <ul>
+      <li><a href="#Config-Files">Config Files</a></li>
       <li><a href="#Main-Menu-Options">Main Menu Options</a></li>
       <li><a href="#Global-User-Level-Health-Checks">Global User Level Health Checks</a></li>
       <li><a href="#Local-and-Project-Level-Health-Checks">Local and Project Level Health Checks</a></li>
-      <li><a href="#Additional-Checks">Additional Checks</a>
+      <li><a href="#Additional-Checks">Additional Checks</a></li>
+      <li><a href="#Run-all-health-checks-and-report-their-status-info1">Run all health checks and report their status [info]</a>
         <ul>
           <li><a href="#Select-actions-to-update-configs-or-files1">Select actions to update configs or files</a></li>
         </ul>
@@ -66,6 +68,22 @@
 
 <p>The &quot;actions&quot; are used to copy config variables and files between the different &quot;levels&quot;. Some actions will only copy things that are missing, while other actions can &quot;force&quot; changes.</p>
 
+<h2 id="Config-Files">Config Files</h2>
+
+<pre><code>       ProductConfig    /usr/share/doc/git-proj/config/gitconfig
+       UserConfig       ~/.gitconfig (--global)
+       ProjectConfig    PROJ/.gitproj
+       LocalConfig      PROJ/.git/config (--local)
+
+       ProductIgnore    /usr/share/doc/git-proj/config/gitignore
+       UserIgnore       ~/.gitignore
+       ProjectIgnore    PROJ/.gitignore
+
+       ProductPreCommit /usr/share/doc/git-proj/hooks/pre-commit
+       UserPreCommit    ~/.pre-commit
+       ProjectPreCommit PROJ/.pre-commit
+       LocalPreCommit   PROJ/.git/hooks/pre-commit</code></pre>
+
 <h2 id="Main-Menu-Options">Main Menu Options</h2>
 
 <dl>
@@ -104,7 +122,7 @@
 
 <p>These are done even if not in a git-proj managed workspace.</p>
 
-<p>The Validate Checks, check ProductConfig and --global. If there is a problem they can be fixed by: 1) manually setting, 2) select default, or 3) if --global select from ProductConfig.</p>
+<p>The Validate Checks, check ProductConfig and --global.</p>
 
 <ul>
 
@@ -148,7 +166,7 @@
 
 <p>These are only done if you are in a git-proj managed workspace.</p>
 
-<p>The Validate Checks, check ProjectConfig and --local. If there is a problem they can be fixed by: 1) manfully setting, 2) select from --global, 3) select default</p>
+<p>The Validate Checks, check ProjectConfig and --local.</p>
 
 <ul>
 
@@ -220,13 +238,17 @@
 <li><p>List symlinks with problems [error]</p>
 
 </li>
-<li><p>Check for big binary files, not in raw/ [warning]</p>
-
-</li>
 <li><p>Report on all symlinks in PROJ [info]</p>
 
 </li>
+<li><p>Check for big binary files, not in raw/ [warning]</p>
+
+</li>
 </ul>
+
+<h2 id="Run-all-health-checks-and-report-their-status-info1">Run all health checks and report their status [info]</h2>
+
+<p>This will list all of the current config var settings and what file they are set in. Other statistics about the course will also be listed, for example, the number of files in raw/ and the space they use.</p>
 
 <h3 id="Select-actions-to-update-configs-or-files1">Select actions to update configs or files</h3>
 

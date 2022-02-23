@@ -707,6 +707,14 @@ testComMenu()
     declare -ag gSub2Actn
     declare -ag gSub3Menu
     declare -ag gSub3Actn
+    declare -g gMenuTitle='Main Menu'
+
+    # ----------
+    fExecFunction()
+    {
+        echo "In fExecFunction" 1>&2
+        echo "gMenuTitle=$gMenuTitle" 1>&2
+    } # fExecFunction
 
     # --------------------
     # Setup
@@ -718,13 +726,13 @@ testComMenu()
     gMainActn[1]="func exit 0"
     gMainMenu[2]="Help"
     gMainActn[2]="help"
-    gMainMenu[3]="Main Item m1"
+    gMainMenu[3]="{item-1} Main Item m1"
     gMainActn[3]="func echo hello world"
-    gMainMenu[4]="Main Item m2"
+    gMainMenu[4]="{item-2} Main Item m2"
     gMainActn[4]="func echo another world"
-    gMainMenu[5]="Sub Menu1"
+    gMainMenu[5]="{sub-1} Sub Menu1"
     gMainActn[5]="menu gSub1Menu gSub1Actn"
-    gMainMenu[6]="Sub Menu2"
+    gMainMenu[6]="{sub-2} Sub Menu2"
     gMainActn[6]="menu gSub2Menu gSub2Actn"
 
     # ----------
@@ -736,11 +744,11 @@ testComMenu()
     gSub1Actn[2]="help"
     gSub1Menu[3]="Quit1"
     gSub1Actn[3]="func exit 1"
-    gSub1Menu[4]="Sub1 Item1-4"
+    gSub1Menu[4]="{item-1-4} Sub1 Item1-4"
     gSub1Actn[4]="func echo item1-4 selected"
-    gSub1Menu[5]="Sub1 Menu2-5"
+    gSub1Menu[5]="{item-2-5} Sub1 Menu2-5"
     gSub1Actn[5]="menu gSub2Menu gSub2Actn"
-    gSub1Menu[6]="Sub1 Menu3-6"
+    gSub1Menu[6]="{item-3-6} Sub1 Menu3-6"
     gSub1Actn[6]="menu gSub3Menu gSub3Actn"
 
     # ----------
@@ -755,7 +763,7 @@ testComMenu()
     gSub2Menu[4]="Sub2 Menu3-4"
     gSub2Actn[4]="menu gSub3Menu gSub3Actn"
     gSub2Menu[5]="Sub2 Item1-5"
-    gSub2Actn[5]="func echo item1-5 selected"
+    gSub2Actn[5]="func fExecFunction"
 
     # ----------
     gSub3Menu[0]="Select a Sub3Menu Item: "
@@ -773,41 +781,46 @@ testComMenu()
     gSub3Menu[6]="Sub3 Main Menu"
     gSub3Actn[6]="menu gMainMenu gMainActn"
 
-    # --------------------
+    # ----------------------------------------
     gpMaxLoop=4
+    gpDebug=1
 
-    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n1'))
+    tResult=$(fComMenu "$gMenuTitle" gMainMenu gMainActn 2>&1 < <(echo -e '3\n1'))
     assertTrue "$LINENO $?" $?
     assertContains "$LINENO" "$tResult" "Select a MainMenu Item"
     assertContains "$LINENO" "$tResult" "Main Item m1"
     assertContains "$LINENO" "$tResult" "Main Item m2"
     assertContains "$LINENO" "$tResult" "Sub Menu2"
     assertContains "$LINENO" "$tResult" "hello world"
+    assertNotContains "$LINENO" "$tResult" "{"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
 
-    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n5\n3'))
+    tResult=$(fComMenu "$gMenuTitle" gMainMenu gMainActn 2>&1 < <(echo -e '3\n5\n3'))
     assertTrue "$LINENO $?" "[ $? -eq 1 ]"
     assertContains "$LINENO" "$tResult" "hello world"
     assertContains "$LINENO" "$tResult" "Select a Sub1Menu Item: "
     assertContains "$LINENO" "$tResult" "Sub Menu1"
+    assertNotContains "$LINENO" "$tResult" "{"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
 
-    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n5\n2\n1\n4\n1'))
+    tResult=$(fComMenu "$gMenuTitle" gMainMenu gMainActn 2>&1 < <(echo -e '3\n5\n2\n1\n4\n1'))
     assertContains "$LINENO" "$tResult" "hello world"
     assertContains "$LINENO" "$tResult" "Select a Sub1Menu Item: "
     assertContains "$LINENO" "$tResult" "Sub Menu1"
     assertContains "$LINENO" "$tResult" "Sub1 help text"
     assertContains "$LINENO" "$tResult" "another world"
+    assertNotContains "$LINENO" "$tResult" "{"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
 
-    tResult=$(fComMenu "Main Menu" gMainMenu gMainActn 2>&1 < <(echo -e '3\n6\n5\n4\n5\n2\n3'))
+    tResult=$(fComMenu "$gMenuTitle" gMainMenu gMainActn 2>&1 < <(echo -e '3\n6\n5\n4\n5\n2\n3'))
     assertTrue "$LINENO $?" "[ $? -eq 1 ]"
-    assertContains "$LINENO" "$tResult" "Menu: Sub Menu2"
+    assertContains "$LINENO" "$tResult" "Sub Menu2"
     assertContains "$LINENO" "$tResult" "Sub2 Item1-5"
-    assertContains "$LINENO" "$tResult" "Menu: Sub2 Menu3-4"
+    assertContains "$LINENO" "$tResult" "Sub2 Menu3-4"
     assertContains "$LINENO" "$tResult" "Select a Sub3Menu Item: "
-    assertContains "$LINENO" "$tResult" "Menu: Sub3 Menu1-5"
+    assertContains "$LINENO" "$tResult" "Sub3 Menu1-5"
     assertContains "$LINENO" "$tResult" "Sub1 help text"
+    assertContains "$LINENO" "$tResult" "gMenuTitle=Main Menu;{sub-2} Sub Menu2"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see"
 
     return 0

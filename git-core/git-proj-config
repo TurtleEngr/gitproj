@@ -47,6 +47,22 @@ The "actions" are used to copy config variables and files between the
 different "levels". Some actions will only copy things that are
 missing, while other actions can "force" changes.
 
+=head2 Config Files
+
+       ProductConfig	/usr/share/doc/git-proj/config/gitconfig
+       UserConfig 	~/.gitconfig (--global)
+       ProjectConfig 	PROJ/.gitproj
+       LocalConfig 	PROJ/.git/config (--local)
+
+       ProductIgnore 	/usr/share/doc/git-proj/config/gitignore
+       UserIgnore    	~/.gitignore
+       ProjectIgnore 	PROJ/.gitignore
+
+       ProductPreCommit	/usr/share/doc/git-proj/hooks/pre-commit
+       UserPreCommit	~/.pre-commit
+       ProjectPreCommit PROJ/.pre-commit
+       LocalPreCommit	PROJ/.git/hooks/pre-commit
+
 =head2 Main Menu Options
 
 =over 4
@@ -74,9 +90,7 @@ This will be available in all menus.
 
 These are done even if not in a git-proj managed workspace.
 
-The Validate Checks, check ProductConfig and --global. If there
-is a problem they can be fixed by: 1) manually setting, 2) select
-default, or 3) if --global select from ProductConfig.
+The Validate Checks, check ProductConfig and --global.
 
 =over 4
 
@@ -110,9 +124,7 @@ default, or 3) if --global select from ProductConfig.
 
 These are only done if you are in a git-proj managed workspace.
 
-The Validate Checks, check ProjectConfig and --local. If there is a
-problem they can be fixed by: 1) manfully setting, 2) select from
---global, 3) select default
+The Validate Checks, check ProjectConfig and --local.
 
 =over 4
 
@@ -170,11 +182,18 @@ Suggest mounting it or running "git proj remote".
 
 =item * List symlinks with problems [error]
 
-=item * Check for big binary files, not in raw/ [warning]
-
 =item * Report on all symlinks in PROJ [info]
 
+=item * Check for big binary files, not in raw/ [warning]
+
 =back
+
+=head2 Run all health checks and report their status [info]
+
+This will list all of the current config var settings and what file
+they are set in. Other statistics about the course will also be
+listed, for example, the number of files in raw/ and the space they
+use.
 
 =head3 Select actions to update configs or files
 

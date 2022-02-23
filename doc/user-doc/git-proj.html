@@ -20,13 +20,18 @@
         <li><a href="#pSubCmd">pSubCmd</a></li>
         <li><a href="#pSubCmdOpt">pSubCmdOpt</a></li>
         <li><a href="#common-options">[common-options]</a></li>
-        <li><a href="#Configuration">Configuration</a></li>
       </ul>
     </li>
     <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
     <li><a href="#EXAMPLES">EXAMPLES</a></li>
     <li><a href="#ENVIRONMENT">ENVIRONMENT</a></li>
-    <li><a href="#FILES">FILES</a></li>
+    <li>
+      <a href="#FILES">FILES</a>
+      <ul>
+        <li><a href="#Configuration-Files">Configuration Files</a></li>
+        <li><a href="#Other-Files">Other Files</a></li>
+      </ul>
+    </li>
     <li><a href="#SEE-ALSO">SEE ALSO</a></li>
     <li><a href="#CAVEATS">CAVEATS</a></li>
     <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
@@ -88,23 +93,28 @@
     <li>
       <a href="#DESCRIPTION7">DESCRIPTION</a>
       <ul>
+        <li><a href="#Config-Files">Config Files</a></li>
         <li><a href="#Main-Menu-Options">Main Menu Options</a></li>
-        <li><a href="#Global-User-Level-Checks">Global User Level
-        Checks</a></li>
-        <li><a href="#Local-and-Project-Level-Checks">Local and Project Level
-        Checks</a></li>
+        <li><a href="#Global-User-Level-Health-Checks">Global User Level
+        Health Checks</a></li>
+        <li><a href="#Local-and-Project-Level-Health-Checks">Local and
+        Project Level Health Checks</a></li>
+        <li><a href="#Additional-Checks">Additional Checks</a></li>
         <li>
-          <a href="#Additional-Checks">Additional Checks</a>
+          <a href="#Run-all-health-checks-and-report-their-status-info1">Run
+          all health checks and report their status [info]</a>
           <ul>
-            <li><a href="#Global-User-Level-Action-Menus">Global User Level
-            Action Menus</a></li>
+            <li><a href="#Select-actions-to-update-configs-or-files1">Select
+            actions to update configs or files</a></li>
           </ul>
         </li>
-        <li><a href="#Local-and-Project-Level-Action-Menus">Local and Project
-        Level Action Menus</a></li>
-        <li><a href="#pre-commit-Hook-Action-Menus">pre-commit Hook Action
-        Menus</a></li>
-        <li><a href="#Other-Action-Menus">Other Action Menus</a></li>
+        <li><a href="#Config-File-Level-Direction">Config File Level
+        Direction</a></li>
+        <li><a href="#Only-copy-missing-or-Force">Only copy missing or
+        Force</a></li>
+        <li><a href="#Copy-gitignore-file1">Copy gitignore file</a></li>
+        <li><a href="#Copy-pre-commit-file1">Copy pre-commit file</a></li>
+        <li><a href="#Continue">Continue?</a></li>
       </ul>
     </li>
     <li><a href="#OPTIONS7">OPTIONS</a></li>
@@ -270,15 +280,6 @@
       <pre><code>    [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)</code></pre>
     </dd>
   </dl>
-  <h2 id="Configuration">Configuration</h2>
-  <p>These are the main configuration files you will need to know about.</p>
-  <pre><code> /usr/share/doc/config/gitconfig
- ~/.gitconfig
- PROJ/.gitproj
- PROJ/.git/config</code></pre>
-  <p>See <a href="config.html">gitproj Configuration Documentation</a> for details
-  about these files and all the important gitproj variables. The pre-commit
-  hook and its config vars are also described.</p>
   <h1 id="RETURN-VALUE">RETURN VALUE</h1>
   <p>The sub-commands will return 0, if there were no serious errors. Even if
   0, pay attention to the log messages that are output.</p>
@@ -292,11 +293,27 @@
   <p>See the <a href="config.html">gitproj Configuration Documentation</a> for a
   complete list of env. vars.</p>
   <h1 id="FILES">FILES</h1>
-  <p>See the <a href="config.html">gitproj Configuration Documentation</a> for a
-  complete list of important files.</p>
+  <p>See <a href="config.html">gitproj Configuration Documentation</a> for details
+  about these files and all the important gitproj variables. The pre-commit
+  hook and its config vars are also described.</p>
   <p>All the User Documentation can also be found online in github at:
   <a href=
   "https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc">/doc/user-doc</a></p>
+  <h2 id="Configuration-Files">Configuration Files</h2>
+  <p>These are the main configuration files you will need to know about.</p>
+  <pre><code> /usr/share/doc/config/gitconfig        # Product
+ ~/.gitconfig                           # User
+ PROJ/.gitproj                          # Project
+ PROJ/.git/config                       # Local</code></pre>
+  <h2 id="Other-Files">Other Files</h2>
+  <pre><code> /usr/share/doc/config/gitignore        # Product
+ ~/.gitignore                           # User
+ PROJ/.gitignore                        # Project
+
+ /usr/share/doc/hooks/pre-commit        # Product
+ ~/.pre-commit                          # User
+ PROJ/.pre-commit                       # Project
+ PROJ/.git/hooks/pre-commit             # Local</code></pre>
   <h1 id="SEE-ALSO">SEE ALSO</h1>
   <pre><code>    git proj init
     git proj remote
@@ -308,9 +325,16 @@
     git proj config
 
     /usr/share/doc/git-proj/user-doc/
-        git-proj.html - all in one file
+        git-proj.html - all sub-commands in one file (html format)
+        git-proj.md - all sub-commands in one file (markdown format)
         config.html - important configuration information
-    /usr/share/doc/git-proj/user-doc/tutorial/
+        config.md - important configuration information
+        subcommands/
+            git-proj-CMD.html
+            git-proj-CMD.md
+        tutorial/
+            *.html
+            *.md
 
     Online docs: L&lt;https://github.com/TurtleEngr/gitproj/tree/main/doc|https://github.com/TurtleEngr/gitproj/tree/main/doc&gt;</code></pre>
   <h1 id="CAVEATS">CAVEATS</h1>
@@ -725,8 +749,8 @@
   <pre><code>    NOT IMPLEMENTED YET
     git proj config [common-options]</code></pre>
   <h1 id="DESCRIPTION7">DESCRIPTION</h1>
-  <p>This is text menu driven tool for checking and tuning up your git-proj
-  configurations. There are are 4 configuration"levels" to consider: Product,
+  <p>This is a text menu driven tool for checking and tuning up your git-proj
+  configurations. There are 4 configuration "levels" to consider: Product,
   User, Project, and Local. The standard git support configs at the User and
   Local levels, and the usual --global and --local options can be used with
   "git config" to get and set variables. Or you can edit the files directly.
@@ -742,43 +766,48 @@
   <p>The "actions" are used to copy config variables and files between the
   different "levels". Some actions will only copy things that are missing,
   while other actions can "force" changes.</p>
+  <h2 id="Config-Files">Config Files</h2>
+  <pre><code>       ProductConfig    /usr/share/doc/git-proj/config/gitconfig
+       UserConfig       ~/.gitconfig (--global)
+       ProjectConfig    PROJ/.gitproj
+       LocalConfig      PROJ/.git/config (--local)
+
+       ProductIgnore    /usr/share/doc/git-proj/config/gitignore
+       UserIgnore       ~/.gitignore
+       ProjectIgnore    PROJ/.gitignore
+
+       ProductPreCommit /usr/share/doc/git-proj/hooks/pre-commit
+       UserPreCommit    ~/.pre-commit
+       ProjectPreCommit PROJ/.pre-commit
+       LocalPreCommit   PROJ/.git/hooks/pre-commit</code></pre>
   <h2 id="Main-Menu-Options">Main Menu Options</h2>
   <dl>
-    <dt id="Quit">(1) Quit</dt>
+    <dt id="Quit-exit-git-proj-config">(1) Quit, exit git-proj-config</dt>
     <dd>
-      <p>In lower levels #1 will change to "Back" and Quit will move to
-      #3.</p>
+      <p>In the lower level menus, #1 will change to "Back" and "Quit" will
+      move to #3.</p>
     </dd>
     <dt id="Help">(2) Help</dt>
     <dd>
       <p>This will be available in all menus.</p>
     </dd>
-    <dt id="Run-all-health-checks-only-report-problems.-errors">(3) Run all
-    health checks, only report problems. [errors]</dt>
+    <dt id="Run-health-checks-that-look-for-problems-errors">(3) Run health
+    checks that look for problems [errors]</dt>
     <dd></dd>
-    <dt id="Run-all-health-checks-only-report-differences-diff-warnings">(4)
-    Run all health checks, only report differences [diff, warnings]</dt>
+    <dt id="Run-health-checks-that-look-for-differences-diff-warnings">(4)
+    Run health checks that look for differences [diff, warnings]</dt>
     <dd></dd>
-    <dt id="Run-all-health-checks-report-status-info">(5) Run all health
-    checks, report status [info]</dt>
+    <dt id="Run-all-health-checks-and-report-their-status-info">(5) Run all
+    health checks and report their status [info]</dt>
     <dd></dd>
-    <dt id="Select-Global-User-Level-Actions">(6) Select Global User Level
-    Actions</dt>
-    <dd></dd>
-    <dt id="Select-Local-Project-Level-Actions-offered-only-if-in-a-PROJ">(7)
-    Select Local Project Level Actions (offered only if in a PROJ)</dt>
-    <dd></dd>
-    <dt id="Select-pre-commit-Hook-Actions-offered-only-if-in-a-PROJ">(8)
-    Select pre-commit Hook Actions (offered only if in a PROJ)</dt>
-    <dd></dd>
-    <dt id="Select-Other-Actions">(9) Select Other Actions</dt>
+    <dt id="Select-actions-to-update-configs-or-files">(6) Select actions to
+    update configs or files</dt>
     <dd></dd>
   </dl>
-  <h2 id="Global-User-Level-Checks">Global User Level Checks</h2>
+  <h2 id="Global-User-Level-Health-Checks">Global User Level Health
+  Checks</h2>
   <p>These are done even if not in a git-proj managed workspace.</p>
-  <p>The Validate Checks, check ProductConfig and --global. If there is a
-  problem they can be fixed by: 1) manually setting, 2) select default, or 3)
-  if --global select from ProductConfig.</p>
+  <p>The Validate Checks, check ProductConfig and --global.</p>
   <ul>
     <li>
       <p>Validate "facility" name [error]</p>
@@ -813,11 +842,10 @@
       </ul>
     </li>
   </ul>
-  <h2 id="Local-and-Project-Level-Checks">Local and Project Level Checks</h2>
-  <p>These are done if you are in a git-proj managed workspace.</p>
-  <p>The Validate Checks, check ProjectConfig and --local. If there is a
-  problem they can be fixed by: 1) manfully setting, 2) select from --global,
-  3) select default</p>
+  <h2 id="Local-and-Project-Level-Health-Checks">Local and Project Level
+  Health Checks</h2>
+  <p>These are only done if you are in a git-proj managed workspace.</p>
+  <p>The Validate Checks, check ProjectConfig and --local.</p>
   <ul>
     <li>
       <p>If defined, validate "facility" name [error]</p>
@@ -887,96 +915,138 @@
       <p>List symlinks with problems [error]</p>
     </li>
     <li>
-      <p>Check for big binary files, not in raw/ [warning]</p>
-    </li>
-    <li>
       <p>Report on all symlinks in PROJ [info]</p>
     </li>
+    <li>
+      <p>Check for big binary files, not in raw/ [warning]</p>
+    </li>
   </ul>
-  <h3 id="Global-User-Level-Action-Menus">Global User Level Action Menus</h3>
+  <h2 id="Run-all-health-checks-and-report-their-status-info1">Run all health
+  checks and report their status [info]</h2>
+  <p>This will list all of the current config var settings and what file they
+  are set in. Other statistics about the course will also be listed, for
+  example, the number of files in raw/ and the space they use.</p>
+  <h3 id="Select-actions-to-update-configs-or-files1">Select actions to
+  update configs or files</h3>
+  <p>Define the config sections or files that you want to update or
+  copy."</p>
   <dl>
     <dt id="Back">(1) Back</dt>
     <dd></dd>
     <dt id="Help1">(2) Help</dt>
     <dd></dd>
-    <dt id="Quit1">(3) Quit</dt>
+    <dt id="Quit-back-to-main">(3) Quit, back to main</dt>
     <dd></dd>
-    <dt id="ProductConfig-----global-Only-update-missing-vars">(4)
-    ProductConfig -&gt; --global Only update missing vars</dt>
+    <dt id="Copy-all-config-section:-core-alias-git-flow-gitproj.config">(4)
+    Copy all config section: core, alias, git-flow, gitproj.config</dt>
     <dd></dd>
-    <dt id="ProductConfig-----global-Force-update-of-all-gitproj-vars">(5)
-    ProductConfig -&gt; --global Force update of all gitproj vars</dt>
+    <dt id="Copy-some-config-section:-git-flow-gitproj.config">(5) Copy some
+    config section: git-flow, gitproj.config</dt>
     <dd></dd>
-    <dt id="ProductIgnore---UserIgnore-only-add-missing">(6) ProductIgnore
-    -&gt; UserIgnore (only add missing)</dt>
-    <dd>
-      <p>Note: this will result in a sorted list, with duplicates
-      removed.</p>
-    </dd>
-    <dt id="Install-update-git-flow-and-corresponding-configs">(7)
-    Install/update git-flow and corresponding configs</dt>
+    <dt id="Only-copy-gitproj.config-section">(6) Only copy gitproj.config
+    section</dt>
     <dd></dd>
-  </dl>
-  <h2 id="Local-and-Project-Level-Action-Menus">Local and Project Level
-  Action Menus</h2>
-  <dl>
-    <dt id=
-    "local---ProjectConfig-Force-core-git-flow-and-gitproj.config-sections-only">
-    (4) --local -&gt; ProjectConfig (Force core, git-flow, and gitproj.config
-    sections only)</dt>
+    <dt id="Only-copy-gitproj.hooks-section">(7) Only copy gitproj.hooks
+    section</dt>
     <dd></dd>
-    <dt id=
-    "global---ProjectConfig-and---local-Update-missing-vars-in-gitproj.config-sections-only">
-    (5) --global -&gt; ProjectConfig and --local (Update missing vars in
-    gitproj.config sections only)</dt>
+    <dt id="Copy-gitignore-file">(8) Copy gitignore file</dt>
     <dd></dd>
-    <dt id=
-    "global---ProjectConfig-and---local-Force-update-of-all-gitproj.config-section-vars-in-common-remotes-are-not-changed">
-    (6) --global -&gt; ProjectConfig and --local (Force update of all
-    gitproj.config section, vars in-common) (remotes are not changed)</dt>
+    <dt id="Copy-pre-commit-file">(9) Copy pre-commit file</dt>
     <dd></dd>
-    <dt id="UserIgnore---ProjectIgnore-only-adds-missing-items">(7)
-    UserIgnore -&gt; ProjectIgnore (only adds missing items)</dt>
+    <dt id="Select-the-configs-or-file-to-be-moved">Select the configs or
+    file to be moved:</dt>
     <dd></dd>
   </dl>
-  <h2 id="pre-commit-Hook-Action-Menus">pre-commit Hook Action Menus</h2>
+  <h2 id="Config-File-Level-Direction">Config File Level Direction</h2>
+  <p>These options are for all of the config files actions.</p>
+  <p>Define what level to copy from and what level to copy to.</p>
+  <p>For example, if you select 'Product -&gt; User', then that means
+  sections from /usr/share/doc/git-proj/config/gitconfig will be copied to
+  ~/.gitconfig</p>
+  <p>The config 'levels' and files are more completely described in the
+  user-doc 'gitproj Configuration Documentation' (config.md</p>
   <dl>
-    <dt id="ProductPreCommit---UserPreCommit">(4) ProductPreCommit -&gt;
-    UserPreCommit</dt>
+    <dt id="Product---Use">(4) Product -&gt; Use</dt>
     <dd></dd>
-    <dt id=
-    "global---ProjectConfig-and---local-Force-update-of-gitproj-hooks-section">
-    (5) --global -&gt; ProjectConfig and --local (Force update of 'gitproj
-    hooks' section)</dt>
+    <dt id="User---Project">(5) User -&gt; Project</dt>
     <dd></dd>
-    <dt id="UserPreCommit---ProjectPreCommit-and-LocalPreCommit">(6)
-    UserPreCommit -&gt; ProjectPreCommit and LocalPreCommit</dt>
+    <dt id="Project---Local">(6) Project -&gt; Local</dt>
     <dd></dd>
-    <dt id="local---ProjectConfig-Force-update-of-gitproj.hooks-section">(7)
-    --local -&gt; ProjectConfig (Force update of 'gitproj.hooks'
-    section)</dt>
+    <dt id="Local---Project">(7) Local -&gt; Project</dt>
     <dd></dd>
-    <dt id="LocalPreCommit---ProjectPreCommit">(8) LocalPreCommit -&gt;
-    ProjectPreCommit</dt>
+    <dt id="Project---User">(8) Project -&gt; User</dt>
     <dd></dd>
-    <dt id="local-----global-Force-update-of-gitproj.hooks-section">(9)
-    --local -&gt; --global (Force update of 'gitproj.hooks' section)</dt>
-    <dd></dd>
-    <dt id="LocalPreCommit---UserPreCommit">(10) LocalPreCommit -&gt;
-    UserPreCommit</dt>
+    <dt id="Select-the-from-to">Select the from/to:</dt>
     <dd></dd>
   </dl>
-  <h2 id="Other-Action-Menus">Other Action Menus</h2>
+  <h2 id="Only-copy-missing-or-Force">Only copy missing or Force</h2>
+  <p>If you select 'Force copy', then the variables in the 'from' file will
+  replace the variables in the 'to' file.</p>
+  <p>If you select 'Only copy missing', then existing variables, in the 'to'
+  file, will not be replaced with variables in the 'from' file. But missing
+  variables will be copied from the 'from' file.</p>
   <dl>
-    <dt id="Set-remote-min-space">(4) Set remote-min-space</dt>
+    <dt id="Force-copy">(4) Force copy</dt>
+    <dd></dd>
+    <dt id="Only-copy-missing">(5) Only copy missing</dt>
+    <dd></dd>
+    <dt id="Select-the-force-option">Select the "force" option:</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Copy-gitignore-file1">Copy gitignore file</h2>
+  <p>Define what level to copy from and what level to copy to.</p>
+  <p>For example, if you select 'Product -&gt; User', then that means
+  /usr/share/doc/git-proj/config/gitignore will be merged to ~/.gitignore</p>
+  <p>An existing ~/.gitignore will be copied to ~/.gitignore.bak The updated
+  ~/.gitignore will be sorted with duplicates and comments removed.</p>
+  <p>The config 'levels' and files are more completely described in the
+  user-doc 'gitproj Configuration Documentation' (config.md)</p>
+  <dl>
+    <dt id="Product---User">(4) Product -&gt; User</dt>
+    <dd></dd>
+    <dt id="User---Project1">(5) User -&gt; Project</dt>
+    <dd></dd>
+    <dt id="Project---User1">(6) Project -&gt; User</dt>
+    <dd></dd>
+    <dt id="Select-the-from-to1">Select the from/to:</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Copy-pre-commit-file1">Copy pre-commit file</h2>
+  <p>Define what level to copy from and what level to copy to.</p>
+  <p>For example, if you select 'Product -&gt; User', then that means
+  /usr/share/doc/git-proj/hooks/pre-commit will be copied to
+  ~/.pre-commit</p>
+  <p>An existing ~/.pre-commit will be copied to ~/.pre-commit.~1~</p>
+  <p>The config 'levels' and files are more completely described in the
+  user-doc 'gitproj Configuration Documentation' (config.md)</p>
+  <dl>
+    <dt id="Product---Use1">(4) Product -&gt; Use</dt>
+    <dd></dd>
+    <dt id="User---Project2">(5) User -&gt; Project</dt>
+    <dd></dd>
+    <dt id="Project---Local1">(6) Project -&gt; Local</dt>
+    <dd></dd>
+    <dt id="Local---Project1">(7) Local -&gt; Project</dt>
+    <dd></dd>
+    <dt id="Project---User2">(8) Project -&gt; User</dt>
+    <dd></dd>
+    <dt id="Select-the-from-to2">Select the from/to:</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Continue">Continue?</h2>
+  <p>Selecting 'Yes' will make the changes you have selected. If you do not
+  want to continue, then you can Quit, to return to the main menu, or select
+  the Back options to update your selections.</p>
+  <dl>
+    <dt id="Back1">(1) Back</dt>
+    <dd></dd>
+    <dt id="Help2">(2) Help</dt>
+    <dd></dd>
+    <dt id="Quit-back-to-main1">(3) Quit, back to main</dt>
+    <dd></dd>
+    <dt id="Yes-continue">(4) Yes, continue</dt>
     <dd>
-      <p>Fix options: 1) set manually, 2) set from --global, 3) default</p>
-    </dd>
-    <dt id="Set-the-max-size-for-commits-of-binary-files">(5) Set the max
-    size for commits of binary files.</dt>
-    <dd>
-      <p>Fix options: 1) set manually, 2) set from ~/.gitconfig, 3)
-      default</p>
+      <p>Are the above actions correct?</p>
     </dd>
   </dl>
   <h1 id="OPTIONS7">OPTIONS</h1>

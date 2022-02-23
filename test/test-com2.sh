@@ -248,8 +248,10 @@ testComConfigCopy()
     local tSrc=$gpDoc/config/gitconfig
     local tDstDir=$HOME/project/test
     local tDst=$HOME/project/test/config.test
+    local tIncPat
+    local tExcPat
 
-    # fComConfigCopy [-f] [-s pSrc] [-d pDst] [-i pInclPat] [-e pExclPat]
+    # fComConfigCopy [-f] [-s pSrc] [-d pDst] [-i pIncPat] [-e pExcPat]
 
     tResult=$(fComConfigCopy 2>&1)
     assertFalse "$LINENO" "$?"
@@ -265,7 +267,7 @@ testComConfigCopy()
 
     tResult=$(fComConfigCopy -s $tSrc -d $tDst 2>&1)
     assertFalse "$LINENO" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "$tDst is missing or not writable"
+    assertContains "$LINENO $tResult" "$tResult" "directory does not exist"
 
     mkdir $tDstDir
     touch $tDst
@@ -275,6 +277,21 @@ testComConfigCopy()
     assertTrue "$LINENO" "[ -f $tDst.bak ]"
     assertTrue "$LINENO $(diff -ibBwZ $tSrc $tDst)" "diff -qibBwZ $tSrc $tDst"
 
+
+    git config -f $tDst gitproj.config.local-status local-status-val
+    git config -f $tDst gitproj.config.local-host local-host-val
+    git config -f $tDst gitproj.config.remote-status remote-status-val
+    git config -f $tDst gitproj.config.proj-name proj-name-val
+    tResult=$(fComConfigCopy -f -s $tSrc -d $tDst \
+        -i 'gitproj\.config\.local-|gitproj.config.proj-name' \
+	-e "gitproj\.config\.local-host" 2>&1)
+    assertTrue "$LINENO $tResult" "$?"
+    assertFalse "$LINENO local-status" "grep -q local-status-val $tDst"
+    assertFalse "$LINENO proj-name" "grep -q proj-name-val $tDst"
+    assertTrue "$LINENO local-host" "grep -q local-host-val $tDst"
+    assertTrue "$LINENO remote-status" "grep -q remote-status-val $tDst"
+
+    return 0
 } # testComConfigCopy
 
 testComConfigUpdateLocal()

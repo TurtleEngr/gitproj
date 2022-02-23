@@ -175,6 +175,11 @@ fComConfigCopy()
         return 1
     fi
 
+    if [ ! -d ${pDest%/*} ]; then
+        fError -n -i -m "${pDest%/*} directory does not exist" -l $tSrc:$LINENO
+        return 1
+    fi
+
     touch $pDest
     if [ ! -w $pDest ]; then
         fError -n -i -m "-d $pDest file is not writable" -l $tSrc:$LINENO
@@ -185,17 +190,16 @@ fComConfigCopy()
         return 1
     fi
 
-    git config -f $pSource --list | while read tSrcConfig; do
+    git config -f $pSource --list | \
+      grep -E "$pIncPat" | grep -Ev "$pExcPat" | \
+      while read tSrcConfig; do
         tVar=${tSrcConfig%=*}
         tValue="${tSrcConfig#*=}"
-        tFound=$(echo $tVar | grep -E "$pIncPat" | grep -Ev "$pExcPat")
-        if [ -z "$tFound" ]; then
-            continue
-        fi
         if [ $pForce -ne 0 ]; then
-            git config -f $pDest $tVar $tValue
+            git config -f $pDest $tVar "$tValue"
             if [ $? -ne 0 ]; then
                 fError -i -n "git config error" -l $tSrc:$LINENO
+	        fLog -f -p warning -m "git config -f $pDest $tVar $tValue" -l $tSrc:$LINENO
             fi
             continue
         fi
@@ -207,7 +211,7 @@ fComConfigCopy()
             fError -i -n "git config error" -l $tSrc:$LINENO
         fi
     done
-    if diff -q $pDest $pDest.bak; then
+    if diff -q $pDest $pDest.bak >/dev/null 2>&1; then
         rm -f $pDest.bak
     fi
 
@@ -831,6 +835,7 @@ fComMenu()
     local tSelect
     local tCmd
     local tFun
+    local tIFS
 
     tSize=$(eval echo "\${#${pMenu}[@]}")
     let --tSize
@@ -845,9 +850,10 @@ fComMenu()
 	tSelected=$(echo $pTitle | sed 's/{[^}]*} //g')
         echo
         echo "Current selections:"
+	tIFS="$IFS"
 	IFS=';'
 	printf '\t%s\n' $tSelected
-	IFS=' '
+	IFS="$tIFS"
         for ((tItem = 1 ; tItem <= tSize ; tItem++)); do
             tMenu[$tItem]="$(eval echo $(echo \${${pMenu}[$tItem]}))"
             echo -e "  $tItem)\n      ${tMenu[$tItem]}" | \
@@ -2065,6 +2071,37 @@ fComIsRemoteMounted()
     fLog -p $pLevel -m "$gpRemoteRawOrigin was not found. Try again after mounting it or run 'git proj remote' to change the remote.raw.dir location." -l $tSrc:$LINENO
     return 1
 } # fComIsRemoteMounted
+
+# --------------------
+fComCheckDirSpace()
+{
+    local pMountDir=$1
+    local pMinSpace=$2
+    local tSrc=${BASH_SOURCE##*/}
+    local tAvail
+    local tGitSize
+    local tRawSize
+    local tDesiredSize
+
+    tAvail=$(df -BM $pMountDir --output=avail | tail -n1)
+    tAvail=${tAvail%M}
+
+    tGitSize=$(du -sm $gpLocalTopDir/.git | awk '{print $1}')
+    let tGitSize*=2
+
+    tRawSize=$(du -sm $gpLocalTopDir/raw | awk '{print $1}')
+    let tRawSize*=2
+
+    let tDesiredSize=tGitSize+tRawSize
+    let pMinSpace=pMinSpace/1024/1024
+
+    if [ $tAvail -lt $tDesiredSize ] || [ $tAvail -lt $pMinSpace ]; then
+        fLog -f -p warning -m "There is may not be enough space at $pMountDir, which has ${tAvail}MB. .git and raw needs ${tDesiredSize}MB (or ${pMinSpace}MB)" -l $tSrc:$LINENO
+        return 1
+    fi
+
+    return 0
+} # fComCheckDirSpace
 
 # --------------------
 fComGetProjGlobals()

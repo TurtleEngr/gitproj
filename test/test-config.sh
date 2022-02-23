@@ -107,6 +107,8 @@ setUp()
 
     fTestSetupEnv
     fTestCreateEnv
+    gpVerbose=0
+
     cd $cTestDestDir >/dev/null 2>&1
     if [ ! -e $tTarIn ]; then
         echo "Missing: $tTarIn" 1>&2
@@ -127,7 +129,6 @@ setUp()
     fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     git ci -am "Updated" >/dev/null 2>&1
-
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     . $gpBin/gitproj-config.inc
 
@@ -190,7 +191,7 @@ tearDown()
 testSetUp()
 {
     local tResult
-
+return 0
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     HOME=$cDatHome
     fComGetProjGlobals

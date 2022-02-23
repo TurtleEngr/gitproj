@@ -33,6 +33,22 @@ The "actions" are used to copy config variables and files between the
 different "levels". Some actions will only copy things that are
 missing, while other actions can "force" changes.
 
+## Config Files
+
+       ProductConfig    /usr/share/doc/git-proj/config/gitconfig
+       UserConfig       ~/.gitconfig (--global)
+       ProjectConfig    PROJ/.gitproj
+       LocalConfig      PROJ/.git/config (--local)
+
+       ProductIgnore    /usr/share/doc/git-proj/config/gitignore
+       UserIgnore       ~/.gitignore
+       ProjectIgnore    PROJ/.gitignore
+
+       ProductPreCommit /usr/share/doc/git-proj/hooks/pre-commit
+       UserPreCommit    ~/.pre-commit
+       ProjectPreCommit PROJ/.pre-commit
+       LocalPreCommit   PROJ/.git/hooks/pre-commit
+
 ## Main Menu Options
 
 - (1) Quit, exit git-proj-config
@@ -53,9 +69,7 @@ missing, while other actions can "force" changes.
 
 These are done even if not in a git-proj managed workspace.
 
-The Validate Checks, check ProductConfig and --global. If there
-is a problem they can be fixed by: 1) manually setting, 2) select
-default, or 3) if --global select from ProductConfig.
+The Validate Checks, check ProductConfig and --global.
 
 - Validate "facility" name \[error\]
 - Validate "bin" and "doc" locations \[error\]
@@ -72,9 +86,7 @@ default, or 3) if --global select from ProductConfig.
 
 These are only done if you are in a git-proj managed workspace.
 
-The Validate Checks, check ProjectConfig and --local. If there is a
-problem they can be fixed by: 1) manfully setting, 2) select from
-\--global, 3) select default
+The Validate Checks, check ProjectConfig and --local.
 
 - If defined, validate "facility" name \[error\]
 - If defined, validate "bin" and "doc" locations \[error\]
@@ -112,8 +124,15 @@ in --global \[diff\]
 ## Additional Checks
 
 - List symlinks with problems \[error\]
-- Check for big binary files, not in raw/ \[warning\]
 - Report on all symlinks in PROJ \[info\]
+- Check for big binary files, not in raw/ \[warning\]
+
+## Run all health checks and report their status \[info\]
+
+This will list all of the current config var settings and what file
+they are set in. Other statistics about the course will also be
+listed, for example, the number of files in raw/ and the space they
+use.
 
 ### Select actions to update configs or files
 

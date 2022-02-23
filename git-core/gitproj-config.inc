@@ -3,8 +3,8 @@
 # --------------------
 export cGetOrigin cGetTopDir cTop
 
-export gpBin gpCheckFileNames gpCheckForBigFiles \
-    gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
+export gpBin gpInProj gpTopDir \
+    gpCmdName gpDebug gpDoc gpFacility \
     gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus \
     gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
@@ -13,31 +13,308 @@ export gpBin gpCheckFileNames gpCheckForBigFiles \
 fCheckForErrors()
 {
     local tSrc=${BASH_SOURCE##*/}
-    echo "TBD fCheckForErrors()"
+    local tConfFileList
+    local tFile
+    local tKey
+    local tValue
 
-    # Product
+    echo
+    echo '----------------------------------------'
+    echo "Errors - things that must be fixed"
+    echo
 
-    # User
+    tConfFileList="$gpDoc/config/gitconfig $HOME/.gitconfig"
+    if $gpInProj; then
+        fConfFileList="$fConfFileList $gpTopDir/.gitproj $gpTopDir/.git/config"
+    fi
 
-    # Project
+    for tFile in $tConfFileList; do
 
-    # Local
+        tValue=$(fComGetConfig -f $tFile -k "gitproj.config.facility" -d "null")
+        echo $tValue | grep -Eq 'auth|authpriv|cron|daemon|ftp|lpr|mail|news|syslog|user|uucp|local[0-7]|null'
+        if [ $? -ne 0 ]; then
+            echo
+            fError -n -m "Invalid facility name, $tValue, in $tFile. It can only be: auth, authpriv, cron, daemon, ftp, lpr, mail, news, syslog, user, uucp, or local[0-7]" -l $tSrc:$LINENO
+        fi
+
+        tValue=$(fComGetConfig -f $tFile -k "gitproj.config.bin" -d "null")
+        if [ "$tValue" != "null" ]; then
+            if [[ ! -d $tValue ]]; then
+               echo
+               fError -n -m "Invalid gitproj.config.bin, $tValue, in $tFile"  -l $tSrc:$LINENO
+            fi
+        fi
+
+#       tValue=$(fComGetConfig -f $tFile -k "gitproj.config.doc" -d "null")
+#       if [ "$tValue" != "null" ]; then
+#           if [[ ! -d $tValue || ! -f $tValue/config/gitconfig ]]; then
+#              echo
+#              fError -n -m "$tValue directory not found. Set in gitproj.config.doc in $tFile"  -l $tSrc:$LINENO
+#           fi
+#       fi
+
+        if [[ ! -d $gpDoc || ! -f $gpDoc/config/gitconfig ]]; then
+            echo
+            fError -n -m "$gpDoc directory not found."  -l $tSrc:$LINENO
+        fi
+
+        for tKey in \
+            core.filemode \
+            core.autocrlf \
+            core.ignorecase \
+            core.logAllRefUpdates \
+            core.quotePath \
+            core.trustctime \
+            gitproj.config.syslog \
+            gitproj.config.git-flow \
+            gitproj.hook.verbose \
+            gitproj.hook.pre-commit-enabled \
+            gitproj.hook.check-file-names \
+            gitproj.hook.gitproj.hook.check-in-raw \
+            gitproj.hook.check-whitespace \
+            gitproj.hook.check-for-tabs \
+            gitproj.hook.check-for-big-files \
+            ; do
+            tValue=$(fComGetConfig -f $tFile -k "$tKey" -d "null")
+            if [ "$tValue" = "null" ]; then
+                continue
+            fi
+            if [[ "$tValue" != "false" && "$tValue" != "true" ]]; then
+                echo
+                fError -n -m "$tKey is $tValue, in file $tFile. It should only be 'true' or 'false'" -l $tSrc:$LINENO
+            fi
+        done
+
+        for tKey in \
+            gitproj.config.remote-min-space \
+            gitproj.config.verbose \
+            gitproj.hook.binary-file-size \
+            ; do
+            tValue=$(fComGetConfig -f $tFile -k "$tKey" -d "null")
+            if [ "$tValue" = "null" ]; then
+                continue
+            fi
+            echo ${tValue,,} | grep -Eq '[0-9][0-9]*[kmg]*'
+            if [ $? -ne 0 ]; then
+                echo
+                fError -n -m "$tKey is $tValue, in file $tFile. It should only be an integer" -l $tSrc:$LINENO
+            fi
+        done
+    done
+
+    # ----------
+    # Look for all required vars
+
+    tConfFileList=""
+    tValue=$(fComGetConfig -k gitproj.config.git-flow -d "null")
+    if [ "$tValue" != "null" ]; then
+            tConfFileList="gitflow.prefix.feature gitflow.prefix.release gitflow.prefix.hotfix gitflow.prefix.bugfix gitflow.prefix.support"
+    fi
+
+    if $gpInProj; then
+        tConfFileList="$tConfFileList branch.main.remote branch.develop.remote remote.origin.url"
+    fi
+
+    for tKey in \
+        gitproj.config.proj-status \
+        gitproj.config.syslog \
+        gitproj.config.facility \
+        gitproj.config.bin \
+        gitproj.config.doc \
+        gitproj.config.git-flow-pkg \
+        gitproj.config.git-flow \
+        gitproj.config.local-status \
+        gitproj.config.local-host \
+        gitproj.config.proj-name \
+        gitproj.config.remote-status \
+        gitproj.config.remote-raw-origin \
+        gitproj.config.remote-min-space \
+        gitproj.config.verbose \
+        gitproj.hook.verbose \
+        gitproj.hook.pre-commit-enabled \
+        gitproj.hook.check-file-names \
+        gitproj.hook.check-in-raw \
+        gitproj.hook.check-whitespace \
+        gitproj.hook.check-for-tabs \
+        gitproj.hook.tab-exclude-list \
+        gitproj.hook.check-for-big-files \
+        gitproj.hook.binary-file-size \
+        $tConfFileList \
+        ; do
+        tValue=$(fComGetConfig -k $tKey -d "null")
+        if [ "$tValue" = "null" ]; then
+            echo
+            fError -n -m "$tKey is not defined anywhere." -l $tSrc:$LINENO
+        fi
+    done
+
+    # ----------
+    for tFile in $gpDoc/config/gitconfig $HOME/.gitconfig; do
+        for tKey in \
+            gitproj.config.local-status \
+            gitproj.config.local-host \
+            gitproj.config.proj-name \
+            gitproj.config.remote-status \
+            gitproj.config.remote-raw-origin \
+            ; do
+            tValue=$(fComGetConfig -f $tFile -k $tKey -d "null")
+            if [[ "$tValue" != "null" && "$tValue" != "TBD" ]]; then
+                echo
+                fError -n -m "$tKey should be TBD or NOT set in $tFile" -l $tSrc:$LINENO
+            fi
+        done
+    done
+
+    if $gpInProj; then
+        for tKey in \
+            gitproj.config.local-host \
+            gitproj.config.remote-status \
+            gitproj.config.remote-raw-origin \
+            ; do
+            tValue=$(fComGetConfig -f $gpTopDir/.gitproj -k $tKey -d "null")
+            if [[ "$tValue" != "null" && "$tValue" != "TBD" ]]; then
+                echo
+                fError -n -m "$tKey should be TBD or NOT set in $gpTopDir/.gitproj" -l $tSrc:$LINENO
+            fi
+        done
+    fi
+
+    # ----------
+    # List symlinks with problems [error]
+    if $gpInProj; then
+        cd $gpTopDir >/dev/null 2>&1
+        for tFile in $(find . -type l); do
+            if [ ! -e $tFile ]; then
+                echo
+                fError -n -m "Symlink $tFile is broken" -l $tSrc:$LINENO
+            fi
+        done
+        cd - >/dev/null 2>&1
+    fi
+
+    # ----------
+    if $gpInProj; then
+        tFile=$gpTopDir/.git/config
+        for tKey in \
+            gitproj.config.local-status \
+            gitproj.config.local-host \
+            gitproj.config.proj-name \
+            gitproj.config.remote-status \
+            gitproj.config.remote-raw-origin \
+            ; do
+            tValue=$(fComGetConfig -f $tFile -k $tKey -d "null")
+            if [[ "$tValue" = "null" || "$tValue" = "TBD" ]]; then
+                echo
+                fError -n -m "$tKey is not set in $tFile. Run git-proj-init or git-proj-remote" -l $tSrc:$LINENO
+            fi
+        done
+    fi
 
     return 0
-} # fCheckForErrors()
+} # fCheckForErrors
 
 fCheckForWarnings()
 {
     local tSrc=${BASH_SOURCE##*/}
-    echo "TBD fCheckForWarnings()"
+    local tKey
+    local tValue
+    local tValue2
+    local tMount
 
-    # Product
+    echo
+    echo '----------------------------------------'
+    echo "Warnings - things that should be looked at"
+    echo
 
-    # User
+    # gitignore diffs
+    if ! diff -q $gpDoc/config/gitignore $HOME/.gitignore >/dev/null 2>&1; then
+        echo
+        fLog -f -p warning -m "$gpDoc/config/gitignore ~/.gitignore are different" -l $tSrc:$LINENO
+    fi
+    if $gpInProj; then
+        if ! diff -q $HOME/.gitignore $gpTopDir/.gitignore >/dev/null 2>&1; then
+            echo
+            fLog -f -p warning -m "~/.gitignore $gpTopDir/.gitignore are different" -l $tSrc:$LINENO
+        fi
+    fi
 
-    # Project
+    # pre-commit diffs
+    if ! diff -q $gpDoc/hooks/pre-commit $HOME/.pre-commit >/dev/null 2>&1; then
+        echo
+        fLog -f -p warning -m "$gpDoc/hooks/pre-commit ~/.pre-commit are different" -l $tSrc:$LINENO
+    fi
+    if $gpInProj; then
+        if ! diff -q $HOME/.pre-commit $gpTopDir/.pre-commit >/dev/null 2>&1; then
+            echo
+            fLog -f -p warning -m "~/.pre-commit $gpTopDir/.pre-commit are different" -l $tSrc:$LINENO
+        fi
+        if ! diff -q $gpTopDir/.pre-commit $gpTopDir/.git/hooks/pre-commit >/dev/null 2>&1; then
+            echo
+            fLog -f -p warning -m "$gpTopDir/.pre-commit $gpTopDir/.git/hooks/pre-commit are different" -l $tSrc:$LINENO
+        fi
+    fi
 
-    # Local
+    # Note disabled pre-commit checks [info]
+    if $gpInProj; then
+        for tKey in \
+            gitproj.hook.pre-commit-enabled \
+            gitproj.hook.check-in-raw \
+            gitproj.hook.check-for-big-files \
+            ; do
+            tValue=$(fComGetConfig -k $tKey)
+            if [ "$tValue" != "true" ]; then
+                echo
+                fLog -f -p warning -m "$tKey should be 'true'" -l $tSrc:$LINENO
+            fi
+        done
+        tValue=$(fComGetConfig -k gitproj.hook.binary-file-size -d null)
+        if [ "$tValue" = "null" ]; then
+            echo
+            fError -n -m "gitproj.hook.binary-file-size is not set" -l $tSrc:$LINENO
+        fi
+        if ! grep -q '/raw/' $HOME/.gitignore $gpTopDir/.gitignore; then
+            echo
+            fError -n -m "/raw/ was not found in any of the .gitignore files." -l $tSrc:$LINENO
+        fi
+    fi
+
+    # ----------
+
+    if $gpInProj; then
+        if [ "$gpProjName" != "${gpTopDir##*/}" ]; then
+            echo
+            fLog -f -p warning -m "proj-name != ${gpTopDir##*/}" -l $tSrc:$LINENO
+        fi
+
+        for tKeyValue in $(git config --list -f $gpTopDir/.gitproj | grep -v TBD); do
+            tKey=${tKeyValue%%=*}
+            tValue=${tKeyValue##*=}
+            tValue2=$(fComGetConfig -g -k $tKey -d "null")
+            if [ "$tValue" != "$tValue2" ]; then
+                echo
+                fLog -f -p warning -m "$tKey in $gpTopDir/.gitproj is different from ~/.gitconfig" -l $tSrc:$LINENO
+            fi
+            tValue2=$(fComGetConfig -l -k $tKey -d "null")
+            if [ "$tValue" != "$tValue2" ]; then
+                echo
+                fLog -f -p warning -m "$tKey in $gpTopDir/.git/config is different from $gpTopDir/.gitproj" -l $tSrc:$LINENO
+            fi
+        done
+    fi
+
+    # ----------
+    # Check space on remote
+    if $gpInProj; then
+    tMount=$(fComGetConfig -l -k "gitproj.config.remote-raw-origin")
+        if fComIsRemoteMounted; then
+            fComCheckDirSpace "$tMount" "$gpRemoteMinSpace"
+        else
+            echo
+            fLog -f -p warning -m "$tMount is not mounted" -l $tSrc:$LINENO
+        fi
+    fi
+
+    # TBD Check for big binary files, not in raw/ [warning]
 
     return 0
 } # fCheckForWarnings
@@ -45,15 +322,82 @@ fCheckForWarnings()
 fCheckStatus()
 {
     local tSrc=${BASH_SOURCE##*/}
-    echo "TBD fCheckStatus()"
+    local tKey
+    local tValue
+    local tFile
 
-    # Product
+    echo
+    echo '----------------------------------------'
+    echo 'List all config variables and where they are set'
+    echo
+    for tKey in \
+        core.filemode \
+        core.autocrlf \
+        core.ignorecase \
+        core.excludesFile \
+        core.logAllRefUpdates \
+        core.quotePath \
+        core.trustctime \
+        gap \
+        user.name \
+        user.email \
+        gap \
+        gitflow.branch.master \
+        gitflow.branch.main \
+        gitflow.branch.develop \
+        gitflow.prefix.feature \
+        gitflow.prefix.release \
+        gitflow.prefix.hotfix \
+        gitflow.prefix.bugfix \
+        gitflow.prefix.support \
+        gap \
+        gitproj.config.proj-status \
+        gitproj.config.syslog \
+        gitproj.config.facility \
+        gitproj.config.bin \
+        gitproj.config.doc \
+        gitproj.config.git-flow-pkg \
+        gitproj.config.git-flow \
+        gitproj.config.local-status \
+        gitproj.config.local-host \
+        gitproj.config.proj-name \
+        gitproj.config.remote-status \
+        gitproj.config.remote-raw-origin \
+        gitproj.config.remote-min-space \
+        gitproj.config.verbose \
+        gap \
+        gitproj.hook.verbose \
+        gitproj.hook.pre-commit-enabled \
+        gitproj.hook.check-file-names \
+        gitproj.hook.check-in-raw \
+        gitproj.hook.check-whitespace \
+        gitproj.hook.check-for-tabs \
+        gitproj.hook.tab-include-list \
+        gitproj.hook.tab-exclude-list \
+        gitproj.hook.check-for-big-files \
+        gitproj.hook.binary-file-size \
+        ; do
+        if [ "$tKey" = "gap" ]; then
+            echo
+            continue
+        fi
+        tValue=$(git config --get --show-origin $tKey)
+        tValue=$(echo $tValue | tr '\t' ' ')
+        tFile=${tValue%% *}
+        tValue=${tValue#file:* }
+        printf "%-33s = %-10s\t%s\n" $tKey $tValue $tFile
+    done
 
-    # User
-
-    # Project
-
-    # Local
+    if $gpInProj; then
+        echo
+        echo '----------------------------------------'
+        echo '$gpProjName/raw/ Report'
+        echo
+        tNumRaw=$(find $gpTopDir/raw -type f | wc -l)
+        tSizeRaw=$(du -sm $gpTopDir/raw)
+        echo "There are $tNumRaw files in raw/ using:"
+        echo "$tSizeRaw MB"
+    fi
 
     return 0
 } # fCheckStatus
@@ -78,6 +422,7 @@ fConfigHealth()
             fCheckStatus
             ;;
         *)
+            echo
             fError -i -m "Invalid option: $pStatus" -l $tSrc$LINENO -e 20
             ;;
     esac
@@ -87,14 +432,14 @@ fConfigHealth()
 
 fConfigUpdate()
 {
-    local pInc
-    local pFiles
-    local pForce
+    local pInc=$1
+    local pFiles=$2
+    local pForce=$3
     local tSrc=${BASH_SOURCE##*/}
     local tFrom
     local tTo
     local tForce
-    local tTopDir=$($cGetTopDir)
+    local tExclude
 
     if [ "$pForce" = "force" ]; then
         tForce='-f'
@@ -102,31 +447,36 @@ fConfigUpdate()
 
     case $pFiles in
         ProdUser)
-	    tFrom=/usr/share/doc/git-proj/config/gitconfig
-	    tTo=~/.gitconfig
-	    ;;
+            tFrom=/usr/share/doc/git-proj/config/gitconfig
+            tTo=$HOME/.gitconfig
+            ;;
         UserProj)
-	    tFrom=~/.gitconfig
-	    tTo=$tTopDir/.gitproj
-	    ;;
-    	ProjLocal)
-	    tFrom=$tTopDir/.gitproj
-	    tTo=$tTopDir/.git/config
-	    ;;
-    	LocalProj)
-	    tFrom=$tTopDir/.git/config
-	    tTo=$tTopDir/.gitproj
-	    ;;
-    	ProjUser)
-	    tFrom=$tTopDir/.gitproj
-	    tTo=~/.gitconfig
-	    ;;
-	*)
-	    fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
-	    ;;
+            tFrom=$HOME/.gitconfig
+            tTo=$gpTopDir/.gitproj
+            tExclude='^gitproj\.config\.local-status|^gitproj\.config\.remote-status|^gitproj\.config\.proj-name'
+            ;;
+        ProjLocal)
+            tFrom=$gpTopDir/.gitproj
+            tTo=$gpTopDir/.git/config
+            tExclude='^gitproj\.config\.local-status|^gitproj\.config\.local-host|^gitproj\.config\.proj-name|^gitproj\.config\.remote-status|^gitproj\.config\.remote-raw-origin'
+            ;;
+        LocalProj)
+            tFrom=$gpTopDir/.git/config
+            tTo=$gpTopDir/.gitproj
+            tExclude="^gitproj\.config\.local-host|^gitproj\.config\.remote-raw-origin"
+            ;;
+        ProjUser)
+            tFrom=$gpTopDir/.gitproj
+            tTo=$HOME/.gitconfig
+            tExclude="^gitproj\.config\.local-status|^gitproj\.config\.remote-status"
+            ;;
+        *)
+            echo
+            fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
+            ;;
     esac
 
-    fComConfigCopy $tForce -s $tFrom -d $tTo -i "$pInc"
+    fComConfigCopy $tForce -s $tFrom -d $tTo -i "$pInc" -e "$tExclude"
     return $?
 } # fConfigUpdate
 
@@ -137,6 +487,7 @@ fConfigMergeIgnore()
     local tSrc=${BASH_SOURCE##*/}
 
     if [ ! -f $pFrom ]; then
+        echo
         fError -i -m "Missing: $pFrom" -l $tSrc:$LINENO -e 20
     fi
     if [ ! -f $tTo ]; then
@@ -145,7 +496,7 @@ fConfigMergeIgnore()
     fi
 
     cp -v --backup=t  $tTo $tTo.bak
-    cat $pFrom $pTo | grep -v '^#' | sort -u >t.tmp
+    cat $pFrom $pTo | grep -v '^#' | sort -fu >t.tmp
     mv -f t.tmp $pTo
 
     return 0
@@ -157,24 +508,24 @@ fConfigIgnore()
     local tSrc=${BASH_SOURCE##*/}
     local tFrom
     local tTo
-    local tTopDir=$($cGetTopDir)
-    
+
     case $pFiles in
         ProdUser)
-	    tFrom=/usr/share/doc/git-proj/config/gitignore
-	    tTo=~/.gitignore
-	    ;;
+            tFrom=$gpDoc/config/gitignore
+            tTo=$HOME/.gitignore
+            ;;
         UserProj)
-	    tFrom=~/.gitignore
-	    tTo=$tTopDir/.gitignore
-	    ;;
-    	ProjUser)
-	    tFrom=$tTopDir/.gitignore
-	    tTo=~/.gitignore
-	    ;;
-	*)
-	    fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
-	    ;;
+            tFrom=$HOME/.gitignore
+            tTo=$gpTopDir/.gitignore
+            ;;
+        ProjUser)
+            tFrom=$gpTopDir/.gitignore
+            tTo=$HOME/.gitignore
+            ;;
+        *)
+            echo
+            fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
+            ;;
     esac
 
     fConfigMergeIgnore $tFrom $tTo
@@ -183,8 +534,8 @@ fConfigIgnore()
 
 fConfigCopyPreCommit()
 {
-    local pFrom
-    local pTo
+    local pFrom=$1
+    local pTo=$2
     local tSrc=${BASH_SOURCE##*/}
 
     cp --backup=t $pFrom $pTo
@@ -197,32 +548,32 @@ fConfigPreCommit()
     local tSrc=${BASH_SOURCE##*/}
     local tFrom
     local tTo
-    local tTopDir=$($cGetTopDir)
-    
+
     case $pFiles in
         ProdUser)
-	    tFrom=/usr/share/doc/git-proj/hooks/pre-commit
-	    tTo=~/.pre-commit
-	    ;;
+            tFrom=$gpDoc/hooks/pre-commit
+            tTo=$HOME/.pre-commit
+            ;;
         UserProj)
-	    tFrom=~/.pre-commit
-	    tTo=$tTopDir/.pre-commit
-	    ;;
-    	ProjLocal)
-	    tFrom=$tTopDir/.pre-commit
-	    tTo=$tTopDir/.git/hooks/pre-commit
-	    ;;
-    	LocalProj)
-	    tFrom=$tTopDir/.git/hooks/pre-commit
-	    tTo=$tTopDir/.git/hooks/pre-commit
-	    ;;
-    	ProjUser)
-	    tFrom=$tTopDir/.git/hooks/pre-commit
-	    tTo=~/.pre-commit
-	    ;;
-	*)
-	    fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
-	    ;;
+            tFrom=$HOME/.pre-commit
+            tTo=$gpTopDir/.pre-commit
+            ;;
+        ProjLocal)
+            tFrom=$gpTopDir/.pre-commit
+            tTo=$gpTopDir/.git/hooks/pre-commit
+            ;;
+        LocalProj)
+            tFrom=$gpTopDir/.git/hooks/pre-commit
+            tTo=$gpTopDir/.git/hooks/pre-commit
+            ;;
+        ProjUser)
+            tFrom=$gpTopDir/.git/hooks/pre-commit
+            tTo=$HOME/.pre-commit
+            ;;
+        *)
+            echo
+            fError -i -m "Unknown option: $pFiles" -l $tSrc:$LINENO -e 20
+            ;;
     esac
 
     fConfigCopyPreCommit $tFrom $tTo
@@ -254,26 +605,27 @@ fConfigExecAction()
     # Select on the type
     case ${tArgList[1]} in
         copy-all)
-	    fConfigUpdate 'core\.|alias\.|git-flow\.|gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
-	    ;;
-	copy-some)
-	    fConfigUpdate 'git-flow\.|gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
-	    ;;
-	copy-gitproj)
-	    fConfigUpdate 'gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
-	    ;;
-	copy-hooks)
-	    fConfigUpdate 'gitproj\.hooks\.' ${tArgList[2]} ${tArgList[3]}
-	    ;;
-	gitignore)
-	    fConfigIgnore ${tArgList[2]}
-	    ;;
-	pre-commit)
-	    fConfigPreCommit ${tArgList[2]}
-	    ;;
-	*)
-	    fError -i -m "${tArgList[1]} is unknown type" -l $tSrc:$LINENO -e 20
-	    ;;
+            fConfigUpdate '^core\.|^alias\.|^git-flow\.|^gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
+            ;;
+        copy-some)
+            fConfigUpdate '^git-flow\.|^gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
+            ;;
+        copy-gitproj)
+            fConfigUpdate '^gitproj\.config\.' ${tArgList[2]} ${tArgList[3]}
+            ;;
+        copy-hooks)
+            fConfigUpdate '^gitproj\.hooks\.' ${tArgList[2]} ${tArgList[3]}
+            ;;
+        gitignore)
+            fConfigIgnore ${tArgList[2]}
+            ;;
+        pre-commit)
+            fConfigPreCommit ${tArgList[2]}
+            ;;
+        *)
+            echo
+            fError -i -m "${tArgList[1]} is unknown type" -l $tSrc:$LINENO -e 20
+            ;;
     esac
 
     # s/b in a subshell, so this will return to main main
@@ -284,7 +636,6 @@ fConfigExecAction()
 fConfigMenu()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tInProj
     declare -ag gMainMenu
     declare -ag gMainActn
     declare -ag gTypeMenu
@@ -300,11 +651,12 @@ fConfigMenu()
     declare -ag gYesNoMenu
     declare -ag gYesNoActn
     declare -g gMenuTitle='Main'
-    declare -g gExitMenu=0
 
-    tInProj=false
+    gpInProj=false
+    gpTopDir=""
     if fComMustBeInProjRepo $PWD >/dev/null 2>&1; then
-        tInProj=true
+        gpInProj=true
+        gpTopDir=$($cGetTopDir)
     fi
 
     # ------------------------------
@@ -354,7 +706,7 @@ fConfigMenu()
 
     # 4, 5, 6, 7
     gConfMenu[0]="Select the from/to:"
-    
+
     gConfActn[0]="\n Define what level to copy from and what level to
 copy to.\n\n For example, if you select 'Product -> User', then that
 means sections from /usr/share/doc/git-proj/config/gitignore will be
@@ -370,20 +722,20 @@ Documentation' (config.md)"
     gConfActn[3]="func exit 2"
     gConfMenu[4]="{ProdUser} Product -> User"
     gConfActn[4]="menu gForceMenu gForceActn"
-    if $tInProj; then
+    if $gpInProj; then
         gConfMenu[5]="{UserProj} User -> Project"
-    	gConfActn[5]="menu gForceMenu gForceActn"
-    	gConfMenu[6]="{ProjLocal} Project -> Local"
-    	gConfActn[6]="menu gForceMenu gForceActn"
-    	gConfMenu[7]="{LocalProj} Local -> Project"
-	gConfActn[7]="menu gForceMenu gForceActn"
-    	gConfMenu[8]="{ProjUser} Project -> User"
-    	gConfActn[8]="menu gForceMenu gForceActn"
+        gConfActn[5]="menu gForceMenu gForceActn"
+        gConfMenu[6]="{ProjLocal} Project -> Local"
+        gConfActn[6]="menu gForceMenu gForceActn"
+        gConfMenu[7]="{LocalProj} Local -> Project"
+        gConfActn[7]="menu gForceMenu gForceActn"
+        gConfMenu[8]="{ProjUser} Project -> User"
+        gConfActn[8]="menu gForceMenu gForceActn"
     fi
-    
+
     # 7
     gIgnoreMenu[0]="Select the from -> to direction:"
-    
+
     gIgnoreActn[0]="\n Define what level to copy from and what level
 to copy to.\n\n For example, if you select 'Product -> User', then
 that means /usr/share/doc/git-proj/config/gitignore will be merged to
@@ -401,16 +753,16 @@ Documentation' (config.md)"
     gIgnoreActn[3]="func exit 3"
     gIgnoreMenu[4]="{ProdUser} Product -> User"
     gIgnoreActn[4]="menu gYesNoMenu gYesNoActn"
-    if $tInProj; then
+    if $gpInProj; then
         gIgnoreMenu[5]="{UserProj} User -> Project"
-     	gIgnoreActn[5]="menu gYesNoMenu gYesNoActn"
-    	gIgnoreMenu[6]="{ProjUser} Project -> User"
-    	gIgnoreActn[6]="menu gYesNoMenu gYesNoActn"
+        gIgnoreActn[5]="menu gYesNoMenu gYesNoActn"
+        gIgnoreMenu[6]="{ProjUser} Project -> User"
+        gIgnoreActn[6]="menu gYesNoMenu gYesNoActn"
     fi
-    
+
     # 8
     gPreCommitMenu[0]="Select the from -> to direction:"
-    
+
     gPreCommitActn[0]="\n Define what level to copy from and what
 level to copy to.\n\n For example, if you select 'Product -> User',
 then that means /usr/share/doc/git-proj/hooks/pre-commit will be
@@ -427,26 +779,26 @@ Documentation' (config.md)"
     gPreCommitActn[3]="func exit 4"
     gPreCommitMenu[4]="{ProdUser} Product -> User"
     gPreCommitActn[4]="menu gYesNoMenu gYesNoActn"
-    if $tInProj; then
+    if $gpInProj; then
         gPreCommitMenu[5]="{UserProj} User -> Project"
-    	gPreCommitActn[5]="menu gYesNoMenu gYesNoActn"
-    	gPreCommitMenu[6]="{ProjLocal} Project -> Local"
-    	gPreCommitActn[6]="menu gYesNoMenu gYesNoActn"
-    	gPreCommitMenu[7]="{LocalProj} Local -> Project"
-    	gPreCommitActn[7]="menu gYesNoMenu gYesNoActn"
-    	gPreCommitMenu[8]="{ProjUser} Project -> User"
-   	gPreCommitActn[8]="menu gYesNoMenu gYesNoActn"
+        gPreCommitActn[5]="menu gYesNoMenu gYesNoActn"
+        gPreCommitMenu[6]="{ProjLocal} Project -> Local"
+        gPreCommitActn[6]="menu gYesNoMenu gYesNoActn"
+        gPreCommitMenu[7]="{LocalProj} Local -> Project"
+        gPreCommitActn[7]="menu gYesNoMenu gYesNoActn"
+        gPreCommitMenu[8]="{ProjUser} Project -> User"
+        gPreCommitActn[8]="menu gYesNoMenu gYesNoActn"
     fi
-    
+
     # 3, 4, 5, 6
-    gForceMenu[0]="Select the "force" option:"
-    
+    gForceMenu[0]="Select the 'force' option:"
+
     gForceActn[0]="\nIf you select 'Force copy', then the variables in
 the 'from' file will replace the variables in the 'to' file.\n\n If
 you select 'Only copy missing', then existing variables, in the 'to'
 file, will not be replaced with variables in the 'from' file. But
 missing variables will be copied from the 'from' file."
-    
+
     gForceMenu[1]="Back"
     gForceActn[1]="back"
     gForceMenu[2]="Help"
@@ -464,7 +816,7 @@ missing variables will be copied from the 'from' file."
 selected. If you do not want to continue, then you can Quit, to return
 to the main menu, or select the Back options to update your
 selections."
-    
+
     gYesNoMenu[1]="Back"
     gYesNoActn[1]="back"
     gYesNoMenu[2]="Help"
@@ -476,9 +828,9 @@ selections."
 
     while true; do
         (fComMenu "$gMenuTitle" gMainMenu gMainActn)
-	if [ $? -eq 222 ]; then
-	    break
-	fi
+        if [ $? -eq 222 ]; then
+            break
+        fi
     done
     return $?
 } # fConfigMenu

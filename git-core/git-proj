@@ -238,19 +238,6 @@ Debug log messages look like this::
 
 =back
 
-=head2 Configuration
-
-These are the main configuration files you will need to know about.
-
- /usr/share/doc/config/gitconfig
- ~/.gitconfig
- PROJ/.gitproj
- PROJ/.git/config
-
-See LINK{gitproj Configuration Documentation|config.html} for
-details about these files and all the important gitproj variables.
-The pre-commit hook and its config vars are also described.
-
 =head1 RETURN VALUE
 
 The sub-commands will return 0, if there were no serious errors. Even
@@ -275,11 +262,32 @@ complete list of env. vars.
 
 =head1 FILES
 
-See the LINK{gitproj Configuration Documentation|config.html} for a
-complete list of important files.
+See LINK{gitproj Configuration Documentation|config.html} for
+details about these files and all the important gitproj variables.
+The pre-commit hook and its config vars are also described.
 
 All the User Documentation can also be found online in github at:
 L</doc/user-doc|https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc>
+
+=head2 Configuration Files
+
+These are the main configuration files you will need to know about.
+
+ /usr/share/doc/config/gitconfig        # Product
+ ~/.gitconfig                           # User
+ PROJ/.gitproj                          # Project
+ PROJ/.git/config                       # Local
+
+=head2 Other Files
+
+ /usr/share/doc/config/gitignore        # Product
+ ~/.gitignore                           # User
+ PROJ/.gitignore                        # Project
+
+ /usr/share/doc/hooks/pre-commit        # Product
+ ~/.pre-commit                          # User
+ PROJ/.pre-commit                       # Project
+ PROJ/.git/hooks/pre-commit             # Local
 
 =head1 SEE ALSO
 
@@ -293,9 +301,16 @@ L</doc/user-doc|https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc>
     git proj config
 
     /usr/share/doc/git-proj/user-doc/
-	git-proj.html - all in one file
+        git-proj.html - all sub-commands in one file (html format)
+        git-proj.md - all sub-commands in one file (markdown format)
         config.html - important configuration information
-    /usr/share/doc/git-proj/user-doc/tutorial/
+        config.md - important configuration information
+        subcommands/
+            git-proj-CMD.html
+            git-proj-CMD.md
+        tutorial/
+            *.html
+            *.md
 
     Online docs: L<https://github.com/TurtleEngr/gitproj/tree/main/doc|https://github.com/TurtleEngr/gitproj/tree/main/doc>
 
