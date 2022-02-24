@@ -171,7 +171,7 @@ testComSetConfigMore()
     cd $HOME/$cDatProj1
     tResult=$(fComSetConfig -L -k com.test.Lvar -v "defined" 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "fLookFor Lvar .gitproj"
+    assertTrue "$LINENO" "fLookFor lvar .gitproj"
 
     # ----------
     cd $HOME
@@ -236,7 +236,7 @@ testComSetConfigMore()
     #rm $HOME/$c ConfigGlobal
     tResult=$(fComGetConfig -e -g -k com.test.Xvar 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Unexpected: com.test.Xvar is not defined!"
+    assertContains "$LINENO $tResult" "$tResult" "crit: Error: Unexpected: com.test.xvar is not defined!"
 
     return 0
 } # testComSetConfigMore
