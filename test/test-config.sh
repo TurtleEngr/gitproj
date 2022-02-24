@@ -235,7 +235,7 @@ testCheckForErrors()
     tResult=$(fCheckForErrors 2>&1)
     assertContains "$LINENO" "$tResult" 'Errors - things that must be fixed'
     tCount=$(echo -e "$tResult" | wc -l)
-    if [ [ $tCount -gt 3 ]; then
+    if [ $tCount -gt 3 ]; then
         echo -e "tResult=$tResult" 1>&2
     fi
     #assertTrue "$LINENO $tCount lines $tResult" "[ $tCount -le 3 ]"
@@ -255,7 +255,7 @@ testCheckForWarnings()
     tResult=$(fCheckForWarnings 2>&1)
     assertContains "$LINENO" "$tResult" "Warnings - things that should be looked at"
     tCount=$(echo -e "$tResult" | wc -l)
-    if [ [ $tCount -gt 15 ]; then
+    if [ $tCount -gt 15 ]; then
         echo -e "tResult=$tResult" 1>&2
     fi
     #assertTrue "$LINENO $tCount lines" "[ $tCount -le 16 ]"
@@ -273,7 +273,7 @@ testCheckStatus()
     tResult=$(fCheckStatus 2>&1)
     assertContains "$LINENO" "$tResult" 'List all config variables and where they are set'
     tCount=$(echo -e "$tResult" | wc -l)
-    if [ [ $tCount -gt 50 ]; then
+    if [ $tCount -gt 50 ]; then
         echo -e "tResult=$tResult" 1>&2
     fi
     #assertTrue "$LINENO $tCount lines" "[ $tCount -le 55 ]"
