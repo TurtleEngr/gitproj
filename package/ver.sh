@@ -1,4 +1,4 @@
-1# Input DEF file for: mkver.pl.  All variables must have "export "
+# Input DEF file for: mkver.pl.  All variables must have "export "
 # at the beginning.  No spaces around the "=".  And all values
 # enclosed with double quotes.  Variables may include other variables
 # in their values.
@@ -15,7 +15,7 @@ export ProdName="git-proj"
 export ProdAlias="git-proj"
 # One word [-a-z0-9]
 
-export ProdVer="0.7.1"
+export ProdVer="0.7.2"
 # [0-9]*.[0-9]*{.[0-9]*}
 # Requires 2 numbers, 3'rd number is optional
 # First, Major changes:
