@@ -15,7 +15,7 @@ fCheckForErrors()
     local tSrc=${BASH_SOURCE##*/}
     local tConfFileList
     local tFile
-    local tKey
+    declare -l tKey
     local tValue
 
     echo
@@ -216,7 +216,7 @@ fCheckForErrors()
 fCheckForWarnings()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tKey
+    declare -l tKey
     local tValue
     local tValue2
     local tMount
@@ -337,7 +337,7 @@ fCheckForWarnings()
 fCheckStatus()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tKey
+    declare -l tKey
     local tValue
     local tFile
 

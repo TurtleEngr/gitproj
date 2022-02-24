@@ -65,7 +65,7 @@ remotes across a network.
 * `git proj pull` - pull raw/ files from the remote repo (and do a regular git pull).
 * `git proj status` - git status and status of binary files in raw/ compared to the remote's raw/.
 * `git proj clone` - create a git workspace and raw/ workspace from a remote.
-* `git proj config` - TBD. Fix or change the git-proj configuration.
+* `git proj config` - Fix or change the git-proj configuration files.
 * `git proj add` - TBD. Add files and symlinks to the top raw/ directory.
 
 ## User Docs

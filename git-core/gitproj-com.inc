@@ -1422,7 +1422,7 @@ fComSetConfig()
 {
     local pScope=""
     local pType=""
-    local pKey=""
+    declare -l pKey=""
     local pValue=""
     local pAdd=""
     local tSrc=${BASH_SOURCE##*/}
@@ -1568,7 +1568,7 @@ fComGetConfig()
 {
     local pScope=""
     local pType=""
-    local pKey=""
+    declare -l pKey=""
     local pDefault=""
     local pFilter=""
     local pExitOnError=0
@@ -1787,7 +1787,7 @@ EOF
 fComUnsetConfig()
 {
     local pScope=""
-    local pKey=""
+    declare -l pKey=""
     local pAll="--unset"
     local tSrc=${BASH_SOURCE##*/}
     local tTopDir
@@ -1846,7 +1846,7 @@ fComUnsetConfig()
 fComSaveVar2Config()
 {
     local pFile="$1"
-    local pKey="$2"
+    declare -l pKey="$2"
     local pVarName="$3"
     local tSrc=${BASH_SOURCE##*/}
     local tValue
