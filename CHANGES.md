@@ -1,12 +1,36 @@
 # git-proj CHANGES
 
-## tag-...
+## tag-0.6.1
+
+Wed 23 Feb 2022 10:49:07 PM PST
 
 * Updated docs, fixed typos
 
-* INT: Add update of doc/VERSION to "first" target for package/Makefile
+* Implemented git-proj-config. It is mostly ready, but still rough in spots. Issue #15
 
-* INT: documented the "epm" dependency for development.
+* Documented the menus in git-proj-config. Issue #15
+
+* INT: Added git-proj-config to git-proj help list. Issue #15
+
+* INT: Wrote fComMenu. It is more general than fComSelect.
+
+* INT: Added some tests for git-proj-config. More are needed. See Issue #31
+
+* INT: Fixed pre-commit check for binary files. Grep changed.
+
+* INT: Fixed up fComConfigCopy, so that the "to" file doesn't need to exist.
+
+* INT: Updated stats.sh. It is still not very accurate.
+
+* INT: Add update of doc/VERSION to be in "first" target for package/Makefile
+
+* INT: documented the "epm" dependency for development. I.e. where to get it.
+
+* INT: Regenerated the tar files, and repaired the tests.
+
+* INT: Remove try/catch functions. They don't work well enough to use.
+
+* INT: Fixed the dev-doc generation.
 
 ## tag-0-5-7-1
 
