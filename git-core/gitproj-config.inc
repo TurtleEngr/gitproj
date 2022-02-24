@@ -272,32 +272,47 @@ fCheckForWarnings()
             echo
             fError -n -m "gitproj.hook.binary-file-size is not set" -l $tSrc:$LINENO
         fi
-        if ! grep -q '/raw/' $HOME/.gitignore $gpTopDir/.gitignore; then
+        if [ ! -f $HOME/.gitignore ]; then
             echo
-            fError -n -m "/raw/ was not found in any of the .gitignore files." -l $tSrc:$LINENO
-        fi
+	    fError -n -m "Missing ~/.gitignore" -l $tSrc:$LINENO
+	else
+            if ! grep -q '/raw/' $HOME/.gitignore; then
+                echo
+            	fError -n -m "/raw/ was not found in ~/.gitignore." -l $tSrc:$LINENO
+	    fi
+	fi
+        if [ ! -f $gpTopDir/.gitignore ]; then
+            echo
+	    fError -n -m "Missing PROJ/.gitignore" -l $tSrc:$LINENO
+	else
+            if ! grep -q '/raw/' $gpTopDir/.gitignore; then
+                echo
+            	fError -n -m "/raw/ was not found in PROJ/.gitignore" -l $tSrc:$LINENO
+            fi
+	fi
     fi
 
     # ----------
-
     if $gpInProj; then
         if [ "$gpProjName" != "${gpTopDir##*/}" ]; then
             echo
             fLog -f -p warning -m "proj-name != ${gpTopDir##*/}" -l $tSrc:$LINENO
         fi
 
-        for tKeyValue in $(git config --list -f $gpTopDir/.gitproj | grep -v TBD); do
+	# Compare PROJ/.gitproj to ~/.gitconfig
+        for tKeyValue in $(git config --list -f $gpTopDir/.gitproj | \
+	  grep -Ev 'TBD|proj-name|local-status|remote-status'); do
             tKey=${tKeyValue%%=*}
             tValue=${tKeyValue##*=}
             tValue2=$(fComGetConfig -g -k $tKey -d "null")
             if [ "$tValue" != "$tValue2" ]; then
                 echo
-                fLog -f -p warning -m "$tKey in $gpTopDir/.gitproj is different from ~/.gitconfig" -l $tSrc:$LINENO
+                fLog -f -p warning -m "$tKey in $gpTopDir/.gitproj is different from ~/.gitconfig ($tValue vs $tValue2)" -l $tSrc:$LINENO
             fi
             tValue2=$(fComGetConfig -l -k $tKey -d "null")
             if [ "$tValue" != "$tValue2" ]; then
                 echo
-                fLog -f -p warning -m "$tKey in $gpTopDir/.git/config is different from $gpTopDir/.gitproj" -l $tSrc:$LINENO
+                fLog -f -p warning -m "$tKey in $gpTopDir/.git/config is different from $gpTopDir/.gitproj ($tValue2 vs $tValue)" -l $tSrc:$LINENO
             fi
         done
     fi
@@ -391,12 +406,12 @@ fCheckStatus()
     if $gpInProj; then
         echo
         echo '----------------------------------------'
-        echo '$gpProjName/raw/ Report'
+        echo "$gpProjName/raw/ Report"
         echo
         tNumRaw=$(find $gpTopDir/raw -type f | wc -l)
-        tSizeRaw=$(du -sm $gpTopDir/raw)
-        echo "There are $tNumRaw files in raw/ using:"
-        echo "$tSizeRaw MB"
+        tSizeRaw=$(du -sm $gpTopDir/raw | awk '{print $1}')
+        echo -n "There are $tNumRaw files in raw/ using: "
+        echo "${tSizeRaw}MB"
     fi
 
     return 0
@@ -488,13 +503,16 @@ fConfigMergeIgnore()
 
     if [ ! -f $pFrom ]; then
         echo
-        fError -i -m "Missing: $pFrom" -l $tSrc:$LINENO -e 20
+        fError -n -m "Missing: $pFrom" -l $tSrc:$LINENO -e 20
+	return 1
     fi
     if [ ! -f $tTo ]; then
+        echo
         cp -v $pFrom $tTo
         return $?
     fi
 
+    echo
     cp -v --backup=t  $tTo $tTo.bak
     cat $pFrom $pTo | grep -v '^#' | sort -fu >t.tmp
     mv -f t.tmp $pTo

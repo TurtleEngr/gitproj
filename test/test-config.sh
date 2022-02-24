@@ -159,6 +159,9 @@ setUp()
     HOME=$cDatHome
     fComGetProjGlobals
 
+    gpInProj=true
+    gpTopDir=$($cGetTopDir)
+
     gpVerbose=3
     gpDebug=0
     gpUnitDebug=0
@@ -191,10 +194,8 @@ tearDown()
 testSetUp()
 {
     local tResult
-return 0
+
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    HOME=$cDatHome
-    fComGetProjGlobals
 
     assertFalse "$LINENO" "[ -f raw/NewFile2.txt ]"
     assertFalse "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
@@ -202,6 +203,12 @@ return 0
 
     assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
     assertTrue "$LINENO" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
+
+    assertTrue "$LINENO" "[ -d $gpDoc ]"
+    assertTrue "$LINENO" "[ -f $gpDoc/config/gitconfig ]"
+
+    assertTrue "$LINENO" $gpInProj
+    assertTrue "$LINENO" "[ -d $gpTopDir ]"
 
     cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
     HOME=$cDatHome2
@@ -216,6 +223,126 @@ return 0
 
     return 0
 } # testSetUp
+
+# --------------------------------
+testCheckForErrors()
+{
+    local tResult
+    local tCount
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    tResult=$(fCheckForErrors 2>&1)
+    assertContains "$LINENO" "$tResult" 'Errors - things that must be fixed'
+    tCount=$(echo -e "$tResult" | wc -l)
+    assertTrue "$LINENO $tCount lines" "[ $tCount -le 3 ]"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
+
+    return 0
+} # testCheckForErrors
+
+# --------------------------------
+testCheckForWarnings()
+{
+    local tResult
+    local tCount
+
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    tResult=$(fCheckForWarnings 2>&1)
+    assertContains "$LINENO" "$tResult" "Warnings - things that should be looked at"
+    tCount=$(echo -e "$tResult" | wc -l)
+    assertTrue "$LINENO $tCount lines" "[ $tCount -le 16 ]"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
+
+    return 0
+} # testCheckForWarnings
+
+# --------------------------------
+testCheckStatus()
+{
+    local tResult
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    tResult=$(fCheckStatus 2>&1)
+    assertContains "$LINENO" "$tResult" 'List all config variables and where they are set'
+    tCount=$(echo -e "$tResult" | wc -l)
+    assertTrue "$LINENO $tCount lines" "[ $tCount -le 55 ]"
+    assertContains "$LINENO" "$tResult" "There are 6 files in raw/ using: 2MB"
+    ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
+
+    return 0
+} # testCheckStatus
+
+# --------------------------------
+testConfigUpdate()
+{
+    local tResult
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    startSkipping
+    fail "TBD"
+    return 0
+
+    tResult=$(fConfigUpdate ???)
+    return 0
+} # testConfigUpdate
+
+# --------------------------------
+testConfigMergeIgnore()
+{
+    local tResult
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    startSkipping
+    fail "TBD"
+    return 0
+
+    tResult=$(fConfigMergeIgnore ???)
+    return 0
+} # testConfigMergeIgnore
+
+# --------------------------------
+testConfigIgnore()
+{
+    local tResult
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    startSkipping
+    fail "TBD"
+    return 0
+
+    tResult=$(fConfigIgnore ???)
+    return 0
+} # testConfigIgnore
+
+# --------------------------------
+testConfigCopyPreCommit()
+{
+    local tResult
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    startSkipping
+    fail "TBD"
+    return 0
+
+    tResult=$(fConfigCopyPreCommit ???)
+    return 0
+} # testConfigCopyPreCommit
+
+# --------------------------------
+testConfigPreCommit()
+{
+    local tResult
+    cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+
+    startSkipping
+    fail "TBD"
+    return 0
+
+    tResult=$(fConfigPreCommit ???)
+    return 0
+} # testConfigPreCommit
 
 # ========================================
 # This should be the last defined function
