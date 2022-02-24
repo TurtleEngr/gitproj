@@ -235,7 +235,7 @@ testCheckForErrors()
     tResult=$(fCheckForErrors 2>&1)
     assertContains "$LINENO" "$tResult" 'Errors - things that must be fixed'
     tCount=$(echo -e "$tResult" | wc -l)
-    assertTrue "$LINENO $tCount lines" "[ $tCount -le 3 ]"
+    assertTrue "$LINENO $tCount lines $tResult" "[ $tCount -le 3 ]"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
 
     return 0
