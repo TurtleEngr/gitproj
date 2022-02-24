@@ -46,7 +46,7 @@ If the -g option is given then run:
 If the -d option is used, then the remote raw/ will be made identical
 to the local raw/. I.e. files might be deleted from the remote raw/.
 
-See the EXAMPLES section for a "save" way to use this option.
+See the EXAMPLES section for a "safe" way to use this option.
 
 =item B<-a>
 
@@ -91,6 +91,28 @@ be very careful with the -d option; files will be permanently deleted.
 For a "safe" way, of updating the files in raw/, is to do a "push",
 then "pull" with no -d. Then manually remove files you don't want in
 the local raw/. Now run "push" with -d, to update the remote raw/
+
+For example:
+
+    cd PROJ
+    mount REMOTE-DRIVE
+
+    # Update remote with all local raw/ files
+    git proj push
+
+    # Get all remote raw/ files
+    git proj pull
+
+    # Review and remove fiies from local, preparing for permanent removal
+    cd raw
+    rm FILES
+
+    # Remove raw/ files from remote, that are not in local raw/ dir
+    git proj push -d
+
+Note: Because is is so destructive, the -d option cannot be used with
+the -a option. Also the -y option will be ignored--you must answer the
+"delete?" prompt.
 
 =for comment=head1 ENVIRONMENT
 
