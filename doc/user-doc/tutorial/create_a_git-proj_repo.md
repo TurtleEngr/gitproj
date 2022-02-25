@@ -32,7 +32,8 @@ Output:
                 pSubCmdOpt: Just run: "git proj [pSubCmd] -H usage"
                 [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]
 
-For even more usage help see the Documentation section at the end.
+For even more usage help see the Documentation section at the end of
+this tutorial.
 
 # Create a "test" project
 
@@ -106,7 +107,7 @@ But first, let's take a look at some of the files created or modified.
 `~/.gitconfig.bak`, and the sections were added for `git-flow` and
 `gitproj`.
 
-This if the project's directory tree now:
+This is the project's directory tree now:
 
     cd tmp/project
     tree -aF hello-world/
@@ -177,7 +178,8 @@ repo is created, those files would have been moved into raw/ and
 symlinks created to point to the files. (The symlinks are versioned.)
 
 Between `~/.gitignore` and `.git/hooks/pre-commit`, you will be
-prevented from saving large binary files in the git repo.
+prevented from saving large binary files in the git repo. Well, strong
+reminders, because the reminders can be overridden.
 
 # Try out some git commands
 
@@ -218,7 +220,7 @@ All error and other log messages have these parts:
         Location: [gitproj-com.inc:1545](1)
 
 You can control the amount of output with config `verbose` variable
-or with the command line.
+or with the command line options: -q, -v, -V.
 
 # Creating a remote directory location for files in raw/
 
@@ -282,8 +284,8 @@ You should see:
 # Using the raw/ directory
 
 Let's put a file in raw/. It doesn't have to be a binary file and it
-can be any size. Mainly the raw/ area is just "synced" to the
-`gitproj.config.remote-raw-origin dir`
+can be any size. Mainly the raw/ area is just "synced" to the location
+defined by the config variable: `gitproj.config.remote-raw-origin dir`
 
     cd tmp/project/hello-world
     echo "New file for raw" >raw/testing-raw
@@ -301,7 +303,7 @@ Now you should see:
 
 To "save" the raw/ files to remote-raw we run `git proj push` (there
 no "commit" for files in raw/ because they are not versioned--existing
-files will be override.)
+files will be overridden.)
 
     git proj push
 
@@ -490,6 +492,24 @@ Output:
     REMOTE/ = /home/bruce/test/tmp/mounted-drive/repo/hello-world.raw/
     No differences.
 
+## Practice
+
+Now you have directory structures setup to simulate two users sharing
+a remote git-proj repository. You can cd between the two user's
+working directories, try `git` and `git proj` commands to see what
+happens in the working directories and the repository.
+
+    # The location of the tmp/ dir
+    tTmp=$PWD/tmp
+
+    # Workspace dirs:
+    Your User: cd $tTmp/project/hello-world
+    User Bob:  cd $tTmp/bob/ver/proj/hello-world
+
+    # Remote repository
+    git: cd $tTmp/mounted-drive/repo/hello-world.git/
+    raw: cd $tTmp/mounted-drive/repo/hello-world.raw/
+
 # Documentation
 
 Quick help:
@@ -500,8 +520,10 @@ For more help, run:
 
     $ man git-proj
 
-Or for help that lists all of the command with their help
+Or for help that lists all of the commands with their help
 
     $ git proj -h
 
-or
+Or you can access the user documentation online. But the online help
+will be for the latest stable version, which may be different from the
+version you have installed.

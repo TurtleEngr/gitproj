@@ -49,8 +49,8 @@ ignored files, use::
 =item B<-r "pRawOpt">
 
 Raw options. Currently these options will be passed to the diff
-command. (This will be added after the default options: -qr) For
-example to show the files that are the same between local and remote:
+command. For example to show the files that are the same between local
+and remote:
 
     git proj status -r "-s"
 
@@ -73,7 +73,7 @@ sub-commands.
 
 =for comment =head1 ERRORS
 
-=for comment =head1 EXAMPLES
+=head1 EXAMPLES
 
 =for comment=head1 ENVIRONMENT
 

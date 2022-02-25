@@ -29,8 +29,8 @@
 - **-r "pRawOpt"**
 
     Raw options. Currently these options will be passed to the diff
-    command. (This will be added after the default options: -qr) For
-    example to show the files that are the same between local and remote:
+    command. For example to show the files that are the same between local
+    and remote:
 
         git proj status -r "-s"
 
@@ -48,6 +48,8 @@
 
     0 - if OK
     !0 - if errors
+
+# EXAMPLES
 
 # SEE ALSO
 

@@ -51,6 +51,7 @@
     <li><a href="#DESCRIPTION2">DESCRIPTION</a></li>
     <li><a href="#OPTIONS2">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE2">RETURN VALUE</a></li>
+    <li><a href="#EXAMPLES1">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO2">SEE ALSO</a></li>
     <li><a href="#AUTHOR2">AUTHOR</a></li>
     <li><a href="#HISTORY2">HISTORY</a></li>
@@ -59,7 +60,7 @@
     <li><a href="#DESCRIPTION3">DESCRIPTION</a></li>
     <li><a href="#OPTIONS3">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE3">RETURN VALUE</a></li>
-    <li><a href="#EXAMPLES1">EXAMPLES</a></li>
+    <li><a href="#EXAMPLES2">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO3">SEE ALSO</a></li>
     <li><a href="#AUTHOR3">AUTHOR</a></li>
     <li><a href="#HISTORY3">HISTORY</a></li>
@@ -68,7 +69,7 @@
     <li><a href="#DESCRIPTION4">DESCRIPTION</a></li>
     <li><a href="#OPTIONS4">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE4">RETURN VALUE</a></li>
-    <li><a href="#EXAMPLES2">EXAMPLES</a></li>
+    <li><a href="#EXAMPLES3">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO4">SEE ALSO</a></li>
     <li><a href="#AUTHOR4">AUTHOR</a></li>
     <li><a href="#HISTORY4">HISTORY</a></li>
@@ -77,6 +78,7 @@
     <li><a href="#DESCRIPTION5">DESCRIPTION</a></li>
     <li><a href="#OPTIONS5">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE5">RETURN VALUE</a></li>
+    <li><a href="#EXAMPLES4">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO5">SEE ALSO</a></li>
     <li><a href="#AUTHOR5">AUTHOR</a></li>
     <li><a href="#HISTORY5">HISTORY</a></li>
@@ -85,6 +87,7 @@
     <li><a href="#DESCRIPTION6">DESCRIPTION</a></li>
     <li><a href="#OPTIONS6">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE6">RETURN VALUE</a></li>
+    <li><a href="#EXAMPLES5">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO6">SEE ALSO</a></li>
     <li><a href="#AUTHOR6">AUTHOR</a></li>
     <li><a href="#HISTORY6">HISTORY</a></li>
@@ -119,6 +122,7 @@
     </li>
     <li><a href="#OPTIONS7">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE7">RETURN VALUE</a></li>
+    <li><a href="#EXAMPLES6">EXAMPLES</a></li>
     <li>
       <a href="#FILES1">FILES</a>
       <ul>
@@ -487,6 +491,7 @@
   <h1 id="RETURN-VALUE2">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
+  <h1 id="EXAMPLES1">EXAMPLES</h1>
   <h1 id="SEE-ALSO2">SEE ALSO</h1>
   <pre><code> git proj
  git proj init
@@ -538,7 +543,7 @@
   <h1 id="RETURN-VALUE3">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-  <h1 id="EXAMPLES1">EXAMPLES</h1>
+  <h1 id="EXAMPLES2">EXAMPLES</h1>
   <p>The drive is mounted at: /mnt/usb-video and the the repo is at:
   video-2019-04-01/trip.git So use this to get a local copy.</p>
   <p>proj-get-local -d /mnt/usb-video/video-2019-04-01/trip.git</p>
@@ -575,7 +580,7 @@
       <p>If the -d option is used, then the remote raw/ will be made
       identical to the local raw/. I.e. files might be deleted from the
       remote raw/.</p>
-      <p>See the EXAMPLES section for a "save" way to use this option.</p>
+      <p>See the EXAMPLES section for a "safe" way to use this option.</p>
     </dd>
     <dt id="a2"><b>-a</b></dt>
     <dd>
@@ -603,13 +608,32 @@
   <h1 id="RETURN-VALUE4">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-  <h1 id="EXAMPLES2">EXAMPLES</h1>
+  <h1 id="EXAMPLES3">EXAMPLES</h1>
   <p>The rsync (and rclone) updates of the files in raw/ are not versioned,
   so be very careful with the -d option; files will be permanently
   deleted.</p>
   <p>For a "safe" way, of updating the files in raw/, is to do a "push", then
   "pull" with no -d. Then manually remove files you don't want in the local
   raw/. Now run "push" with -d, to update the remote raw/</p>
+  <p>For example:</p>
+  <pre><code>    cd PROJ
+    mount REMOTE-DRIVE
+
+    # Update remote with all local raw/ files
+    git proj push
+
+    # Get all remote raw/ files
+    git proj pull
+
+    # Review and remove fiies from local, preparing for permanent removal
+    cd raw
+    rm FILES
+
+    # Remove raw/ files from remote, that are not in local raw/ dir
+    git proj push -d</code></pre>
+  <p>Note: Because is is so destructive, the -d option cannot be used with
+  the -a option. Also the -y option will be ignored--you must answer the
+  "delete?" prompt.</p>
   <h1 id="SEE-ALSO4">SEE ALSO</h1>
   <pre><code> git proj
  git proj init
@@ -646,19 +670,20 @@
       <p>If the -d option is used, then the local raw/ will be made identical
       to the remote raw/. I.e. files might be deleted from the local
       raw/.</p>
-      <p>See the help EXAMPLES section, in "git proj push", for a "save" way
+      <p>See the help EXAMPLES section, in "git proj push", for a "safe" way
       to use this option.</p>
     </dd>
     <dt id="a3"><b>-a</b></dt>
     <dd>
-      <p>This turns on automated push for raw/ files. Use the -y or -n to
+      <p>This turns on automated pull for raw/ files. Use the -y or -n to
       select the action. -n will just display what would be done.</p>
       <p>If there is a -d option, that will be removed and the -n option will
-      be added. -d could be very destructive, so it needs to be run
+      be added. -d could be very destructive, so it must be used
       interactively.</p>
     </dd>
     <dt id="y--n2"><b>-y|-n</b></dt>
     <dd>
+      <p>These are only use with the -a option.</p>
       <p>If -y, then pull files from the remote raw/</p>
       <p>If -n, then just show what would be pulled from the remote raw/</p>
     </dd>
@@ -674,6 +699,20 @@
   <h1 id="RETURN-VALUE5">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
+  <h1 id="EXAMPLES4">EXAMPLES</h1>
+  <pre><code>    cd PROJ
+    git proj pull
+    (Error: remote not mounted)
+
+    mount REMOTE-DRIVE
+    git proj pull
+
+    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
+    # -v will show more details about what changed.
+    git proj pull -d -v
+
+    # Pull raw/ and git files from remote, using -a -y to answer all prompts
+    git proj pull -gay</code></pre>
   <h1 id="SEE-ALSO5">SEE ALSO</h1>
   <pre><code> git proj
  git proj init
@@ -711,9 +750,8 @@
     <dt id="r-pRawOpt"><b>-r "pRawOpt"</b></dt>
     <dd>
       <p>Raw options. Currently these options will be passed to the diff
-      command. (This will be added after the default options: -qr) For
-      example to show the files that are the same between local and
-      remote:</p>
+      command. For example to show the files that are the same between local
+      and remote:</p>
       <pre><code>    git proj status -r "-s"</code></pre>
     </dd>
     <dt id="common-options6"><b>[common-options]</b></dt>
@@ -729,6 +767,7 @@
   <h1 id="RETURN-VALUE6">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
+  <h1 id="EXAMPLES5">EXAMPLES</h1>
   <h1 id="SEE-ALSO6">SEE ALSO</h1>
   <pre><code> git proj
  git proj init
@@ -1064,6 +1103,7 @@
   <h1 id="RETURN-VALUE7">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
+  <h1 id="EXAMPLES6">EXAMPLES</h1>
   <h1 id="FILES1">FILES</h1>
   <h2 id="Product-Level">Product Level</h2>
   <ul>

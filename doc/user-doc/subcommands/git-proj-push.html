@@ -53,7 +53,7 @@
 
 <p>If the -d option is used, then the remote raw/ will be made identical to the local raw/. I.e. files might be deleted from the remote raw/.</p>
 
-<p>See the EXAMPLES section for a &quot;save&quot; way to use this option.</p>
+<p>See the EXAMPLES section for a &quot;safe&quot; way to use this option.</p>
 
 </dd>
 <dt id="a"><b>-a</b></dt>
@@ -97,6 +97,26 @@
 <p>The rsync (and rclone) updates of the files in raw/ are not versioned, so be very careful with the -d option; files will be permanently deleted.</p>
 
 <p>For a &quot;safe&quot; way, of updating the files in raw/, is to do a &quot;push&quot;, then &quot;pull&quot; with no -d. Then manually remove files you don&#39;t want in the local raw/. Now run &quot;push&quot; with -d, to update the remote raw/</p>
+
+<p>For example:</p>
+
+<pre><code>    cd PROJ
+    mount REMOTE-DRIVE
+
+    # Update remote with all local raw/ files
+    git proj push
+
+    # Get all remote raw/ files
+    git proj pull
+
+    # Review and remove fiies from local, preparing for permanent removal
+    cd raw
+    rm FILES
+
+    # Remove raw/ files from remote, that are not in local raw/ dir
+    git proj push -d</code></pre>
+
+<p>Note: Because is is so destructive, the -d option cannot be used with the -a option. Also the -y option will be ignored--you must answer the &quot;delete?&quot; prompt.</p>
 
 <a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
 

@@ -44,8 +44,8 @@ git to version video projects. But video files are HUGE, yet they
 don't change much. Since most video files are rendered from video
 editing tools, it is only important to version the video editor files,
 so that you can recreate a particular video file. Since rendering
-takes time you will want to save the rendered files. But there is
-usually no need to save every rendered version.
+takes time you will want to save some of the rendered files. But there
+is usually no need to save every rendered version.
 
 Currently this tool only supports git and large files on a local
 system. The "remotes" can be setup on mounted drives, and they can be
@@ -121,14 +121,15 @@ timestamps) in the names are not "stable".
 
 ### Download example:
 
-    tPkg=git-proj-0.5.4-1-mx-x86_64.deb
+    tVer=0.7.1-1
+    tPkg=git-proj-$tVer-mx-x86_64.deb
     tUrl=https://moria.whyayh.com/rel/released/software/own/git-proj/deb
     tOpt="--user=guest --password=guest"
     wget $tOpt $tUrl/$tPkg
 
 ### Install Example:
 
-    sudo apt-get install ./git-proj-0.4.1-1-mx-x86_64.deb
+    sudo apt-get install ./$tPkg
 
 # Getting more usage help
 

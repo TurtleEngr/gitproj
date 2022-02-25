@@ -30,19 +30,21 @@ If the -g option is given then run:
     If the -d option is used, then the local raw/ will be made identical
     to the remote raw/. I.e. files might be deleted from the local raw/.
 
-    See the help EXAMPLES section, in "git proj push", for a "save" way to
+    See the help EXAMPLES section, in "git proj push", for a "safe" way to
     use this option.
 
 - **-a**
 
-    This turns on automated push for raw/ files. Use the -y or -n to
+    This turns on automated pull for raw/ files. Use the -y or -n to
     select the action. -n will just display what would be done.
 
-    If there is a -d option, that will be removed and the -n option
-    will be added. -d could be very destructive, so it needs to be
-    run interactively.
+    If there is a -d option, that will be removed and the -n option will
+    be added. -d could be very destructive, so it must be used
+    interactively.
 
 - **-y|-n**
+
+    These are only use with the -a option.
 
     If -y, then pull files from the remote raw/
 
@@ -61,6 +63,22 @@ If the -g option is given then run:
 
     0 - if OK
     !0 - if errors
+
+# EXAMPLES
+
+    cd PROJ
+    git proj pull
+    (Error: remote not mounted)
+
+    mount REMOTE-DRIVE
+    git proj pull
+
+    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
+    # -v will show more details about what changed.
+    git proj pull -d -v
+
+    # Pull raw/ and git files from remote, using -a -y to answer all prompts
+    git proj pull -gay
 
 # SEE ALSO
 

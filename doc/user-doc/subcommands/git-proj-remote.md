@@ -46,6 +46,8 @@ rsync access.)
     0 - if OK
     !0 - if errors
 
+# EXAMPLES
+
 # SEE ALSO
 
     git proj

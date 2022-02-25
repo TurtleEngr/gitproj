@@ -435,6 +435,8 @@ rsync access.)
     0 - if OK
     !0 - if errors
 
+# EXAMPLES
+
 # SEE ALSO
 
     git proj
@@ -558,7 +560,7 @@ GPLv3 Copyright 2021 by TurtleEngr
     If the -d option is used, then the remote raw/ will be made identical
     to the local raw/. I.e. files might be deleted from the remote raw/.
 
-    See the EXAMPLES section for a "save" way to use this option.
+    See the EXAMPLES section for a "safe" way to use this option.
 
 - **-a**
 
@@ -599,6 +601,28 @@ be very careful with the -d option; files will be permanently deleted.
 For a "safe" way, of updating the files in raw/, is to do a "push",
 then "pull" with no -d. Then manually remove files you don't want in
 the local raw/. Now run "push" with -d, to update the remote raw/
+
+For example:
+
+    cd PROJ
+    mount REMOTE-DRIVE
+
+    # Update remote with all local raw/ files
+    git proj push
+
+    # Get all remote raw/ files
+    git proj pull
+
+    # Review and remove fiies from local, preparing for permanent removal
+    cd raw
+    rm FILES
+
+    # Remove raw/ files from remote, that are not in local raw/ dir
+    git proj push -d
+
+Note: Because is is so destructive, the -d option cannot be used with
+the -a option. Also the -y option will be ignored--you must answer the
+"delete?" prompt.
 
 # SEE ALSO
 
@@ -653,19 +677,21 @@ If the -g option is given then run:
     If the -d option is used, then the local raw/ will be made identical
     to the remote raw/. I.e. files might be deleted from the local raw/.
 
-    See the help EXAMPLES section, in "git proj push", for a "save" way to
+    See the help EXAMPLES section, in "git proj push", for a "safe" way to
     use this option.
 
 - **-a**
 
-    This turns on automated push for raw/ files. Use the -y or -n to
+    This turns on automated pull for raw/ files. Use the -y or -n to
     select the action. -n will just display what would be done.
 
-    If there is a -d option, that will be removed and the -n option
-    will be added. -d could be very destructive, so it needs to be
-    run interactively.
+    If there is a -d option, that will be removed and the -n option will
+    be added. -d could be very destructive, so it must be used
+    interactively.
 
 - **-y|-n**
+
+    These are only use with the -a option.
 
     If -y, then pull files from the remote raw/
 
@@ -684,6 +710,22 @@ If the -g option is given then run:
 
     0 - if OK
     !0 - if errors
+
+# EXAMPLES
+
+    cd PROJ
+    git proj pull
+    (Error: remote not mounted)
+
+    mount REMOTE-DRIVE
+    git proj pull
+
+    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
+    # -v will show more details about what changed.
+    git proj pull -d -v
+
+    # Pull raw/ and git files from remote, using -a -y to answer all prompts
+    git proj pull -gay
 
 # SEE ALSO
 
@@ -737,8 +779,8 @@ GPLv3 Copyright 2021 by TurtleEngr
 - **-r "pRawOpt"**
 
     Raw options. Currently these options will be passed to the diff
-    command. (This will be added after the default options: -qr) For
-    example to show the files that are the same between local and remote:
+    command. For example to show the files that are the same between local
+    and remote:
 
         git proj status -r "-s"
 
@@ -756,6 +798,8 @@ GPLv3 Copyright 2021 by TurtleEngr
 
     0 - if OK
     !0 - if errors
+
+# EXAMPLES
 
 # SEE ALSO
 
@@ -1030,6 +1074,8 @@ select the Back options to update your selections.
 
     0 - if OK
     !0 - if errors
+
+# EXAMPLES
 
 # FILES
 

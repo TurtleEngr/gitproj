@@ -30,7 +30,11 @@
   <li><a href="#Other-computers-have-changed-the-remote-raw-files">Other computers have changed the remote raw files</a></li>
   <li><a href="#Set-up-for-git-proj-clone-simulation">Set up for git proj clone simulation</a></li>
   <li><a href="#Run-git-proj-clone">Run git proj clone</a></li>
-  <li><a href="#Now-try-git-proj-status-in-bobs-dir">Now try git proj status in bob&#39;s dir</a></li>
+  <li><a href="#Now-try-git-proj-status-in-bobs-dir">Now try git proj status in bob&#39;s dir</a>
+    <ul>
+      <li><a href="#Practice">Practice</a></li>
+    </ul>
+  </li>
   <li><a href="#Documentation">Documentation</a></li>
 </ul>
 
@@ -68,7 +72,7 @@
                 pSubCmdOpt: Just run: &quot;git proj [pSubCmd] -H usage&quot;
                 [common-options]: [-h] [-H pStyle] [-q -v -V N] [-x... -X N]</code></pre>
 
-<p>For even more usage help see the Documentation section at the end.</p>
+<p>For even more usage help see the Documentation section at the end of this tutorial.</p>
 
 <a href="#_podtop_"><h1 id="Create-a-test-project">Create a &quot;test&quot; project</h1></a>
 
@@ -138,7 +142,7 @@
 
 <p>* If you did have a <code>~/.gitconfig</code> file, it was backed up to <code>~/.gitconfig.bak</code>, and the sections were added for <code>git-flow</code> and <code>gitproj</code>.</p>
 
-<p>This if the project&#39;s directory tree now:</p>
+<p>This is the project&#39;s directory tree now:</p>
 
 <pre><code>    cd tmp/project
     tree -aF hello-world/
@@ -201,7 +205,7 @@
 
 <p>The raw/ directory is where you will put large binary files. If hello-world already had some large binary files then, before the git repo is created, those files would have been moved into raw/ and symlinks created to point to the files. (The symlinks are versioned.)</p>
 
-<p>Between <code>~/.gitignore</code> and <code>.git/hooks/pre-commit</code>, you will be prevented from saving large binary files in the git repo.</p>
+<p>Between <code>~/.gitignore</code> and <code>.git/hooks/pre-commit</code>, you will be prevented from saving large binary files in the git repo. Well, strong reminders, because the reminders can be overridden.</p>
 
 <a href="#_podtop_"><h1 id="Try-out-some-git-commands">Try out some git commands</h1></a>
 
@@ -238,7 +242,7 @@
                     should not be set to: TBD
         Location: [gitproj-com.inc:1545](1)</code></pre>
 
-<p>You can control the amount of output with config <code>verbose</code> variable or with the command line.</p>
+<p>You can control the amount of output with config <code>verbose</code> variable or with the command line options: -q, -v, -V.</p>
 
 <a href="#_podtop_"><h1 id="Creating-a-remote-directory-location-for-files-in-raw">Creating a remote directory location for files in raw/</h1></a>
 
@@ -298,7 +302,7 @@
 
 <a href="#_podtop_"><h1 id="Using-the-raw-directory">Using the raw/ directory</h1></a>
 
-<p>Let&#39;s put a file in raw/. It doesn&#39;t have to be a binary file and it can be any size. Mainly the raw/ area is just &quot;synced&quot; to the <code>gitproj.config.remote-raw-origin dir</code></p>
+<p>Let&#39;s put a file in raw/. It doesn&#39;t have to be a binary file and it can be any size. Mainly the raw/ area is just &quot;synced&quot; to the location defined by the config variable: <code>gitproj.config.remote-raw-origin dir</code></p>
 
 <pre><code>    cd tmp/project/hello-world
     echo &quot;New file for raw&quot; &gt;raw/testing-raw
@@ -314,7 +318,7 @@
 
 <a href="#_podtop_"><h1 id="Pushing-files-to-remote-raw">Pushing files to remote raw</h1></a>
 
-<p>To &quot;save&quot; the raw/ files to remote-raw we run <code>git proj push</code> (there no &quot;commit&quot; for files in raw/ because they are not versioned--existing files will be override.)</p>
+<p>To &quot;save&quot; the raw/ files to remote-raw we run <code>git proj push</code> (there no &quot;commit&quot; for files in raw/ because they are not versioned--existing files will be overridden.)</p>
 
 <pre><code>    git proj push</code></pre>
 
@@ -489,6 +493,21 @@
     REMOTE/ = /home/bruce/test/tmp/mounted-drive/repo/hello-world.raw/
     No differences.</code></pre>
 
+<h2 id="Practice">Practice</h2>
+
+<p>Now you have directory structures setup to simulate two users sharing a remote git-proj repository. You can cd between the two user&#39;s working directories, try <code>git</code> and <code>git proj</code> commands to see what happens in the working directories and the repository.</p>
+
+<pre><code>    # The location of the tmp/ dir
+    tTmp=$PWD/tmp
+
+    # Workspace dirs:
+    Your User: cd $tTmp/project/hello-world
+    User Bob:  cd $tTmp/bob/ver/proj/hello-world
+
+    # Remote repository
+    git: cd $tTmp/mounted-drive/repo/hello-world.git/
+    raw: cd $tTmp/mounted-drive/repo/hello-world.raw/</code></pre>
+
 <a href="#_podtop_"><h1 id="Documentation">Documentation</h1></a>
 
 <p>Quick help:</p>
@@ -499,11 +518,11 @@
 
 <pre><code>    $ man git-proj</code></pre>
 
-<p>Or for help that lists all of the command with their help</p>
+<p>Or for help that lists all of the commands with their help</p>
 
 <pre><code>    $ git proj -h</code></pre>
 
-<p>or</p>
+<p>Or you can access the user documentation online. But the online help will be for the latest stable version, which may be different from the version you have installed.</p>
 
 
 </body>

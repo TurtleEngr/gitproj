@@ -77,8 +77,7 @@
   <hr />
   <h3 id="fComConfigCopy">fComConfigCopy</h3>
   <h4 id="Synopsis">Synopsis</h4>
-  <pre>
-  <code>    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]</code></pre>
+  <pre><code>    fComConfigCopy [-f] -s pSource -d pDest [-i pInclPat] [-e pExclPat]</code></pre>
   <h4 id="Description">Description</h4>
   <p>Copy values from git config file pSource to pDest. If -f (force), the
   pSource values will override the pDest values, otherwise the pSource value
@@ -90,8 +89,9 @@
   match the pattern. For example: <span style="white-space: nowrap;">-e
   'gitproj.config.remote-raw-origin'</span> pExcPat is applied after
   pIncPat.</p>
-  <p>pSource and pDest files must exist. pSource must be readable, and pDest
-  must be writable.</p>
+  <p>pSource must exist and be readable. If pDest exists, must be writable.
+  If pDest does not exist then it will be created with the specified include
+  and exclude patterns.</p>
   <p>A backup copy of pDest is made with this command: <span style=
   "white-space: nowrap;">cp -backup=t $pDest $pDest.bak</span></p>
   <hr />
@@ -140,8 +140,7 @@
   <hr />
   <h3 id="fComMenu-pTitle-pMenu-pActn">fComMenu pTitle pMenu pActn</h3>
   <p>pTitle - string</p>
-  <pre>
-  <code>    If the Actn is a "menu", the selected menu's text will be append
+  <pre><code>    If the Actn is a "menu", the selected menu's text will be append
     to the current pTitle, separated with ';'. And gMenuTitle will be
     set to that combined title.
 
@@ -225,8 +224,7 @@
   <pre><code>    pActn[0] - help text for the menu
     pActn[1..Size]  - first word is a command, followed by options</code></pre>
   <p>pActn Commands</p>
-  <pre>
-  <code>    help - send the pActn array name to fComMenuHelp, it will output
+  <pre><code>    help - send the pActn array name to fComMenuHelp, it will output
         pActn[0].
     
     func pFuncName [pArgs...]- call pFuncName passing pArgs. The
@@ -358,8 +356,7 @@
   <hr />
   <h3 id="fComGetConfig">fComGetConfig</h3>
   <h4 id="Synopsis1">Synopsis</h4>
-  <pre>
-  <code>    fComSetConfig -k pKey -v pValue [-g|-l|-L|-f pFile] [-b|-i] [-a]</code></pre>
+  <pre><code>    fComSetConfig -k pKey -v pValue [-g|-l|-L|-f pFile] [-b|-i] [-a]</code></pre>
   <h4 id="Description1">Description</h4>
   <h4 id="Options">Options</h4>
   <p>Only one of these will be used: -g, -l, -L, -f. The last one in the list

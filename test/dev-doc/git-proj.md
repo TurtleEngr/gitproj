@@ -34,8 +34,9 @@ The -e pExcPat is a "grep" pattern that removes variable names that
 match the pattern. For example: -e 'gitproj.config.remote-raw-origin'
 pExcPat is applied after pIncPat.
 
-pSource and pDest files must exist. pSource must be readable, and
-pDest must be writable.
+pSource must exist and be readable. If pDest exists, must be writable.
+If pDest does not exist then it will be created with the specified
+include and exclude patterns.
 
 A backup copy of pDest is made with this command:
 cp -backup=t $pDest $pDest.bak

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-cat <<EOF
-git proj check
-    look for broken symlinks
-    verify configs are still valid
-EOF
-
-find * -xtype l -exec stat -c %N {} \;
