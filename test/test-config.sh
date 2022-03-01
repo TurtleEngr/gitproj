@@ -204,6 +204,8 @@ testCheckForErrors()
     tCount=$(echo -e "$tResult" | wc -l)
     if [ $tCount -gt 3 ]; then
         echo -e "tResult=$tResult" 1>&2
+	ls -l raw  1>&2
+	find . -type l -exec ls -l {} \; 1>&2
     fi
     assertTrue "$LINENO $tCount lines $tResult" "[ $tCount -le 3 ]"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
