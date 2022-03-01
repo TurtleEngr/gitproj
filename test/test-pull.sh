@@ -319,7 +319,7 @@ testPullFromOrigin()
     local tResult
 
     tResult=$(fPullFromOrigin 1 1 2>&1 < <(echo -e y))
-    sleep 0.5
+    sleep 1
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"
