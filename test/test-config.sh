@@ -119,43 +119,24 @@ setUp()
     fTestPatchPath
 
     # Patch the version that was set in the tar file
-
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    fComSetConfig -g -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     git ci -am "Updated" >/dev/null 2>&1
 
-    cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
-    fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
-    fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
-    git ci -am "Updated" >/dev/null 2>&1
+    # Patch the files that were in the tar file
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    . $gpBin/gitproj-config.inc
-
-    # --------
-    # Make changes to $cDatHome2 area
-
-    cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
-    HOME=$cDatHome2
-    fComGetProjGlobals
-
-    # Add a file to local raw/ and remove a file from local raw/
-    echo "Make a new file" >raw/NewFile2.txt
-    rm raw/src/raw/MOV001.mp4
-
-    # Add a file to local git, and change a file in local git
-    echo "Add a file to git area" >doc/NewFileFromBob.txt
-    echo 'Make a change' >>README.html
-    git add doc/NewFileFromBob.txt README.html >/dev/null 2>&1
-    git commit -am Updated >/dev/null 2>&1
-    git push origin develop >/dev/null 2>&1
-
-    # Push changes to remote ($gpRemoteRawOrigin)
-    $gpBin/git-proj-push -d >/dev/null 2>&1 < <(echo -e "y")
+    cp $gpDoc/config/gitignore $cDatHome/.gitignore
+    cp $gpDoc/config/gitignore $cDatHome/$cDatProj1/.gitignore
+    cp $gpDoc/hooks/pre-commit $cDatHome/.pre-commit
+    cp $gpDoc/hooks/pre-commit $cDatHome/$cDatProj1/.pre-commit
+    cp $gpDoc/hooks/pre-commit $cDatHome/$cDatProj1/.git/hooks/pre-commit
 
     # --------
     # Now test "git proj config" command and functions, from this user
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
+    . $gpBin/gitproj-config.inc
     HOME=$cDatHome
     fComGetProjGlobals
 
@@ -201,25 +182,11 @@ testSetUp()
     assertFalse "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
     assertFalse "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
 
-    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
-    assertTrue "$LINENO" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
-
     assertTrue "$LINENO" "[ -d $gpDoc ]"
     assertTrue "$LINENO" "[ -f $gpDoc/config/gitconfig ]"
 
     assertTrue "$LINENO" $gpInProj
     assertTrue "$LINENO" "[ -d $gpTopDir ]"
-
-    cd $cDatHome2/$cDatProj1 >/dev/null 2>&1
-    HOME=$cDatHome2
-    fComGetProjGlobals
-
-    assertTrue "$LINENO" "[ -f raw/NewFile2.txt ]"
-    assertTrue "$LINENO" "[ ! -f raw/src/raw/MOV001.mp4 ]"
-    assertTrue "$LINENO" "[ -f doc/NewFileFromBob.txt ]"
-
-    assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/NewFile2.txt ]"
-    assertTrue "$LINENO" "[ ! -f $gpRemoteRawOrigin/src/raw/MOV001.mp4 ]"
 
     return 0
 } # testSetUp
@@ -238,7 +205,7 @@ testCheckForErrors()
     if [ $tCount -gt 3 ]; then
         echo -e "tResult=$tResult" 1>&2
     fi
-    #assertTrue "$LINENO $tCount lines $tResult" "[ $tCount -le 3 ]"
+    assertTrue "$LINENO $tCount lines $tResult" "[ $tCount -le 3 ]"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
 
     return 0
@@ -255,10 +222,10 @@ testCheckForWarnings()
     tResult=$(fCheckForWarnings 2>&1)
     assertContains "$LINENO" "$tResult" "Warnings - things that should be looked at"
     tCount=$(echo -e "$tResult" | wc -l)
-    if [ $tCount -gt 15 ]; then
+    if [ $tCount -gt 3 ]; then
         echo -e "tResult=$tResult" 1>&2
     fi
-    #assertTrue "$LINENO $tCount lines" "[ $tCount -le 16 ]"
+    assertTrue "$LINENO $tCount lines" "[ $tCount -le 3 ]"
     ##assertContains "$LINENO $tResult" "$tResult" "Uncomment to see result"
 
     return 0
