@@ -206,7 +206,7 @@ fInitGetMoveFiles()
     declare -l tResult
 
     echo
-    fLog -f -p notice -m "Looking for binary files are greater than $gpMaxSize:" -l $tSrc:$LINENO
+    fLog -f -p notice -m "Looking for binary files that are greater than $gpMaxSize:" -l $tSrc:$LINENO
 
     if ! fInitGetBinaryFiles; then
         fLog -f -p notice -m 'No large binary files were found.' -l $tSrc:$LINENO

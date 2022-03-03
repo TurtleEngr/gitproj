@@ -45,8 +45,8 @@
                 <li><a href="#fLog-Examples">fLog Examples:</a></li>
               </ul>
             </li>
-            <li><a href="#fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg
-            [-l $LINENO] [-e pErr] [-i]</a></li>
+            <li><a href="#fError--m-pMsg--l-LINENO--e-pErr--i--n">fError -m
+            "pMsg" [-l $LINENO] [-e pErr] [-i] [-n]</a></li>
             <li><a href="#fComGit-pArgs">fComGit [pArgs...]</a></li>
             <li>
               <a href="#fComGetConfig">fComGetConfig</a>
@@ -160,14 +160,14 @@
     gMenu1[3]="Quit"
     gActn1[3]="func exit 1"
     This will be displayed as:
-    
+
     Current selections:
             First title
     1) Select text for Code1
     2) Select alternate text
     3) Quit
     Select the text style:
-    
+
     User selects menu item 1, and the next menu will be
     pTitle="First title;code1: Select text for Code1"
     gMenu2[0]="Select the type:"
@@ -196,7 +196,7 @@
     gYesNoActn[2]="func exit 1"
     gYesNoMenu[3]="Back"
     gYesNoActn[3]="back"
-    
+
     This will be desplayed as:
 
     Current selections:
@@ -209,7 +209,7 @@
     Are the above selections OK?
 
     If the user selects 2, then then fProcess will be called:
-    
+
     fProcess First title;{code1} Select text for Code1;{section} Change section</code></pre>
   <p>pMenu - the name of an array of menu items</p>
   <pre><code>    pMenu[0] - prompt for the menu
@@ -226,12 +226,12 @@
   <p>pActn Commands</p>
   <pre><code>    help - send the pActn array name to fComMenuHelp, it will output
         pActn[0].
-    
+
     func pFuncName [pArgs...]- call pFuncName passing pArgs. The
         \$gMenuTitle can be passed to the function, so that the list of
         what was selected can be parsed. Look for ';text: ' for the
         selection codes.
-    
+
     menu pMenu pActn - call fComMenu passing the specified array names
         The pTitle will be the text from the calling menu item.
 
@@ -339,10 +339,49 @@
     Output: program.sh debug-3: Output only if $gpDebug &gt;= 3 [234]
     return 0</code></pre>
   <hr />
-  <h3 id="fError--m-pMsg--l-LINENO--e-pErr--i">fError -m pMsg [-l $LINENO]
-  [-e pErr] [-i]</h3>
-  <p>This will call: fLog -p crit -m "pMsg" -l pLine -e pErr</p>
-  <p>If no -i, then "fUsage short", will be called.</p>
+  <h3 id="fError--m-pMsg--l-LINENO--e-pErr--i--n">fError -m "pMsg" [-l
+  $LINENO] [-e pErr] [-i] [-n]</h3>
+  <pre><code>    If no -n
+        if no -i
+            fLog -p crit -m "Error: pMsg" -l pLine -e pErr
+            fUsage short
+            (exit 1)
+        if -i
+            fLog -p crit -m "Error: Internal: pMsg" -l pLine -e pErr
+            fComStackTrace
+            exit $pErr
+    if -n
+        if no -i
+            fLog -p err -m "Error: pMsg" -l pLine -e pErr
+        if -i
+            fLog -p err -m "Error: Internal: pMsg" -l pLine -e pErr
+            fComStackTrace
+    if gpDebug &gt;= 2
+        fComStackTrace</code></pre>
+  <p>Typical example:</p>
+  <pre><code>    export gpCmd=git-proj-init
+
+    testIt()
+    {
+        local tSrc=${BASH_SOURCE##*/}
+        local Dir="foobar"
+
+        if [ ! -w $tDir ]; then
+            fError -n -i -m "Directory $tDir is not writable" -l $tSrc:$LINENO
+        fi
+        if [ ! -d $tDir ]; then
+            fError -i -n -m "Directory $tDir not found" -l $tSrc:$LINENO
+        fi
+        fError -m "Too many errors" -l $tSrc:$LINENO
+    }</code></pre>
+  <p>Output:</p>
+  <pre><code>   git-proj-init err: Error: Directory foobar is not writable [gpproj-com:1403]
+
+   git-proj-init err: Error: Internal: Directory foobar not found [gpproj-com:1406]
+   stack dump:
+
+   git-proj-init crit: Error: Too many errors [gpproj-com:1408]
+   Usage:</code></pre>
   <hr />
   <h3 id="fComGit-pArgs">fComGit [pArgs...]</h3>
   <p>TODO: replace this with set/try/catch</p>
