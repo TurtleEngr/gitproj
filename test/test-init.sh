@@ -870,7 +870,7 @@ testInitCreateLocalGitAuto()
     gpAutoMove=true
 
     gpAuto=1
-    gpSysLog=true
+    gpSysLog=false
     gpVerbose=3
     gpDebug=10
 
