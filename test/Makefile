@@ -341,7 +341,7 @@ test-env_Home3AfterCloneSummary.tgz :
 # --------------------
 # Update test-env*.tgz files at $(mTestUrl)
 
-update-tgz-files :
+uplocad-tgz-files :
 	for i in saved-path.tgz $(mTestEnvFiles); do \
 		'rsync' $(mRsyncOpt) $$i $(mTestUrl); \
 		if [ -z $$? ]; then \
