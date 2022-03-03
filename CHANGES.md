@@ -1,5 +1,25 @@
 # git-proj CHANGES
 
+## tag-0.7.3
+
+Thu 03 Mar 2022 11:23:08 AM PST
+
+* Removed vars: bin and doc. Fixed symlinks, for moved files, to be relative. See issue #51
+
+* Make sure git config var name are always lower case. Issue #2
+
+* Updated the documentation with more examples. See  issue #30
+
+* INT: Regenerated the test-env tar files, and repaired tests
+
+* INT: Increased sleep time, so the "test Action" will work
+
+* INT: Fixed tests that use upper-case in key names. Issue #2
+
+* INT: Adding more tests for git-proj-config. Issue #15
+
+* INT: Fixed pre-commit check for binary files.
+
 ## tag-0.7.1
 
 Wed 23 Feb 2022 10:49:07 PM PST
