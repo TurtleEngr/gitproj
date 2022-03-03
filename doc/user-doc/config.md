@@ -273,11 +273,11 @@ These are some suggested uses for the localN facilities:
     local6 - available
     local7 - available
 
-## gpBin; -NA; gitproj.config.bin; (/usr/lib/git-core)
+## gpBin; -NA; NA; (/usr/lib/git-core)
 
-The location of the executing command will override this.
+The location of the executing command will set this.
 
-## gpDoc; -NA; gitproj.config.doc; (/usr/share/doc/git-proj)
+## gpDoc; -NA; NA; (/usr/share/doc/git-proj)
 
 If not found, then set to: $gpBin/../doc  If still not found: error.
 

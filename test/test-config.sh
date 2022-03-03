@@ -120,7 +120,6 @@ setUp()
 
     # Patch the version that was set in the tar file
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
-    fComSetConfig -g -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     fComSetConfig -l -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     fComSetConfig -L -k gitproj.config.ver -v $(cat $gpDoc/VERSION)
     git ci -am "Updated" >/dev/null 2>&1

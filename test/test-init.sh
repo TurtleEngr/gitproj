@@ -828,8 +828,6 @@ testInitSaveVarsToConfigs()
     tFile=$HOME/.gitconfig
     tS=gitproj.config
     fTestCheckConfig2Var $tFile $tS.proj-status gpProjStatus ${gpProjStatus} $LINENO
-    fTestCheckConfig2Var $tFile $tS.bin gpBin "${gBin#$gpLocalTopDir/}" $LINENO
-    fTestCheckConfig2Var $tFile $tS.doc gpDoc "${gDoc#$gpLocalTopDir/}" $LINENO
     fTestCheckConfig2Var $tFile $tS.facility gpFacility user $LINENO
     fTestCheckConfig2Var $tFile $tS.syslog gpSysLog false $LINENO
 

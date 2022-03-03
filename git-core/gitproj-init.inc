@@ -377,6 +377,7 @@ fInitMoveBinaryFiles()
     local tFileList
     local tFile
     local tDir
+    local tFileOnly
     local tResult
 
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -393,8 +394,10 @@ fInitMoveBinaryFiles()
     for tFile in $tFileList; do
         tDir=${tFile%/*}
         if [ "$tDir" = "$tFile" ]; then
-            tDir=""
+            tDir="."
+	    tFileOnly=$tFile
         else
+	    tFileOnly=${tFile##*/}
             if [ ! -d $gpLocalRawDir/$tDir ]; then
                 tResult=$(mkdir -v -p $gpLocalRawDir/$tDir 2>&1)
                 fLog -p info -m "$tResult" -l $tSrc:$LINENO
@@ -409,10 +412,10 @@ fInitMoveBinaryFiles()
         if [ ! -s $gpLocalRawDir/$tFile ]; then
             fError -i -m "Could not move: $tFile" -l $tSrc:$LINENO
         fi
-        if [ -f $tFile ]; then
-            rm $tFile
-        fi
-        ln -s $gpLocalRawDir/$tFile $tFile
+	tRelPath=$(realpath --relative-to=$tDir ./raw)
+        cd $tDir >/dev/null 2>&1
+	ln -s ${tRelPath}/$tDir/$tFileOnly .
+	cd - >/dev/null 2>&1
         if [ ! -L $tFile ]; then
             fError -i -m "Could not create symlink for: $tFile" -l $tSrc:$LINENO
         fi
@@ -509,8 +512,6 @@ fInitSaveVarsToConfigs()
     tFile=$HOME/.gitconfig
     tS=gitproj.config
     fComSaveVar2Config $tFile $tS.proj-status gpProjStatus
-    fComSaveVar2Config $tFile $tS.bin gpBin
-    fComSaveVar2Config $tFile $tS.doc gpDoc
     fComSaveVar2Config $tFile $tS.facility gpFacility
     fComSaveVar2Config $tFile $tS.syslog gpSysLog
 

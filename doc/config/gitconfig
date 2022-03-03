@@ -42,8 +42,6 @@
         proj-status = installed
         syslog = false
         facility = user
-        bin = /usr/lib/git-core
-        doc = /usr/share/doc/git-proj
         git-flow-pkg = git-flow
         git-flow = true
         local-status=TBD

@@ -330,7 +330,7 @@ selections."
 
 export gpDebug=1
 export gpProjName=george
-export gpDoc=/usr/share/doc/git-proj/
+export gpDoc=/usr/share/doc/git-proj
 # fConfigMenu
 fConfigMenu2
 echo $?

@@ -378,7 +378,7 @@ fComSetGlobals()
     # Use: tBranch=$($cGetCurBranch)
 
     cRemoteProjFile=.remote.proj
-    # File will contain cGetOrigin value. Put in remote raw dir
+    # This file will contain cGetOrigin value. Put in remote raw dir
 
     gpMaxLoop=${gpMaxLoop:-20}
     # Used internally to limit number of invalid responses to prompts.

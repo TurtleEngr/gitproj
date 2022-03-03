@@ -329,9 +329,6 @@ Global Config ~/.gitconfig
     proj-status = $(fComGetConfig -k "gitproj.config.proj-status")
     syslog = $(fComGetConfig -k "gitproj.config.syslog")
     facility = $(fComGetConfig -k "gitproj.config.facility")
-    bin = $(fComGetConfig -k "gitproj.config.bin")
-    doc = $(fComGetConfig -k "gitproj.config.doc")
-    test = $(fComGetConfig -k "gitproj.config.test")
 
 Local Proj Config $gpProjName/.gitproj
 [gitproj "config"]

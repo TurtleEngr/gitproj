@@ -37,22 +37,6 @@ fCheckForErrors()
             fError -n -m "Invalid facility name, $tValue, in $tFile. It can only be: auth, authpriv, cron, daemon, ftp, lpr, mail, news, syslog, user, uucp, or local[0-7]" -l $tSrc:$LINENO
         fi
 
-        tValue=$(fComGetConfig -f $tFile -k "gitproj.config.bin" -d "null")
-        if [ "$tValue" != "null" ]; then
-            if [[ ! -d $tValue ]]; then
-               echo
-               fError -n -m "Invalid gitproj.config.bin, $tValue, in $tFile"  -l $tSrc:$LINENO
-            fi
-        fi
-
-#       tValue=$(fComGetConfig -f $tFile -k "gitproj.config.doc" -d "null")
-#       if [ "$tValue" != "null" ]; then
-#           if [[ ! -d $tValue || ! -f $tValue/config/gitconfig ]]; then
-#              echo
-#              fError -n -m "$tValue directory not found. Set in gitproj.config.doc in $tFile"  -l $tSrc:$LINENO
-#           fi
-#       fi
-
         if [[ ! -d $gpDoc || ! -f $gpDoc/config/gitconfig ]]; then
             echo
             fError -n -m "$gpDoc directory not found."  -l $tSrc:$LINENO
@@ -119,8 +103,6 @@ fCheckForErrors()
         gitproj.config.proj-status \
         gitproj.config.syslog \
         gitproj.config.facility \
-        gitproj.config.bin \
-        gitproj.config.doc \
         gitproj.config.git-flow-pkg \
         gitproj.config.git-flow \
         gitproj.config.local-status \
@@ -301,7 +283,7 @@ fCheckForWarnings()
 
 	# Compare PROJ/.gitproj to ~/.gitconfig
         for tKeyValue in $(git config --list -f $gpTopDir/.gitproj | \
-	  grep -Ev 'TBD|proj-name|local-status|remote-status'); do
+	  grep -Ev 'TBD|proj-name|local-status|remote-status|ver='); do
             tKey=${tKeyValue%%=*}
             tValue=${tKeyValue##*=}
             tValue2=$(fComGetConfig -g -k $tKey -d "null")
@@ -369,8 +351,6 @@ fCheckStatus()
         gitproj.config.proj-status \
         gitproj.config.syslog \
         gitproj.config.facility \
-        gitproj.config.bin \
-        gitproj.config.doc \
         gitproj.config.git-flow-pkg \
         gitproj.config.git-flow \
         gitproj.config.local-status \
