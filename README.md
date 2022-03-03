@@ -68,6 +68,8 @@ remotes across a network.
 * `git proj config` - Fix or change the git-proj configuration files.
 * `git proj add` - TBD. Add files and symlinks to the top raw/ directory.
 
+[<img src="image/git-proj_User_DFD.png" width="300"/>](https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p)
+
 ## User Docs
 
 The user docs can be browsed online at:
