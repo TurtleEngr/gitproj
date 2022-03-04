@@ -100,6 +100,7 @@ build-doc :
 	cd ..; make gen-doc
 	mkdir -p dist/usr/share/doc/git-proj
 	'rsync' -a ../doc/* dist/usr/share/doc/git-proj
+	'rsync' -a ../image dist/usr/share/doc/git-proj
 	cp ../LICENSE dist/usr/share/doc/git-proj
 	-grep -Ev 'INT:' <../CHANGES.md | uniq >dist/usr/share/doc/git-proj/CHANGES.md
 	-grep -Ev 'INT:' <../README.md | uniq | awk ' \
