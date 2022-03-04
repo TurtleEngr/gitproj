@@ -70,6 +70,8 @@ remotes across a network.
 
 [<img src="image/git-proj_User_DFD.png" width="600"/>](https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p)
 
+Click on the image above to see more details.
+
 ## User Docs
 
 The user docs can be browsed online at:
