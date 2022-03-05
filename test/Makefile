@@ -137,7 +137,12 @@ stats :
 	./stats.sh
 
 # ----------------------------------------
-gen-dev-doc : dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html dev-doc/release-server.html
+gen-doc : dev-doc/README.html dev-doc/git-proj.md dev-doc/git-proj.html dev-doc/outline.html dev-doc/coding-convention.html dev-doc/release-server.html
+
+dev-doc/README.html : dev-doc/README.pod
+	-pod2html --title='README for Developers' $(mHtmlOpt) <$? >$@
+	-$(mTidy) $@
+	-pod2markdown <dev-doc/README.pod >dev-doc/README.md
 
 dev-doc/git-proj.md : $(mCore)/git-proj $(mCore)/gitproj-com.inc
 	-$(mCore)/git-proj -H int-md >$@

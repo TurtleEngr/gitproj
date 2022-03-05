@@ -1,5 +1,9 @@
 # git-proj CHANGES
 
+[//]: # (The CHANGES.html is generated from this file. Usually pod is used for formatting.)
+
+----------
+
 ## tag-0.7.3
 
 Thu 03 Mar 2022 11:23:08 AM PST
@@ -19,6 +23,8 @@ Thu 03 Mar 2022 11:23:08 AM PST
 * INT: Adding more tests for git-proj-config. Issue #15
 
 * INT: Fixed pre-commit check for binary files.
+
+----------
 
 ## tag-0.7.1
 
@@ -51,6 +57,8 @@ Wed 23 Feb 2022 10:49:07 PM PST
 * INT: Remove try/catch functions. They don't work well enough to use.
 
 * INT: Fixed the dev-doc generation.
+
+----------
 
 ## tag-0-5-7-1
 

@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>README for Developers</title>
+  <meta http-equiv="content-type"
+        content="text/html; charset=utf-8" />
+  <link rev="made"
+        href="mailto:root@localhost" />
+</head>
+<body id="_podtop_">
+  <ul id="index">
+    <li><a href="#README-for-Developers">README for Developers</a></li>
+    <li>
+      <a href="#Dependencies-for-Development">Dependencies for
+      Development</a>
+      <ul>
+        <li>
+          <a href="#EPM">EPM</a>
+          <ul>
+            <li><a href="#Why-EPM">Why EPM?</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#Library-functions-in-git-core">Library functions in
+    git-core/</a></li>
+    <li>
+      <a href="#Test-scripts-in-test">Test scripts in test/</a>
+      <ul>
+        <li><a href="#Test-Environment-files-test-env-.tgz">Test Environment
+        files (test-env*.tgz)</a></li>
+      </ul>
+    </li>
+    <li><a href="#Documentation-Files">Documentation Files</a></li>
+    <li>
+      <a href="#Initial-Notes">Initial Notes</a>
+      <ul>
+        <li><a href=
+        "#Move-existing-files-to-PROJ.raw-DIRS-and-make-symlinks">Move
+        existing files to PROJ.raw/DIRS and make symlinks</a></li>
+      </ul>
+    </li>
+    <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+  </ul>
+  <h1 id="README-for-Developers"><a href="#_podtop_">README for
+  Developers</a></h1>
+  <p>An outline of the directory structure and files in git-proj can be found
+  at: <b>test/dev-doc/outline.md</b></p>
+  <p>The following MindMap also show how the pieces relate to each other. To
+  get an interactive outline, right mouse click on the MindMap image, and
+  open it in a new tab. Double click on collapsed icons to open/close
+  sub-items.</p><a target="_blank"
+        href=
+        "https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html"><img src="https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png" /></a>
+  <p>Rather than have lots of loose scripts, Makefiles are used to collect
+  together the major processes--not just the <b>build</b> process.</p>
+  <h1 id="Dependencies-for-Development"><a href="#_podtop_">Dependencies for
+  Development</a></h1>
+  <p>The "first" target in <a href=
+  "https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile">package/Makefile</a>
+  lists the required commands.</p>
+  <p>The main <a href=
+  "https://github.com/TurtleEngr/gitproj/blob/develop/README.md">README.md</a>
+  file for this repo lists the required packages for the gitproj script (see
+  section: Installing, System requirements, Packages).</p>
+  <h2 id="EPM">EPM</h2>
+  <p>The package process requires the <b>epm</b> and <b>epm-helper</b>
+  packages. These have the commands: epm, mkepmlist, patch-epm-list, and
+  mkver.pl. The packages can be found at: <a href=
+  "https://moria.whyayh.com/rel/released/software/ThirdParty/epm/">/rel/released/software/ThirdParty/epm/</a></p>
+  <ul>
+    <li>
+      <p>Download and install epm version 5.0.2 or larger from the mx19/ or
+      ubuntu18/ directories.</p>
+    </li>
+    <li>
+      <p>Download and install epm-helper version 1.5.1 or larger.</p>
+    </li>
+  </ul>
+  <p>The GitHub code for making the epm packages can be found at: <a href=
+  "https://github.com/TurtleEngr/epm-deb-pkg">github.com/TurtleEngr/epm-deb-pkg</a>
+  <a href=
+  "https://github.com/TurtleEngr/epm-helper">github.com/TurtleEngr/epm-helper</a></p>
+  <p>The actual EPM source code can be found at: <a href=
+  "https://github.com/jimjag/epm">https://github.com/jimjag/epm</a></p>
+  <h3 id="Why-EPM">Why EPM?</h3>
+  <p>From the EPM intro:</p>
+  <p>"Software distribution under UNIX/Linux can be a challenge, especially
+  if you ship software for more than one operating system. Every operating
+  system provides its own software packaging tools and each has unique
+  requirements or implications for the software development environment."</p>
+  <p>"The ESP Package Manager ("EPM") is one solution to this problem.
+  Besides its own "portable" distribution format, EPM also supports the
+  generation of several vendor-specific formats. This allows you to build
+  software distribution files for almost any operating system *from the same
+  sources.*"</p>
+  <p>I have used EPM since 3/2000, to build packages for Red Hat, Suse, OSX,
+  and Debian based distributions. All with this one packaging tool! Sure it
+  doesn't support all of the "unique" features offered by each different OS,
+  but it has more than 90% of what is needed, and I didn't have to learn (or
+  code for) all of the nuances of different packagers. If you really need a
+  customization that is unique to a particular OS, then use pre and post
+  install scripts to manage the differences. My style is to select the needed
+  scripts when the package is built--that keeps the scripts simple and tuned
+  only for that OS.</p>
+  <h1 id="Library-functions-in-git-core"><a href="#_podtop_">Library
+  functions in git-core/</a></h1>
+  <dl>
+    <dt id=
+    "gitproj-com.inc---has-common-functions-that-are-used-across-many-of-the-scripts">
+    <b>gitproj-com.inc</b> - has common functions that are used across many
+    of the scripts.</dt>
+    <dd></dd>
+    <dt id=
+    "gitproj--CMD-.inc---files-have-the-main-functions-for-the-commands.-This-is-done-so-that-testing-is-easier">
+    <b>gitproj-[CMD].inc</b> - files have the main functions for the
+    commands. This is done so that testing is easier.</dt>
+    <dd></dd>
+    <dt id=
+    "git-proj--CMD---these-files-only-get-the-arguments-and-call-the-functions-in-the-corresponding-gitproj--CMD-.inc-files.-These-files-are-the-main-entry-point-for-git-sub-commands.-For-example:-git-proj-init-is-run-on-the-command-line-with-git-proj-init">
+    <b>git-proj-[CMD]</b> - these files only get the arguments and call the
+    functions in the corresponding <b>gitproj-[CMD].inc</b> files. These
+    files are the main entry point for git sub-commands. For example:
+    <b>git-proj-init</b> is run, on the command line, with <b>git proj
+    init</b></dt>
+    <dd></dd>
+  </dl>
+  <h1 id="Test-scripts-in-test"><a href="#_podtop_">Test scripts in
+  test/</a></h1>
+  <p>Every function should have unit-tests that check the inputs and outputs
+  of functions. Valid inputs and error states should be checked. If a
+  function can only be tested "in production", then refactor the code so that
+  it can be tested! (In a QA/Release/Operations roles, I have had developers
+  say some of the code can only be tested in production. That is B.S. What I
+  hear? They don't want to do the work to be a professional engineer.)</p>
+  <p>Some "mocking" might be done, but most tests are written so that the
+  need for mocking is reduced. Without mocking, the tests will be more
+  fragile. So? It is better to have fragile tests than fragile code.</p>
+  <dl>
+    <dt id="test-com.sh"><b>test-com.sh</b></dt>
+    <dd></dd>
+    <dt id="test-com2.sh"><b>test-com2.sh</b></dt>
+    <dd></dd>
+    <dt id="test-gitproj.sh"><b>test-gitproj.sh</b></dt>
+    <dd></dd>
+    <dt id="test--CMD-.sh"><b>test-[CMD].sh</b></dt>
+    <dd></dd>
+    <dt id=
+    "test--CMD-.log---these-files-are-used-by-the-Makefile-to-collect-the-output-from-a-test--CMD-.sh-script.-If-the-log-file-is-older-than-any-of-its-dependencies-then-the-corresponding-test--CMD-.sh-script-will-be-run.-These-files-are-NOT-versioned">
+    <b>test-[CMD].log</b> - these files are used by the Makefile to collect
+    the output from a <b>test-[CMD].sh</b> script. If the log file is older
+    than any of its dependencies, then the corresponding <b>test-[CMD].sh</b>
+    script will be run. These files are NOT versioned.</dt>
+    <dd></dd>
+    <dt id=
+    "test.inc---this-script-has-common-function-used-by-many-tests-to-setup-the-tests-files-and-env.-vars">
+    <b>test.inc</b> - this script has common function used by many tests to
+    setup the test's files and env. vars.</dt>
+    <dd></dd>
+  </dl>
+  <h2 id="Test-Environment-files-test-env-.tgz">Test Environment files
+  (test-env*.tgz)</h2>
+  <p>These are symlinks to the directory above the git workspace. The
+  symlinks are versioned. The Makefile will copy any missing files from the
+  release server. (There really is not need for these symlinks. The tests
+  could be refactored to just get the files from "../..")</p>
+  <p>See the Makefile for how the tar-env*.tgz files are created and
+  rebuilt.</p>
+  <dl>
+    <dt id="test-env.tgz---was-manually-created"><b>test-env.tgz</b> - was
+    manually created.</dt>
+    <dd></dd>
+  </dl>
+  <h1 id="Documentation-Files"><a href="#_podtop_">Documentation
+  Files</a></h1>
+  <p>The *.pod files are the master files for generating the *.html and *.md
+  files.</p>
+  <p>So if you see a pod file *do not edit the corresponding html or md
+  files*--they will be generated with "make gen-dev-doc"</p>
+  <p>Most of the open items in the TODO.md should be moved to
+  <a>issues</a></p>
+  <p>----------</p>
+  <h1 id="Initial-Notes"><a href="#_podtop_">Initial Notes</a></h1>
+  <p>These are just some of the initial design notes that helped with the
+  implementation of this tool.</p>
+  <p><a href=
+  "https://coderwall.com/p/bt93ia/extend-git-with-custom-commands">https://coderwall.com/p/bt93ia/extend-git-with-custom-commands</a></p>
+  <p><a href=
+  "https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html">
+  https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html</a></p>
+  <pre><code>    source "$(git --exec-path)/git-sh-setup"
+       require_work_tree_exists
+       cd_to_toplevel
+       require_clean_work_tree rebase "Please commit or stash them."</code></pre>
+  <p><a href=
+  "https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html">
+  https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html</a></p>
+  <p><a href=
+  "https://github.com/nvie/gitflow">https://github.com/nvie/gitflow</a></p>
+  <p><a href=
+  "https://github.com/nvie/gitflow/blob/develop/git-flow-init">https://github.com/nvie/gitflow/blob/develop/git-flow-init</a></p>
+  <p><a href=
+  "https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks</a></p>
+  <p><a href=
+  "https://git-scm.com/docs/githooks">https://git-scm.com/docs/githooks</a></p>
+  <p>TDD: <a href=
+  "https://github.com/kward/shunit2">https://github.com/kward/shunit2</a></p>
+  <h2 id="Move-existing-files-to-PROJ.raw-DIRS-and-make-symlinks">Move
+  existing files to PROJ.raw/DIRS and make symlinks</h2>
+  <p>This is an example of moving files in an existing structure and creating
+  symlinks so it looks like the files are still there.</p>
+  <pre><code>    cd /home/video/seal
+    mkdir ../seal.raw
+    ln -s ../seal.raw raw
+    cd edit/src/own/video
+    mkdir -p  ../../../../../seal.raw/edit/src/own/video
+    mv *.MP4 *.JPG *.jpg  ../../../../../seal.raw/edit/src/own/video
+    ln -s ../../../../../seal.raw/edit/src/own/video/* .</code></pre>
+  <p>Yuck. Just put all large binary files in PROJ/raw/ and fix the
+  references to them. If you really need to have files in some other
+  location, then make your own symnlinks to point to the files in raw/.
+  Directories can be in raw/.</p>
+  <h1 id="POD-ERRORS"><a href="#_podtop_">POD ERRORS</a></h1>
+  <p>Hey! <b>The above document had some coding errors, which are explained
+  below:</b></p>
+  <dl>
+    <dt id="Around-line-95">Around line 95:</dt>
+    <dd>
+      <p>You forgot a '=back' before '=head1'</p>
+    </dd>
+  </dl>
+</body>
+</html>

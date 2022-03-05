@@ -1,52 +1,57 @@
-# README for Developers
+=pod
+
+=head1 README for Developers
 
 An outline of the directory structure and files in git-proj can be
-found at: **test/dev-doc/outline.md**
+found at: B<test/dev-doc/outline.md>
 
 The following MindMap also show how the pieces relate to each
 other. To get an interactive outline, right mouse click on the MindMap
 image, and open it in a new tab. Double click on collapsed icons to
 open/close sub-items.
 
-<div>
-    <a target="_blank" href="https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html"><img src="https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png"/></A>
-</div>
+=for html <a target="_blank" href="https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html"><img src="https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png"/></A>
 
-[![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
+=for markdown [![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
 
 Rather than have lots of loose scripts, Makefiles are used to collect
-together the major processes--not just the **build** process.
+together the major processes--not just the B<build> process.
 
-# Dependencies for Development
+=head1 Dependencies for Development
 
 The "first" target in
-[package/Makefile](https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile)
+L<package/Makefile|https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile>
 lists the required commands.
 
 The main
-[README.md](https://github.com/TurtleEngr/gitproj/blob/develop/README.md)
+L<README.md|https://github.com/TurtleEngr/gitproj/blob/develop/README.md>
 file for this repo lists the required packages for the gitproj script
 (see section: Installing, System requirements, Packages).
 
-## EPM
+=head2 EPM
 
-The package process requires the **epm** and **epm-helper**
+The package process requires the B<epm> and B<epm-helper>
 packages.  These have the commands: epm, mkepmlist, patch-epm-list,
 and mkver.pl.  The packages can be found at:
-[/rel/released/software/ThirdParty/epm/](https://moria.whyayh.com/rel/released/software/ThirdParty/epm/)
+L</rel/released/software/ThirdParty/epm/|https://moria.whyayh.com/rel/released/software/ThirdParty/epm/>
 
-- Download and install epm version 5.0.2 or larger from the mx19/ or
+=over 4
+
+=item * Download and install epm version 5.0.2 or larger from the mx19/ or
 ubuntu18/ directories.
-- Download and install epm-helper version 1.5.1 or larger.
+
+=item * Download and install epm-helper version 1.5.1 or larger.
+
+=back
 
 The GitHub code for making the epm packages can be found at:
-[github.com/TurtleEngr/epm-deb-pkg](https://github.com/TurtleEngr/epm-deb-pkg)
-[github.com/TurtleEngr/epm-helper](https://github.com/TurtleEngr/epm-helper)
+L<github.com/TurtleEngr/epm-deb-pkg|https://github.com/TurtleEngr/epm-deb-pkg>
+L<github.com/TurtleEngr/epm-helper|https://github.com/TurtleEngr/epm-helper>
 
 The actual EPM source code can be found at:
-[https://github.com/jimjag/epm](https://github.com/jimjag/epm)
+L<https://github.com/jimjag/epm|https://github.com/jimjag/epm>
 
-### Why EPM?
+=head3 Why EPM?
 
 From the EPM intro:
 
@@ -60,7 +65,7 @@ environment."
 problem. Besides its own "portable" distribution format, EPM also
 supports the generation of several vendor-specific formats.  This
 allows you to build software distribution files for almost any
-operating system \*from the same sources.\*"
+operating system *from the same sources.*"
 
 I have used EPM since 3/2000, to build packages for Red Hat, Suse,
 OSX, and Debian based distributions. All with this one packaging tool!
@@ -72,18 +77,22 @@ particular OS, then use pre and post install scripts to manage the
 differences. My style is to select the needed scripts when the package
 is built--that keeps the scripts simple and tuned only for that OS.
 
-# Library functions in git-core/
+=head1 Library functions in git-core/
 
-- **gitproj-com.inc** - has common functions that are used across many
+=over 4
+
+=item B<gitproj-com.inc> - has common functions that are used across many
 of the scripts.
-- **gitproj-\[CMD\].inc** - files have the main functions for the
-commands. This is done so that testing is easier.
-- **git-proj-\[CMD\]** - these files only get the arguments and call the
-functions in the corresponding **gitproj-\[CMD\].inc** files. These files
-are the main entry point for git sub-commands. For example:
-**git-proj-init** is run, on the command line, with **git proj init**
 
-# Test scripts in test/
+=item B<gitproj-[CMD].inc> - files have the main functions for the
+commands. This is done so that testing is easier.
+
+=item B<git-proj-[CMD]> - these files only get the arguments and call the
+functions in the corresponding B<gitproj-[CMD].inc> files. These files
+are the main entry point for git sub-commands. For example:
+B<git-proj-init> is run, on the command line, with B<git proj init>
+
+=head1 Test scripts in test/
 
 Every function should have unit-tests that check the inputs and
 outputs of functions. Valid inputs and error states should be checked.
@@ -97,69 +106,82 @@ Some "mocking" might be done, but most tests are written so that the
 need for mocking is reduced. Without mocking, the tests will be more
 fragile. So? It is better to have fragile tests than fragile code.
 
-- **test-com.sh**
-- **test-com2.sh**
-- **test-gitproj.sh**
-- **test-\[CMD\].sh**
-- **test-\[CMD\].log** - these files are used by the Makefile to collect the
-output from a **test-\[CMD\].sh** script. If the log file is older than any
-of its dependencies, then the corresponding **test-\[CMD\].sh** script will
+=over 4
+
+=item B<test-com.sh>
+
+=item B<test-com2.sh>
+
+=item B<test-gitproj.sh>
+
+=item B<test-[CMD].sh>
+
+=item B<test-[CMD].log> - these files are used by the Makefile to collect the
+output from a B<test-[CMD].sh> script. If the log file is older than any
+of its dependencies, then the corresponding B<test-[CMD].sh> script will
 be run. These files are NOT versioned.
-- **test.inc** - this script has common function used by many tests to
+
+=item B<test.inc> - this script has common function used by many tests to
 setup the test's files and env. vars.
 
-## Test Environment files (test-env\*.tgz)
+=back
+
+=head2 Test Environment files (test-env*.tgz)
 
 These are symlinks to the directory above the git workspace. The
 symlinks are versioned.  The Makefile will copy any missing files from
 the release server. (There really is not need for these symlinks. The
 tests could be refactored to just get the files from "../..")
 
-See the Makefile for how the tar-env\*.tgz files are created and
+See the Makefile for how the tar-env*.tgz files are created and
 rebuilt.
 
-- **test-env.tgz** - was manually created.
+=over 4
 
-# Documentation Files
+=item B<test-env.tgz> - was manually created.
 
-The \*.pod files are the master files for generating the \*.html and
-\*.md files.
+=back
 
-So if you see a pod file \*do not edit the corresponding html or md
-files\*--they will be generated with "make gen-dev-doc"
+=head1 Documentation Files
+
+The *.pod files are the master files for generating the *.html and
+*.md files.
+
+So if you see a pod file *do not edit the corresponding html or md
+files*--they will be generated with "make gen-dev-doc"
 
 Most of the open items in the TODO.md should be moved to
-[issues](https://metacpan.org/pod/%3Chttps%3A#github.com-TurtleEngr-gitproj-issues)
+L<issues|<https://github.com/TurtleEngr/gitproj/issues>
 
-\----------
+----------
 
-# Initial Notes
+=head1 Initial Notes
 
 These are just some of the initial design notes that helped with
 the implementation of this tool.
 
-[https://coderwall.com/p/bt93ia/extend-git-with-custom-commands](https://coderwall.com/p/bt93ia/extend-git-with-custom-commands)
+L<https://coderwall.com/p/bt93ia/extend-git-with-custom-commands>
 
-[https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html](https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html)
+L<https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html>
 
     source "$(git --exec-path)/git-sh-setup"
        require_work_tree_exists
        cd_to_toplevel
        require_clean_work_tree rebase "Please commit or stash them."
 
-[https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html](https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html)
+L<https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-sh-setup.html>
 
-[https://github.com/nvie/gitflow](https://github.com/nvie/gitflow)
+L<https://github.com/nvie/gitflow>
 
-[https://github.com/nvie/gitflow/blob/develop/git-flow-init](https://github.com/nvie/gitflow/blob/develop/git-flow-init)
+L<https://github.com/nvie/gitflow/blob/develop/git-flow-init>
 
-[https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+L<https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks>
 
-[https://git-scm.com/docs/githooks](https://git-scm.com/docs/githooks)
+L<https://git-scm.com/docs/githooks>
 
-TDD: [https://github.com/kward/shunit2](https://github.com/kward/shunit2)
+TDD: L<https://github.com/kward/shunit2>
 
-## Move existing files to PROJ.raw/DIRS and make symlinks
+=head2 Move existing files to PROJ.raw/DIRS and make symlinks
 
 This is an example of moving files in an existing structure and
 creating symlinks so it looks like the files are still there.
@@ -177,10 +199,4 @@ references to them. If you really need to have files in some other
 location, then make your own symnlinks to point to the files in
 raw/. Directories can be in raw/.
 
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 95:
-
-    You forgot a '=back' before '=head1'
+=cut

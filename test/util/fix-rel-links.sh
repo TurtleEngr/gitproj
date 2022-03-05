@@ -28,21 +28,26 @@ fFixLink()
 /LINK{.*\|.*}/ {
     match($0, /LINK{(.*)\|(.*)}/, tPart)
     if (tPart[1] == "" || tPart[2] == "") {
-        print $0
-        next
+        print $0;
+        next;
     }
-    tText=tPart[1]
-    tPath=tPart[2]
-    tFile=tPath
-    sub(/\.[^.]*$/,"",tFile)
-    if (pType == "html") {
-        sub(/LINK{.*\|.*}/,"<a href=\"" tFile "." pType "\">" tText "</a>")
-    } else {
-        sub(/LINK{.*\|.*}/,"[" tText "](" tFile "." pType ")")
-    }
+    tText = tPart[1];
+    tPath = tPart[2];
+    tFile = tPath;
+    tExt = "." pType;
+    tFound = sub(/\.[^.]*$/,"",tFile)
+    if (! tFound)
+        tExt = "";
+    if (pType == "html")
+        sub(/LINK{.*\|.*}/,"<a href=\"" tFile tExt "\">" tText "</a>");
+    else
+        sub(/LINK{.*\|.*}/,"[" tText "](" tFile tExt ")");
+    print $0;
+    next;
 }
-{ print $0 }
+{ print $0; }
     ' <$pFile >$tTmp
+
     if [ ! -s $tTmp ]; then
         echo "Error in fix-rel-links.sh [$LINENO]"
         exit 1

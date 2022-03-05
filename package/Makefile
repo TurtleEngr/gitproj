@@ -44,8 +44,10 @@
 # Config
 
 SHELL = /bin/bash
-
 mRsyncOpt = -azP
+mDoc=dist/usr/share/doc/git-proj
+
+mTidy = tidy -m -q -i -w 78 -asxhtml --break-before-br yes --indent-attributes yes --indent-spaces 2 --tidy-mark no --vertical-space no
 
 # --------------------
 include ver.mak
@@ -91,35 +93,42 @@ build-prep : ver.mak ver.epm ver.env ../doc/VERSION
 build-core :
 	@echo '--------------------'
 	@echo make build-core
-	mkdir -p dist/usr/lib/git-core
+	-mkdir -p dist/usr/lib/git-core
 	cp ../git-core/* dist/usr/lib/git-core
 
 build-doc :
 	@echo '--------------------'
 	@echo make build-doc
-	cd ..; make gen-doc
-	mkdir -p dist/usr/share/doc/git-proj
-	'rsync' -a ../doc/* dist/usr/share/doc/git-proj
-	'rsync' -a ../image dist/usr/share/doc/git-proj
-	cp ../LICENSE dist/usr/share/doc/git-proj
-	-grep -Ev 'INT:' <../CHANGES.md | uniq >dist/usr/share/doc/git-proj/CHANGES.md
+	-cd ..; make gen-doc
+	-mkdir -p $(mDoc)
+	'rsync' -a ../doc/* $(mDoc)
+	cp ../LICENSE $(mDoc)
+	#
+	-grep -Ev 'INT:' <../CHANGES.md | uniq >$(mDoc)/CHANGES.md
+	/usr/bin/markdown $(mDoc)/CHANGES.md >$(mDoc)/CHANGES.html
+	-$(mTidy) $(mDoc)/CHANGES.html
+	#
 	-grep -Ev 'INT:' <../README.md | uniq | awk ' \
 	    /^## For Developers/ { exit 0 } \
 	    { print $$0 } \
-	' >dist/usr/share/doc/git-proj/README.md
+	' >$(mDoc)/README.md
+	/usr/bin/markdown $(mDoc)/README.md >$(mDoc)/README.html
+	-$(mTidy) $(mDoc)/README.html
 
 build-man :
 	@echo '--------------------'
 	@echo make build-man
-	mkdir -p dist/usr/share/man/man1
+	-mkdir -p dist/usr/share/man/man1
 	pod2man ../git-core/git-proj >dist/usr/share/man/man1/git-proj.1
 	gzip dist/usr/share/man/man1/git-proj.1
 	ln dist/usr/share/man/man1/git-proj.1.gz dist/usr/share/man/man1/gitproj.1.gz
 
 build-contrib :
-	mkdir -p dist/usr/share/doc/git-proj/contrib
-	cp -p ../test/util/rm-trailing-sp ../test/util/bash-fmt ../test/util/bash-lint \
-		dist/usr/share/doc/git-proj/contrib
+	@echo '--------------------'
+	@echo make build-contrib
+	-mkdir -p $(mDoc)/contrib
+	cp -p ../test/util/rm-trailing-sp ../test/util/bash-fmt \
+	      ../test/util/bash-lint $(mDoc)/contrib
 
 build-clean :
 	@echo '--------------------'
@@ -141,7 +150,7 @@ install :
 	if [ "$(USER)" != "root" ]; then exit 1; fi
 	chown -R root:root dist/*
 	'rsync' -n $(mRsyncOpt) dist/usr/lib/git-core/* /usr/lib/git-core/
-	'rsync' -n $(mRsyncOpt) dist/usr/share/doc/git-proj /usr/share/doc
+	'rsync' -n $(mRsyncOpt) $(mDoc) /usr/share/doc
 	'rsync' -n $(mRsyncOpt) dist/usr/share/man/man1/* /usr/share/man/man1/
 	chown -R $(CurLogName):$(CurLogName) dist/*
 	# First: make build
@@ -189,7 +198,7 @@ test-package : epm.list $(ProdOSDist).require
 	@echo make test-package
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	-rm -rf pkg ver.epm ver.env >/dev/null 2>&1
-	mkdir pkg
+	-mkdir pkg
 	export RELEASE=0; mkver.pl -e 'epm env'
 	@echo '--------------------'
 	cat ver.epm
@@ -221,7 +230,7 @@ package : epm.list $(ProdOSDist).require
 	@echo make package
 	if [ "$(USER)" = "root" ]; then exit 1; fi
 	-rm -rf pkg ver.epm ver.env >/dev/null 2>&1
-	mkdir pkg
+	-mkdir pkg
 	export RELEASE=1; mkver.pl -e 'epm env'
 	##. ./ver.env; echo "%release rc$$ProdBuild.$$ProdBuildTime" >>ver.epm
 	@echo '--------------------'

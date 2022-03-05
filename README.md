@@ -1,5 +1,7 @@
 # git-proj
 
+[//]: # (The README.html is generated from this file. Usually pod is used for formatting.)
+
 # Description
 
 git-proj implements git sub-commands` for managing large binary files.
@@ -68,7 +70,7 @@ remotes across a network.
 * `git proj config` - Fix or change the git-proj configuration files.
 * `git proj add` - TBD. Add files and symlinks to the top raw/ directory.
 
-[<img src="image/git-proj_User_DFD.png" width="600"/>](https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p)
+[<img src="https://moria.whyayh.com/rel/released/software/own/git-proj/image/git-proj_User_DFD.png" width="600"/>](https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p)
 
 Click on the image above to see more details.
 

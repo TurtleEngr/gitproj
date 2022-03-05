@@ -1,0 +1,76 @@
+=pod
+
+=head1 gitproj Documentation
+
+=head1 Introduction
+
+=over 4
+
+
+=item * LINK{README|README.md}
+
+=item * LINK{git proj Product|user-doc/git-proj.md}
+
+=item * LINK{VERSION|VERSION}
+
+=item * LINK{CHANGES|CHANGES.md}
+
+=item * LINK{LICENSE|LICENSE}
+
+=back
+
+=head1 Configuration
+
+=over 4
+
+=item * LINK{gitproj Configuration Documentation|user-doc/config.md}
+
+=item * LINK{gitconfig|config/gitconfig}
+
+=item * LINK{gitignore|config/gitignore}
+
+=item * LINK{pre-commit|hooks/pre-commit}
+
+=back
+
+=head1  Sub-Commands
+
+=over 4
+
+=item * LINK{git proj init|user-doc/subcommands/git-proj-init.md}
+
+=item * LINK{git proj remote|user-doc/subcommands/git-proj-remote.md}
+
+=item * LINK{git proj clone|user-doc/subcommands/git-proj-clone.md}
+
+=item * LINK{git proj config|user-doc/subcommands/git-proj-config.md}
+
+=item * LINK{git proj pull|user-doc/subcommands/git-proj-pull.md}
+
+=item * LINK{git proj push|user-doc/subcommands/git-proj-push.md}
+
+=item * LINK{git proj status|user-doc/subcommands/git-proj-status.md}
+
+=back
+
+=head1 Tutorials
+
+=over 4
+
+=item * LINK{Create a git-proj Repo|user-doc/tutorial/create_a_git-proj_repo.md}
+
+=back
+
+=head1 Utility Scripts
+
+=over 4
+
+=item * LINK{bash-fmt|contrib/bash-fmt}
+
+=item * LINK{bash-lint|contrib/bash-lint}
+
+=item * LINK{rm-trailing-sp|contrib/rm-trailing-sp}
+
+=back
+
+=cut
