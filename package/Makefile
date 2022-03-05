@@ -62,6 +62,7 @@ first ver.mak : /usr/lib/git-core ver.sh
 	-mkver.pl -e 'mak env' 2>&1 | grep -v Warning:
 	command -v git
 	command -v epm
+	command -v /usr/bin/markdown
 	command -v mkver.pl
 	command -v mkepmlist
 	command -v patch-epm-list
