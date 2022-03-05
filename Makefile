@@ -37,9 +37,26 @@ clean :
 	-find . -name '*.tmp' -exec rm {} \;
 
 # --------------------
-gen-doc : cmd-doc user-doc
+gen-doc : top-doc cmd-doc user-doc
 	-cd src-doc; make gen-doc
 	-cd test; make gen-doc
+
+# ----------
+top-doc : doc/README.html doc/CHANGES.html
+
+doc/README.html : README.md
+	-grep -Ev 'INT:' <README.md | uniq | awk ' \
+	    /^## For Developers/ { exit 0 } \
+	    { print $$0 } \
+	' >doc/README.md
+	/usr/bin/markdown doc/README.md >doc/README.html
+	-$(mTidy) doc/README.html
+
+
+doc/CHANGES.html : CHANGES.md
+	-grep -Ev 'INT:' <CHANGES.md | uniq >doc/CHANGES.md
+	/usr/bin/markdown doc/CHANGES.md >doc/CHANGES.html
+	-$(mTidy) doc/CHANGES.html
 
 # ----------
 cmd-doc :

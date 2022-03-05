@@ -12,8 +12,6 @@ open/close sub-items.
 
 =for html <a target="_blank" href="https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html"><img src="https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png"/></A>
 
-=for markdown [![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
-
 Rather than have lots of loose scripts, Makefiles are used to collect
 together the major processes--not just the B<build> process.
 

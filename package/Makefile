@@ -104,17 +104,6 @@ build-doc :
 	-mkdir -p $(mDoc)
 	'rsync' -a ../doc/* $(mDoc)
 	cp ../LICENSE $(mDoc)
-	#
-	-grep -Ev 'INT:' <../CHANGES.md | uniq >$(mDoc)/CHANGES.md
-	/usr/bin/markdown $(mDoc)/CHANGES.md >$(mDoc)/CHANGES.html
-	-$(mTidy) $(mDoc)/CHANGES.html
-	#
-	-grep -Ev 'INT:' <../README.md | uniq | awk ' \
-	    /^## For Developers/ { exit 0 } \
-	    { print $$0 } \
-	' >$(mDoc)/README.md
-	/usr/bin/markdown $(mDoc)/README.md >$(mDoc)/README.html
-	-$(mTidy) $(mDoc)/README.html
 
 build-man :
 	@echo '--------------------'

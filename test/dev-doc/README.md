@@ -12,8 +12,6 @@ open/close sub-items.
     <a target="_blank" href="https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html"><img src="https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png"/></A>
 </div>
 
-[![mindmap](https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png)](https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html)
-
 Rather than have lots of loose scripts, Makefiles are used to collect
 together the major processes--not just the **build** process.
 
@@ -181,6 +179,6 @@ raw/. Directories can be in raw/.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 95:
+- Around line 93:
 
     You forgot a '=back' before '=head1'
