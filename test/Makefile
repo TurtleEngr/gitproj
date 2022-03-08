@@ -238,7 +238,7 @@ test-config.sh : $(mTestEnv)/test-env_ProjLocalDefined.tgz $(mTestEnv)/test-env_
 
 # --------------------
 $(mTestEnv)/test-env.tgz :
-	wget $(mTestOpt) https://$(mTestUrl)/$@
+	wget $(mTestOpt) https://$(mTestUrl)/test-env.tgz -P $(mTestEnv)
 	sleep 0.5
 	@echo "$@ needs to be manually updated."
 	@echo "Do not remove: $@"
@@ -254,7 +254,7 @@ $(mTestEnv)/test-env.tgz :
 
 $(mTestEnv)/saved-path.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/saved-path.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		cd ../..; \
@@ -271,9 +271,9 @@ test-env : $(mTestEnvFiles)
 	@echo 'export gpSaveTestEnv=1'
 	@echo 'Then run: make test-env'
 
-$(mTestEnv)/test-env_HomeAfterBMove.tgz :
+$(mTestEnv)test-env_HomeAfterBMove.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-	        wget $(mTestOpt) https://$(mTestUrl)/$@; \
+	        wget $(mTestOpt) https://$(mTestUrl)/test-env_HomeAfterBMove.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-init.sh testInitMoveBinaryFiles; \
@@ -281,7 +281,7 @@ $(mTestEnv)/test-env_HomeAfterBMove.tgz :
 
 $(mTestEnv)/test-env_ProjAfterGInit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-	        wget $(mTestOpt) https://$(mTestUrl)/$@; \
+	        wget $(mTestOpt) https://$(mTestUrl)/test-env_ProjAfterGInit.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-init.sh testInitMkGitDir; \
@@ -289,7 +289,7 @@ $(mTestEnv)/test-env_ProjAfterGInit.tgz :
 
 $(mTestEnv)/test-env_ProjLocalDefined.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_ProjLocalDefined.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-init.sh testInitCreateLocalGitAuto; \
@@ -297,7 +297,7 @@ $(mTestEnv)/test-env_ProjLocalDefined.tgz :
 
 $(mTestEnv)/test-env_TestDestDirAfterMkRemote.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_TestDestDirAfterMkRemote.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-remote.sh testRemoteMkRemote; \
@@ -305,7 +305,7 @@ $(mTestEnv)/test-env_TestDestDirAfterMkRemote.tgz :
 
 $(mTestEnv)/test-env_TestDestDirAfterRemoteReport.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_TestDestDirAfterRemoteReport.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-remote.sh testRemoteReport; \
@@ -313,7 +313,7 @@ $(mTestEnv)/test-env_TestDestDirAfterRemoteReport.tgz :
 
 $(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_TestDestDirAfterCreateRemoteGit.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-remote.sh testRemoteCreateRemoteGit; \
@@ -321,7 +321,7 @@ $(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz :
 
 $(mTestEnv)/test-env_Home2AfterPush.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_Home2AfterPush.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-push.sh testGitProjPushCLI; \
@@ -329,7 +329,7 @@ $(mTestEnv)/test-env_Home2AfterPush.tgz :
 
 $(mTestEnv)/test-env_Home3AfterCloneMkGit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_Home3AfterCloneMkGit.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-clone.sh testCloneMkGitDirPass; \
@@ -337,7 +337,7 @@ $(mTestEnv)/test-env_Home3AfterCloneMkGit.tgz :
 
 $(mTestEnv)/test-env_Home3AfterCloneSummary.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
-		wget $(mTestOpt) https://$(mTestUrl)/$@; \
+		wget $(mTestOpt) https://$(mTestUrl)/test-env_Home3AfterCloneSummary.tgz -P $(mTestEnv); \
 		sleep 0.5; \
 	else \
 		./test-clone.sh testCloneSummary; \
