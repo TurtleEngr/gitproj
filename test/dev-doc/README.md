@@ -15,7 +15,29 @@ open/close sub-items.
 Rather than have lots of loose scripts, Makefiles are used to collect
 together the major processes--not just the **build** process.
 
+# Quick Start
+
+See test.yml and package.yml in
+[.github/workflows/](https://github.com/TurtleEngr/gitproj/tree/develop/.github/workflows)
+for a quick list of commands for the testing, and packaging commands.
+
+This is a list of the commands found there:
+
+    git clone git@github.com:TurtleEngr/gitproj.git
+    cd gitproj/test
+    make install-deps mk-ssh
+    make test-all
+    # If all pass, the you can package
+    cd ../package
+    make first
+    make clean build package
+
+In package/pkg/ you should see the package(s). EPM supports a number
+of "native" packages: bsd, deb, rpm, and macos.
+
 # Dependencies for Development
+
+To install all the dependencies: **cd test; make install-deps mk-ssh**
 
 The "first" target in
 [package/Makefile](https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile)
@@ -127,7 +149,7 @@ So if you see a pod file \*do not edit the corresponding html or md
 files\*--they will be generated with "make gen-dev-doc"
 
 Most of the open items in the TODO.md should be moved to
-[issues](https://metacpan.org/pod/%3Chttps%3A#github.com-TurtleEngr-gitproj-issues)
+[issues](https://metacpan.org/pod/<https:#github.com-TurtleEngr-gitproj-issues)
 
 \----------
 
@@ -179,6 +201,6 @@ raw/. Directories can be in raw/.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 93:
+- Around line 115:
 
     You forgot a '=back' before '=head1'
