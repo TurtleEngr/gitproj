@@ -44,25 +44,27 @@ mReleaseUrl = $(mHost):/rel/released/software/ThirdParty
 mTestUrl = $(mHost):/rel/development/software/own/git-proj/test
 mTestOpt = --user=guest --password=guest
 
+mTestEnv = ../..
+
 # Note: the order matters, when *recreating* these files.
 # The order of tests do not matter when *using* thise files.
 mTestEnvFiles = \
-	test-env_HomeAfterBMove.tgz \
-	test-env_ProjAfterGInit.tgz \
-	test-env_ProjLocalDefined.tgz \
-	test-env_TestDestDirAfterMkRemote.tgz \
-	test-env_TestDestDirAfterRemoteReport.tgz \
-	test-env_Home2AfterPush.tgz \
-	test-env_TestDestDirAfterCreateRemoteGit.tgz \
-	test-env_Home3AfterCloneMkGit.tgz \
-	test-env_Home3AfterCloneSummary.tgz
+	$(mTestEnv)/test-env_HomeAfterBMove.tgz \
+	$(mTestEnv)/test-env_ProjAfterGInit.tgz \
+	$(mTestEnv)/test-env_ProjLocalDefined.tgz \
+	$(mTestEnv)/test-env_TestDestDirAfterMkRemote.tgz \
+	$(mTestEnv)/test-env_TestDestDirAfterRemoteReport.tgz \
+	$(mTestEnv)/test-env_Home2AfterPush.tgz \
+	$(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz \
+	$(mTestEnv)/test-env_Home3AfterCloneMkGit.tgz \
+	$(mTestEnv)/test-env_Home3AfterCloneSummary.tgz
 
 mDepList = \
 	shunit2.1 \
 	$(mCore)/gitproj-com.inc \
 	test.inc \
-	test-env.tgz \
-	saved-path.tgz
+	$(mTestEnv)/test-env.tgz \
+	$(mTestEnv)/saved-path.tgz
 
 mBaseList = \
 	.ran-test-infra.tmp \
@@ -192,11 +194,11 @@ dev-doc/release-server.html : dev-doc/release-server.pod
 	./test-com.sh 2>&1
 	touch $@
 
-.ran-test-com2.tmp : $(mDepList) test-com2.sh test-env_ProjLocalDefined.tgz
+.ran-test-com2.tmp : $(mDepList) test-com2.sh $(mTestEnv)/test-env_ProjLocalDefined.tgz
 	./test-com2.sh 2>&1
 	touch $@
 
-.ran-test-pre-commit.tmp : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
+.ran-test-pre-commit.tmp : $(mDepList) test-pre-commit.sh ../doc/hooks/pre-commit $(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz $(mTestEnv)/test-env_Home3AfterCloneSummary.tgz
 	./test-pre-commit.sh 2>&1
 	touch $@
 
@@ -214,28 +216,28 @@ dev-doc/release-server.html : dev-doc/release-server.pod
 # --------------------
 # Define the test-env*.tgz dependencies here
 
-test-clone.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneMkGit.tgz
+test-clone.sh : $(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz $(mTestEnv)/test-env_Home3AfterCloneMkGit.tgz
 
-test-com2.sh : test-env_ProjLocalDefined.tgz
+test-com2.sh : $(mTestEnv)/test-env_ProjLocalDefined.tgz
 
-test-init.sh : test-env_HomeAfterBMove.tgz test-env_ProjAfterGInit.tgz
+test-init.sh : $(mTestEnv)/test-env_HomeAfterBMove.tgz $(mTestEnv)/test-env_ProjAfterGInit.tgz
 
-test-pre-commit.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
+test-pre-commit.sh : $(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz $(mTestEnv)/test-env_Home3AfterCloneSummary.tgz
 
-test-remote.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
+test-remote.sh : $(mTestEnv)/test-env_ProjLocalDefined.tgz $(mTestEnv)/test-env_TestDestDirAfterMkRemote.tgz
 
-test-pull.sh : test-env_ProjLocalDefined.tgz test-env_Home2AfterPush.tgz
+test-pull.sh : $(mTestEnv)/test-env_ProjLocalDefined.tgz $(mTestEnv)/test-env_Home2AfterPush.tgz
 
-test-push.sh : test-env_TestDestDirAfterRemoteReport.tgz test-env_ProjLocalDefined.tgz
+test-push.sh : $(mTestEnv)/test-env_TestDestDirAfterRemoteReport.tgz $(mTestEnv)/test-env_ProjLocalDefined.tgz
 
-test-remore.sh : test-env_ProjLocalDefined.tgz test-env_TestDestDirAfterMkRemote.tgz
+test-remore.sh : $(mTestEnv)/test-env_ProjLocalDefined.tgz $(mTestEnv)/test-env_TestDestDirAfterMkRemote.tgz
 
-test-status.sh : test-env_TestDestDirAfterCreateRemoteGit.tgz test-env_Home3AfterCloneSummary.tgz
+test-status.sh : $(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz $(mTestEnv)/test-env_Home3AfterCloneSummary.tgz
 
-test-config.sh : test-env_ProjLocalDefined.tgz test-env_Home2AfterPush.tgz
+test-config.sh : $(mTestEnv)/test-env_ProjLocalDefined.tgz $(mTestEnv)/test-env_Home2AfterPush.tgz
 
 # --------------------
-test-env.tgz :
+$(mTestEnv)/test-env.tgz :
 	wget $(mTestOpt) https://$(mTestUrl)/$@
 	sleep 0.5
 	@echo "$@ needs to be manually updated."
@@ -243,15 +245,14 @@ test-env.tgz :
 	@echo "First run:  ./test-init.sh testGitProjInit"
 	@echo "Make manual changes to the env area: ../../test/"
 	@echo "cd ../../test"
-	@echo "tar -czf test-env.tgz test"
-	@echo "mv -fv test-env.tgz gitproj/doc/test"
+	@echo "tar -czf $(mTestEnv)/test-env.tgz test"
 	@echo "Now you should update the other test-env tar files."
 
 # --------------------
 # Define the tests that create the test-env*.tgz files.
 # New files are manually moved and symlinks added.
 
-saved-path.tgz :
+$(mTestEnv)/saved-path.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -260,9 +261,7 @@ saved-path.tgz :
 		mkdir test; \
 		echo "export cSavedPath=$$PWD/test" >test/saved-path.inc; \
 		chmod a+rx test/saved-path.inc; \
-		tar -czf saved-path.tgz test/saved-path.inc; \
-		cd -; \
-		ln -sf ../../saved-path.tgz .; \
+		tar -czf $(mTestEnv)/saved-path.tgz test/saved-path.inc; \
 	fi
 
 test-env : $(mTestEnvFiles)
@@ -272,7 +271,7 @@ test-env : $(mTestEnvFiles)
 	@echo 'export gpSaveTestEnv=1'
 	@echo 'Then run: make test-env'
 
-test-env_HomeAfterBMove.tgz :
+$(mTestEnv)/test-env_HomeAfterBMove.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 	        wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -280,7 +279,7 @@ test-env_HomeAfterBMove.tgz :
 		./test-init.sh testInitMoveBinaryFiles; \
 	fi
 
-test-env_ProjAfterGInit.tgz :
+$(mTestEnv)/test-env_ProjAfterGInit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 	        wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -288,7 +287,7 @@ test-env_ProjAfterGInit.tgz :
 		./test-init.sh testInitMkGitDir; \
 	fi
 
-test-env_ProjLocalDefined.tgz :
+$(mTestEnv)/test-env_ProjLocalDefined.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -296,7 +295,7 @@ test-env_ProjLocalDefined.tgz :
 		./test-init.sh testInitCreateLocalGitAuto; \
 	fi
 
-test-env_TestDestDirAfterMkRemote.tgz :
+$(mTestEnv)/test-env_TestDestDirAfterMkRemote.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -304,7 +303,7 @@ test-env_TestDestDirAfterMkRemote.tgz :
 		./test-remote.sh testRemoteMkRemote; \
 	fi
 
-test-env_TestDestDirAfterRemoteReport.tgz :
+$(mTestEnv)/test-env_TestDestDirAfterRemoteReport.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -312,7 +311,7 @@ test-env_TestDestDirAfterRemoteReport.tgz :
 		./test-remote.sh testRemoteReport; \
 	fi
 
-test-env_TestDestDirAfterCreateRemoteGit.tgz :
+$(mTestEnv)/test-env_TestDestDirAfterCreateRemoteGit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -320,7 +319,7 @@ test-env_TestDestDirAfterCreateRemoteGit.tgz :
 		./test-remote.sh testRemoteCreateRemoteGit; \
 	fi
 
-test-env_Home2AfterPush.tgz :
+$(mTestEnv)/test-env_Home2AfterPush.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -328,7 +327,7 @@ test-env_Home2AfterPush.tgz :
 		./test-push.sh testGitProjPushCLI; \
 	fi
 
-test-env_Home3AfterCloneMkGit.tgz :
+$(mTestEnv)/test-env_Home3AfterCloneMkGit.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -336,7 +335,7 @@ test-env_Home3AfterCloneMkGit.tgz :
 		./test-clone.sh testCloneMkGitDirPass; \
 	fi
 
-test-env_Home3AfterCloneSummary.tgz :
+$(mTestEnv)/test-env_Home3AfterCloneSummary.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 		wget $(mTestOpt) https://$(mTestUrl)/$@; \
 		sleep 0.5; \
@@ -347,8 +346,8 @@ test-env_Home3AfterCloneSummary.tgz :
 # --------------------
 # Update test-env*.tgz files at $(mTestUrl)
 
-uplocad-tgz-files :
-	for i in saved-path.tgz $(mTestEnvFiles); do \
+upload-tgz-files :
+	for i in $(mTestEnv)/saved-path.tgz $(mTestEnvFiles); do \
 		'rsync' $(mRsyncOpt) $$i $(mTestUrl); \
 		if [ -z $$? ]; then \
 			exit 1; \

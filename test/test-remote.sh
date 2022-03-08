@@ -68,7 +68,7 @@ EOF
 # --------------------------------
 NAoneTimeSetUp()
 {
-    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarIn=$gpTestEnv/test-env_ProjLocalDefined.tgz
 
     fTestSetupEnv
     fTestCreateEnv
@@ -88,7 +88,7 @@ NAoneTimeSetUp()
 # --------------------------------
 setUp()
 {
-    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarIn=$gpTestEnv/test-env_ProjLocalDefined.tgz
 
     # Restore default global values, before each test
 
@@ -545,7 +545,7 @@ testRemoteMkRemote()
 {
     local tResult
     local tMountDir
-    local tTarOut=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
+    local tTarOut=$gpTestEnv/test-env_TestDestDirAfterMkRemote.tgz
 
     gpAuto=1
     gpVerbose=2
@@ -587,8 +587,8 @@ testRemoteReport()
     local tResult
     local tStatus
     local tMountDir
-    local tTarIn=$gpTest/test-env_TestDestDirAfterMkRemote.tgz
-    local tTarOut=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    local tTarIn=$gpTestEnv/test-env_TestDestDirAfterMkRemote.tgz
+    local tTarOut=$gpTestEnv/test-env_TestDestDirAfterRemoteReport.tgz
 
     cd $cTestDestDir >/dev/null 2>&1
     if [ ! -r $tTarIn ]; then
@@ -655,7 +655,7 @@ testRemoteCreateRemoteGit()
     local tTopDir
     local tStatus
     local tMountDir
-    local tTarOut=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTarOut=$gpTestEnv/test-env_TestDestDirAfterCreateRemoteGit.tgz
 
     gpVerbose=3
     gpAuto=1

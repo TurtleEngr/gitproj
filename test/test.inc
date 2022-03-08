@@ -4,7 +4,7 @@
 # Test globals
 
 export cCurDir cDatHome cDatHome2 cDatHome3 cHome cTestCurDir \
-    cTestDestDir cTarIn HOSTNAME
+    cTestDestDir gpTestEnv cTarIn HOSTNAME
 export gpBin gpDoc gpTest HOME
 export gpDebug gpUnitDebug SHUNIT_COLOR
 export gpCmdName gpCmdVer
@@ -74,9 +74,13 @@ fTestSetupEnv()
     gpDoc=$PWD
     cd - >/dev/null 2>&1
 
+    cd $gpTest/../..
+    gpTestEnv=$PWD
+    cd - >/dev/null 2>&1
+
     . $gpBin/gitproj-com.inc
 
-    cTarIn=$gpTest/test-env.tgz
+    cTarIn=$gpTestEnv/test-env.tgz
     if [ ! -r $cTarIn ]; then
         echo "Error: Cannot find: $cTarIn. [$tSrc:$LINENO]"
         exit 1
@@ -201,10 +205,7 @@ fTestSavePath()
 
     echo "export cSavedPath=$pSavePath/test" >test/$pSaveFile
     chmod a+rx test/$pSaveFile
-    tar -czf $pSaveTar test/$pSaveFile
-
-    cd $gpTest >/dev/null 2>&1
-    ln -sf ../../saved-path.tgz .
+    tar -czf $gpTestEnv/$pSaveTar test/$pSaveFile
 
     cd $tCurDir >/dev/null 2>&1
 } # fTestSavePath
@@ -228,8 +229,8 @@ fTestPatchPath()
         echo "Error: gpTest is not set [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
-    if [ ! -r $gpTest/$pSaveTar ]; then
-        echo "Error: Missing: $gpTest/$pSaveTar [$tSrc:$LINENO]" 1>&2
+    if [ ! -r $gpTestEnv/$pSaveTar ]; then
+        echo "Error: Missing: $gpTestEnv/$pSaveTar [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
 
@@ -240,11 +241,11 @@ fTestPatchPath()
     fi
     tNewPath=$PWD/test
 
-    if [ ! -r $pSaveTar ]; then
-        echo "Error: Missing: $PWD/$pSaveTar [$tSrc:$LINENO]" 1>&2
+    if [ ! -r $gpTestEnv/$pSaveTar ]; then
+        echo "Error: Missing: $gpTestEnv/$pSaveTar [$tSrc:$LINENO]" 1>&2
         exit 1
     fi
-    tar -xzf $pSaveTar
+    tar -xzf $gpTestEnv/$pSaveTar
     if [ ! -e test/$pSaveFile ]; then
         echo "Error: Missing: test/$pSaveFile [$tSrc:$LINENO]" 1>&2
         exit 1

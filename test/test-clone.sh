@@ -69,7 +69,7 @@ EOF
 # --------------------------------
 setUp()
 {
-    local tTarIn=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTarIn=$gpTestEnv/test-env_TestDestDirAfterCreateRemoteGit.tgz
 
     # Restore default global values, before each test
 
@@ -373,7 +373,7 @@ testCloneMkGitDirFail()
     local tTop
 
     # Assumes setUp has run
-    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # $gpTestEnv/test-env_TestDestDirAfterRemoteReport.tgz
     #                           cTestDestDir=$gpTest/../..
     # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
     # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
@@ -405,10 +405,10 @@ testCloneMkGitDirPass()
     local tResult
     local tStatus
     local tTop
-    local tTarOut=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarOut=$gpTestEnv/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
-    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # $gpTestEnv/test-env_TestDestDirAfterRemoteReport.tgz
     #                           cTestDestDir=$gpTest/../..
     # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
     # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
@@ -476,10 +476,10 @@ testCloneMkGitDirPass()
 testCloneMkRawDirFail()
 {
     local tResult
-    local tTarIn=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarIn=$gpTestEnv/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
-    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # $gpTestEnv/test-env_TestDestDirAfterRemoteReport.tgz
     #                           cTestDestDir=$gpTest/../..
     # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
     # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
@@ -518,10 +518,10 @@ testCloneMkRawDirFail()
 testCloneMkRawDirPass()
 {
     local tResult
-    local tTarIn=$gpTest/test-env_Home3AfterCloneMkGit.tgz
+    local tTarIn=$gpTestEnv/test-env_Home3AfterCloneMkGit.tgz
 
     # Assumes setUp has run
-    # $gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    # $gpTestEnv/test-env_TestDestDirAfterRemoteReport.tgz
     #                           cTestDestDir=$gpTest/../..
     # $cDatHome3/project        $cTestDestDir/test/root/home/adric/project
     # HOME=$cDatHome3           $cTestDestDir/test/root/home/adric
@@ -567,8 +567,8 @@ testCloneSummary()
 {
     local tResult
     local tStatus
-    local tTarIn=$gpTest/test-env_Home3AfterCloneMkGit.tgz
-    local tTarOut=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tTarIn=$gpTestEnv/test-env_Home3AfterCloneMkGit.tgz
+    local tTarOut=$gpTestEnv/test-env_Home3AfterCloneSummary.tgz
 
     # Setup
     cd $cDatHome3 >/dev/null 2>&1

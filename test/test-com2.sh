@@ -80,7 +80,7 @@ setUp()
         gpLocalRawDirPat gpLocalRawSymLink gpLocalTopDir gpMaxSize \
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
-    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarIn=$gpTestEnv/test-env_ProjLocalDefined.tgz
 
     fTestSetupEnv
     fTestCreateEnv

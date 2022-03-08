@@ -71,7 +71,7 @@ EOF
 # --------------------------------
 NAoneTimeSetUp()
 {
-    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarIn=$gpTestEnv/test-env_ProjLocalDefined.tgz
 
     fTestSetupEnv
     fTestCreateEnv
@@ -94,7 +94,7 @@ setUp()
     local tVer=$(cat $gpDoc/VERSION)
     tVer=$(echo $tVer)
     local tConf
-    local tTarIn=$gpTest/test-env_Home2AfterPush.tgz
+    local tTarIn=$gpTestEnv/test-env_Home2AfterPush.tgz
 
     # Restore default global values, before each test
 

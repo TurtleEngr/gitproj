@@ -189,15 +189,14 @@ testPatchPath()
     # ----------
     tResult=$(fTestPatchPath test-xxx.tgz test-saved-path.inc 2>&1)
     assertFalse "$LINENO $tResult" "$?"
-    assertContains "$LINENO $tResult" "$tResult" "Error: Missing: $gpTest/test-xxx.tgz"
+    assertContains "$LINENO $tResult" "$tResult" "Error: Missing: $gpTestEnv/test-xxx.tgz"
 
     # ----------
     tResult=$(fTestSavePath test-saved-path.tgz test-saved-path.inc $tTestSavedPath 2>&1)
     assertTrue "$LINENO $tResult" "$?"
-    assertTrue "$LINENO" "[ -f ../../test-saved-path.tgz ]"
-    assertTrue "$LINENO" "[ -f ../../test/test-saved-path.inc ]"
-    assertTrue "$LINENO" "grep $tTestSavedPath ../../test/test-saved-path.inc"
-    ln -sf ../../test-saved-path.tgz .
+    assertTrue "$LINENO" "[ -f $gpTestEnv/test-saved-path.tgz ]"
+    assertTrue "$LINENO" "[ -f $gpTestEnv/test/test-saved-path.inc ]"
+    assertTrue "$LINENO" "grep $tTestSavedPath $gpTestEnv/test/test-saved-path.inc"
 
     # ----------
     tResult=$(fTestPatchPath test-saved-path.tgz test-xxx-path.inc 2>&1)

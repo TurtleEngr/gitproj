@@ -78,8 +78,8 @@ setUp()
         gpLocalTopDir gpMaxSize \
         gpPath gpProjName gpSysLog gpVer gpVerbose
 
-    local tTarIn=$gpTest/test-env_TestDestDirAfterCreateRemoteGit.tgz
-    local tTarIn2=$gpTest/test-env_Home3AfterCloneSummary.tgz
+    local tTarIn=$gpTestEnv/test-env_TestDestDirAfterCreateRemoteGit.tgz
+    local tTarIn2=$gpTestEnv/test-env_Home3AfterCloneSummary.tgz
     local tVer
     local tConf
 

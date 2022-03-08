@@ -69,7 +69,7 @@ EOF
 # --------------------------------
 NAoneTimeSetUp()
 {
-    local tTarIn=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarIn=$gpTestEnv/test-env_ProjLocalDefined.tgz
 
     fTestSetupEnv
     fTestCreateEnv
@@ -89,7 +89,7 @@ NAoneTimeSetUp()
 # --------------------------------
 setUp()
 {
-    local tTarIn=$gpTest/test-env_TestDestDirAfterRemoteReport.tgz
+    local tTarIn=$gpTestEnv/test-env_TestDestDirAfterRemoteReport.tgz
 
     # Restore default global values, before each test
 
@@ -300,7 +300,7 @@ testGitProjPushCLI()
 {
     local tResult
     local tStatus
-    local tTarOut=$gpTest/test-env_Home2AfterPush.tgz
+    local tTarOut=$gpTestEnv/test-env_Home2AfterPush.tgz
 
     cd $cDatHome/$cDatProj1 >/dev/null 2>&1
     echo "Make a change." >>README.html

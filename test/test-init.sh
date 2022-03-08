@@ -523,7 +523,7 @@ testInitMoveBinaryFiles()
 {
     local tResult
     local tStatus
-    local tTarOut=$gpTest/test-env_HomeAfterBMove.tgz
+    local tTarOut=$gpTestEnv/test-env_HomeAfterBMove.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $gpLocalTopDir >/dev/null 2>&1
@@ -611,8 +611,8 @@ testInitMkGitDir()
     local tResult
     local tStatus
     local tTop
-    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
-    local tTarOut=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTestEnv/test-env_HomeAfterBMove.tgz
+    local tTarOut=$gpTestEnv/test-env_ProjAfterGInit.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $HOME >/dev/null 2>&1
@@ -672,8 +672,8 @@ testComPreCommit()
     local tResult
     local tStatus
     local tTop
-    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
-    local tTarOut=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTestEnv/test-env_HomeAfterBMove.tgz
+    local tTarOut=$gpTestEnv/test-env_ProjAfterGInit.tgz
 
     gpLocalTopDir=$HOME/$cDatProj1
     cd $HOME >/dev/null 2>&1
@@ -737,8 +737,8 @@ testComPreCommit()
 testInitMkLocalConfig()
 {
     local tResult
-    local tTarIn=$gpTest/test-env_HomeAfterBMove.tgz
-    local tTarIn2=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTestEnv/test-env_HomeAfterBMove.tgz
+    local tTarIn2=$gpTestEnv/test-env_ProjAfterGInit.tgz
 
     if [ ! -r $tTarIn ]; then
         fail "Missing: $tTarIn [$LINENO]"
@@ -790,7 +790,7 @@ testInitSaveVarsToConfigs()
     local tResult
     local tFile
     local tS
-    local tTarIn=$gpTest/test-env_ProjAfterGInit.tgz
+    local tTarIn=$gpTestEnv/test-env_ProjAfterGInit.tgz
 
     cd $HOME/project >/dev/null 2>&1
     if [ ! -r $tTarIn ]; then
@@ -863,7 +863,7 @@ testInitCreateLocalGitAuto()
     local tStatus
     local tFile
     local tS
-    local tTarOut=$gpTest/test-env_ProjLocalDefined.tgz
+    local tTarOut=$gpTestEnv/test-env_ProjLocalDefined.tgz
 
     gpGitFlow="true"
     gpMaxSize="10k"
