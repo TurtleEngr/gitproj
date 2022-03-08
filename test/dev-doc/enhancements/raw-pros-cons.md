@@ -82,7 +82,7 @@ Pros and Cons for the different ways of managing remote raw/ files.
   will be required to define the initial configuration, then set the
   "name" of the service in a `gitproj-config` variable.
 
-* The most storage services are not "distributed", so you would want
+* Most storage services are not "distributed", so you would want
   to pick "one" remote service for "main".
 
 --------------------
