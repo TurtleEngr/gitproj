@@ -271,7 +271,7 @@ test-env : $(mTestEnvFiles)
 	@echo 'export gpSaveTestEnv=1'
 	@echo 'Then run: make test-env'
 
-$(mTestEnv)test-env_HomeAfterBMove.tgz :
+$(mTestEnv)/test-env_HomeAfterBMove.tgz :
 	if [ -z "$$gpSaveTestEnv" ]; then \
 	        wget $(mTestOpt) https://$(mTestUrl)/test-env_HomeAfterBMove.tgz -P $(mTestEnv); \
 		sleep 0.5; \
