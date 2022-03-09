@@ -94,9 +94,9 @@
 
 <a href="#_podtop_"><h1 id="EXAMPLES">EXAMPLES</h1></a>
 
-<p>The rsync (and rclone) updates of the files in raw/ are not versioned, so be very careful with the -d option; files will be permanently deleted.</p>
+<p>The rsync (or rclone) updates of the files in raw/ are not versioned, so be very careful with the -d option; files will be permanently deleted.</p>
 
-<p>For a &quot;safe&quot; way, of updating the files in raw/, is to do a &quot;push&quot;, then &quot;pull&quot; with no -d. Then manually remove files you don&#39;t want in the local raw/. Now run &quot;push&quot; with -d, to update the remote raw/</p>
+<p>For a &quot;safe&quot; way, of updating the files in raw/: do a &quot;push&quot;, then &quot;pull&quot; with no -d. Then manually remove files you don&#39;t want, in the local raw/ dir. Now run &quot;push&quot; with -d, to update the remote raw/</p>
 
 <p>For example:</p>
 
@@ -104,7 +104,7 @@
     mount REMOTE-DRIVE
 
     # Update remote with all local raw/ files
-    git proj push
+    git proj push 
 
     # Get all remote raw/ files
     git proj pull
@@ -118,18 +118,21 @@
 
 <p>Note: Because is is so destructive, the -d option cannot be used with the -a option. Also the -y option will be ignored--you must answer the &quot;delete?&quot; prompt.</p>
 
+<p>To quickly and quietly push files to raw and git you would run this</p>
+
+<pre><code>    git proj push -gay</code></pre>
+
 <a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
 
-<pre><code> git proj
- git proj init
- git proj remote
- git proj clone
- git proj add
- git proj push
- git proj pull
- git proj config
- git proj status
- git flow</code></pre>
+<pre><code>    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj add
+    git proj config
+    git flow</code></pre>
 
 <a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
 

@@ -22,8 +22,10 @@ mDepPkg = \
 	gawk \
 	git-flow \
 	libpod-markdown-perl \
+	libmarkdown2 \
 	markdown \
 	openssh-client \
+	openssh-server \
 	perl \
 	rsync \
 	sed \

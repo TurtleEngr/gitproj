@@ -12,6 +12,7 @@
 <body id="_podtop_">
   <ul id="index">
     <li><a href="#README-for-Developers">README for Developers</a></li>
+    <li><a href="#Quick-Start">Quick Start</a></li>
     <li>
       <a href="#Dependencies-for-Development">Dependencies for
       Development</a>
@@ -56,8 +57,25 @@
         "https://atlas.mindmup.com/bruceraf/git_proj_organization/index.html"><img src="https://atlas.mindmup.com/bruceraf/git_proj_organization/thumb.png" /></a>
   <p>Rather than have lots of loose scripts, Makefiles are used to collect
   together the major processes--not just the <b>build</b> process.</p>
+  <h1 id="Quick-Start"><a href="#_podtop_">Quick Start</a></h1>
+  <p>See test.yml and package.yml in <a href=
+  "https://github.com/TurtleEngr/gitproj/tree/develop/.github/workflows">.github/workflows/</a>
+  for a quick list of commands for the testing, and packaging commands.</p>
+  <p>This is a list of the commands found there:</p>
+  <pre><code>    git clone git@github.com:TurtleEngr/gitproj.git
+    cd gitproj/test
+    make install-deps mk-ssh
+    make test-all
+    # If all pass, the you can package
+    cd ../package
+    make first
+    make clean build package</code></pre>
+  <p>In package/pkg/ you should see the package(s). EPM supports a number of
+  "native" packages: bsd, deb, rpm, and macos.</p>
   <h1 id="Dependencies-for-Development"><a href="#_podtop_">Dependencies for
   Development</a></h1>
+  <p>To install all the dependencies: <b>cd test; make install-deps
+  mk-ssh</b></p>
   <p>The "first" target in <a href=
   "https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile">package/Makefile</a>
   lists the required commands.</p>
@@ -226,7 +244,7 @@
   <p>Hey! <b>The above document had some coding errors, which are explained
   below:</b></p>
   <dl>
-    <dt id="Around-line-93">Around line 93:</dt>
+    <dt id="Around-line-115">Around line 115:</dt>
     <dd>
       <p>You forgot a '=back' before '=head1'</p>
     </dd>

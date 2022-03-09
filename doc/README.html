@@ -8,7 +8,7 @@
   <h1>Description</h1>
   <p>git-proj implements git sub-commands` for managing large binary files.
   Its setup and management is simpler than "git LFS", because it doesn't
-  require a git server.</p>
+  <em>require</em> a git server.</p>
   <p><a href=
   "https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml"><img src="https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg"
        alt="test"
@@ -56,22 +56,58 @@
   support remotes across a network.</p>
   <h1>git proj sub-commands</h1>
   <ul>
-    <li><code>git proj</code> - general help.</li>
-    <li><code>git proj init</code> - initialize a local git-proj repo.</li>
-    <li><code>git proj-remote</code> - initialize a new "remote repo" from
-    the local one.</li>
-    <li><code>git proj push</code> - push files in raw/ to the remote repo
-    (and do a regular git push).</li>
-    <li><code>git proj pull</code> - pull raw/ files from the remote repo
-    (and do a regular git pull).</li>
-    <li><code>git proj status</code> - git status and status of binary files
-    in raw/ compared to the remote's raw/.</li>
-    <li><code>git proj clone</code> - create a git workspace and raw/
-    workspace from a remote.</li>
-    <li><code>git proj config</code> - Fix or change the git-proj
-    configuration files.</li>
-    <li><code>git proj add</code> - TBD. Add files and symlinks to the top
-    raw/ directory.</li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md">
+      <code>git proj</code></a> - general help.</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-init.md">
+      <code>git proj init</code></a> - initialize a local git-proj repo.</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-remote.md">
+      <code>git proj-remote</code></a> - initialize a new "remote repo" from
+      the local one.</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-push.md">
+      <code>git proj push</code></a> - push files in raw/ to the remote repo
+      (and do a regular git push).</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-pull.md">
+      <code>git proj pull</code></a> - pull raw/ files from the remote repo
+      (and do a regular git pull).</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-status.md">
+      <code>git proj status</code></a> - git status and status of binary
+      files in raw/ compared to the remote's raw/.</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-clone.md">
+      <code>git proj clone</code></a> - create a git workspace and raw/
+      workspace from a remote.</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-config.md">
+      <code>git proj config</code></a> - Fix or change the git-proj
+      configuration files.</p>
+    </li>
+    <li>
+      <p><a href=
+      "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-add.md">
+      <code>git proj add</code></a> - TBD. Add files and symlinks to the top
+      raw/ directory.</p>
+    </li>
   </ul>
   <p><a href=
   "https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p">
@@ -83,7 +119,8 @@
   <p>The user docs can be browsed online at: <a href=
   "https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc">user-doc</a></p>
   <p>I recommend you start with: <a href=
-  "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md">git-proj</a></p>
+  "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md"><code>
+  git-proj</code></a></p>
   <p>Then the <a href=
   "https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/tutorial/create_a_git-proj_repo.md">
   Create<em>a</em>git-proj_Repo</a> tutorial shows how to get started with
@@ -96,14 +133,21 @@
   <h2>System requirements:</h2>
   <ul>
     <li>
-      <p>OS: Any debian based OS. For example: Ubuntu, Debian, Mint, MX.</p>
+      <p>OS: Any debian based OS. For example: Ubuntu, Debian, Mint, MX. For
+      other OS, the "portable" installer, which ends with ".tar.gz", might
+      work. (Or see the <a href=
+      "https://github.com/TurtleEngr/gitproj/blob/develop/test/dev-doc/README.md#quick-start">
+      Quick Start</a> developer section for building a native package for
+      your OS. This is a harder path. I would recommend trying the portable
+      installer first.)</p>
     </li>
     <li>
       <p>Packages: git (&gt;=2.17), bash, coreutils (fmt, tr), gawk (awk),
-      git-flow, libpod-markdown-perl (pod2markdown), openssh-client,
-      openssh-server, perl (pod2html, pod2man, pod2usage), rsync, sed, tidy.
-      (If you use the apt-get package manager to install, all of these
-      packages will be installed when git-proj is installed.)</p>
+      git-flow, libpod-markdown-perl (pod2markdown), markdown,
+      openssh-client, openssh-server, perl (pod2html, pod2man, pod2usage),
+      rsync, sed, tidy. (If you use the apt-get package manager to install,
+      all of these packages will be installed when git-proj is
+      installed.)</p>
     </li>
     <li>
       <p>The git sub-command directory /usr/lib/git-core exists.</p>
@@ -112,7 +156,7 @@
   <h2>User requirements:</h2>
   <ul>
     <li>
-      <p>Have used more than just <code>git clone</code></p>
+      <p>You have used more than just <code>git clone</code></p>
     </li>
     <li>
       <p>You have used the git CLI a lot (not just git in an IDE)</p>
@@ -123,12 +167,13 @@
     <li>
       <p>The stable versions can be found at: <a href=
       "https://moria.whyayh.com/rel/released/software/own/git-proj/deb">https://moria.whyayh.com/rel/released/software/own/git-proj/deb</a>
-      - when prompted, use guest/guest for User/Password.</p>
+      if prompted, use guest/guest for User/Password.</p>
     </li>
     <li>
       <p>The test packages (ones that have at least passed all tests) can be
       found at: <a href=
-      "https://moria.whyayh.com/rel/development/software/own/git-proj/deb">https://moria.whyayh.com/rel/development/software/own/git-proj/deb</a></p>
+      "https://moria.whyayh.com/rel/development/software/own/git-proj/deb">https://moria.whyayh.com/rel/development/software/own/git-proj/deb</a>
+      if prompted, use guest/guest for User/Password.</p>
     </li>
   </ul>
   <p><a href=
@@ -164,12 +209,11 @@ wget $tOpt $tUrl/$tPkg
   example: "git proj init -h"</p>
   <p><code>git proj [CMD] -H usage</code> - this outputs just the short usage
   help for "git proj CMD". For example: "git proj init -H usage". If a
-  command requires options, you can just type the command for the usage
+  command has required options, you can just type the command for the usage
   help.</p>
   <h1>Source</h1>
   <p><a href=
   "https://github.com/TurtleEngr/gitproj">https://github.com/TurtleEngr/gitproj</a></p>
-  <hr />
   <h1>For Developers</h1>
   <p>The developer docs can be found at: <a href=
   "https://github.com/TurtleEngr/gitproj/tree/develop/test/dev-doc">test/dev-doc</a></p>

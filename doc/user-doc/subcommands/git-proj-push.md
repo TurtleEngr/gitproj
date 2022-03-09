@@ -61,12 +61,12 @@
 
 # EXAMPLES
 
-The rsync (and rclone) updates of the files in raw/ are not versioned, so
+The rsync (or rclone) updates of the files in raw/ are not versioned, so
 be very careful with the -d option; files will be permanently deleted.
 
-For a "safe" way, of updating the files in raw/, is to do a "push",
-then "pull" with no -d. Then manually remove files you don't want in
-the local raw/. Now run "push" with -d, to update the remote raw/
+For a "safe" way, of updating the files in raw/: do a "push", then
+"pull" with no -d. Then manually remove files you don't want, in the
+local raw/ dir. Now run "push" with -d, to update the remote raw/
 
 For example:
 
@@ -74,7 +74,7 @@ For example:
     mount REMOTE-DRIVE
 
     # Update remote with all local raw/ files
-    git proj push
+    git proj push 
 
     # Get all remote raw/ files
     git proj pull
@@ -90,17 +90,20 @@ Note: Because is is so destructive, the -d option cannot be used with
 the -a option. Also the -y option will be ignored--you must answer the
 "delete?" prompt.
 
+To quickly and quietly push files to raw and git you would run this
+
+    git proj push -gay
+
 # SEE ALSO
 
-    git proj
     git proj init
     git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
-    git proj config
     git proj status
+    git proj add
+    git proj config
     git flow
 
 # AUTHOR

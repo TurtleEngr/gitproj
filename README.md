@@ -60,15 +60,23 @@ remotes across a network.
 
 # git proj sub-commands
 
-* `git proj` - general help.
-* `git proj init` - initialize a local git-proj repo.
-* `git proj-remote` - initialize a new "remote repo" from the local one.
-* `git proj push` - push files in raw/ to the remote repo (and do a regular git push).
-* `git proj pull` - pull raw/ files from the remote repo (and do a regular git pull).
-* `git proj status` - git status and status of binary files in raw/ compared to the remote's raw/.
-* `git proj clone` - create a git workspace and raw/ workspace from a remote.
-* `git proj config` - Fix or change the git-proj configuration files.
-* `git proj add` - TBD. Add files and symlinks to the top raw/ directory.
+* [`git proj`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md) - general help.
+
+* [`git proj init`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-init.md) - initialize a local git-proj repo.
+
+* [`git proj-remote`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-remote.md) - initialize a new "remote repo" from the local one.
+
+* [`git proj push`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-push.md) - push files in raw/ to the remote repo (and do a regular git push).
+
+* [`git proj pull`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-pull.md) - pull raw/ files from the remote repo (and do a regular git pull).
+
+* [`git proj status`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-status.md) - git status and status of binary files in raw/ compared to the remote's raw/.
+
+* [`git proj clone`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-clone.md) - create a git workspace and raw/ workspace from a remote.
+
+* [`git proj config`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-config.md) - Fix or change the git-proj configuration files.
+
+* [`git proj add`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-add.md) - TBD. Add files and symlinks to the top raw/ directory.
 
 [<img src="https://moria.whyayh.com/rel/released/software/own/git-proj/image/git-proj_User_DFD.png" width="600"/>](https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p)
 
@@ -119,12 +127,12 @@ all of these packages will be installed when git-proj is installed.)
 
 * The stable versions can be found at:
 [https://moria.whyayh.com/rel/released/software/own/git-proj/deb](https://moria.whyayh.com/rel/released/software/own/git-proj/deb)
-- if prompted, use guest/guest for User/Password.
+if prompted, use guest/guest for User/Password.
 
 * The test packages (ones that have at least passed all tests) can be
 found at:
 [https://moria.whyayh.com/rel/development/software/own/git-proj/deb](https://moria.whyayh.com/rel/development/software/own/git-proj/deb)
-- if prompted, use guest/guest for User/Password.
+if prompted, use guest/guest for User/Password.
 
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)

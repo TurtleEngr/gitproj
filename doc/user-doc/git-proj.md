@@ -206,14 +206,16 @@ These are the main configuration files you will need to know about.
 
 # SEE ALSO
 
+    git proj
     git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
     git proj status
-    git proj add
     git proj config
+    git proj add   TODO
+    git flow
 
     /usr/share/doc/git-proj/user-doc/
         git-proj.html - all sub-commands in one file (html format)
@@ -366,17 +368,73 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     0 - if OK
     !0 - if errors
 
+    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
+
+For this example, you have a directory of files at:
+
+    ~/project/bigsur-video/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4
+            MVI_0225.MP4
+
+You have started editing, when you realize you should version the
+bigsur-vacation files. To do this automatically (-a, no prompts),
+quietly (-q), move binary files greater than 10K (-m), and add
+git-flow configs (-f).
+
+    cd ~/project/bigsur-video
+    git init -l $PWD -aqmf
+
+This is what the bigsur-video/ will look like after:
+
+    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -> ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -> ../raw/MVI_0225.MP4
+
+And if this is the first time you have run a git-proj command, these files
+will be created (or merged with the files) in in your home dir:
+
+    $HOME/
+        .gitconfig (see the gitproj and gitflow sections)
+        .gitignore
+        .pre-commit
+
+Or to be prompted, do this:
+
+    cd ~/project/bigsur-video
+    git init -l $PWD
+
+Now you can used the usual git commands to save your changes for the
+files that are not in raw/. To save all the files to an external
+drive, see the **git proj remote** command (and the push/pull
+commands).
+
 # SEE ALSO
 
     git proj
+    git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
-    git proj set
     git proj status
-    git proj add   TODO
-    git proj config TDO
+    git proj config
+    git proj add   TBD
     git flow
 
 # AUTHOR
@@ -437,17 +495,73 @@ rsync access.)
 
 # EXAMPLES
 
+This example direcory is what you have after running **git init**:
+
+    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -> ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -> ../raw/MVI_0225.MP4
+
+You want to save these files to an external drive so that they are
+backed up and so that you can clone them to another computer. Or to
+restore them, if you remove the project from your computer.
+
+For this example, assume the external drive is mounted at /mnt/usb-drive/
+and that there is a top directory "video-proj" on it. This is the quick
+quiet way of defining the remote location for the project files:
+
+    cd ~/project/bigsur-video/
+    git proj remote -aqd /mnt/usb-drive/video-proj
+
+This is what will be created on the mounted drive:
+
+    /mnt/usb-drive/video-proj/
+        bigsur-video.raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        bigsur-video.git/
+            config
+            hooks/
+                pre-config
+            [other-dirs]/
+
+    git config --get remote.origin.url
+    outputs:
+    /mnt/usb-drive/video-proj/bigsur-video.git
+
+    git config --get gitproj.config.remote-raw-origin
+    outputs:
+    /mnt/usb-drive/video-proj/bigsur-video.raw
+
+See **git proj push/pull** for how to push or pull files to/from the
+external drive.
+
 # SEE ALSO
 
-    git proj
     git proj init
+    git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
-    git proj config
     git proj status
+    git proj add
+    git proj config
     git flow
+    
 
 # AUTHOR
 
@@ -595,12 +709,12 @@ GPLv3 Copyright 2021 by TurtleEngr
 
 # EXAMPLES
 
-The rsync (and rclone) updates of the files in raw/ are not versioned, so
+The rsync (or rclone) updates of the files in raw/ are not versioned, so
 be very careful with the -d option; files will be permanently deleted.
 
-For a "safe" way, of updating the files in raw/, is to do a "push",
-then "pull" with no -d. Then manually remove files you don't want in
-the local raw/. Now run "push" with -d, to update the remote raw/
+For a "safe" way, of updating the files in raw/: do a "push", then
+"pull" with no -d. Then manually remove files you don't want, in the
+local raw/ dir. Now run "push" with -d, to update the remote raw/
 
 For example:
 
@@ -608,7 +722,7 @@ For example:
     mount REMOTE-DRIVE
 
     # Update remote with all local raw/ files
-    git proj push
+    git proj push 
 
     # Get all remote raw/ files
     git proj pull
@@ -624,17 +738,20 @@ Note: Because is is so destructive, the -d option cannot be used with
 the -a option. Also the -y option will be ignored--you must answer the
 "delete?" prompt.
 
+To quickly and quietly push files to raw and git you would run this
+
+    git proj push -gay
+
 # SEE ALSO
 
-    git proj
     git proj init
     git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
-    git proj config
     git proj status
+    git proj add
+    git proj config
     git flow
 
 # AUTHOR
@@ -720,12 +837,15 @@ If the -g option is given then run:
     mount REMOTE-DRIVE
     git proj pull
 
-    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
-    # -v will show more details about what changed.
-    git proj pull -d -v
+To quickly and quietly pull raw/ and git files from remote, use this:
 
-    # Pull raw/ and git files from remote, using -a -y to answer all prompts
     git proj pull -gay
+
+Note: remote raw files will be merged with the local raw files, but no
+local files will be removed. To make raw/ identical to remote raw/,
+i.e. allow deletes in local dir use the -d option.
+
+    git proj pull -d
 
 # SEE ALSO
 
@@ -733,12 +853,13 @@ If the -g option is given then run:
     git proj init
     git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
-    git proj config
     git proj status
+    git proj config
+    git proj add   TBD
     git flow
+    
 
 # AUTHOR
 
@@ -776,13 +897,17 @@ GPLv3 Copyright 2021 by TurtleEngr
 
         git proj status -g "-s --ignored"
 
+    See **git status --help** for the status options.
+
 - **-r "pRawOpt"**
 
     Raw options. Currently these options will be passed to the diff
-    command. For example to show the files that are the same between local
-    and remote:
+    command. For example to show the raw files that are the same between
+    local and remote:
 
         git proj status -r "-s"
+
+    See **git diff --help** for the diff options.
 
 - **\[common-options\]**
 
@@ -799,8 +924,6 @@ GPLv3 Copyright 2021 by TurtleEngr
     0 - if OK
     !0 - if errors
 
-# EXAMPLES
-
 # SEE ALSO
 
     git proj
@@ -809,8 +932,9 @@ GPLv3 Copyright 2021 by TurtleEngr
     git proj clone
     git proj push
     git proj pull
-    git proj add   TODO
-    git proj config TODO
+    git proj status
+    git proj config
+    git proj add   TBD
     git flow
 
 # AUTHOR
@@ -834,23 +958,22 @@ GPLv3 Copyright 2021 by TurtleEngr
 
 # DESCRIPTION
 
-This is a text menu driven tool for checking and tuning up your
+This is a text menu driven tool for checking and "tuning up" your
 git-proj configurations. There are 4 configuration "levels" to
 consider: Product, User, Project, and Local. The standard git support
-configs at the User and Local levels, and the usual --global and
-\--local options can be used with "git config" to get and set
-variables. Or you can edit the files directly. See the FILES section
-for files listed by their levels.
+configs at the User and Local levels (--global and --local) can be
+used with "git config" to get and set variables. Or you can edit the
+files directly. See the FILES section for the files listed by their
+levels.
 
 The "git proj config" tool has two major sections: "Health Checks" and
 "Actions".
 
 The "problem" health check will report serious problems that should be
-fixed (some fix-up help will be offered). The other health checks are
-useful for finding areas that you might want to update.  For example,
-in your user level configs may have changed and you might notice some
-project level configs are different. You can then run and "action" to
-make them consistent.
+fixed. The other health checks are useful for finding areas that you
+might want to update.  For example, your user level configs may have
+changed and you might notice some project level configs are
+different. You can then run an "action" to make them consistent.
 
 The "actions" are used to copy config variables and files between the
 different "levels". Some actions will only copy things that are
@@ -895,7 +1018,6 @@ These are done even if not in a git-proj managed workspace.
 The Validate Checks, check ProductConfig and --global.
 
 - Validate "facility" name \[error\]
-- Validate "bin" and "doc" locations \[error\]
 - Validate all bool vars are only true/false \[error\]
 - Validate all int vars only have numbers \[error\]
 - Compare --global with ProductConfig \[diff\]
@@ -912,7 +1034,6 @@ These are only done if you are in a git-proj managed workspace.
 The Validate Checks, check ProjectConfig and --local.
 
 - If defined, validate "facility" name \[error\]
-- If defined, validate "bin" and "doc" locations \[error\]
 - Validate all gitproj bool vars are only true/false \[error\]
 - Validate all gitproj int vars only have numbers \[error\]
 - Compare ProjectConfig with --global (only list the diffs from
@@ -957,7 +1078,7 @@ they are set in. Other statistics about the course will also be
 listed, for example, the number of files in raw/ and the space they
 use.
 
-### Select actions to update configs or files
+## Select actions to update configs or files
 
 Define the config sections or files that you want to update or copy."
 
@@ -972,7 +1093,7 @@ Define the config sections or files that you want to update or copy."
 - (9) Copy pre-commit file
 - Select the configs or file to be moved:
 
-## Config File Level Direction
+### Config File Level Direction
 
 These options are for all of the config files actions.
 
@@ -992,7 +1113,7 @@ user-doc 'gitproj Configuration Documentation' (config.md
 - (8) Project -> User
 - Select the from/to:
 
-## Only copy missing or Force
+### Only copy missing or Force
 
 If you select 'Force copy', then the variables in the 'from' file will
 replace the variables in the 'to' file.
@@ -1005,7 +1126,7 @@ missing variables will be copied from the 'from' file.
 - (5) Only copy missing
 - Select the "force" option:
 
-## Copy gitignore file
+### Copy gitignore file
 
 Define what level to copy from and what level to copy to.
 
@@ -1025,7 +1146,7 @@ user-doc 'gitproj Configuration Documentation' (config.md)
 - (6) Project -> User
 - Select the from/to:
 
-## Copy pre-commit file
+### Copy pre-commit file
 
 Define what level to copy from and what level to copy to.
 
@@ -1045,7 +1166,7 @@ The config 'levels' and files are more completely described in the user-doc
 - (8) Project -> User
 - Select the from/to:
 
-## Continue?
+### Continue?
 
 Selecting 'Yes' will make the changes you have selected. If you do not
 want to continue, then you can Quit, to return to the main menu, or
@@ -1074,8 +1195,6 @@ select the Back options to update your selections.
 
     0 - if OK
     !0 - if errors
-
-# EXAMPLES
 
 # FILES
 
@@ -1107,14 +1226,14 @@ select the Back options to update your selections.
 # SEE ALSO
 
     git proj
+    git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
-    git proj set
     git proj status
-    git proj add   TODO
     git proj config
+    git proj add   TBD
     git flow
 
 # NOTES

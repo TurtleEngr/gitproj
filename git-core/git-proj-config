@@ -25,23 +25,22 @@ fUsage()
 
 =head1 DESCRIPTION
 
-This is a text menu driven tool for checking and tuning up your
+This is a text menu driven tool for checking and "tuning up" your
 git-proj configurations. There are 4 configuration "levels" to
 consider: Product, User, Project, and Local. The standard git support
-configs at the User and Local levels, and the usual --global and
---local options can be used with "git config" to get and set
-variables. Or you can edit the files directly. See the FILES section
-for files listed by their levels.
+configs at the User and Local levels (--global and --local) can be
+used with "git config" to get and set variables. Or you can edit the
+files directly. See the FILES section for the files listed by their
+levels.
 
 The "git proj config" tool has two major sections: "Health Checks" and
 "Actions".
 
 The "problem" health check will report serious problems that should be
-fixed (some fix-up help will be offered). The other health checks are
-useful for finding areas that you might want to update.  For example,
-in your user level configs may have changed and you might notice some
-project level configs are different. You can then run and "action" to
-make them consistent.
+fixed. The other health checks are useful for finding areas that you
+might want to update.  For example, your user level configs may have
+changed and you might notice some project level configs are
+different. You can then run an "action" to make them consistent.
 
 The "actions" are used to copy config variables and files between the
 different "levels". Some actions will only copy things that are
@@ -96,8 +95,6 @@ The Validate Checks, check ProductConfig and --global.
 
 =item * Validate "facility" name [error]
 
-=item * Validate "bin" and "doc" locations [error]
-
 =item * Validate all bool vars are only true/false [error]
 
 =item * Validate all int vars only have numbers [error]
@@ -129,8 +126,6 @@ The Validate Checks, check ProjectConfig and --local.
 =over 4
 
 =item * If defined, validate "facility" name [error]
-
-=item * If defined, validate "bin" and "doc" locations [error]
 
 =item * Validate all gitproj bool vars are only true/false [error]
 
@@ -195,7 +190,7 @@ they are set in. Other statistics about the course will also be
 listed, for example, the number of files in raw/ and the space they
 use.
 
-=head3 Select actions to update configs or files
+=head2 Select actions to update configs or files
 
 Define the config sections or files that you want to update or copy."
 
@@ -223,7 +218,7 @@ Define the config sections or files that you want to update or copy."
 
 =back
 
-=head2 Config File Level Direction
+=head3 Config File Level Direction
 
 These options are for all of the config files actions.
 
@@ -252,7 +247,7 @@ user-doc 'gitproj Configuration Documentation' (config.md
 
 =back
 
-=head2 Only copy missing or Force
+=head3 Only copy missing or Force
 
 If you select 'Force copy', then the variables in the 'from' file will
 replace the variables in the 'to' file.
@@ -271,7 +266,7 @@ missing variables will be copied from the 'from' file.
 
 =back
 
-=head2 Copy gitignore file
+=head3 Copy gitignore file
 
 Define what level to copy from and what level to copy to.
 
@@ -298,7 +293,7 @@ user-doc 'gitproj Configuration Documentation' (config.md)
 
 =back
 
-=head2 Copy pre-commit file
+=head3 Copy pre-commit file
 
 Define what level to copy from and what level to copy to.
 
@@ -327,7 +322,7 @@ The config 'levels' and files are more completely described in the user-doc
 
 =back
 
-=head2 Continue?
+=head3 Continue?
 
 Selecting 'Yes' will make the changes you have selected. If you do not
 want to continue, then you can Quit, to return to the main menu, or
@@ -370,7 +365,7 @@ sub-commands.
 
 =for comment =head1 ERRORS
 
-=head1 EXAMPLES
+=for comment =head1 EXAMPLES
 
 =for comment=head1 ENVIRONMENT
 
@@ -426,16 +421,16 @@ sub-commands.
 
 =head1 SEE ALSO
 
- git proj
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj set
- git proj status
- git proj add   TODO
- git proj config
- git flow
+    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow
 
 =head1 NOTES
 

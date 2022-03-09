@@ -11,23 +11,22 @@
 
 # DESCRIPTION
 
-This is a text menu driven tool for checking and tuning up your
+This is a text menu driven tool for checking and "tuning up" your
 git-proj configurations. There are 4 configuration "levels" to
 consider: Product, User, Project, and Local. The standard git support
-configs at the User and Local levels, and the usual --global and
-\--local options can be used with "git config" to get and set
-variables. Or you can edit the files directly. See the FILES section
-for files listed by their levels.
+configs at the User and Local levels (--global and --local) can be
+used with "git config" to get and set variables. Or you can edit the
+files directly. See the FILES section for the files listed by their
+levels.
 
 The "git proj config" tool has two major sections: "Health Checks" and
 "Actions".
 
 The "problem" health check will report serious problems that should be
-fixed (some fix-up help will be offered). The other health checks are
-useful for finding areas that you might want to update.  For example,
-in your user level configs may have changed and you might notice some
-project level configs are different. You can then run and "action" to
-make them consistent.
+fixed. The other health checks are useful for finding areas that you
+might want to update.  For example, your user level configs may have
+changed and you might notice some project level configs are
+different. You can then run an "action" to make them consistent.
 
 The "actions" are used to copy config variables and files between the
 different "levels". Some actions will only copy things that are
@@ -72,7 +71,6 @@ These are done even if not in a git-proj managed workspace.
 The Validate Checks, check ProductConfig and --global.
 
 - Validate "facility" name \[error\]
-- Validate "bin" and "doc" locations \[error\]
 - Validate all bool vars are only true/false \[error\]
 - Validate all int vars only have numbers \[error\]
 - Compare --global with ProductConfig \[diff\]
@@ -89,7 +87,6 @@ These are only done if you are in a git-proj managed workspace.
 The Validate Checks, check ProjectConfig and --local.
 
 - If defined, validate "facility" name \[error\]
-- If defined, validate "bin" and "doc" locations \[error\]
 - Validate all gitproj bool vars are only true/false \[error\]
 - Validate all gitproj int vars only have numbers \[error\]
 - Compare ProjectConfig with --global (only list the diffs from
@@ -134,7 +131,7 @@ they are set in. Other statistics about the course will also be
 listed, for example, the number of files in raw/ and the space they
 use.
 
-### Select actions to update configs or files
+## Select actions to update configs or files
 
 Define the config sections or files that you want to update or copy."
 
@@ -149,7 +146,7 @@ Define the config sections or files that you want to update or copy."
 - (9) Copy pre-commit file
 - Select the configs or file to be moved:
 
-## Config File Level Direction
+### Config File Level Direction
 
 These options are for all of the config files actions.
 
@@ -169,7 +166,7 @@ user-doc 'gitproj Configuration Documentation' (config.md
 - (8) Project -> User
 - Select the from/to:
 
-## Only copy missing or Force
+### Only copy missing or Force
 
 If you select 'Force copy', then the variables in the 'from' file will
 replace the variables in the 'to' file.
@@ -182,7 +179,7 @@ missing variables will be copied from the 'from' file.
 - (5) Only copy missing
 - Select the "force" option:
 
-## Copy gitignore file
+### Copy gitignore file
 
 Define what level to copy from and what level to copy to.
 
@@ -202,7 +199,7 @@ user-doc 'gitproj Configuration Documentation' (config.md)
 - (6) Project -> User
 - Select the from/to:
 
-## Copy pre-commit file
+### Copy pre-commit file
 
 Define what level to copy from and what level to copy to.
 
@@ -222,7 +219,7 @@ The config 'levels' and files are more completely described in the user-doc
 - (8) Project -> User
 - Select the from/to:
 
-## Continue?
+### Continue?
 
 Selecting 'Yes' will make the changes you have selected. If you do not
 want to continue, then you can Quit, to return to the main menu, or
@@ -251,8 +248,6 @@ select the Back options to update your selections.
 
     0 - if OK
     !0 - if errors
-
-# EXAMPLES
 
 # FILES
 
@@ -284,14 +279,14 @@ select the Back options to update your selections.
 # SEE ALSO
 
     git proj
+    git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
-    git proj set
     git proj status
-    git proj add   TODO
     git proj config
+    git proj add   TBD
     git flow
 
 # NOTES

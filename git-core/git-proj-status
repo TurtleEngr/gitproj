@@ -46,13 +46,17 @@ ignored files, use::
 
     git proj status -g "-s --ignored"
 
+See B<git status --help> for the status options.
+
 =item B<-r "pRawOpt">
 
 Raw options. Currently these options will be passed to the diff
-command. For example to show the files that are the same between local
-and remote:
+command. For example to show the raw files that are the same between
+local and remote:
 
     git proj status -r "-s"
+
+See B<git diff --help> for the diff options.
 
 =item B<[common-options]>
 
@@ -73,7 +77,7 @@ sub-commands.
 
 =for comment =head1 ERRORS
 
-=head1 EXAMPLES
+=for comment =head1 EXAMPLES
 
 =for comment=head1 ENVIRONMENT
 
@@ -81,15 +85,16 @@ sub-commands.
 
 =head1 SEE ALSO
 
- git proj
- git proj init
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj add   TODO
- git proj config TODO
- git flow
+    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow
 
 =for comment =head1 NOTES
 

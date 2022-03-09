@@ -26,13 +26,17 @@
 
         git proj status -g "-s --ignored"
 
+    See **git status --help** for the status options.
+
 - **-r "pRawOpt"**
 
     Raw options. Currently these options will be passed to the diff
-    command. For example to show the files that are the same between local
-    and remote:
+    command. For example to show the raw files that are the same between
+    local and remote:
 
         git proj status -r "-s"
+
+    See **git diff --help** for the diff options.
 
 - **\[common-options\]**
 
@@ -49,8 +53,6 @@
     0 - if OK
     !0 - if errors
 
-# EXAMPLES
-
 # SEE ALSO
 
     git proj
@@ -59,8 +61,9 @@
     git proj clone
     git proj push
     git proj pull
-    git proj add   TODO
-    git proj config TODO
+    git proj status
+    git proj config
+    git proj add   TBD
     git flow
 
 # AUTHOR

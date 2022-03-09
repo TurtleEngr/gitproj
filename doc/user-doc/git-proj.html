@@ -87,7 +87,6 @@
     <li><a href="#DESCRIPTION6">DESCRIPTION</a></li>
     <li><a href="#OPTIONS6">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE6">RETURN VALUE</a></li>
-    <li><a href="#EXAMPLES5">EXAMPLES</a></li>
     <li><a href="#SEE-ALSO6">SEE ALSO</a></li>
     <li><a href="#AUTHOR6">AUTHOR</a></li>
     <li><a href="#HISTORY6">HISTORY</a></li>
@@ -103,26 +102,27 @@
         <li><a href="#Local-and-Project-Level-Health-Checks">Local and
         Project Level Health Checks</a></li>
         <li><a href="#Additional-Checks">Additional Checks</a></li>
+        <li><a href=
+        "#Run-all-health-checks-and-report-their-status-info1">Run all health
+        checks and report their status [info]</a></li>
         <li>
-          <a href="#Run-all-health-checks-and-report-their-status-info1">Run
-          all health checks and report their status [info]</a>
+          <a href="#Select-actions-to-update-configs-or-files1">Select
+          actions to update configs or files</a>
           <ul>
-            <li><a href="#Select-actions-to-update-configs-or-files1">Select
-            actions to update configs or files</a></li>
+            <li><a href="#Config-File-Level-Direction">Config File Level
+            Direction</a></li>
+            <li><a href="#Only-copy-missing-or-Force">Only copy missing or
+            Force</a></li>
+            <li><a href="#Copy-gitignore-file1">Copy gitignore file</a></li>
+            <li><a href="#Copy-pre-commit-file1">Copy pre-commit
+            file</a></li>
+            <li><a href="#Continue">Continue?</a></li>
           </ul>
         </li>
-        <li><a href="#Config-File-Level-Direction">Config File Level
-        Direction</a></li>
-        <li><a href="#Only-copy-missing-or-Force">Only copy missing or
-        Force</a></li>
-        <li><a href="#Copy-gitignore-file1">Copy gitignore file</a></li>
-        <li><a href="#Copy-pre-commit-file1">Copy pre-commit file</a></li>
-        <li><a href="#Continue">Continue?</a></li>
       </ul>
     </li>
     <li><a href="#OPTIONS7">OPTIONS</a></li>
     <li><a href="#RETURN-VALUE7">RETURN VALUE</a></li>
-    <li><a href="#EXAMPLES6">EXAMPLES</a></li>
     <li>
       <a href="#FILES1">FILES</a>
       <ul>
@@ -251,13 +251,16 @@
       <p>gpVerbose and gpDebug control what log messages are output. This is
       what the log messages look like:</p>
       <p>* Normal log messages:</p>
-      <pre><code>    [Command] [warning|notice|info]: [Message] [File:LineNo](ErrCode)</code></pre>
+      <pre>
+      <code>    [Command] [warning|notice|info]: [Message] [File:LineNo](ErrCode)</code></pre>
       <p>* Error messages (crit will exit, err might continue):</p>
-      <pre><code>    [Command] [crit|err]: Error: [Message] [File:LineNo](ErrCode)
+      <pre>
+      <code>    [Command] [crit|err]: Error: [Message] [File:LineNo](ErrCode)
     If gpDebug &gt;= 2, a StackTrace will be output.</code></pre>
       <p>* An internal error. This is probably a defect in the code (collect
       all the output for a bug report):</p>
-      <pre><code>    [Command] [crit|err]: Internal: Error: [Message] [File:LineNo](ErrCode)
+      <pre>
+      <code>    [Command] [crit|err]: Internal: Error: [Message] [File:LineNo](ErrCode)
     StackTrace: ...</code></pre>
       <p>Key:</p>
       <pre><code>    [Command] - the top level command
@@ -281,7 +284,8 @@
     ...
     N  - "debug-N" and messages less than N</code></pre>
       <p>Debug log messages look like this::</p>
-      <pre><code>    [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)</code></pre>
+      <pre>
+      <code>    [Command] [debug]: debug-N: [Message] [File:LineNo](ErrCode)</code></pre>
     </dd>
   </dl>
   <h1 id="RETURN-VALUE">RETURN VALUE</h1>
@@ -319,14 +323,16 @@
  PROJ/.pre-commit                       # Project
  PROJ/.git/hooks/pre-commit             # Local</code></pre>
   <h1 id="SEE-ALSO">SEE ALSO</h1>
-  <pre><code>    git proj init
+  <pre><code>    git proj
+    git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
     git proj status
-    git proj add
     git proj config
+    git proj add   TODO
+    git flow
 
     /usr/share/doc/git-proj/user-doc/
         git-proj.html - all sub-commands in one file (html format)
@@ -409,7 +415,8 @@
     <dt id="m"><b>-m</b></dt>
     <dd>
       <p>Prompt:</p>
-      <pre><code>    Binary files greater than [pSize] were found in your project dir:
+      <pre>
+      <code>    Binary files greater than [pSize] were found in your project dir:
         [file list]</code></pre>
       <p>The listed files can be moved to the project's "raw" directory. Dirs
       will be created in the raw directory that correspond to the project's
@@ -440,17 +447,61 @@
   <h1 id="RETURN-VALUE1">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
+  <pre>
+  <code>    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]</code></pre>
+  <p>For this example, you have a directory of files at:</p>
+  <pre><code>    ~/project/bigsur-video/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4
+            MVI_0225.MP4</code></pre>
+  <p>You have started editing, when you realize you should version the
+  bigsur-vacation files. To do this automatically (-a, no prompts), quietly
+  (-q), move binary files greater than 10K (-m), and add git-flow configs
+  (-f).</p>
+  <pre><code>    cd ~/project/bigsur-video
+    git init -l $PWD -aqmf</code></pre>
+  <p>This is what the bigsur-video/ will look like after:</p>
+  <pre><code>    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -&gt; ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -&gt; ../raw/MVI_0225.MP4</code></pre>
+  <p>And if this is the first time you have run a git-proj command, these
+  files will be created (or merged with the files) in in your home dir:</p>
+  <pre><code>    $HOME/
+        .gitconfig (see the gitproj and gitflow sections)
+        .gitignore
+        .pre-commit</code></pre>
+  <p>Or to be prompted, do this:</p>
+  <pre><code>    cd ~/project/bigsur-video
+    git init -l $PWD</code></pre>
+  <p>Now you can used the usual git commands to save your changes for the
+  files that are not in raw/. To save all the files to an external drive, see
+  the <b>git proj remote</b> command (and the push/pull commands).</p>
   <h1 id="SEE-ALSO1">SEE ALSO</h1>
-  <pre><code> git proj
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj set
- git proj status
- git proj add   TODO
- git proj config TDO
- git flow</code></pre>
+  <pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow</code></pre>
   <h1 id="AUTHOR1">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY1">HISTORY</h1>
@@ -458,7 +509,8 @@
   <hr />
   <h1 id="NAME-git-proj-remote">NAME git proj remote</h1>
   <h1 id="SYNOPSIS2">SYNOPSIS</h1>
-  <pre><code>    git proj remote [-a] [-d pMountDir] [common-options]</code></pre>
+  <pre>
+  <code>    git proj remote [-a] [-d pMountDir] [common-options]</code></pre>
   <h1 id="DESCRIPTION2">DESCRIPTION</h1>
   <p>This will create a remote git repo on an external drive.</p>
   <p>(Future versions may support repos on remote computers, where you have
@@ -492,16 +544,66 @@
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="EXAMPLES1">EXAMPLES</h1>
+  <p>This example direcory is what you have after running <b>git
+  init</b>:</p>
+  <pre><code>    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -&gt; ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -&gt; ../raw/MVI_0225.MP4</code></pre>
+  <p>You want to save these files to an external drive so that they are
+  backed up and so that you can clone them to another computer. Or to restore
+  them, if you remove the project from your computer.</p>
+  <p>For this example, assume the external drive is mounted at
+  /mnt/usb-drive/ and that there is a top directory "video-proj" on it. This
+  is the quick quiet way of defining the remote location for the project
+  files:</p>
+  <pre><code>    cd ~/project/bigsur-video/
+    git proj remote -aqd /mnt/usb-drive/video-proj</code></pre>
+  <p>This is what will be created on the mounted drive:</p>
+  <pre><code>    /mnt/usb-drive/video-proj/
+        bigsur-video.raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        bigsur-video.git/
+            config
+            hooks/
+                pre-config
+            [other-dirs]/
+
+    git config --get remote.origin.url
+    outputs:
+    /mnt/usb-drive/video-proj/bigsur-video.git
+
+    git config --get gitproj.config.remote-raw-origin
+    outputs:
+    /mnt/usb-drive/video-proj/bigsur-video.raw</code></pre>
+  <p>See <b>git proj push/pull</b> for how to push or pull files to/from the
+  external drive.</p>
   <h1 id="SEE-ALSO2">SEE ALSO</h1>
-  <pre><code> git proj
- git proj init
- git proj clone
- git proj add
- git proj push
- git proj pull
- git proj config
- git proj status
- git flow</code></pre>
+  <pre><code>    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj add
+    git proj config
+    git flow
+    </code></pre>
   <h1 id="AUTHOR2">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY2">HISTORY</h1>
@@ -509,7 +611,8 @@
   <hr />
   <h1 id="NAME-git-proj-clone">NAME git proj clone</h1>
   <h1 id="SYNOPSIS3">SYNOPSIS</h1>
-  <pre><code>    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]</code></pre>
+  <pre>
+  <code>    git proj clone -d pRemoteDir [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION3">DESCRIPTION</h1>
   <p>Clone a local git repo from the external pRemoteDir.</p>
   <p>Use this script get a local copy of the remote git repo frome a mounted
@@ -564,7 +667,8 @@
   <hr />
   <h1 id="NAME-git-proj-push">NAME git proj push</h1>
   <h1 id="SYNOPSIS4">SYNOPSIS</h1>
-  <pre><code>    git proj push [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
+  <pre>
+  <code>    git proj push [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION4">DESCRIPTION</h1>
   <pre><code> rsync will be used top copy the '[ProjName]/raw/' files to
  [remote-raw-origin]/[ProjName].raw.</code></pre>
@@ -609,18 +713,17 @@
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
   <h1 id="EXAMPLES3">EXAMPLES</h1>
-  <p>The rsync (and rclone) updates of the files in raw/ are not versioned,
-  so be very careful with the -d option; files will be permanently
-  deleted.</p>
-  <p>For a "safe" way, of updating the files in raw/, is to do a "push", then
-  "pull" with no -d. Then manually remove files you don't want in the local
-  raw/. Now run "push" with -d, to update the remote raw/</p>
+  <p>The rsync (or rclone) updates of the files in raw/ are not versioned, so
+  be very careful with the -d option; files will be permanently deleted.</p>
+  <p>For a "safe" way, of updating the files in raw/: do a "push", then
+  "pull" with no -d. Then manually remove files you don't want, in the local
+  raw/ dir. Now run "push" with -d, to update the remote raw/</p>
   <p>For example:</p>
   <pre><code>    cd PROJ
     mount REMOTE-DRIVE
 
     # Update remote with all local raw/ files
-    git proj push
+    git proj push 
 
     # Get all remote raw/ files
     git proj pull
@@ -634,17 +737,18 @@
   <p>Note: Because is is so destructive, the -d option cannot be used with
   the -a option. Also the -y option will be ignored--you must answer the
   "delete?" prompt.</p>
+  <p>To quickly and quietly push files to raw and git you would run this</p>
+  <pre><code>    git proj push -gay</code></pre>
   <h1 id="SEE-ALSO4">SEE ALSO</h1>
-  <pre><code> git proj
- git proj init
- git proj remote
- git proj clone
- git proj add
- git proj push
- git proj pull
- git proj config
- git proj status
- git flow</code></pre>
+  <pre><code>    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj add
+    git proj config
+    git flow</code></pre>
   <h1 id="AUTHOR4">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY4">HISTORY</h1>
@@ -652,7 +756,8 @@
   <hr />
   <h1 id="NAME-git-proj-pull">NAME git proj pull</h1>
   <h1 id="SYNOPSIS5">SYNOPSIS</h1>
-  <pre><code>    git proj pull [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
+  <pre>
+  <code>    git proj pull [-g] [-d] [-a] [-y|-n] [common-options]</code></pre>
   <h1 id="DESCRIPTION5">DESCRIPTION</h1>
   <p>rsync will be used top copy the [remote-raw-origin]/[ProjName].raw/
   files to '[ProjName]/raw/'.</p>
@@ -705,25 +810,26 @@
     (Error: remote not mounted)
 
     mount REMOTE-DRIVE
-    git proj pull
-
-    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
-    # -v will show more details about what changed.
-    git proj pull -d -v
-
-    # Pull raw/ and git files from remote, using -a -y to answer all prompts
-    git proj pull -gay</code></pre>
+    git proj pull</code></pre>
+  <p>To quickly and quietly pull raw/ and git files from remote, use
+  this:</p>
+  <pre><code>    git proj pull -gay</code></pre>
+  <p>Note: remote raw files will be merged with the local raw files, but no
+  local files will be removed. To make raw/ identical to remote raw/, i.e.
+  allow deletes in local dir use the -d option.</p>
+  <pre><code>    git proj pull -d</code></pre>
   <h1 id="SEE-ALSO5">SEE ALSO</h1>
-  <pre><code> git proj
- git proj init
- git proj remote
- git proj clone
- git proj add
- git proj push
- git proj pull
- git proj config
- git proj status
- git flow</code></pre>
+  <pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow
+    </code></pre>
   <h1 id="AUTHOR5">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY5">HISTORY</h1>
@@ -731,7 +837,8 @@
   <hr />
   <h1 id="NAME-git-proj-status">NAME git proj status</h1>
   <h1 id="SYNOPSIS6">SYNOPSIS</h1>
-  <pre><code> git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]</code></pre>
+  <pre>
+  <code> git proj status [-g "pGitOpt"] [-r "pRawOpt"] [common-options]</code></pre>
   <h1 id="DESCRIPTION6">DESCRIPTION</h1>
   <pre><code>    Do a "git status"
     Verify gitproj.config.remote-raw-origin is defined and mounted.
@@ -746,13 +853,15 @@
       <p>Git status options. For example to give a "short" status and show
       ignored files, use::</p>
       <pre><code>    git proj status -g "-s --ignored"</code></pre>
+      <p>See <b>git status --help</b> for the status options.</p>
     </dd>
     <dt id="r-pRawOpt"><b>-r "pRawOpt"</b></dt>
     <dd>
       <p>Raw options. Currently these options will be passed to the diff
-      command. For example to show the files that are the same between local
-      and remote:</p>
+      command. For example to show the raw files that are the same between
+      local and remote:</p>
       <pre><code>    git proj status -r "-s"</code></pre>
+      <p>See <b>git diff --help</b> for the diff options.</p>
     </dd>
     <dt id="common-options6"><b>[common-options]</b></dt>
     <dd>
@@ -767,17 +876,17 @@
   <h1 id="RETURN-VALUE6">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-  <h1 id="EXAMPLES5">EXAMPLES</h1>
   <h1 id="SEE-ALSO6">SEE ALSO</h1>
-  <pre><code> git proj
- git proj init
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj add   TODO
- git proj config TODO
- git flow</code></pre>
+  <pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow</code></pre>
   <h1 id="AUTHOR6">AUTHOR</h1>
   <p>TurtleEngr</p>
   <h1 id="HISTORY6">HISTORY</h1>
@@ -788,20 +897,19 @@
   <pre><code>    NOT IMPLEMENTED YET
     git proj config [common-options]</code></pre>
   <h1 id="DESCRIPTION7">DESCRIPTION</h1>
-  <p>This is a text menu driven tool for checking and tuning up your git-proj
-  configurations. There are 4 configuration "levels" to consider: Product,
-  User, Project, and Local. The standard git support configs at the User and
-  Local levels, and the usual --global and --local options can be used with
-  "git config" to get and set variables. Or you can edit the files directly.
-  See the FILES section for files listed by their levels.</p>
+  <p>This is a text menu driven tool for checking and "tuning up" your
+  git-proj configurations. There are 4 configuration "levels" to consider:
+  Product, User, Project, and Local. The standard git support configs at the
+  User and Local levels (--global and --local) can be used with "git config"
+  to get and set variables. Or you can edit the files directly. See the FILES
+  section for the files listed by their levels.</p>
   <p>The "git proj config" tool has two major sections: "Health Checks" and
   "Actions".</p>
   <p>The "problem" health check will report serious problems that should be
-  fixed (some fix-up help will be offered). The other health checks are
-  useful for finding areas that you might want to update. For example, in
-  your user level configs may have changed and you might notice some project
-  level configs are different. You can then run and "action" to make them
-  consistent.</p>
+  fixed. The other health checks are useful for finding areas that you might
+  want to update. For example, your user level configs may have changed and
+  you might notice some project level configs are different. You can then run
+  an "action" to make them consistent.</p>
   <p>The "actions" are used to copy config variables and files between the
   different "levels". Some actions will only copy things that are missing,
   while other actions can "force" changes.</p>
@@ -852,9 +960,6 @@
       <p>Validate "facility" name [error]</p>
     </li>
     <li>
-      <p>Validate "bin" and "doc" locations [error]</p>
-    </li>
-    <li>
       <p>Validate all bool vars are only true/false [error]</p>
     </li>
     <li>
@@ -888,9 +993,6 @@
   <ul>
     <li>
       <p>If defined, validate "facility" name [error]</p>
-    </li>
-    <li>
-      <p>If defined, validate "bin" and "doc" locations [error]</p>
     </li>
     <li>
       <p>Validate all gitproj bool vars are only true/false [error]</p>
@@ -965,8 +1067,8 @@
   <p>This will list all of the current config var settings and what file they
   are set in. Other statistics about the course will also be listed, for
   example, the number of files in raw/ and the space they use.</p>
-  <h3 id="Select-actions-to-update-configs-or-files1">Select actions to
-  update configs or files</h3>
+  <h2 id="Select-actions-to-update-configs-or-files1">Select actions to
+  update configs or files</h2>
   <p>Define the config sections or files that you want to update or
   copy."</p>
   <dl>
@@ -996,7 +1098,7 @@
     file to be moved:</dt>
     <dd></dd>
   </dl>
-  <h2 id="Config-File-Level-Direction">Config File Level Direction</h2>
+  <h3 id="Config-File-Level-Direction">Config File Level Direction</h3>
   <p>These options are for all of the config files actions.</p>
   <p>Define what level to copy from and what level to copy to.</p>
   <p>For example, if you select 'Product -&gt; User', then that means
@@ -1018,7 +1120,7 @@
     <dt id="Select-the-from-to">Select the from/to:</dt>
     <dd></dd>
   </dl>
-  <h2 id="Only-copy-missing-or-Force">Only copy missing or Force</h2>
+  <h3 id="Only-copy-missing-or-Force">Only copy missing or Force</h3>
   <p>If you select 'Force copy', then the variables in the 'from' file will
   replace the variables in the 'to' file.</p>
   <p>If you select 'Only copy missing', then existing variables, in the 'to'
@@ -1032,7 +1134,7 @@
     <dt id="Select-the-force-option">Select the "force" option:</dt>
     <dd></dd>
   </dl>
-  <h2 id="Copy-gitignore-file1">Copy gitignore file</h2>
+  <h3 id="Copy-gitignore-file1">Copy gitignore file</h3>
   <p>Define what level to copy from and what level to copy to.</p>
   <p>For example, if you select 'Product -&gt; User', then that means
   /usr/share/doc/git-proj/config/gitignore will be merged to ~/.gitignore</p>
@@ -1050,7 +1152,7 @@
     <dt id="Select-the-from-to1">Select the from/to:</dt>
     <dd></dd>
   </dl>
-  <h2 id="Copy-pre-commit-file1">Copy pre-commit file</h2>
+  <h3 id="Copy-pre-commit-file1">Copy pre-commit file</h3>
   <p>Define what level to copy from and what level to copy to.</p>
   <p>For example, if you select 'Product -&gt; User', then that means
   /usr/share/doc/git-proj/hooks/pre-commit will be copied to
@@ -1072,7 +1174,7 @@
     <dt id="Select-the-from-to2">Select the from/to:</dt>
     <dd></dd>
   </dl>
-  <h2 id="Continue">Continue?</h2>
+  <h3 id="Continue">Continue?</h3>
   <p>Selecting 'Yes' will make the changes you have selected. If you do not
   want to continue, then you can Quit, to return to the main menu, or select
   the Back options to update your selections.</p>
@@ -1103,7 +1205,6 @@
   <h1 id="RETURN-VALUE7">RETURN VALUE</h1>
   <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-  <h1 id="EXAMPLES6">EXAMPLES</h1>
   <h1 id="FILES1">FILES</h1>
   <h2 id="Product-Level">Product Level</h2>
   <ul>
@@ -1155,16 +1256,16 @@
     </li>
   </ul>
   <h1 id="SEE-ALSO7">SEE ALSO</h1>
-  <pre><code> git proj
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj set
- git proj status
- git proj add   TODO
- git proj config
- git flow</code></pre>
+  <pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow</code></pre>
   <h1 id="NOTES">NOTES</h1>
   <p>The checks and actions do not cover "all" of the configuration changes
   that you might like. "git proj config" is just a helper tool to point out

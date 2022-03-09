@@ -6,7 +6,7 @@
 
 git-proj implements git sub-commands` for managing large binary files.
 Its setup and management is simpler than "git LFS", because it doesn't
-require a git server.
+*require* a git server.
 
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
@@ -37,7 +37,7 @@ repository. Your snappy repo will start to become huge and
 *slow*. There are some good reasons for wanting to save and track
 those kind of files, but a git repo is not the place. So git-lfs was
 created. If you are OK with that solution and don't mind paying for
-the storage, you can skip this tool.  I wanted something simpler to
+the storage, you can skip this tool. I wanted something simpler to
 setup and with a more distributed approach. This tool is a start down
 that path.
 
@@ -60,15 +60,23 @@ remotes across a network.
 
 # git proj sub-commands
 
-* `git proj` - general help.
-* `git proj init` - initialize a local git-proj repo.
-* `git proj-remote` - initialize a new "remote repo" from the local one.
-* `git proj push` - push files in raw/ to the remote repo (and do a regular git push).
-* `git proj pull` - pull raw/ files from the remote repo (and do a regular git pull).
-* `git proj status` - git status and status of binary files in raw/ compared to the remote's raw/.
-* `git proj clone` - create a git workspace and raw/ workspace from a remote.
-* `git proj config` - Fix or change the git-proj configuration files.
-* `git proj add` - TBD. Add files and symlinks to the top raw/ directory.
+* [`git proj`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md) - general help.
+
+* [`git proj init`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-init.md) - initialize a local git-proj repo.
+
+* [`git proj-remote`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-remote.md) - initialize a new "remote repo" from the local one.
+
+* [`git proj push`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-push.md) - push files in raw/ to the remote repo (and do a regular git push).
+
+* [`git proj pull`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-pull.md) - pull raw/ files from the remote repo (and do a regular git pull).
+
+* [`git proj status`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-status.md) - git status and status of binary files in raw/ compared to the remote's raw/.
+
+* [`git proj clone`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-clone.md) - create a git workspace and raw/ workspace from a remote.
+
+* [`git proj config`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-config.md) - Fix or change the git-proj configuration files.
+
+* [`git proj add`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/subcommands/git-proj-add.md) - TBD. Add files and symlinks to the top raw/ directory.
 
 [<img src="https://moria.whyayh.com/rel/released/software/own/git-proj/image/git-proj_User_DFD.png" width="600"/>](https://docs.google.com/presentation/d/15JqVxkBczpMKwtJI64FNU-2ixbXCh2ijwS3vfIBt4ko/edit#slide=id.p)
 
@@ -80,7 +88,7 @@ The user docs can be browsed online at:
 [user-doc](https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc)
 
 I recommend you start with:
-[git-proj](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md)
+[`git-proj`](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/git-proj.md)
 
 Then the
 [Create_a_git-proj_Repo](https://github.com/TurtleEngr/gitproj/blob/main/doc/user-doc/tutorial/create_a_git-proj_repo.md)
@@ -94,30 +102,37 @@ For a full understanding of all the configuration variable and their
 
 ## System requirements:
 
-* OS: Any debian based OS. For example: Ubuntu, Debian, Mint, MX.
+* OS: Any debian based OS. For example: Ubuntu, Debian, Mint, MX.  For
+other OS, the "portable" installer, which ends with ".tar.gz", might
+work. (Or see the [Quick
+Start](https://github.com/TurtleEngr/gitproj/blob/develop/test/dev-doc/README.md#quick-start)
+developer section for building a native package for your OS. This is a
+harder path. I would recommend trying the portable installer first.)
 
-* Packages: git (>=2.17), bash, coreutils (fmt, tr), gawk (awk), git-flow,
-  libpod-markdown-perl (pod2markdown), openssh-client, openssh-server,
-  perl (pod2html, pod2man, pod2usage), rsync, sed, tidy. (If you use
-  the apt-get package manager to install, all of these packages will
-  be installed when git-proj is installed.)
+* Packages: git (>=2.17), bash, coreutils (fmt, tr), gawk (awk),
+git-flow, libpod-markdown-perl (pod2markdown), markdown,
+openssh-client, openssh-server, perl (pod2html, pod2man, pod2usage),
+rsync, sed, tidy. (If you use the apt-get package manager to install,
+all of these packages will be installed when git-proj is installed.)
 
 * The git sub-command directory /usr/lib/git-core exists.
 
 ## User requirements:
 
-* Have used more than just `git clone`
+* You have used more than just `git clone`
 
 * You have used the git CLI a lot (not just git in an IDE)
 
 ## Download Locations:
 
 * The stable versions can be found at:
-[https://moria.whyayh.com/rel/released/software/own/git-proj/deb](https://moria.whyayh.com/rel/released/software/own/git-proj/deb) -
-when prompted, use guest/guest for User/Password.
+[https://moria.whyayh.com/rel/released/software/own/git-proj/deb](https://moria.whyayh.com/rel/released/software/own/git-proj/deb)
+if prompted, use guest/guest for User/Password.
 
-* The test packages (ones that have at least passed all tests) can be found at:
+* The test packages (ones that have at least passed all tests) can be
+found at:
 [https://moria.whyayh.com/rel/development/software/own/git-proj/deb](https://moria.whyayh.com/rel/development/software/own/git-proj/deb)
+if prompted, use guest/guest for User/Password.
 
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
@@ -157,13 +172,12 @@ For example: "git proj init -h"
 
 `git proj [CMD] -H usage` - this outputs just the short usage help for
 "git proj CMD".  For example: "git proj init -H usage". If a command
-requires options, you can just type the command for the usage help.
+has required options, you can just type the command for the usage
+help.
 
 # Source
 
 [https://github.com/TurtleEngr/gitproj](https://github.com/TurtleEngr/gitproj)
-
-----------
 
 # For Developers
 

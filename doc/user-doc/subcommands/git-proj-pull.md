@@ -73,12 +73,15 @@ If the -g option is given then run:
     mount REMOTE-DRIVE
     git proj pull
 
-    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
-    # -v will show more details about what changed.
-    git proj pull -d -v
+To quickly and quietly pull raw/ and git files from remote, use this:
 
-    # Pull raw/ and git files from remote, using -a -y to answer all prompts
     git proj pull -gay
+
+Note: remote raw files will be merged with the local raw files, but no
+local files will be removed. To make raw/ identical to remote raw/,
+i.e. allow deletes in local dir use the -d option.
+
+    git proj pull -d
 
 # SEE ALSO
 
@@ -86,12 +89,13 @@ If the -g option is given then run:
     git proj init
     git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
-    git proj config
     git proj status
+    git proj config
+    git proj add   TBD
     git flow
+    
 
 # AUTHOR
 

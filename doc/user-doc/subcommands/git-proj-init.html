@@ -117,18 +117,67 @@
 <pre><code> 0 - if OK
  !0 - if errors</code></pre>
 
+<pre><code>    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]</code></pre>
+
+<p>For this example, you have a directory of files at:</p>
+
+<pre><code>    ~/project/bigsur-video/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4
+            MVI_0225.MP4</code></pre>
+
+<p>You have started editing, when you realize you should version the bigsur-vacation files. To do this automatically (-a, no prompts), quietly (-q), move binary files greater than 10K (-m), and add git-flow configs (-f).</p>
+
+<pre><code>    cd ~/project/bigsur-video
+    git init -l $PWD -aqmf</code></pre>
+
+<p>This is what the bigsur-video/ will look like after:</p>
+
+<pre><code>    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -&gt; ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -&gt; ../raw/MVI_0225.MP4</code></pre>
+
+<p>And if this is the first time you have run a git-proj command, these files will be created (or merged with the files) in in your home dir:</p>
+
+<pre><code>    $HOME/
+        .gitconfig (see the gitproj and gitflow sections)
+        .gitignore
+        .pre-commit</code></pre>
+
+<p>Or to be prompted, do this:</p>
+
+<pre><code>    cd ~/project/bigsur-video
+    git init -l $PWD</code></pre>
+
+<p>Now you can used the usual git commands to save your changes for the files that are not in raw/. To save all the files to an external drive, see the <b>git proj remote</b> command (and the push/pull commands).</p>
+
 <a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
 
-<pre><code> git proj
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj set
- git proj status
- git proj add   TODO
- git proj config TDO
- git flow</code></pre>
+<pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow</code></pre>
 
 <a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
 

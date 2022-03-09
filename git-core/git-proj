@@ -291,14 +291,16 @@ These are the main configuration files you will need to know about.
 
 =head1 SEE ALSO
 
+    git proj
     git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
     git proj status
-    git proj add
     git proj config
+    git proj add   TODO
+    git flow
 
     /usr/share/doc/git-proj/user-doc/
         git-proj.html - all sub-commands in one file (html format)

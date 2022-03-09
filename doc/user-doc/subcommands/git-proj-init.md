@@ -93,17 +93,73 @@ will be saved to \[project\]/.git/config and \[project\]/.gitproj
     0 - if OK
     !0 - if errors
 
+    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
+
+For this example, you have a directory of files at:
+
+    ~/project/bigsur-video/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4
+            MVI_0225.MP4
+
+You have started editing, when you realize you should version the
+bigsur-vacation files. To do this automatically (-a, no prompts),
+quietly (-q), move binary files greater than 10K (-m), and add
+git-flow configs (-f).
+
+    cd ~/project/bigsur-video
+    git init -l $PWD -aqmf
+
+This is what the bigsur-video/ will look like after:
+
+    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -> ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -> ../raw/MVI_0225.MP4
+
+And if this is the first time you have run a git-proj command, these files
+will be created (or merged with the files) in in your home dir:
+
+    $HOME/
+        .gitconfig (see the gitproj and gitflow sections)
+        .gitignore
+        .pre-commit
+
+Or to be prompted, do this:
+
+    cd ~/project/bigsur-video
+    git init -l $PWD
+
+Now you can used the usual git commands to save your changes for the
+files that are not in raw/. To save all the files to an external
+drive, see the **git proj remote** command (and the push/pull
+commands).
+
 # SEE ALSO
 
     git proj
+    git proj init
     git proj remote
     git proj clone
     git proj push
     git proj pull
-    git proj set
     git proj status
-    git proj add   TODO
-    git proj config TDO
+    git proj config
+    git proj add   TBD
     git flow
 
 # AUTHOR

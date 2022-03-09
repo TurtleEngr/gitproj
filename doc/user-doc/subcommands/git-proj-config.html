@@ -21,21 +21,20 @@
       <li><a href="#Global-User-Level-Health-Checks">Global User Level Health Checks</a></li>
       <li><a href="#Local-and-Project-Level-Health-Checks">Local and Project Level Health Checks</a></li>
       <li><a href="#Additional-Checks">Additional Checks</a></li>
-      <li><a href="#Run-all-health-checks-and-report-their-status-info1">Run all health checks and report their status [info]</a>
+      <li><a href="#Run-all-health-checks-and-report-their-status-info1">Run all health checks and report their status [info]</a></li>
+      <li><a href="#Select-actions-to-update-configs-or-files1">Select actions to update configs or files</a>
         <ul>
-          <li><a href="#Select-actions-to-update-configs-or-files1">Select actions to update configs or files</a></li>
+          <li><a href="#Config-File-Level-Direction">Config File Level Direction</a></li>
+          <li><a href="#Only-copy-missing-or-Force">Only copy missing or Force</a></li>
+          <li><a href="#Copy-gitignore-file1">Copy gitignore file</a></li>
+          <li><a href="#Copy-pre-commit-file1">Copy pre-commit file</a></li>
+          <li><a href="#Continue">Continue?</a></li>
         </ul>
       </li>
-      <li><a href="#Config-File-Level-Direction">Config File Level Direction</a></li>
-      <li><a href="#Only-copy-missing-or-Force">Only copy missing or Force</a></li>
-      <li><a href="#Copy-gitignore-file1">Copy gitignore file</a></li>
-      <li><a href="#Copy-pre-commit-file1">Copy pre-commit file</a></li>
-      <li><a href="#Continue">Continue?</a></li>
     </ul>
   </li>
   <li><a href="#OPTIONS">OPTIONS</a></li>
   <li><a href="#RETURN-VALUE">RETURN VALUE</a></li>
-  <li><a href="#EXAMPLES">EXAMPLES</a></li>
   <li><a href="#FILES">FILES</a>
     <ul>
       <li><a href="#Product-Level">Product Level</a></li>
@@ -61,11 +60,11 @@
 
 <a href="#_podtop_"><h1 id="DESCRIPTION">DESCRIPTION</h1></a>
 
-<p>This is a text menu driven tool for checking and tuning up your git-proj configurations. There are 4 configuration &quot;levels&quot; to consider: Product, User, Project, and Local. The standard git support configs at the User and Local levels, and the usual --global and --local options can be used with &quot;git config&quot; to get and set variables. Or you can edit the files directly. See the FILES section for files listed by their levels.</p>
+<p>This is a text menu driven tool for checking and &quot;tuning up&quot; your git-proj configurations. There are 4 configuration &quot;levels&quot; to consider: Product, User, Project, and Local. The standard git support configs at the User and Local levels (--global and --local) can be used with &quot;git config&quot; to get and set variables. Or you can edit the files directly. See the FILES section for the files listed by their levels.</p>
 
 <p>The &quot;git proj config&quot; tool has two major sections: &quot;Health Checks&quot; and &quot;Actions&quot;.</p>
 
-<p>The &quot;problem&quot; health check will report serious problems that should be fixed (some fix-up help will be offered). The other health checks are useful for finding areas that you might want to update. For example, in your user level configs may have changed and you might notice some project level configs are different. You can then run and &quot;action&quot; to make them consistent.</p>
+<p>The &quot;problem&quot; health check will report serious problems that should be fixed. The other health checks are useful for finding areas that you might want to update. For example, your user level configs may have changed and you might notice some project level configs are different. You can then run an &quot;action&quot; to make them consistent.</p>
 
 <p>The &quot;actions&quot; are used to copy config variables and files between the different &quot;levels&quot;. Some actions will only copy things that are missing, while other actions can &quot;force&quot; changes.</p>
 
@@ -130,9 +129,6 @@
 <li><p>Validate &quot;facility&quot; name [error]</p>
 
 </li>
-<li><p>Validate &quot;bin&quot; and &quot;doc&quot; locations [error]</p>
-
-</li>
 <li><p>Validate all bool vars are only true/false [error]</p>
 
 </li>
@@ -172,9 +168,6 @@
 <ul>
 
 <li><p>If defined, validate &quot;facility&quot; name [error]</p>
-
-</li>
-<li><p>If defined, validate &quot;bin&quot; and &quot;doc&quot; locations [error]</p>
 
 </li>
 <li><p>Validate all gitproj bool vars are only true/false [error]</p>
@@ -251,7 +244,7 @@
 
 <p>This will list all of the current config var settings and what file they are set in. Other statistics about the course will also be listed, for example, the number of files in raw/ and the space they use.</p>
 
-<h3 id="Select-actions-to-update-configs-or-files1">Select actions to update configs or files</h3>
+<h2 id="Select-actions-to-update-configs-or-files1">Select actions to update configs or files</h2>
 
 <p>Define the config sections or files that you want to update or copy.&quot;</p>
 
@@ -299,7 +292,7 @@
 </dd>
 </dl>
 
-<h2 id="Config-File-Level-Direction">Config File Level Direction</h2>
+<h3 id="Config-File-Level-Direction">Config File Level Direction</h3>
 
 <p>These options are for all of the config files actions.</p>
 
@@ -337,7 +330,7 @@
 </dd>
 </dl>
 
-<h2 id="Only-copy-missing-or-Force">Only copy missing or Force</h2>
+<h3 id="Only-copy-missing-or-Force">Only copy missing or Force</h3>
 
 <p>If you select &#39;Force copy&#39;, then the variables in the &#39;from&#39; file will replace the variables in the &#39;to&#39; file.</p>
 
@@ -359,7 +352,7 @@
 </dd>
 </dl>
 
-<h2 id="Copy-gitignore-file1">Copy gitignore file</h2>
+<h3 id="Copy-gitignore-file1">Copy gitignore file</h3>
 
 <p>Define what level to copy from and what level to copy to.</p>
 
@@ -389,7 +382,7 @@
 </dd>
 </dl>
 
-<h2 id="Copy-pre-commit-file1">Copy pre-commit file</h2>
+<h3 id="Copy-pre-commit-file1">Copy pre-commit file</h3>
 
 <p>Define what level to copy from and what level to copy to.</p>
 
@@ -427,7 +420,7 @@
 </dd>
 </dl>
 
-<h2 id="Continue">Continue?</h2>
+<h3 id="Continue">Continue?</h3>
 
 <p>Selecting &#39;Yes&#39; will make the changes you have selected. If you do not want to continue, then you can Quit, to return to the main menu, or select the Back options to update your selections.</p>
 
@@ -474,8 +467,6 @@
 
 <pre><code> 0 - if OK
  !0 - if errors</code></pre>
-
-<a href="#_podtop_"><h1 id="EXAMPLES">EXAMPLES</h1></a>
 
 <a href="#_podtop_"><h1 id="FILES">FILES</h1></a>
 
@@ -540,16 +531,16 @@
 
 <a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
 
-<pre><code> git proj
- git proj remote
- git proj clone
- git proj push
- git proj pull
- git proj set
- git proj status
- git proj add   TODO
- git proj config
- git flow</code></pre>
+<pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow</code></pre>
 
 <a href="#_podtop_"><h1 id="NOTES">NOTES</h1></a>
 

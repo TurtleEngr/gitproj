@@ -45,13 +45,9 @@ gen-doc : top-doc cmd-doc user-doc
 top-doc : doc/README.html doc/CHANGES.html
 
 doc/README.html : README.md
-	-grep -Ev 'INT:' <README.md | uniq | awk ' \
-	    /^## For Developers/ { exit 0 } \
-	    { print $$0 } \
-	' >doc/README.md
+	-grep -Ev 'INT:' <README.md | uniq >doc/README.md
 	/usr/bin/markdown doc/README.md >doc/README.html
 	-$(mTidy) doc/README.html
-
 
 doc/CHANGES.html : CHANGES.md
 	-grep -Ev 'INT:' <CHANGES.md | uniq >doc/CHANGES.md

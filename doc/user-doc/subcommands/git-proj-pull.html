@@ -102,27 +102,29 @@
     (Error: remote not mounted)
 
     mount REMOTE-DRIVE
-    git proj pull
+    git proj pull</code></pre>
 
-    # Make raw/ identical to remote raw/, i.e. allow deletes in local dir
-    # -v will show more details about what changed.
-    git proj pull -d -v
+<p>To quickly and quietly pull raw/ and git files from remote, use this:</p>
 
-    # Pull raw/ and git files from remote, using -a -y to answer all prompts
-    git proj pull -gay</code></pre>
+<pre><code>    git proj pull -gay</code></pre>
+
+<p>Note: remote raw files will be merged with the local raw files, but no local files will be removed. To make raw/ identical to remote raw/, i.e. allow deletes in local dir use the -d option.</p>
+
+<pre><code>    git proj pull -d</code></pre>
 
 <a href="#_podtop_"><h1 id="SEE-ALSO">SEE ALSO</h1></a>
 
-<pre><code> git proj
- git proj init
- git proj remote
- git proj clone
- git proj add
- git proj push
- git proj pull
- git proj config
- git proj status
- git flow</code></pre>
+<pre><code>    git proj
+    git proj init
+    git proj remote
+    git proj clone
+    git proj push
+    git proj pull
+    git proj status
+    git proj config
+    git proj add   TBD
+    git flow
+    </code></pre>
 
 <a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
 

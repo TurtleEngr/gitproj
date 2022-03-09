@@ -48,17 +48,73 @@ rsync access.)
 
 # EXAMPLES
 
+This example direcory is what you have after running **git init**:
+
+    ~/project/bigsur-video/
+        .gitproj
+        .gitignore
+        .pre-commit
+        raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        .git/
+            config (configs copied from .gitproj)
+            hooks/
+                pre-commit (copied from .pre-commit)
+            [other-dirs]/
+        bigsur.kdenlive
+        src/
+            MVI_0224.MP4 -> ../raw/MVI_0224.MP4
+            MVI_0225.MP4 -> ../raw/MVI_0225.MP4
+
+You want to save these files to an external drive so that they are
+backed up and so that you can clone them to another computer. Or to
+restore them, if you remove the project from your computer.
+
+For this example, assume the external drive is mounted at /mnt/usb-drive/
+and that there is a top directory "video-proj" on it. This is the quick
+quiet way of defining the remote location for the project files:
+
+    cd ~/project/bigsur-video/
+    git proj remote -aqd /mnt/usb-drive/video-proj
+
+This is what will be created on the mounted drive:
+
+    /mnt/usb-drive/video-proj/
+        bigsur-video.raw/
+            src/
+                MVI_0224.MP4
+                MVI_0225.MP4
+        bigsur-video.git/
+            config
+            hooks/
+                pre-config
+            [other-dirs]/
+
+    git config --get remote.origin.url
+    outputs:
+    /mnt/usb-drive/video-proj/bigsur-video.git
+
+    git config --get gitproj.config.remote-raw-origin
+    outputs:
+    /mnt/usb-drive/video-proj/bigsur-video.raw
+
+See **git proj push/pull** for how to push or pull files to/from the
+external drive.
+
 # SEE ALSO
 
-    git proj
     git proj init
+    git proj remote
     git proj clone
-    git proj add
     git proj push
     git proj pull
-    git proj config
     git proj status
+    git proj add
+    git proj config
     git flow
+    
 
 # AUTHOR
 

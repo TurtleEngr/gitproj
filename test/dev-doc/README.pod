@@ -15,7 +15,29 @@ open/close sub-items.
 Rather than have lots of loose scripts, Makefiles are used to collect
 together the major processes--not just the B<build> process.
 
+=head1 Quick Start
+
+See test.yml and package.yml in
+L<.github/workflows/|https://github.com/TurtleEngr/gitproj/tree/develop/.github/workflows>
+for a quick list of commands for the testing, and packaging commands.
+
+This is a list of the commands found there:
+
+    git clone git@github.com:TurtleEngr/gitproj.git
+    cd gitproj/test
+    make install-deps mk-ssh
+    make test-all
+    # If all pass, the you can package
+    cd ../package
+    make first
+    make clean build package
+
+In package/pkg/ you should see the package(s). EPM supports a number
+of "native" packages: bsd, deb, rpm, and macos.
+
 =head1 Dependencies for Development
+
+To install all the dependencies: B<cd test; make install-deps mk-ssh>
 
 The "first" target in
 L<package/Makefile|https://github.com/TurtleEngr/gitproj/blob/develop/package/Makefile>
