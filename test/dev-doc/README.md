@@ -3,7 +3,7 @@
 An outline of the directory structure and files in git-proj can be
 found at: **test/dev-doc/outline.md**
 
-The following MindMap also show how the pieces relate to each
+The following MindMap also shows how the pieces relate to each
 other. To get an interactive outline, right mouse click on the MindMap
 image, and open it in a new tab. Double click on collapsed icons to
 open/close sub-items.
@@ -19,15 +19,15 @@ together the major processes--not just the **build** process.
 
 See test.yml and package.yml in
 [.github/workflows/](https://github.com/TurtleEngr/gitproj/tree/develop/.github/workflows)
-for a quick list of commands for the testing, and packaging commands.
+for a quick list of commands for the testing and packaging commands.
 
-This is a list of the commands found there:
+These are the relevant commands found in the workflows:
 
     git clone git@github.com:TurtleEngr/gitproj.git
     cd gitproj/test
     make install-deps mk-ssh
     make test-all
-    # If all pass, the you can package
+    # If all pass, then you can package
     cd ../package
     make first
     make clean build package
@@ -50,9 +50,9 @@ file for this repo lists the required packages for the gitproj script
 
 ## EPM
 
-The package process requires the **epm** and **epm-helper**
-packages.  These have the commands: epm, mkepmlist, patch-epm-list,
-and mkver.pl.  The packages can be found at:
+The packaging process requires the **epm** and **epm-helper**
+packages. These have the commands: epm, mkepmlist, patch-epm-list,
+and mkver.pl. The packages can be found at:
 [/rel/released/software/ThirdParty/epm/](https://moria.whyayh.com/rel/released/software/ThirdParty/epm/)
 
 - Download and install epm version 5.0.2 or larger from the mx19/ or
@@ -78,18 +78,18 @@ environment."
 
 "The ESP Package Manager ("EPM") is one solution to this
 problem. Besides its own "portable" distribution format, EPM also
-supports the generation of several vendor-specific formats.  This
+supports the generation of several vendor-specific formats. This
 allows you to build software distribution files for almost any
 operating system \*from the same sources.\*"
 
-I have used EPM since 3/2000, to build packages for Red Hat, Suse,
-OSX, and Debian based distributions. All with this one packaging tool!
+I have used EPM since 3/2000 to build packages for Red Hat, Suse,
+OSX, and Debian-based distributions. All with this one packaging tool!
 Sure it doesn't support all of the "unique" features offered by each
 different OS, but it has more than 90% of what is needed, and I didn't
 have to learn (or code for) all of the nuances of different
 packagers. If you really need a customization that is unique to a
-particular OS, then use pre and post install scripts to manage the
-differences. My style is to select the needed scripts when the package
+particular OS, then use pre and post-install scripts to manage the
+differences. My style is to select the necessary scripts when the package
 is built--that keeps the scripts simple and tuned only for that OS.
 
 # Library functions in git-core/
@@ -107,14 +107,14 @@ are the main entry point for git sub-commands. For example:
 
 Every function should have unit-tests that check the inputs and
 outputs of functions. Valid inputs and error states should be checked.
-If a function can only be tested "in production", then refactor the
+If a function can only be tested "in production," then refactor the
 code so that it can be tested! (In a QA/Release/Operations roles, I
 have had developers say some of the code can only be tested in
-production. That is B.S. What I hear? They don't want to do the work
+production. That is B.S. What do I hear? They don't want to do the work
 to be a professional engineer.)
 
-Some "mocking" might be done, but most tests are written so that the
-need for mocking is reduced. Without mocking, the tests will be more
+Some "mocking" might be done, but most tests are written to reduce the
+need for mocking. Without mocking, the tests will be more
 fragile. So? It is better to have fragile tests than fragile code.
 
 - **test-com.sh**
@@ -122,18 +122,14 @@ fragile. So? It is better to have fragile tests than fragile code.
 - **test-gitproj.sh**
 - **test-\[CMD\].sh**
 - **test-\[CMD\].log** - these files are used by the Makefile to collect the
-output from a **test-\[CMD\].sh** script. If the log file is older than any
-of its dependencies, then the corresponding **test-\[CMD\].sh** script will
-be run. These files are NOT versioned.
-- **test.inc** - this script has common function used by many tests to
+output from a **test-\[CMD\].sh** script. The corresponding **test-\[CMD\].sh** script will
+run if the log file is older than any of its dependencies. These files are NOT versioned.
+- **test.inc** - this script has common functions used by many tests to
 setup the test's files and env. vars.
 
-## Test Environment files (test-env\*.tgz)
+## Test Environment files (../../test-env\*.tgz)
 
-These are symlinks to the directory above the git workspace. The
-symlinks are versioned.  The Makefile will copy any missing files from
-the release server. (There really is not need for these symlinks. The
-tests could be refactored to just get the files from "../..")
+The location of the test-env tar files is specified with the $gpTestEnv and $(mTestEnv) variables. The tar files are archived on the release server.
 
 See the Makefile for how the tar-env\*.tgz files are created and
 rebuilt.
@@ -146,7 +142,7 @@ The \*.pod files are the master files for generating the \*.html and
 \*.md files.
 
 So if you see a pod file \*do not edit the corresponding html or md
-files\*--they will be generated with "make gen-dev-doc"
+files\*--are generated with "make gen-dev-doc".
 
 Most of the open items in the TODO.md should be moved to
 [issues](https://metacpan.org/pod/<https:#github.com-TurtleEngr-gitproj-issues)
@@ -192,10 +188,8 @@ creating symlinks so it looks like the files are still there.
     mv *.MP4 *.JPG *.jpg  ../../../../../seal.raw/edit/src/own/video
     ln -s ../../../../../seal.raw/edit/src/own/video/* .
 
-Yuck. Just put all large binary files in PROJ/raw/ and fix the
-references to them. If you really need to have files in some other
-location, then make your own symnlinks to point to the files in
-raw/. Directories can be in raw/.
+Yuck. Just put all large binary files in PROJ/raw/ and fix their
+references. If you really need to have files in another location, make your symlinks to point to the files in raw/. Directories can be in raw/.
 
 # POD ERRORS
 

@@ -30,8 +30,8 @@
     <li>
       <a href="#Test-scripts-in-test">Test scripts in test/</a>
       <ul>
-        <li><a href="#Test-Environment-files-test-env-.tgz">Test Environment
-        files (test-env*.tgz)</a></li>
+        <li><a href="#Test-Environment-files-..-..-test-env-.tgz">Test
+        Environment files (../../test-env*.tgz)</a></li>
       </ul>
     </li>
     <li><a href="#Documentation-Files">Documentation Files</a></li>
@@ -49,7 +49,7 @@
   Developers</a></h1>
   <p>An outline of the directory structure and files in git-proj can be found
   at: <b>test/dev-doc/outline.md</b></p>
-  <p>The following MindMap also show how the pieces relate to each other. To
+  <p>The following MindMap also shows how the pieces relate to each other. To
   get an interactive outline, right mouse click on the MindMap image, and
   open it in a new tab. Double click on collapsed icons to open/close
   sub-items.</p><a target="_blank"
@@ -60,13 +60,13 @@
   <h1 id="Quick-Start"><a href="#_podtop_">Quick Start</a></h1>
   <p>See test.yml and package.yml in <a href=
   "https://github.com/TurtleEngr/gitproj/tree/develop/.github/workflows">.github/workflows/</a>
-  for a quick list of commands for the testing, and packaging commands.</p>
-  <p>This is a list of the commands found there:</p>
+  for a quick list of commands for the testing and packaging commands.</p>
+  <p>These are the relevant commands found in the workflows:</p>
   <pre><code>    git clone git@github.com:TurtleEngr/gitproj.git
     cd gitproj/test
     make install-deps mk-ssh
     make test-all
-    # If all pass, the you can package
+    # If all pass, then you can package
     cd ../package
     make first
     make clean build package</code></pre>
@@ -84,7 +84,7 @@
   file for this repo lists the required packages for the gitproj script (see
   section: Installing, System requirements, Packages).</p>
   <h2 id="EPM">EPM</h2>
-  <p>The package process requires the <b>epm</b> and <b>epm-helper</b>
+  <p>The packaging process requires the <b>epm</b> and <b>epm-helper</b>
   packages. These have the commands: epm, mkepmlist, patch-epm-list, and
   mkver.pl. The packages can be found at: <a href=
   "https://moria.whyayh.com/rel/released/software/ThirdParty/epm/">/rel/released/software/ThirdParty/epm/</a></p>
@@ -114,15 +114,15 @@
   generation of several vendor-specific formats. This allows you to build
   software distribution files for almost any operating system *from the same
   sources.*"</p>
-  <p>I have used EPM since 3/2000, to build packages for Red Hat, Suse, OSX,
-  and Debian based distributions. All with this one packaging tool! Sure it
+  <p>I have used EPM since 3/2000 to build packages for Red Hat, Suse, OSX,
+  and Debian-based distributions. All with this one packaging tool! Sure it
   doesn't support all of the "unique" features offered by each different OS,
   but it has more than 90% of what is needed, and I didn't have to learn (or
   code for) all of the nuances of different packagers. If you really need a
-  customization that is unique to a particular OS, then use pre and post
-  install scripts to manage the differences. My style is to select the needed
-  scripts when the package is built--that keeps the scripts simple and tuned
-  only for that OS.</p>
+  customization that is unique to a particular OS, then use pre and
+  post-install scripts to manage the differences. My style is to select the
+  necessary scripts when the package is built--that keeps the scripts simple
+  and tuned only for that OS.</p>
   <h1 id="Library-functions-in-git-core"><a href="#_podtop_">Library
   functions in git-core/</a></h1>
   <dl>
@@ -149,13 +149,13 @@
   test/</a></h1>
   <p>Every function should have unit-tests that check the inputs and outputs
   of functions. Valid inputs and error states should be checked. If a
-  function can only be tested "in production", then refactor the code so that
+  function can only be tested "in production," then refactor the code so that
   it can be tested! (In a QA/Release/Operations roles, I have had developers
-  say some of the code can only be tested in production. That is B.S. What I
-  hear? They don't want to do the work to be a professional engineer.)</p>
-  <p>Some "mocking" might be done, but most tests are written so that the
-  need for mocking is reduced. Without mocking, the tests will be more
-  fragile. So? It is better to have fragile tests than fragile code.</p>
+  say some of the code can only be tested in production. That is B.S. What do
+  I hear? They don't want to do the work to be a professional engineer.)</p>
+  <p>Some "mocking" might be done, but most tests are written to reduce the
+  need for mocking. Without mocking, the tests will be more fragile. So? It
+  is better to have fragile tests than fragile code.</p>
   <dl>
     <dt id="test-com.sh"><b>test-com.sh</b></dt>
     <dd></dd>
@@ -166,24 +166,23 @@
     <dt id="test--CMD-.sh"><b>test-[CMD].sh</b></dt>
     <dd></dd>
     <dt id=
-    "test--CMD-.log---these-files-are-used-by-the-Makefile-to-collect-the-output-from-a-test--CMD-.sh-script.-If-the-log-file-is-older-than-any-of-its-dependencies-then-the-corresponding-test--CMD-.sh-script-will-be-run.-These-files-are-NOT-versioned">
+    "test--CMD-.log---these-files-are-used-by-the-Makefile-to-collect-the-output-from-a-test--CMD-.sh-script.-The-corresponding-test--CMD-.sh-script-will-run-if-the-log-file-is-older-than-any-of-its-dependencies.-These-files-are-NOT-versioned">
     <b>test-[CMD].log</b> - these files are used by the Makefile to collect
-    the output from a <b>test-[CMD].sh</b> script. If the log file is older
-    than any of its dependencies, then the corresponding <b>test-[CMD].sh</b>
-    script will be run. These files are NOT versioned.</dt>
+    the output from a <b>test-[CMD].sh</b> script. The corresponding
+    <b>test-[CMD].sh</b> script will run if the log file is older than any of
+    its dependencies. These files are NOT versioned.</dt>
     <dd></dd>
     <dt id=
-    "test.inc---this-script-has-common-function-used-by-many-tests-to-setup-the-tests-files-and-env.-vars">
-    <b>test.inc</b> - this script has common function used by many tests to
+    "test.inc---this-script-has-common-functions-used-by-many-tests-to-setup-the-tests-files-and-env.-vars">
+    <b>test.inc</b> - this script has common functions used by many tests to
     setup the test's files and env. vars.</dt>
     <dd></dd>
   </dl>
-  <h2 id="Test-Environment-files-test-env-.tgz">Test Environment files
-  (test-env*.tgz)</h2>
-  <p>These are symlinks to the directory above the git workspace. The
-  symlinks are versioned. The Makefile will copy any missing files from the
-  release server. (There really is not need for these symlinks. The tests
-  could be refactored to just get the files from "../..")</p>
+  <h2 id="Test-Environment-files-..-..-test-env-.tgz">Test Environment files
+  (../../test-env*.tgz)</h2>
+  <p>The location of the test-env tar files is specified with the $gpTestEnv
+  and $(mTestEnv) variables. The tar files are archived on the release
+  server.</p>
   <p>See the Makefile for how the tar-env*.tgz files are created and
   rebuilt.</p>
   <dl>
@@ -196,7 +195,7 @@
   <p>The *.pod files are the master files for generating the *.html and *.md
   files.</p>
   <p>So if you see a pod file *do not edit the corresponding html or md
-  files*--they will be generated with "make gen-dev-doc"</p>
+  files*--are generated with "make gen-dev-doc".</p>
   <p>Most of the open items in the TODO.md should be moved to
   <a>issues</a></p>
   <p>----------</p>
@@ -236,10 +235,9 @@
     mkdir -p  ../../../../../seal.raw/edit/src/own/video
     mv *.MP4 *.JPG *.jpg  ../../../../../seal.raw/edit/src/own/video
     ln -s ../../../../../seal.raw/edit/src/own/video/* .</code></pre>
-  <p>Yuck. Just put all large binary files in PROJ/raw/ and fix the
-  references to them. If you really need to have files in some other
-  location, then make your own symnlinks to point to the files in raw/.
-  Directories can be in raw/.</p>
+  <p>Yuck. Just put all large binary files in PROJ/raw/ and fix their
+  references. If you really need to have files in another location, make your
+  symlinks to point to the files in raw/. Directories can be in raw/.</p>
   <h1 id="POD-ERRORS"><a href="#_podtop_">POD ERRORS</a></h1>
   <p>Hey! <b>The above document had some coding errors, which are explained
   below:</b></p>

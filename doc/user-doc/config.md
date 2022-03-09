@@ -5,7 +5,7 @@
 There are over 20 config variables for managing the git-proj
 sub-commands. Their "scope" is defined by the file they are
 in. Definitions "closer" to the project directory have higher
-precedence. Think of this as a sieve, with variables looked for in the
+precedence than files farther away. Think of this as a sieve, with variables looked for in the
 following order, where the last definition wins.
 
        Scope           Access    Location
@@ -26,7 +26,7 @@ git-proj doesn't do anything with "/etc/config" or
 
     /etc/gitconfg
 
-Currently gitproj does not do anything with this file. Variables that
+Currently, gitproj does not do anything with this file. Variables that
 should be set for all users on a system can be put in this file. Since
 gitproj defines all of the gitproj variables in a user's ~/.gitconfig,
 the /etc/gitconfig changes will not have any impact on the gitproj
@@ -37,7 +37,7 @@ variables.
     [/usr/share/doc/git-proj/config/gitconfig](..md)
 
 gitproj default variable values for all users and projects are defined
-in this file. The values are only copied at selected times and unless
+in this file. The values are only copied at selected times, and unless
 specified, they will only add missing vars, not change user or project
 vars.
 
@@ -46,10 +46,9 @@ This file is mainly used when creating an initial project with
 "git proj config".
 
 The /usr/share/doc/git-proj/config/gitconfig file is not used directly
-by "git config".  It is only used to setup the ~/.gitconfig file.
+by "git config".  It is only used to set up the ~/.gitconfig file.
 
-When a new version of gitproj is installed, new vars and new default
-values may be added. Package manager options can be used to replace or
+New vars and default values may be added when a new version of gitproj is installed. Package manager options can be used to replace or
 keep the existing config file (see man dpkg --force-confdef,
 \--force-confnew, or --force-confold).
 
@@ -142,8 +141,8 @@ changed.
     PROJ/.gitproj
     PROJ/.gitignore
 
-The PROJ/.gitproj file is not used directly by "git config".  It is
-only used to setup the initial PROJ/.git/config file.
+The PROJ/.gitproj file is not used directly by "git config". It is
+only used to set up the initial PROJ/.git/config file.
 
 "git proj init" will create PROJ/.gitproj from the gitproj sections in
 ~/.gitconfig (also filling in "missing" vars from
@@ -155,7 +154,7 @@ PROJ/.git/config after the files are created. If PROJ/.gitproj is
 missing, it will create it with the "init" process.
 
 git-proj commands that change gitproj section vars in PROJ/.git/config
-will also change the vars in PROD/.gitproj, so that later clones can
+will also change the vars in PROD/.gitproj so that later clones can
 update PROJ/.git/config.
 
 ## PROJ/.git/config (--local proj)
@@ -189,13 +188,13 @@ their own pre-commit functions.
 
 # Config Variables and Environment Variables
 
-These are globals and vars that effect how the script runs. Just about
+These are globals and vars that affect how the script runs. Just about
 all of the env. vars. that begin with "gp" can be set and exported
-before the script is run. That way you can set your own defaults, by
+before the script is run. That way, you can set your own defaults by
 putting them in your ~/.bashrc or ~/.bash\_profile files.
 
 Global variable precedence (the last one to set the gp variable,
-wins).  (Internally, this is not implemented in this order, but this
+wins). (Internally, this is not implemented in this order, but this
 is the logical result.)
 
     * internal hardcoded default
@@ -217,16 +216,16 @@ This is used to run the scripts in batch mode.
 
 ## gpAutoMove; -m; NA; (false)
 
-This it used by the "git proj init" command.
+This is used by the "git proj init" command.
 
 ## gpYesNo; -y; -n; NA; (No)
 
-If gpAuto is true, then gpYesNo can be used to define default answers.
+If gpAuto is true, then gpYesNo can define the default answers.
 
 ## NA; -NA, gitproj.config.proj-status; (TBD)
 
 Once the gitproj package is installed and configured, this will be
-changed to "installed"
+changed to "installed."
 
 ## gpSysLog; -NA; gitproj.config.syslog; (false)
 
@@ -239,7 +238,7 @@ Default: false
 ## gpFacility; -NA; gitproj.config.facility; (user)
 
 Log messages sent to syslog will be sent to the "facility" specified
-by by gpFacility.
+by gpFacility.
 
 "user" log messages will be sent to /var/log/user.log, or
 /var/log/syslog, or /var/log/messages.log
@@ -266,8 +265,8 @@ These are some suggested uses for the localN facilities:
 
     local0 - system or application configuration
     local1 - application processes
-    local2 - web site errors
-    local3 - web site access
+    local2 - website errors
+    local3 - website access
     local4 - backend processes
     local5 - publishing
     local6 - available
@@ -291,30 +290,30 @@ There is no config variable for gpDebug.
 
 ## gpGitFlow; -NA; gitproj.config.flow; (true)
 
-If true, git-flow will be setup for the project.
+If true, git-flow will be set up for the project.
 
 ## NA; -NA, gitproj.config.local-status; (TBD)
 
-When a project has been successfully setup by git proj init or
+When a project has been successfully set up by git proj init or
 git proj clone, this will be set to "defined" in PROJ/.gitproj and
 PROJ/.git/config.  If should always be "TBD" in ~/.gitconfig
 
 ## NA; -NA, gitproj.config.local-host; (TBD)
 
-When a project has been successfully setup by git proj init or
+When a project has been successfully set up by git proj init or
 git proj clone, this will be set to "$HOSTNAME" in PROJ/.git/config
 only.
 
 ## gpProjName; -NA, gitproj.config.proj-name; (TBD)
 
-When a project has been successfully setup by git proj init or
+When a project has been successfully set up by git proj init or
 git proj clone, this will be set to the project's name in
-PROJ/.gitproj and PROJ/.git/config. Usually this is the top directory
+PROJ/.gitproj and PROJ/.git/config. Usually, this is the top directory
 name. If should always be "TBD" in ~/.gitconfig
 
 ## NA; -NA, gitproj.config.remote-status; (TBD)
 
-When git proj remote runs OK this is changed to "defined", in
+When git proj remote runs OK, this is changed to "defined", in
 PROJ/.gitproj and PROJ/.git/config. If should always be "TBD" in
 ~/.gitconfig
 
@@ -327,8 +326,8 @@ in ~/.gitconfig and PROJ/.gitproj.
 ## gpRemoteMinSpace; -NA; gitproj.config.remote-min-space; (2g)
 
 This is the minimum space that should be available on the external
-drive.  The git proj remote command will not continue if there is
-not enough space.  The available space should be at least twice the
+drive. The git proj remote command will not continue if there is
+not enough space. The available space should be at least twice the
 size of the space used by ProjName.raw.
 
 ## gpVerbose; -q, -v, -V N; gitproj.config.verbose; (2)
@@ -343,10 +342,8 @@ version of gitproj. The version is defined in the file:
 /usr/share/doc/git-proj/VERSION
 
 git proj clone will compare ver in PROJ/.gitproj to
-/usr/share/doc/git-proj/VERSION. If the major or minor numbers of the
-checked out project are greater than the installed version there could
-be problems. If the installed version is greater, this should not be a
-problem, because gitproj tried to be backward compatible. And it might
+/usr/share/doc/git-proj/VERSION. If the checked-out project's major or minor numbers are greater than the installed version, there could
+be problems. It should not be a problem if the installed version is greater because gitproj tries to be backward compatible. And it might
 try to upgrade the project.
 
 A warning message will be output if there are differences.
@@ -358,7 +355,7 @@ identified.
 
 ## gpPreCommitEnabled; -NA; gitproj.hook.pre-commit-enable; (true)
 
-Use this to turn all pre-commit check off.
+Use this to turn all pre-commit checks off.
 
 ## gpCheckFileNames; -NA; gitproj.hook.check-file-names; (true)
 
@@ -400,4 +397,4 @@ gitproj.hook.binary-file-size will not be allowed into the git repo.
 
 Valid suffixes: k, m, g
 
-If no suffix, then bytes are assumed.
+If there is no suffix, then bytes are assumed.

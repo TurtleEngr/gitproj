@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>Configuration Documentation</title>
@@ -115,9 +115,9 @@
   <h1 id="Precedence"><a href="#_podtop_">Precedence</a></h1>
   <p>There are over 20 config variables for managing the git-proj
   sub-commands. Their "scope" is defined by the file they are in. Definitions
-  "closer" to the project directory have higher precedence. Think of this as
-  a sieve, with variables looked for in the following order, where the last
-  definition wins.</p>
+  "closer" to the project directory have higher precedence than files farther
+  away. Think of this as a sieve, with variables looked for in the following
+  order, where the last definition wins.</p>
   <pre><code>       Scope           Access    Location
     1. System          --file    /etc/gitconfig
        gitproj, global --file    /usr/share/doc/config/gitconfig
@@ -131,16 +131,17 @@
   ".git/config.worktree".</p>
   <h2 id="etc-gitconfg-System">/etc/gitconfg (System)</h2>
   <pre><code>    /etc/gitconfg</code></pre>
-  <p>Currently gitproj does not do anything with this file. Variables that
+  <p>Currently, gitproj does not do anything with this file. Variables that
   should be set for all users on a system can be put in this file. Since
   gitproj defines all of the gitproj variables in a user's ~/.gitconfig, the
   /etc/gitconfig changes will not have any impact on the gitproj
   variables.</p>
   <h2 id="usr-share-doc-git-proj-config-gitconfig-gitproj-global">
   /usr/share/doc/git-proj/config/gitconfig (gitproj global)</h2>
-  <pre><code>    LINK{/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig}</code></pre>
+  <pre>
+  <code>    LINK{/usr/share/doc/git-proj/config/gitconfig|../config/gitconfig}</code></pre>
   <p>gitproj default variable values for all users and projects are defined
-  in this file. The values are only copied at selected times and unless
+  in this file. The values are only copied at selected times, and unless
   specified, they will only add missing vars, not change user or project
   vars.</p>
   <p>This file is mainly used when creating an initial project with
@@ -148,10 +149,10 @@
   "white-space: nowrap;">"git proj clone"</span>. It is also used by
   <span style="white-space: nowrap;">"git proj config"</span>.</p>
   <p>The /usr/share/doc/git-proj/config/gitconfig file is not used directly
-  by "git config". It is only used to setup the ~/.gitconfig file.</p>
-  <p>When a new version of gitproj is installed, new vars and new default
-  values may be added. Package manager options can be used to replace or keep
-  the existing config file (see man dpkg --force-confdef, --force-confnew, or
+  by "git config". It is only used to set up the ~/.gitconfig file.</p>
+  <p>New vars and default values may be added when a new version of gitproj
+  is installed. Package manager options can be used to replace or keep the
+  existing config file (see man dpkg --force-confdef, --force-confnew, or
   --force-confold).</p>
   <pre><code>    [core]
         # These options work will between Linux and Windows
@@ -237,7 +238,7 @@
   <pre><code>    PROJ/.gitproj
     PROJ/.gitignore</code></pre>
   <p>The PROJ/.gitproj file is not used directly by "git config". It is only
-  used to setup the initial PROJ/.git/config file.</p>
+  used to set up the initial PROJ/.git/config file.</p>
   <p><span style="white-space: nowrap;">"git proj init"</span> will create
   PROJ/.gitproj from the gitproj sections in ~/.gitconfig (also filling in
   "missing" vars from /usr/share/doc/config/gitconfig). PROJ/.gitproj should
@@ -247,7 +248,7 @@
   vars from PROJ/.gitproj to PROJ/.git/config after the files are created. If
   PROJ/.gitproj is missing, it will create it with the "init" process.</p>
   <p>git-proj commands that change gitproj section vars in PROJ/.git/config
-  will also change the vars in PROD/.gitproj, so that later clones can update
+  will also change the vars in PROD/.gitproj so that later clones can update
   PROJ/.git/config.</p>
   <h2 id="PROJ-.git-config---local-proj">PROJ/.git/config (--local proj)</h2>
   <pre><code>    PROJ/.git/config</code></pre>
@@ -258,7 +259,8 @@
   "usr-share-doc-git-proj-hooks-pre-commit-.pre-commit-PROJ-.pre-commit-PROJ-.git-hooks-pre-commit">
   /usr/share/doc/git-proj/hooks/pre-commit, ~/.pre-commit, PROJ/.pre-commit,
   PROJ/.git/hooks/pre-commit</h2>
-  <pre><code>    LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
+  <pre>
+  <code>    LINK{/usr/share/doc/git-proj/hooks/pre-commit|../hooks/pre-commit}
     ~/.pre-commit (optimal)
     PROJ/.pre-commit (optimal)
     PROJ/.git/hooks/pre-commit</code></pre>
@@ -276,9 +278,9 @@
   own pre-commit functions.</p>
   <h1 id="Config-Variables-and-Environment-Variables"><a href=
   "#_podtop_">Config Variables and Environment Variables</a></h1>
-  <p>These are globals and vars that effect how the script runs. Just about
+  <p>These are globals and vars that affect how the script runs. Just about
   all of the env. vars. that begin with "gp" can be set and exported before
-  the script is run. That way you can set your own defaults, by putting them
+  the script is run. That way, you can set your own defaults by putting them
   in your ~/.bashrc or ~/.bash_profile files.</p>
   <p>Global variable precedence (the last one to set the gp variable, wins).
   (Internally, this is not implemented in this order, but this is the logical
@@ -290,22 +292,22 @@
  * command line option</code></pre>
   <h2 id="Notation:-gp-Var---A-git.config.-var-default">Notation: gp[Var];
   -[A]; git.config.[var]; (default)</h2>
-  <pre><code>    gp[Var];          - a global env. var. name (NA means there is none)
+  <pre>
+  <code>    gp[Var];          - a global env. var. name (NA means there is none)
     -[A];             - a CLI option (-NA means there is none)
     git.config.[var]; - git config var name (NA means there is none)
     (default)         - its default value, if not defined anywhere</code></pre>
   <h2 id="gpAuto--a-NA-false">gpAuto; -a; NA; (false)</h2>
   <p>This is used to run the scripts in batch mode.</p>
   <h2 id="gpAutoMove--m-NA-false">gpAutoMove; -m; NA; (false)</h2>
-  <p>This it used by the <span style="white-space: nowrap;">"git proj
+  <p>This is used by the <span style="white-space: nowrap;">"git proj
   init"</span> command.</p>
   <h2 id="gpYesNo--y--n-NA-No">gpYesNo; -y; -n; NA; (No)</h2>
-  <p>If gpAuto is true, then gpYesNo can be used to define default
-  answers.</p>
+  <p>If gpAuto is true, then gpYesNo can define the default answers.</p>
   <h2 id="NA--NA-gitproj.config.proj-status-TBD">NA; -NA,
   gitproj.config.proj-status; (TBD)</h2>
   <p>Once the gitproj package is installed and configured, this will be
-  changed to "installed"</p>
+  changed to "installed."</p>
   <h2 id="gpSysLog--NA-gitproj.config.syslog-false">gpSysLog; -NA;
   gitproj.config.syslog; (false)</h2>
   <p>If set to 0, log messages will only be sent to stderr.</p>
@@ -314,7 +316,7 @@
   <h2 id="gpFacility--NA-gitproj.config.facility-user">gpFacility; -NA;
   gitproj.config.facility; (user)</h2>
   <p>Log messages sent to syslog will be sent to the "facility" specified by
-  by gpFacility.</p>
+  gpFacility.</p>
   <p>"user" log messages will be sent to /var/log/user.log, or
   /var/log/syslog, or /var/log/messages.log</p>
   <p>Default: user</p>
@@ -335,8 +337,8 @@
   <p>These are some suggested uses for the localN facilities:</p>
   <pre><code> local0 - system or application configuration
  local1 - application processes
- local2 - web site errors
- local3 - web site access
+ local2 - website errors
+ local3 - website access
  local4 - backend processes
  local5 - publishing
  local6 - available
@@ -356,30 +358,30 @@
   gitproj.config.git-flow-pkg, (git-flow)</h2>
   <h2 id="gpGitFlow--NA-gitproj.config.flow-true">gpGitFlow; -NA;
   gitproj.config.flow; (true)</h2>
-  <p>If true, git-flow will be setup for the project.</p>
+  <p>If true, git-flow will be set up for the project.</p>
   <h2 id="NA--NA-gitproj.config.local-status-TBD">NA; -NA,
   gitproj.config.local-status; (TBD)</h2>
-  <p>When a project has been successfully setup by <span style=
+  <p>When a project has been successfully set up by <span style=
   "white-space: nowrap;">git proj init</span> or <span style=
   "white-space: nowrap;">git proj clone</span>, this will be set to "defined"
   in PROJ/.gitproj and PROJ/.git/config. If should always be "TBD" in
   ~/.gitconfig</p>
   <h2 id="NA--NA-gitproj.config.local-host-TBD">NA; -NA,
   gitproj.config.local-host; (TBD)</h2>
-  <p>When a project has been successfully setup by <span style=
+  <p>When a project has been successfully set up by <span style=
   "white-space: nowrap;">git proj init</span> or <span style=
   "white-space: nowrap;">git proj clone</span>, this will be set to
   "$HOSTNAME" in PROJ/.git/config only.</p>
   <h2 id="gpProjName--NA-gitproj.config.proj-name-TBD">gpProjName; -NA,
   gitproj.config.proj-name; (TBD)</h2>
-  <p>When a project has been successfully setup by <span style=
+  <p>When a project has been successfully set up by <span style=
   "white-space: nowrap;">git proj init</span> or <span style=
   "white-space: nowrap;">git proj clone</span>, this will be set to the
-  project's name in PROJ/.gitproj and PROJ/.git/config. Usually this is the
+  project's name in PROJ/.gitproj and PROJ/.git/config. Usually, this is the
   top directory name. If should always be "TBD" in ~/.gitconfig</p>
   <h2 id="NA--NA-gitproj.config.remote-status-TBD">NA; -NA,
   gitproj.config.remote-status; (TBD)</h2>
-  <p>When <span style="white-space: nowrap;">git proj remote</span> runs OK
+  <p>When <span style="white-space: nowrap;">git proj remote</span> runs OK,
   this is changed to "defined", in PROJ/.gitproj and PROJ/.git/config. If
   should always be "TBD" in ~/.gitconfig</p>
   <h2 id="gpRemoteRawOrigin--d-gitproj.config.remote-raw-origin-TBD">
@@ -405,11 +407,11 @@
   currently installed version of gitproj. The version is defined in the file:
   /usr/share/doc/git-proj/VERSION</p>
   <p><span style="white-space: nowrap;">git proj clone</span> will compare
-  ver in PROJ/.gitproj to /usr/share/doc/git-proj/VERSION. If the major or
-  minor numbers of the checked out project are greater than the installed
-  version there could be problems. If the installed version is greater, this
-  should not be a problem, because gitproj tried to be backward compatible.
-  And it might try to upgrade the project.</p>
+  ver in PROJ/.gitproj to /usr/share/doc/git-proj/VERSION. If the checked-out
+  project's major or minor numbers are greater than the installed version,
+  there could be problems. It should not be a problem if the installed
+  version is greater because gitproj tries to be backward compatible. And it
+  might try to upgrade the project.</p>
   <p>A warning message will be output if there are differences.</p>
   <h2 id="gpHookVerbose--NA-gitproj.hook.verbose-true">gpHookVerbose; -NA;
   gitproj.hook.verbose; (true)</h2>
@@ -417,7 +419,7 @@
   identified.</p>
   <h2 id="gpPreCommitEnabled--NA-gitproj.hook.pre-commit-enable-true">
   gpPreCommitEnabled; -NA; gitproj.hook.pre-commit-enable; (true)</h2>
-  <p>Use this to turn all pre-commit check off.</p>
+  <p>Use this to turn all pre-commit checks off.</p>
   <h2 id="gpCheckFileNames--NA-gitproj.hook.check-file-names-true">
   gpCheckFileNames; -NA; gitproj.hook.check-file-names; (true)</h2>
   <p>If true, only these characters can be used in file and directory names:
@@ -449,6 +451,6 @@
   <h2 id="gpMaxSize--i---int-gitproj.hook.binary-file-size-10k">gpMaxSize;
   -i, --int; gitproj.hook.binary-file-size; (10k)</h2>
   <p>Valid suffixes: k, m, g</p>
-  <p>If no suffix, then bytes are assumed.</p>
+  <p>If there is no suffix, then bytes are assumed.</p>
 </body>
 </html>
