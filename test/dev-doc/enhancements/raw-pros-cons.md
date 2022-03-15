@@ -1,10 +1,14 @@
 # enh-raw Pros/Cons
 
+[Decide on which network service to implement for remotes #18](https://github.com/TurtleEngr/gitproj/issues/18)
+
 Pros and Cons for the different ways of managing remote raw/ files.
 
 --------------------
 
 ## enh-raw-ssh
+
+[For full remotes (over network), use ssh #21](https://github.com/TurtleEngr/gitproj/issues/21)
 
 ### Pros
 
@@ -42,6 +46,8 @@ Pros and Cons for the different ways of managing remote raw/ files.
 
 ## enh-raw-cvs
 
+[Manage the different raw/ versions of large binary files with "cvs" #20](https://github.com/TurtleEngr/gitproj/issues/20)
+
 ### Pros
 
 * Files in raw/ can be managed with all of the CVS commands,
@@ -69,6 +75,8 @@ Pros and Cons for the different ways of managing remote raw/ files.
 
 ## enh-raw-rclone
 
+[Use rclone for remote raw/ files #22](https://github.com/TurtleEngr/gitproj/issues/22)
+
 ### Pros
 
 * Very similar to rsync, so easy to setup for remote raw/ file access.
@@ -88,6 +96,8 @@ Pros and Cons for the different ways of managing remote raw/ files.
 --------------------
 
 ## enh-raw-rsnapshot
+
+[Manage different versions of raw/ files with a backup style #19](https://github.com/TurtleEngr/gitproj/issues/19)
 
 ### Pros
 
@@ -117,3 +127,13 @@ Pros and Cons for the different ways of managing remote raw/ files.
 
 * Backing up the remote raw/ area would require preserving the hard
   links.  Or maybe only the latest directory would be backed up.
+
+* This remote management style would be the hardest one to implement.
+
+* This would likely lead to a lot of disk space being used. (And
+removing "old" dirs is not fast.)
+
+* This is more of a "backup" process, so if you want backups, then
+  implement rsnapshot on the remote raw repository (i.e. the one using
+  ssh).
+  
