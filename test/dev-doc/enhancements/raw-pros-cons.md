@@ -4,6 +4,8 @@
 
 Pros and Cons for the different ways of managing remote raw/ files.
 
+See also: [Raw Design](https://github.com/TurtleEngr/gitproj/blob/develop/test/dev-doc/enhancements/raw-design.md)
+
 --------------------
 
 ## enh-raw-ssh
