@@ -197,7 +197,7 @@ statement (if they fit).
 # File Include Pattern - prod
 
     gpBin=/usr/lib/git-core     # set when a CMD is run
-    gpDoc=/usr/share/doc/gitproj
+    gpDoc=/usr/share/doc/git-proj
 
         $gpBin/git-proj-CMD
             source $gpBin/gitproj-com.inc

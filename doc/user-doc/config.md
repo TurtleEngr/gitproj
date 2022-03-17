@@ -10,7 +10,7 @@ following order, where the last definition wins.
 
        Scope           Access    Location
     1. System          --file    /etc/gitconfig
-       gitproj, global --file    /usr/share/doc/config/gitconfig
+       gitproj, global --file    /usr/share/doc/git-proj/config/gitconfig
     2. Global, user    --global  ~/.gitconfig
        gitproj, local  --file    PROJ/.gitproj
     3. Local, proj     --local   PROJ/.git/config
@@ -128,11 +128,11 @@ keep the existing config file (see man dpkg --force-confdef,
     ~/.gitignore
 
 If the ~/.gitconfig is not defined, it will be copied from
-/usr/share/doc/config/gitconfig. Also if ~/.gitignore is not defined,
-it will be copied from /usr/share/doc/config/gitignore.
+/usr/share/doc/git-proj/config/gitconfig. Also if ~/.gitignore is not defined,
+it will be copied from /usr/share/doc/git-proj/config/gitignore.
 
 "git proj init" and "git proj clone" will update ~/.gitconfig
-from /usr/share/doc/config/gitconfig, for any gitproj section vars
+from /usr/share/doc/git-proj/config/gitconfig, for any gitproj section vars
 that are not defined in ~/.gitconfig. Existing values will not be
 changed.
 
@@ -146,7 +146,7 @@ only used to set up the initial PROJ/.git/config file.
 
 "git proj init" will create PROJ/.gitproj from the gitproj sections in
 ~/.gitconfig (also filling in "missing" vars from
-/usr/share/doc/config/gitconfig). PROJ/.gitproj should be versioned,
+/usr/share/doc/git-proj/config/gitconfig). PROJ/.gitproj should be versioned,
 for use by git proj clone
 
 "git proj clone" will add all vars from PROJ/.gitproj to

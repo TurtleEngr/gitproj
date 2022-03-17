@@ -172,14 +172,14 @@ See  the tutorial document for some examples.
 
 HOME, USER, gpSysLog, gpFacility, gpVerbose, gpDebug, gpAuto
 
-See the [gitproj Configuration Documentation](config.md) for a
-complete list of env. vars.
+See /usr/share/doc/git-proj/user-doc/config.html for a complete list
+of env. vars.
 
 # FILES
 
-See [gitproj Configuration Documentation](config.md) for
-details about these files and all the important gitproj variables.
-The pre-commit hook and its config vars are also described.
+See /usr/share/doc/git-proj/user-doc/config.html for details about
+these files and all the important gitproj variables.  The pre-commit
+hook and its config vars are also described.
 
 All the User Documentation can also be found online in github at:
 [/doc/user-doc](https://github.com/TurtleEngr/gitproj/tree/main/doc/user-doc)
@@ -188,18 +188,18 @@ All the User Documentation can also be found online in github at:
 
 These are the main configuration files you will need to know about.
 
-    /usr/share/doc/config/gitconfig        # Product
-    ~/.gitconfig                           # User
+    /usr/share/doc/git-proj/config/gitconfig        # Product
+    ~/.gitconfig                           # User (--global)
     PROJ/.gitproj                          # Project
-    PROJ/.git/config                       # Local
+    PROJ/.git/config                       # Local (--local)
 
 ## Other Files
 
-    /usr/share/doc/config/gitignore        # Product
+    /usr/share/doc/git-proj/config/gitignore        # Product
     ~/.gitignore                           # User
     PROJ/.gitignore                        # Project
 
-    /usr/share/doc/hooks/pre-commit        # Product
+    /usr/share/doc/git-proj/hooks/pre-commit        # Product
     ~/.pre-commit                          # User
     PROJ/.pre-commit                       # Project
     PROJ/.git/hooks/pre-commit             # Local
