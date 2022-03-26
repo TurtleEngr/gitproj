@@ -250,7 +250,7 @@ fCloneMkGitDir()
 fCloneMkRawDir()
 {
     local tSrc=${BASH_SOURCE##*/}
-    local tOpt="-azC"
+    local tOpt="-az"
     local tVerbose=""
     local tStatus
     local tCmd

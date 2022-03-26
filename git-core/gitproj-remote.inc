@@ -268,7 +268,7 @@ fRemoteMkRemote()
     local tSrc=${BASH_SOURCE##*/}
     local tProjName=${PWD##*/}
     local tVerbose=""
-    local tOpt="-azC"
+    local tOpt="-az"
 
     cd $pMountDir >/dev/null 2>&1
     fLog -p notice -m "git clone to $pMountDir" -l $tSrc:$LINENO

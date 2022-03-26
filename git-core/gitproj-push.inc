@@ -16,7 +16,7 @@ fPushRawFiles()
     local pDeleteRaw=${1:-0}
     local tSrc=${BASH_SOURCE##*/}
     local tDiff
-    local tOpt="-azC"
+    local tOpt="-az"
     local tDel=""
     local tVerbose
 

@@ -17,7 +17,7 @@ fPullRawFiles()
     local tSrc=${BASH_SOURCE##*/}
     local tDiff
     local tHelp
-    local tOpt="-azC"
+    local tOpt="-az"
     local tDel=""
     local tStatus
     local tVerbose
