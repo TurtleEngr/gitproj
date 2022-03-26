@@ -342,7 +342,11 @@ testGitProjPullCLI()
     local tResult
 
     tResult=$($gpBin/git-proj-pull -g -d -V 3 2>&1 < <(echo -e y))
-    sleep 2
+
+    # !!!!!!!!!!!
+    # Git needs time to update the dirs, before they are checked
+    sleep 3
+
     assertTrue "$LINENO $tResult" "$?"
     # raw
     assertContains "$LINENO $tResult" "$tResult" "NewFile2.txt"

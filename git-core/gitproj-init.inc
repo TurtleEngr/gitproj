@@ -6,7 +6,7 @@ export cGetOrigin cGetTopDir cTop
 export gpAuto gpAutoMove gpBin gpCheckFileNames gpCheckForBigFiles \
     gpCheckInRaw gpCheckWhitespace gpCmdName gpDebug gpDoc gpFacility \
     gpGitFlow gpHookVerbose gpLocalRawDir gpLocalStatus \
-    gpLocalTopDir gpMaxSize gpPath gpPreCommitEnabled gpProjName \
+    gpLocalTopDir gpMaxSize gpNoAdd gpPath gpPreCommitEnabled gpProjName \
     gpProjStatus gpRemoteStatus gpSysLog gpVer gpVerbose
 
 # ========================================
@@ -226,10 +226,10 @@ will replace the moved file. The symlink will point to
 
 EOF
 
-    gpAutoMove=0
+    gpAutoMove=false
     if fComYesNo "Move the files (-m)?"; then
         fLog -f -p notice -m 'Binary files will be moved' -l $tSrc:$LINENO
-        gpAutoMove=1
+        gpAutoMove=true
         return 0
     fi
     fLog -f -p notice -m 'Binary files will NOT be moved' -l $tSrc:$LINENO
@@ -448,11 +448,15 @@ fInitMkGitDir()
 
     echo
     fLog -p notice -m "git init" -l $tSrc:$LINENO
-    git init
+    git init --shared=all
 
     echo
     fLog -p notice -m "git add FILES" -l $tSrc:$LINENO
-    git add .gitignore *
+    git add .gitignore
+
+    if [ $gpNoAdd -eq 0 ]; then
+        git add .
+    fi
 
     echo
     fLog -p notice -m "git commit" -l $tSrc:$LINENO

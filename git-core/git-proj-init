@@ -22,7 +22,7 @@ fUsage()
 
 =head1 SYNOPSIS
 
-    git proj init -l pLocalDir [-a] [-s pMaxSize] [-m] [-f]
+    git proj init -l pLocalDir [-a] [-n] [-s pMaxSize] [-m] [-f]
                   [common-options]
 
 =head1 DESCRIPTION
@@ -50,6 +50,14 @@ The -a option will automatically run the whole init process with
 default settings. The other options can be defined to override the
 default settings.
 
+=item B<-f>
+
+If git-flow is installed.
+
+Prompt:
+
+    Setup git-flow (-f) [y/n]?
+
 =item B<-l pLocalDir>
 
 Define the existing project directory. The last directory will be used
@@ -59,14 +67,6 @@ Prompt:
 
     Dir (-l) [$PWD]? $gpLocalTopDir
         So the project Name will be: ${gpLocalTopDir##*/}
-
-=item B<-s pMaxSize>
-
-Define the "size" for large binary files. Default 10K
-
-Prompt:
-
-    Size (-s) [10K]?
 
 =item B<-m>
 
@@ -88,13 +88,19 @@ Prompt:
 
     Move the files (-m) [y/n]?
 
-=item B<-f>
+=item B<-n>
 
-If git-flow is installed.
+Do not add files to the new git repo. This allows the user to update
+the .gitignore file so they can only add the files they want in the
+git repo.
+
+=item B<-s pMaxSize>
+
+Define the "size" for large binary files. Default 10K
 
 Prompt:
 
-    Setup git-flow (-f) [y/n]?
+    Size (-s) [10K]?
 
 =item B<[common-options]>
 
@@ -249,13 +255,15 @@ fi
 . $gpBin/gitproj-init.inc
 # Calls: fInitSetGlobals
 
-while getopts :al:s:mfhH:qvV:xX: tArg; do
+gpNoAdd=0
+while getopts :al:s:mnfhH:qvV:xX: tArg; do
     case $tArg in
         # Script arguments
         a) gpAuto=1 ;;
         l) gpLocalTopDir="$OPTARG" ;;
         s) gpMaxSize=="$OPTARG" ;;
-        m) gpMove=1 ;;
+        m) gpAutoMove=true ;;
+        n) gpNoAdd=1 ;;
         f) gpGitFlow=1 ;;
         # Common arguments
         h) fUsage long ;;

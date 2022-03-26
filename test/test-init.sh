@@ -422,12 +422,12 @@ testInitGetMoveFiles()
     gpMaxSize="18k"
     fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "n")
     assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "0" "$gpAutoMove"
+    assertEquals "$LINENO" "false" "$gpAutoMove"
 
     gpMaxSize="18k"
     fInitGetMoveFiles >/dev/null 2>&1 < <(echo -e "y")
     assertTrue "$LINENO" $?
-    assertEquals "$LINENO" "1" "$gpAutoMove"
+    assertEquals "$LINENO" "true" "$gpAutoMove"
 
     return 0
 } # testInitGetMoveFiles
