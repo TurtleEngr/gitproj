@@ -562,7 +562,7 @@ testRemoteMkRemote()
     assertTrue "$LINENO" "$tStatus"
     assertContains "$LINENO $tResult" "$tResult" "git clone to $tMountDir"
     assertContains "$LINENO $tResult" "$tResult" "Cloning into bare repository 'george.git'"
-    assertContains "$LINENO $tResult" "$tResult" "'rsync' -azC"
+    assertContains "$LINENO $tResult" "$tResult" "'rsync' -az"
     assertContains "$LINENO $tResult" "$tResult" "/$gpProjName.raw"
     assertTrue "$LINENO" "[ -d $gpRemoteRawOrigin ]"
     assertTrue "$LINENO" "[ -f $gpRemoteRawOrigin/$cRemoteProjFile ]"
@@ -675,7 +675,7 @@ testRemoteCreateRemoteGit()
     cd $tTopDir >/dev/null 2>&1
     fComSetGlobals
     fRemoteSetGlobals
-    assertEquals "$LINENO" "$gpLocalTopDir" "$tTopDir"
+    assertEquals "$LINENO" "$gpLocalTopDir" "$(realpath $tTopDir)"
 
     tMountDir=$cDatMount3/video-2020-04-02
     chmod a-w $tMountDir
