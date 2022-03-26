@@ -4,6 +4,24 @@
 
 ----------
 
+## tag-0.7.6
+
+Sat Mar 26 08:00:36 PDT 2022
+
+* Removed -C from rsync copy of raw/ files
+
+* Added links to docs
+
+* Added Quick Start
+
+* Added index files to docs
+
+* Updated overview image
+
+* Added UserDFD image and link to docs
+
+----------
+
 ## tag-0.7.3
 
 Thu 03 Mar 2022 11:23:08 AM PST

@@ -4,6 +4,40 @@
 
 ----------
 
+## tag-0.7.6
+
+Sat Mar 26 08:00:36 PDT 2022
+
+* Removed -C from rsync copy of raw/ files
+
+* INT: Cleaned up formatting
+
+* Added links to docs
+
+* INT: Describe possible designs for remore raw methods. Issue #18
+
+* INT: Grammerly checks run against all doc and usage text
+
+* INT: Fixed up product deps. Fixed up docs a bit.
+
+* Added Quick Start
+
+* INT: Fixed download path for tar files.
+
+* INT: Remove symlinks to tar files. With gpTestEnv and mTestEnv, specify the directory for the tar files.
+
+* INT: Added markdown package
+
+* Added index files to docs
+
+* INT: Cleaned up the doc files so they are all generated consistently.
+
+* Updated overview image
+
+* Added UserDFD image and link to docs
+
+----------
+
 ## tag-0.7.3
 
 Thu 03 Mar 2022 11:23:08 AM PST
