@@ -77,7 +77,7 @@ configuration settings that you have defined at the global level."
     gGlobalMenu[7]="$gpDoc/config/gitignore -> ~/.gitignore (only add missing)"
     gGlobalActn[7]="func echo fComStub update ignore"
     # Note this will result in a sorted list, with duplicates removed.
-    # cat $gpDoc/config/gitignore ~/.gitignore grep -v '#' | sort -fu
+    # cat $gpDoc/config/gitignore ~/.gitignore grep -v '#' | sort -u
 
     gGlobalMenu[8]="Install/update git-flow and corresponding configs"
     gGlobalActn[8]="func echo fComStub git-flow"

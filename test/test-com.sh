@@ -635,7 +635,7 @@ testComSelect()
 
     gpAuto=0
 
-    tDirList=$(find $cDatMount3 $cDatMount3/* $cDatMount3/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
+    tDirList=$(find $cDatMount3 $cDatMount3/* $cDatMount3/*/* -prune -type d 2>/dev/null | grep -v ' ' | sort -u)
     tPrompt="Select a mount point: "
     tHelp="Just select by number."
     tResult=$(fComSelect "$pPrompt" "$tDirList" "$tHelp" 2>&1 < <(echo -e "1\n"))

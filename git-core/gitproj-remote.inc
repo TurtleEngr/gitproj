@@ -99,7 +99,7 @@ fRemoteGetDirList()
     export gResponse=""
 
     if [ -n "$pMountDir" ]; then
-        tList=$(find $pMountDir $pMountDir/* -prune -type d 2>/dev/null | grep -v ' ' | sort -uf)
+        tList=$(find $pMountDir $pMountDir/* -prune -type d 2>/dev/null | grep -v ' ' | sort -u)
         gResponse="$gResponse $tList"
     fi
 
@@ -111,7 +111,7 @@ fRemoteGetDirList()
                 awk '{print $6}'
         ); do
             find $i $i/* $i/*/* -prune -type d 2>/dev/null | grep -v ' '
-        done | sort -uf
+        done | sort -u
     )
     gResponse="$gResponse $tList"
 

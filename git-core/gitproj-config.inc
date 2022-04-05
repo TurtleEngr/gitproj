@@ -494,7 +494,7 @@ fConfigMergeIgnore()
 
     echo
     cp -v --backup=t  $tTo $tTo.bak
-    cat $pFrom $pTo | grep -v '^#' | sort -fu >t.tmp
+    cat $pFrom $pTo | grep -v '^#' | sort -u >t.tmp
     mv -f t.tmp $pTo
 
     return 0
