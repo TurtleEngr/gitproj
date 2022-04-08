@@ -73,6 +73,10 @@ See also: [Raw Design](https://github.com/TurtleEngr/gitproj/blob/develop/test/d
 * cvs is not "distributed", so you would want to pick "one" remote
   host for "main".
 
+* raw file > 2GB will not transfer over the network. (They can be
+transferred locally.) A workaround: split the file into smaller
+pieces when pushing. Then reassemble them when pulling.
+
 --------------------
 
 ## enh-raw-rclone
