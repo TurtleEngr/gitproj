@@ -7,7 +7,7 @@ Make a script to inc version tag "major.minor.fix-rc.N+build" parts
 See: https://semver.org/ for a RegEx pattern matcher (so imp. with
 Perl) This supports a proper sub-set of semver.
 
-        sem-ver [-M] [-m] [-p] [-b] [-d ver] FILE[:key]
+        sem-ver [-M] [-m] [-r] [-p] [-b] [-B] [-c] [-v] [-V] [-d pVer] FILE[:key]
             If FILE does not exist, create file with 0.1.0
             If no option, output the full version
             -M inc major, set minor, see -m (if rc, inc it, set all others to 0)
@@ -16,14 +16,14 @@ Perl) This supports a proper sub-set of semver.
             -r inc the release number, if none, inc patch, then insert
                "-rc.1" after "patch", clear all after +
             -b inc build, if none, append "+1"
-	    -B datestamp build, clear all after + then add:
-	    	date ++%Y.%m.%d.%H.%M
-		     +2021.12.31.15.06
+            -B datestamp build, clear all after + then add:
+               date ++%Y.%m.%d.%H.%M
+               +2021.12.31.15.06
             -c clear release and build parts (do this after a "release")
             -v output with no build part
-            -V output just the major.minor.fix parts
+            -V output just the major.minor.patch parts
             -d "ver" - only compare major, minor, and patch parts. Ignore the rest.
-            Difference compare with expected "ver"
+               Difference compare with expected "ver"
                 -3 if ver < FILE if Major part is <
                 -2 if ver < FILE if minor part is <
                 -1 if ver < FILE if patch part is <
