@@ -32,7 +32,7 @@ mDepPkg = \
 	tidy
 
 mEpmPkg = epm-5.0.1-2-linux-5.3-x86_64.deb 
-mEpmHelperPkg = epm-helper-1.6.1-3-linux-noarch.deb
+mEpmHelperPkg = epm-helper-1.5.1-3-linux-noarch.deb 
 
 mHtmlOpt = --cachedir=/tmp --index --backlink
 mRsyncOpt = -rlptzLP
