@@ -111,6 +111,8 @@ epm :
 	fi
 
 epm-helper :
+	sudo apt-get update
+	sudo apt-get install -y perl
 	if ! dpkg -l $@; then \
 		wget $(mTestOpt) https://$(mReleaseUrl)/epm/$(mEpmHelperPkg); \
 		sudo apt-get install -y ./$(mEpmHelperPkg); \
