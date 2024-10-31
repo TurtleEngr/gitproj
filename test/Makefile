@@ -111,11 +111,11 @@ epm :
 	fi
 
 epm-helper :
-	sudo apt-get update
-	sudo apt-get install -y perl
-	if ! dpkg -l $@; then \
-		wget $(mTestOpt) https://$(mReleaseUrl)/epm/$(mEpmHelperPkg); \
-		sudo apt-get install -y ./$(mEpmHelperPkg); \
+	if [[ ! -x /usr/local/bin/mkver.pl ]]; then \
+		if ! dpkg -l $@; then \
+			wget $(mTestOpt) https://$(mReleaseUrl)/epm/$(mEpmHelperPkg); \
+			sudo apt-get install -y ./$(mEpmHelperPkg); \
+		fi; \
 	fi
 
 mk-ssh : util/ssh/id.hamp util/ssh/config
