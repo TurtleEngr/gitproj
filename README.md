@@ -1,5 +1,4 @@
 # git-proj
-
 [//]: # (The README.html is generated from this file. Usually, pod is used for formatting.)
 
 # Description
