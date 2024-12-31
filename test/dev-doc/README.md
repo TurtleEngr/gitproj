@@ -145,7 +145,7 @@ So if you see a pod file \*do not edit the corresponding html or md
 files\*--are generated with "make gen-dev-doc".
 
 Most of the open items in the TODO.md should be moved to
-[issues](https://metacpan.org/pod/<https:#github.com-TurtleEngr-gitproj-issues)
+[issues](https://metacpan.org/pod/%3Chttps%3A#github.com-TurtleEngr-gitproj-issues)
 
 \----------
 
@@ -190,11 +190,3 @@ creating symlinks so it looks like the files are still there.
 
 Yuck. Just put all large binary files in PROJ/raw/ and fix their
 references. If you really need to have files in another location, make your symlinks to point to the files in raw/. Directories can be in raw/.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 115:
-
-    You forgot a '=back' before '=head1'
