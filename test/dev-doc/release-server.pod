@@ -100,7 +100,7 @@ Put the id.hamp key in your ~/.ssh directory. Added the
 "test/ssh/config file" text to your ~/.ssh/config file, before any
 last "Host *" rules.
 
-over 4
+=over 4
 
 =item * Manual tests that should work
 
