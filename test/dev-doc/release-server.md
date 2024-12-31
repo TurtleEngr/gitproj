@@ -76,8 +76,6 @@ Put the id.hamp key in your ~/.ssh directory. Added the
 "test/ssh/config file" text to your ~/.ssh/config file, before any
 last "Host \*" rules.
 
-over 4
-
 - Manual tests that should work
 
         scp -i ~/.ssh/id.hamp test.txt hamp@moria.whyayh.com:/software/own/foo.txt
@@ -107,11 +105,3 @@ over 4
         make build
         make package
         make release
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 105:
-
-    '=item' outside of any '=over'
