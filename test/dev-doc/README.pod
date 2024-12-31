@@ -112,6 +112,8 @@ functions in the corresponding B<gitproj-[CMD].inc> files. These files
 are the main entry point for git sub-commands. For example:
 B<git-proj-init> is run, on the command line, with B<git proj init>
 
+=back
+
 =head1 Test scripts in test/
 
 Every function should have unit-tests that check the inputs and
