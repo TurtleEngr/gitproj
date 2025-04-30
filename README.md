@@ -9,9 +9,9 @@ Its setup and management is more straightforward than "git LFS"
 because it doesn't *require* a git server.
 
 ![GitHub License](https://img.shields.io/github/license/TurtleEngr/gitproj)
+![GitHub issue custom search](https://img.shields.io/github/issues-search?query=repo%3ATurtleEngr%2Fgitproj%20is%3Aopen&style=flat&label=issues)
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
-![GitHub issue custom search](https://img.shields.io/github/issues-search?query=repo%3ATurtleEngr%2Fgitproj%20is%3Aopen&style=flat&label=issues)
 
 ## Why git-proj?
 
