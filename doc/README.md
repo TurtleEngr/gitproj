@@ -10,7 +10,7 @@ because it doesn't *require* a git server.
 
 [![test](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/test.yml)
 [![package](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml/badge.svg)](https://github.com/TurtleEngr/gitproj/actions/workflows/package.yml)
-[![GitHub Tag](https://img.shields.io/github/v/tag/TurtleEngr/gitproj)](https://github.com/TurtleEngr/gitproj/tags)
+[![GitHub Tag](https://img.shields.io/github/v/tag/TurtleEngr/gitproj?label=release-tag)](https://github.com/TurtleEngr/gitproj/tags)
 [![GitHub issue custom search](https://img.shields.io/github/issues-search?query=repo%3ATurtleEngr%2Fgitproj%20is%3Aopen&style=flat&label=issues)](https://github.com/TurtleEngr/gitproj/issues)
 [![GitHub License](https://img.shields.io/github/license/TurtleEngr/gitproj)](https://github.com/TurtleEngr/gitproj/blob/develop/LICENSE)
 
