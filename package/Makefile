@@ -253,9 +253,8 @@ tag : ver.mak
 	echo "$(ProdTag)" >>REL-VERSION
 	echo "Released: $$(ls pkg)" >>REL-VERSION
 	echo "to: $(ProdRelServer):$(ProdRelDir)" >>REL-VERSION
-	#git commit -am Updated
-	#git push origin develop
-	#git push --tags -f
+	git commit -am Updated
+	git push --tags origin develop
 	#put tag in CHANGES.md and add 'git log' messages
 
 # --------------------
