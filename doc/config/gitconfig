@@ -58,7 +58,7 @@
         check-in-raw = true
         check-whitespace = true
         check-for-tabs = false
-	tab-include-list = *.sh|*.inc
-	tab-exclude-list = Makefile
+        tab-include-list = .sh .inc .pod .md .php
+        tab-exclude-list = Makefile .phar
         check-for-big-files = true
         binary-file-size = 10k
